@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=yes, viewport-fit=cover" />
+    <meta name="description" content="Reserve su cita con el Dr. Agramonte. Elija centro, fecha y hora. Medicina Interna integral y personalizada." />
+    <title>Reservar Cita – Dr. Agramonte</title>
+
+    
+    <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
+    <link rel="apple-touch-icon" href="icons/app-icon.svg">
+    <meta name="theme-color" content="#0F766E">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Dr. Agramonte">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="css/dr-agramonte.css">
+    <link rel="stylesheet" href="css/pages-extra.css">
+    <script src="js/modules/theme-init.js"></script>
+    <link rel="stylesheet" href="css/reserva-page.css">
+</head>
+<body class="reserva-page">
+<script src="js/modules/api-config.js"></script>
+
+<header class="main-header" role="banner">
+    <div class="container">
+        <div class="header-content">
+            <div class="logo-section"><a href="index.html" class="logo-link"><div class="logo-icon"><i class="fas fa-user-md"></i></div><div class="logo-text"><h1 class="logo-title">Dr. Agramonte</h1><p class="logo-subtitle">Especialista en Medicina Interna</p></div></a></div>
+            <div class="header-end">
+                <button type="button" class="theme-toggle" id="themeToggle" aria-label="Activar modo oscuro" title="Cambiar tema claro / oscuro" aria-pressed="false">
+                    <i class="fas fa-moon" id="themeToggleIcon" aria-hidden="true"></i>
+                </button>
+            <nav class="main-nav"><button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu"><span class="nav-toggle-icon"></span></button><ul class="nav-menu" id="nav-menu"><li><a href="index.html" class="nav-link">Inicio</a></li><li><a href="sobre-mi.html" class="nav-link">Sobre mí</a></li><li><a href="servicios.html" class="nav-link">Servicios</a></li><li><a href="testimonios.html" class="nav-link">Testimonios</a></li><li><a href="contacto.html" class="nav-link">Contacto</a></li><li><a href="reservar.html" class="nav-link nav-link--reserva active">Reservar cita</a></li></ul></nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+<section class="page-hero page-hero--compact">
+    <div class="container">
+        <h1><i class="fas fa-calendar-plus" aria-hidden="true"></i> Reservar cita médica</h1>
+        <p>Elige el centro de consulta, la fecha y la hora.</p>
+        <p id="servicioBanner" class="servicio-banner" hidden style="margin-top:1rem"></p>
+    </div>
+</section>
+
+<main class="page-wrapper">
+
+    <div class="reserva-grid">
+
+        <!-- ── Columna izquierda: centro + calendario ── -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-icon"><i class="fas fa-calendar-alt"></i></div>
+                <div><h2>Selección de cita</h2><p>Centro, fecha y hora</p></div>
+            </div>
+            <div class="card-body">
+
+                <!-- Stepper — 4 pasos -->
+                <div class="stepper">
+                    <div class="step active" id="step-1"><div class="step-num">1</div><span>Centro</span></div>
+                    <div class="step" id="step-2"><div class="step-num">2</div><span>Fecha</span></div>
+                    <div class="step" id="step-3"><div class="step-num">3</div><span>Hora</span></div>
+                    <div class="step" id="step-4"><div class="step-num">4</div><span>Datos</span></div>
+                </div>
+
+                <!-- PASO 1 — Selección de centro -->
+                <div id="centroSelector">
+                    <p class="form-section-title"><i class="fas fa-map-marker-alt" style="color:var(--teal);margin-right:.35rem;"></i>Centro de consulta</p>
+                    <div class="centros-grid" id="centrosGrid">
+                        <!-- renderizado por JS con CENTROS[] -->
+                    </div>
+                </div>
+
+                <!-- PASOS 2 y 3 — Calendario + horas (ocultos hasta elegir centro) -->
+                <div id="calendarSection" style="display:none">
+                    <div class="cal-nav">
+                        <button class="btn-nav" id="btnPrevMonth" aria-label="Mes anterior"><i class="fas fa-chevron-left"></i></button>
+                        <h3 id="calMonthLabel"></h3>
+                        <button class="btn-nav" id="btnNextMonth" aria-label="Mes siguiente"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="cal-weekdays"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+                    <div class="cal-grid" id="calGrid"></div>
+                    <div class="cal-legend">
+                        <div class="legend-item"><div class="legend-dot" style="background:var(--teal-light)"></div>Disponible</div>
+                        <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Pocas plazas</div>
+                        <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Última plaza</div>
+                        <div class="legend-item"><div class="legend-dot" style="background:var(--gray-200)"></div>Completo</div>
+                    </div>
+                    <div class="time-panel" id="timePanel" style="display:none">
+                        <div class="time-panel-header">
+                            <h4>Horarios disponibles</h4>
+                            <span class="date-chip" id="selectedDateLabel"></span>
+                        </div>
+                        <div class="slots-grid" id="slotsGrid"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ── Columna derecha: formulario de datos ── -->
+        <div class="sticky-panel">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-header-icon"><i class="fas fa-user-edit"></i></div>
+                    <div><h2>Datos de la cita</h2><p>Completa el formulario</p></div>
+                </div>
+                <div class="card-body">
+
+                    <!-- Resumen de selección — ahora incluye centro -->
+                    <div class="summary-chip empty" id="summaryChip">
+                        <div class="chip-item empty" id="chipCentro"><i class="fas fa-map-marker-alt"></i> <span id="chipCentroText">Sin centro</span></div>
+                        <div class="chip-divider"></div>
+                        <div class="chip-item empty" id="chipDate"><i class="fas fa-calendar"></i> <span id="chipDateText">Sin fecha</span></div>
+                        <div class="chip-divider"></div>
+                        <div class="chip-item empty" id="chipTime"><i class="fas fa-clock"></i> <span id="chipTimeText">Sin hora</span></div>
+                        <button class="chip-edit" id="chipEditBtn" style="display:none">Cambiar</button>
+                    </div>
+                    <div id="connectionStatus" class="status-banner" role="status" aria-live="polite"></div>
+
+                    <form id="formReserva" novalidate>
+                        <input type="hidden" id="hiddenCentro" name="centroId">
+                        <input type="hidden" id="hiddenFecha" name="fecha">
+                        <input type="hidden" id="hiddenHora" name="hora">
+                        <input type="hidden" id="extraFeeAccepted" value="0">
+
+                        <!-- Especialista -->
+                        <div class="form-section">
+                            <p class="form-section-title">Especialista</p>
+                            <div class="field">
+                                <select id="medicoSelect" required aria-describedby="medicoHelp">
+                                    <option value="">Cargando especialistas...</option>
+                                </select>
+                                <small id="medicoHelp" class="field-hint">Selecciona el especialista para consultar su agenda real.</small>
+                            </div>
+                        </div>
+
+                        <!-- Modalidad -->
+                        <div class="form-section">
+                            <p class="form-section-title">Modalidad</p>
+                            <div class="modality-grid">
+                                <div class="modality-opt">
+                                    <input type="radio" name="modalidad" id="presencial" value="presencial" checked>
+                                    <label for="presencial">
+                                        <i class="fas fa-hospital-user"></i>
+                                        <span>Presencial</span>
+                                        <small>En el centro seleccionado</small>
+                                    </label>
+                                </div>
+                                <div class="modality-opt">
+                                    <input type="radio" name="modalidad" id="online" value="online">
+                                    <label for="online">
+                                        <i class="fas fa-video"></i>
+                                        <span>Videoconsulta</span>
+                                        <small>Desde cualquier lugar</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tipo de consulta -->
+                        <div class="form-section">
+                            <p class="form-section-title">Tipo de consulta</p>
+                            <div class="field">
+                                <select id="tipoConsulta" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="primera-visita">Primera visita</option>
+                                    <option value="revision">Revisión</option>
+                                    <option value="control-cronico">Control crónico</option>
+                                    <option value="urgente">Consulta urgente</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Datos personales -->
+                        <div class="form-section">
+                            <p class="form-section-title">Datos personales</p>
+                            <div class="field">
+                                <input type="text" id="nombre" placeholder="Nombre completo" autocomplete="name" required>
+                            </div>
+                            <div class="field-row">
+                                <div class="field">
+                                    <input type="tel" id="telefono" placeholder="Teléfono" required>
+                                </div>
+                                <div class="field">
+                                    <input type="email" id="email" placeholder="Email" required>
+                                </div>
+                            </div>
+                            <div id="guestAccountBlock" class="form-section guest-account-block">
+                                <p class="form-section-title">Cuenta (opcional)</p>
+                                <p class="form-hint">Puedes reservar sin registro. Si ya tienes cuenta,
+                                    <button type="button" class="link-btn" data-auth-trigger data-auth-tab="login">inicia sesión</button>.
+                                    ¿Primera vez?
+                                    <button type="button" class="link-btn" data-auth-trigger data-auth-tab="registro">crea una cuenta</button>.
+                                    También puedes definir una contraseña abajo para gestionar tus citas después.</p>
+                                <div class="field">
+                                    <input type="password" id="passwordInvitado" placeholder="Contraseña (mín. 6 caracteres, opcional)" autocomplete="new-password" minlength="6">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <textarea id="motivo" rows="3" placeholder="Cuéntanos brevemente tu motivo de consulta (opcional)..."></textarea>
+                            </div>
+                            <div class="field">
+                                <textarea id="notas" rows="2" placeholder="Notas adicionales (opcional)"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Aviso suplemento extra -->
+                        <div id="extraFeeWarning" class="payment-warning" style="display:none">
+                            <i class="fas fa-euro-sign"></i> Esta videoconsulta es fuera del horario laboral (19:30–20:30).
+                            El Dr. Agramonte aplica un suplemento de <strong>25€</strong> por dedicación exclusiva.
+                        </div>
+                        <div id="extraFeeCheckboxDiv" style="display:none" class="payment-check">
+                            <input type="checkbox" id="acceptExtraFee">
+                            <label for="acceptExtraFee">
+                                Acepto pagar el suplemento de 25€ por videoconsulta fuera de horario.
+                                <span style="font-size:.7rem;">(Pago seguro tras confirmar)</span>
+                            </label>
+                        </div>
+
+                        <!-- Privacidad -->
+                        <div class="privacy-check">
+                            <input type="checkbox" id="acepto" required>
+                            <label for="acepto">Acepto la <a href="privacidad.html">Política de Privacidad</a> y el tratamiento de mis datos.</label>
+                        </div>
+
+                        <button type="submit" class="btn-submit" id="btnSubmit">
+                            <span class="btn-label"><i class="fas fa-paper-plane"></i> Confirmar reserva</span>
+                            <div class="spinner"></div>
+                        </button>
+                    </form>
+
+                    <div class="appointments-panel">
+                        <button class="appointments-toggle" id="aptsToggle" type="button">
+                            <i class="fas fa-list-alt"></i> Mis citas programadas
+                            <span class="apts-badge zero" id="aptsBadge">0</span>
+                            <i class="fas fa-chevron-down chevron-icon"></i>
+                        </button>
+                        <p class="apts-sync-hint" id="aptsSyncHint">Las citas se sincronizan con el servidor (mismo listado que el panel TFG).</p>
+                        <div class="appointments-list" id="aptsList"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /.reserva-grid -->
+</main>
+
+<!-- Modal de confirmación -->
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div class="modal-icon"><i class="fas fa-check"></i></div>
+            <h2>¡Cita reservada!</h2>
+            <p>Recibirás un email con los detalles</p>
+        </div>
+        <div class="modal-details" id="modalDetails"></div>
+        <div class="modal-actions">
+            <button class="btn-modal secondary" id="btnModalClose">Cerrar</button>
+            <button class="btn-modal primary" id="btnExportICS"><i class="fas fa-calendar-plus"></i> Añadir a calendario</button>
+        </div>
+    </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section"><h3>Dr. Agramonte</h3><p>Especialista en Medicina Interna</p><p>Colegiado N° 12345</p><p>Madrid, España</p></div>
+        <div class="footer-section"><h3>Contacto</h3><a href="tel:+34748962648"><i class="fas fa-phone"></i> +34 748 962 648</a><a href="mailto:Dr.Agramonte@gmail.com"><i class="fas fa-envelope"></i> Dr.Agramonte@gmail.com</a><p><i class="fas fa-map-marker-alt"></i> Calle Salud, 123, Madrid</p></div>
+        <div class="footer-section"><h3>Horario</h3><p><strong>Lunes a Viernes</strong><br>9:00 - 14:00<br>16:00 - 19:00</p><p><strong>Sábados</strong><br>9:00 - 13:00 (con cita)</p></div>
+        <div class="footer-section"><h3>Enlaces</h3><a href="privacidad.html"><i class="fas fa-shield-alt"></i> Política de Privacidad</a><a href="offline.html"><i class="fas fa-wifi-slash"></i> Modo Offline</a><a href="panel-pruebas.html"><i class="fas fa-flask"></i> Pruebas TFG (reservas / médico)</a><p style="margin-top:.8rem;">Web: <a href="https://www.saludybienestarinterno.com/" target="_blank">www.saludybienestarinterno.com</a></p></div>
+    </div>
+    <div class="footer-bottom"><p>© 2025 Salud y Bienestar Interno – Dr. Juan Manuel Agramonte. <a href="privacidad.html" target="_blank">Política de Privacidad</a></p></div>
+</footer>
+
+<script src="js/modules/auth-ui.js" defer></script>
+<script src="js/pages/dr-agramonte.js" defer></script>
+<script type="module" src="./js/pages/reserva.js"></script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="description" content="Contacto del Dr. Agramonte – Medicina Interna en Madrid. Dirección, teléfonos, correo y horarios.">
+    <title>Contacto – Dr. Agramonte</title>
+
+    
+    <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
+    <link rel="apple-touch-icon" href="icons/app-icon.svg">
+    <meta name="theme-color" content="#0F766E">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Dr. Agramonte">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="css/dr-agramonte.css">
+    <link rel="stylesheet" href="css/pages-extra.css">
+    <script src="js/modules/theme-init.js"></script>
+</head>
+<body>
+<header class="main-header" role="banner">
+    <div class="container">
+        <div class="header-content">
+            <div class="logo-section"><a href="index.html" class="logo-link"><div class="logo-icon"><i class="fas fa-user-md"></i></div><div class="logo-text"><h1 class="logo-title">Dr. Agramonte</h1><p class="logo-subtitle">Especialista en Medicina Interna</p></div></a></div>
+            <div class="header-end">
+                <button type="button" class="theme-toggle" id="themeToggle" aria-label="Activar modo oscuro" title="Cambiar tema claro / oscuro" aria-pressed="false">
+                    <i class="fas fa-moon" id="themeToggleIcon" aria-hidden="true"></i>
+                </button>
+            <nav class="main-nav"><button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu"><span class="nav-toggle-icon"></span></button><ul class="nav-menu" id="nav-menu"><li><a href="index.html" class="nav-link">Inicio</a></li><li><a href="sobre-mi.html" class="nav-link">Sobre mí</a></li><li><a href="servicios.html" class="nav-link">Servicios</a></li><li><a href="testimonios.html" class="nav-link">Testimonios</a></li><li><a href="contacto.html" class="nav-link">Contacto</a></li><li><a href="reservar.html" class="nav-link nav-link--reserva"><i class="fas fa-calendar-plus" aria-hidden="true"></i> Reservar cita</a></li></ul></nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+<section class="page-hero page-hero--compact" aria-labelledby="titulo-contacto">
+    <div class="container">
+        <h1 id="titulo-contacto"><i class="fas fa-envelope" aria-hidden="true"></i> Contacto</h1>
+        <p>Consultas generales, información sobre citas o colaboración profesional.</p>
+    </div>
+</section>
+
+<main class="container">
+    <section id="contacto" class="contacto-section">
+        <div class="contacto-container">
+            <div class="info-contacto">
+                <div class="info-item"><i class="fas fa-map-marker-alt"></i><div><h3>Dirección</h3><p>Calle Salud, 123<br>Barrio de Salamanca<br>28006 Madrid, España</p><a href="https://maps.google.com?q=Calle+Salud,+123,+Madrid" target="_blank" class="enlace-mapa">Ver en mapa</a></div></div>
+                <div class="info-item"><i class="fas fa-phone"></i><div><h3>Teléfonos</h3><p><a href="tel:+34910000000">+34 910 000 000</a> <span class="info-tag">Consultorio</span></p><p><a href="tel:+34 748962648">+34 748962648</a> <span class="info-tag">WhatsApp/General</span></p></div></div>
+                <div class="info-item"><i class="fas fa-envelope"></i><div><h3>Correo electrónico</h3><p><a href="mailto:Dr.Agramonte@gmail.com">Dr.Agramonte@gmail.com</a><br><a href="mailto:contacto@saludybienestarinterno.com">contacto@saludybienestarinterno.com</a></p></div></div>
+                <div class="info-item"><i class="fas fa-clock"></i><div><h3>Horario</h3><p><strong>Lunes a viernes:</strong> 9:00 - 14:00 / 16:00 - 19:00</p><p><strong>Sábados:</strong> 9:00 - 13:00 (con cita)</p></div></div>
+            </div>
+            <aside class="formulario-contacto">
+                <h3>Enviar mensaje</h3>
+                <p class="form-aviso">Este formulario no sustituye una valoración médica presencial.</p>
+                <form id="contactForm" action="#" method="post" novalidate>
+                    <div class="form-group"><label for="nombre">Nombre y apellidos *</label><input type="text" id="nombre" name="nombre" required><span class="error-message" id="error-nombre"></span></div>
+                    <div class="form-group"><label for="email">Correo electrónico *</label><input type="email" id="email" name="email" required><span class="error-message" id="error-email"></span></div>
+                    <div class="form-group"><label for="telefono">Teléfono</label><input type="tel" id="telefono" name="telefono"></div>
+                    <div class="form-group"><label for="motivo">Motivo</label><select id="motivo" name="motivo"><option value="">Seleccione</option><option value="primera-visita">Primera visita</option><option value="revision">Revisión</option><option value="segunda-opinion">Segunda opinión</option><option value="colaboracion">Colaboración</option><option value="otro">Otro</option></select></div>
+                    <div class="form-group"><label for="mensaje">Mensaje *</label><textarea id="mensaje" name="mensaje" placeholder="Explique brevemente su consulta..." rows="4" required minlength="10" maxlength="1000"></textarea></div>
+                    <div class="form-group checkbox-group"><label class="checkbox-label"><input type="checkbox" id="privacidad" name="privacidad" required><span>Acepto la <a href="privacidad.html" target="_blank">Política de Privacidad</a> *</span></label><span class="error-message" id="error-privacidad"></span></div>
+                    <button type="submit" class="btn-enviar" id="submitBtn"><span class="btn-text">Enviar mensaje</span><i class="fas fa-paper-plane"></i><span class="btn-loading oculto"><i class="fas fa-spinner fa-spin"></i> Enviando...</span></button>
+                </form>
+            </aside>
+        </div>
+        <section class="mapa-ubicacion"><h3>Ubicación</h3><p>Barrio de Salamanca, cerca del metro Diego de León.</p><div class="mapa-contenedor"><iframe src="https://maps.google.com?q=Calle+Salud,+123,+Madrid&output=embed" title="Ubicación consulta Dr. Agramonte" loading="lazy" allowfullscreen></iframe></div></section>
+        <section class="preguntas-frecuentes"><h3>Preguntas frecuentes</h3><div class="faq-grid"><details class="faq-item"><summary>¿Cómo puedo contactar?</summary><p>Vía teléfono, WhatsApp o correo electrónico.</p></details><details class="faq-item"><summary>¿Dónde se encuentra?</summary><p>Barrio de Salamanca, Madrid. Cerca de metro Diego de León.</p></details><details class="faq-item"><summary>¿Atienden urgencias?</summary><p>Para urgencias contacte al móvil. Emergencias vitales: 112.</p></details></div></section>
+        <div class="aviso-reservas"><i class="fas fa-info-circle" aria-hidden="true"></i><p>Para <strong>solicitar cita</strong> use el formulario de reservas online.</p><a href="reservar.html" class="btn btn--primary btn--reserva"><i class="fas fa-calendar-plus" aria-hidden="true"></i> Reservar cita</a></div>
+    </section>
+</main>
+
+<div id="toast" class="toast oculto" role="alert"></div>
+
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section"><h3>Dr. Agramonte</h3><p>Especialista en Medicina Interna</p><p>Colegiado N° 12345</p><p>Madrid, España</p></div>
+        <div class="footer-section"><h3>Contacto</h3><a href="tel:+34 748962648"><i class="fas fa-phone"></i> +34 748962648</a><a href="mailto:Dr.Agramonte@gmail.com"><i class="fas fa-envelope"></i> Dr.Agramonte@gmail.com</a><p><i class="fas fa-map-marker-alt"></i> Calle Salud, 123, Madrid</p></div>
+        <div class="footer-section"><h3>Horario</h3><p><strong>Lunes a Viernes</strong><br>9:00 - 14:00<br>16:00 - 19:00</p><p><strong>Sábados</strong><br>9:00 - 13:00 (con cita)</p></div>
+        <div class="footer-section"><h3>Enlaces</h3><a href="privacidad.html"><i class="fas fa-shield-alt"></i> Política de Privacidad</a><a href="offline.html"><i class="fas fa-wifi-slash"></i> Modo Offline</a><a href="panel-pruebas.html"><i class="fas fa-flask"></i> Pruebas TFG (reservas / médico)</a><p style="margin-top:.8rem;">Web: <a href="https://www.saludybienestarinterno.com/" target="_blank">www.saludybienestarinterno.com</a></p></div>
+    </div>
+    <div class="footer-bottom"><p>© 2025 Salud y Bienestar Interno – Dr. Juan Manuel Agramonte. <a href="privacidad.html">Política de privacidad</a></p></div>
+</footer>
+
+<script src="js/modules/api-config.js"></script>
+<script src="js/modules/auth-ui.js" defer></script>
+<script src="js/pages/dr-agramonte.js" defer></script>
+<script src="js/pages/contacto.js" defer></script>
+</body>
+</html>

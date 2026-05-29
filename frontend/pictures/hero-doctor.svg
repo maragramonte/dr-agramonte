@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" role="img" aria-label="Dr. Juan Manuel Agramonte, especialista en Medicina Interna">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f766e"/>
+      <stop offset="100%" style="stop-color:#14b8a6"/>
+    </linearGradient>
+    <linearGradient id="coat" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff"/>
+      <stop offset="100%" style="stop-color:#e2e8f0"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="520" fill="url(#bg)"/>
+  <circle cx="640" cy="120" r="90" fill="#ffffff" opacity="0.08"/>
+  <circle cx="120" cy="420" r="70" fill="#ffffff" opacity="0.06"/>
+  <ellipse cx="400" cy="480" rx="280" ry="40" fill="#0d5c56" opacity="0.35"/>
+  <g transform="translate(400 255)">
+    <ellipse cx="0" cy="95" rx="95" ry="28" fill="#0d5c56" opacity="0.25"/>
+    <path d="M-72 20c0-45 32-78 72-78s72 33 72 78v95H-72V20z" fill="#fbbf24"/>
+    <path d="M-88 115h176l-18 95H-70l-18-95z" fill="url(#coat)"/>
+    <path d="M-88 115h52l8 95H-70l-18-95zm88 0h52l18 95H70l-8-95z" fill="#0f766e" opacity="0.12"/>
+    <path d="M-12 115v95h24v-95" fill="#14b8a6" opacity="0.35"/>
+    <circle cx="0" cy="-8" r="52" fill="#fcd9b6"/>
+    <path d="M-52-8c0-32 23-52 52-52s52 20 52 52" fill="#5c3d2e"/>
+    <rect x="-28" y="38" width="56" height="14" rx="7" fill="#ffffff" opacity="0.9"/>
+    <path d="M-18 45h36" stroke="#0f766e" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="0" cy="52" r="5" fill="#ef4444"/>
+  </g>
+  <text x="48" y="72" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700">Dr. Juan Manuel Agramonte</text>
+  <text x="48" y="108" fill="#ccfbf1" font-family="Segoe UI, Arial, sans-serif" font-size="18">Medicina Interna · Madrid</text>
+</svg>

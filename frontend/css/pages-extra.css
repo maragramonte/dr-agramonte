@@ -1,0 +1,212 @@
+/* Páginas auxiliares – privacidad, panel TFG, offline */
+/* --- Privacidad --- */
+/* Estilos originales de privacidad.html – se mantienen igual, solo se ajusta el header */
+        .privacidad-badge,
+        .page-hero-badge { display: inline-flex; align-items: center; gap: 0.8rem; }
+        .toc-container { background: var(--card); border-radius: var(--radius-lg); padding: var(--space-3) var(--space-4); margin-bottom: var(--space-5); border: 1px solid var(--gray-200); }
+        .toc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.5rem; }
+        .toc-link { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.8rem; background: var(--gray-100); border-radius: var(--radius); font-size: 0.85rem; color: var(--gray-700); cursor: pointer; transition: all 0.2s; }
+        .toc-link.active { background: var(--teal); color: white; }
+        .privacy-card { background: var(--card); border-radius: var(--radius-lg); padding: var(--space-4); border: 1px solid var(--gray-200); display: none; }
+        .privacy-card.active { display: block; border-color: var(--teal); }
+        .rights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: var(--space-2); margin: var(--space-3) 0; }
+        .right-item { background: var(--teal-pale); border-radius: var(--radius); padding: 0.6rem; text-align: center; }
+        .update-banner { background: var(--teal-pale); border-left: 4px solid var(--teal); border-radius: var(--radius); padding: var(--space-3); margin: var(--space-5) 0; text-align: center; }
+        .privacy-cta { background: linear-gradient(135deg, var(--card), var(--bg)); border-radius: var(--radius-lg); padding: var(--space-5); text-align: center; margin: var(--space-6) 0 var(--space-4); border: 1px solid var(--gray-200); }
+        .privacy-intro { text-align: center; font-size: 1.05rem; margin: 1rem 0 2rem; }
+        @media (max-width:768px){ .toc-grid { grid-template-columns: 1fr 1fr; } }
+/* --- Panel pruebas --- */
+        .pruebas-wrap { max-width: 1100px; margin: 0 auto; padding: 0 1rem 3rem; }
+        .pruebas-toolbar {
+            display: flex; flex-wrap: wrap; gap: .75rem; align-items: center;
+            justify-content: space-between; margin-bottom: 1rem;
+        }
+        .pruebas-conn {
+            font-size: .78rem; font-weight: 600; padding: .35rem .75rem; border-radius: 999px;
+        }
+        .pruebas-conn.ok { background: #d1fae5; color: #065f46; }
+        .pruebas-conn.err { background: #fee2e2; color: #991b1b; }
+        .pruebas-tabs {
+            display: flex; gap: .35rem; margin-bottom: 1.25rem;
+            border-bottom: 2px solid var(--gray-200); padding-bottom: 0;
+        }
+        .pruebas-tab {
+            padding: .65rem 1.1rem; border: none; background: transparent;
+            font-weight: 600; font-size: .88rem; color: var(--gray-500);
+            cursor: pointer; border-radius: 8px 8px 0 0;
+            font-family: inherit;
+        }
+        .pruebas-tab.active {
+            color: var(--teal); background: var(--teal-pale);
+            box-shadow: inset 0 -2px 0 var(--teal);
+        }
+        .pruebas-panel { display: none; }
+        .pruebas-panel.active { display: block; }
+        .stats-row {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: .75rem; margin-bottom: 1rem;
+        }
+        .stat-box {
+            background: var(--card); border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg); padding: 1rem; text-align: center;
+        }
+        .stat-box .n { font-size: 1.5rem; font-weight: 700; color: var(--teal); }
+        .stat-box .l { font-size: .75rem; color: var(--gray-500); margin-top: .2rem; }
+        .table-wrap {
+            overflow-x: auto; background: var(--card);
+            border: 1px solid var(--gray-200); border-radius: var(--radius-lg);
+        }
+        .reservas-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+        .reservas-table th, .reservas-table td {
+            padding: .65rem .85rem; text-align: left; border-bottom: 1px solid var(--gray-200);
+        }
+        .reservas-table th { background: var(--gray-50); font-weight: 600; color: var(--gray-700); }
+        .reservas-table tr:hover td { background: var(--teal-pale); }
+        .muted { color: var(--gray-500); font-size: .75rem; }
+        .estado-pill {
+            font-size: .7rem; font-weight: 700; padding: .2rem .5rem; border-radius: 999px;
+        }
+        .estado-activa { background: #d1fae5; color: #065f46; }
+        .estado-cancelada { background: #fee2e2; color: #991b1b; }
+        .loading-cell, .error-cell { text-align: center; color: var(--gray-500); padding: 1.5rem !important; }
+        .empty-msg {
+            text-align: center; padding: 2rem; color: var(--gray-500);
+            background: var(--gray-50); border-radius: var(--radius-lg); margin-top: 1rem;
+        }
+        .acceso-card {
+            background: var(--card); border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem;
+        }
+        .acceso-card h3 { font-size: 1rem; color: var(--teal); margin-bottom: .75rem; }
+        .acceso-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+        }
+        @media (max-width: 768px) { .acceso-grid { grid-template-columns: 1fr; } }
+        .acceso-list { list-style: none; font-size: .82rem; }
+        .acceso-list li {
+            padding: .45rem 0; border-bottom: 1px solid var(--gray-100);
+            display: flex; gap: .5rem; align-items: flex-start;
+        }
+        .acceso-list code {
+            font-size: .72rem; background: var(--gray-100); padding: .15rem .4rem;
+            border-radius: 4px; white-space: nowrap;
+        }
+        .medico-layout {
+            display: grid; grid-template-columns: 260px 1fr; gap: 1rem;
+            min-height: 420px;
+        }
+        @media (max-width: 768px) { .medico-layout { grid-template-columns: 1fr; } }
+        .medico-list {
+            background: var(--card); border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg); overflow: hidden;
+            display: flex; flex-direction: column; max-height: 520px;
+        }
+        .medico-list-header {
+            padding: .65rem .85rem; font-size: .78rem; font-weight: 700;
+            color: var(--teal); border-bottom: 1px solid var(--gray-200);
+            background: var(--gray-50);
+        }
+        .medico-list-body { overflow-y: auto; flex: 1; padding: .35rem; }
+        .medico-patient {
+            padding: .6rem .7rem; border-radius: 8px; cursor: pointer;
+            border: 1px solid transparent; margin-bottom: .25rem;
+        }
+        .medico-patient:hover { background: var(--teal-pale); }
+        .medico-patient.active { background: var(--teal-pale); border-color: var(--teal); }
+        .medico-patient strong { display: block; font-size: .82rem; }
+        .medico-patient span { font-size: .72rem; color: var(--gray-500); }
+        .medico-detail {
+            background: var(--card); border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg); padding: 1.25rem;
+        }
+        .medico-detail h3 { font-size: 1.1rem; margin-bottom: .75rem; color: var(--gray-900); }
+        .medico-kv { display: grid; gap: .5rem; font-size: .82rem; margin-bottom: 1rem; }
+        .medico-kv div { display: flex; gap: .5rem; }
+        .medico-kv dt { font-weight: 600; color: var(--gray-500); min-width: 5rem; }
+        .medico-citas-list { list-style: none; font-size: .82rem; }
+        .medico-citas-list li {
+            padding: .55rem .7rem; background: var(--gray-50);
+            border-radius: 8px; margin-bottom: .4rem; border: 1px solid var(--gray-200);
+        }
+        .medico-placeholder {
+            color: var(--gray-400); text-align: center; padding: 3rem 1rem; font-size: .88rem;
+        }
+        .field-inline label { font-size: .78rem; font-weight: 600; margin-right: .5rem; }
+        .field-inline select {
+            padding: .45rem .65rem; border-radius: 8px; border: 1px solid var(--gray-200);
+            font-family: inherit;
+        }
+        .btn-pruebas {
+            padding: .5rem 1rem; border-radius: 8px; border: none;
+            background: var(--teal); color: #fff; font-weight: 600; cursor: pointer;
+            font-size: .82rem; font-family: inherit;
+        }
+        .btn-pruebas:hover { background: var(--teal-dark); }
+        .btn-pruebas.outline {
+            background: transparent; color: var(--teal); border: 1.5px solid var(--teal);
+        }
+/* --- Offline --- */
+/* Estilos específicos de la página offline */
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'DM Sans',sans-serif;background:linear-gradient(135deg,#e8f3f3 0%,#d4eaea 100%);min-height:100vh;}
+        .offline-container{min-height:calc(100vh - 70px);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;text-align:center;}
+        .offline-card{background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:24px;padding:3rem 2rem;max-width:550px;width:100%;box-shadow:0 20px 40px rgba(0,0,0,0.1);animation:fadeInUp 0.6s ease-out;}
+        @keyframes fadeInUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+        .offline-icon{font-size:5rem;color:#14b8a6;margin-bottom:1.5rem;animation:pulse 2s infinite;}@keyframes pulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.1);opacity:0.8;}}
+        .offline-title{font-family:'DM Serif Display',serif;font-size:2rem;color:#0F766E;margin-bottom:1rem;}
+        .offline-text{font-size:1rem;color:#4B5563;max-width:400px;margin:0 auto 2rem auto;line-height:1.6;}
+        .offline-features{background:#F9FAFB;padding:1.5rem;border-radius:16px;margin-bottom:2rem;text-align:left;border:1px solid #E5E7EB;}
+        .offline-features h3{color:#0F766E;margin-bottom:1rem;font-size:1.1rem;display:flex;align-items:center;gap:0.5rem;}
+        .offline-features ul{list-style:none;padding:0;} .offline-features li{padding:0.6rem 0;display:flex;align-items:center;gap:0.75rem;color:#374151;font-size:0.9rem;border-bottom:1px solid #E5E7EB;}
+        .offline-features li:last-child{border-bottom:none;} .offline-features i{color:#14b8a6;width:20px;}
+        .btn-group{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem;}
+        .btn-offline{display:inline-flex;align-items:center;gap:0.5rem;padding:0.85rem 1.8rem;border-radius:100px;font-weight:600;font-size:0.9rem;cursor:pointer;transition:all 0.3s ease;text-decoration:none;border:none;}
+        .btn-primary-offline{background:linear-gradient(135deg,#0F766E 0%,#14B8A6 100%);color:white;box-shadow:0 2px 8px rgba(15,118,110,0.2);}
+        .btn-primary-offline:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(15,118,110,0.3);}
+        .btn-secondary-offline{background:white;color:#0F766E;border:2px solid #0F766E;}
+        .btn-secondary-offline:hover{background:rgba(15,118,110,0.05);transform:translateY(-2px);}
+        .info-note{display:flex;align-items:center;justify-content:center;gap:0.5rem;color:#6B7280;font-size:0.85rem;margin-top:1rem;padding-top:1rem;border-top:1px solid #E5E7EB;}
+        [data-theme="dark"] .offline-card{background:rgba(30,41,59,0.95);}
+        [data-theme="dark"] .offline-features{background:#1E293B;border-color:rgba(148,163,184,0.2);}
+        [data-theme="dark"] .offline-features li{color:#CBD5E1;border-bottom-color:rgba(148,163,184,0.15);}
+        [data-theme="dark"] .offline-text{color:#94A3B8;}
+        [data-theme="dark"] .btn-secondary-offline{background:#1E293B;color:#14B8A6;border-color:#14B8A6;}
+        [data-theme="dark"] .info-note{color:#94A3B8;border-top-color:rgba(148,163,184,0.2);}
+        @media(max-width:480px){.offline-card{padding:2rem 1.5rem;}.offline-icon{font-size:3.5rem;}.offline-title{font-size:1.5rem;}.btn-group{flex-direction:column;}.btn-offline{justify-content:center;}}
+
+body.offline-page {
+    background: linear-gradient(135deg, var(--silver-light) 0%, rgba(15, 118, 110, 0.14) 100%);
+}
+[data-theme="dark"] body.offline-page {
+    background: linear-gradient(135deg, #0f172a 0%, #134e48 100%);
+}
+.offline-title { font-family: var(--font-display); color: var(--teal-dark); }
+.offline-icon { color: var(--teal-light); }
+.offline-features h3 { color: var(--teal); }
+.offline-features i { color: var(--teal-light); }
+.btn-primary-offline {
+    background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal-light) 100%);
+}
+.btn-secondary-offline {
+    background: var(--card);
+    color: var(--teal);
+    border-color: var(--teal);
+}
+
+[data-theme="dark"] .stat-box,
+[data-theme="dark"] .table-wrap,
+[data-theme="dark"] .acceso-card,
+[data-theme="dark"] .medico-list,
+[data-theme="dark"] .medico-detail,
+[data-theme="dark"] .field-inline select {
+    background: var(--card);
+    border-color: var(--border);
+    color: var(--text);
+}
+[data-theme="dark"] .reservas-table th {
+    background: var(--gray-100);
+    color: var(--text);
+}
+[data-theme="dark"] .medico-list-header {
+    background: var(--gray-100);
+}

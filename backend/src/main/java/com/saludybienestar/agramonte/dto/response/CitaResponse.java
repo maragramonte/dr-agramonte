@@ -1,0 +1,19 @@
+package com.saludybienestar.agramonte.dto.response;
+
+import com.saludybienestar.agramonte.entity.EstadoCita;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+
+@Data
+@AllArgsConstructor
+public class CitaResponse {
+    private Long id;
+    private Long usuarioId;
+    private Long medicoId;
+    private String medicoNombre;
+    private LocalDateTime fechaHora;
+    private String motivo;
+    private EstadoCita estado;
+}

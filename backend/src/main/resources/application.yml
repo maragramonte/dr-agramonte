@@ -1,0 +1,51 @@
+spring:
+  profiles:
+    active: ${APP_PROFILE:postgres}
+  mail:
+    host: ${MAIL_HOST:}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    from: ${MAIL_FROM:}
+    properties:
+      mail:
+        smtp:
+          auth: ${MAIL_SMTP_AUTH:true}
+          starttls:
+            enable: ${MAIL_SMTP_STARTTLS:true}
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+      fail-on-empty-beans: false
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-exception: false
+    include-stacktrace: never
+  port: 8080
+
+app:
+  contact:
+    inbox: ${CONTACT_INBOX:}
+  twilio:
+    enabled: ${TWILIO_ENABLED:false}
+    account-sid: ${TWILIO_ACCOUNT_SID:}
+    auth-token: ${TWILIO_AUTH_TOKEN:}
+    from: ${TWILIO_FROM:}
+    notify-to: ${TWILIO_NOTIFY_TO:}
+    channel: ${TWILIO_CHANNEL:whatsapp}
+    notify-patients: ${TWILIO_NOTIFY_PATIENTS:true}
+    reminder-hours-before: ${TWILIO_REMINDER_HOURS:24}
+    reminder-cron: ${TWILIO_REMINDER_CRON:0 */15 * * * *}
+
+# Sin MAIL_HOST el indicador de correo falla y /actuator/health devuelve 503 (DOWN).
+# El formulario de contacto sigue funcionando (solo logs) sin SMTP.
+management:
+  health:
+    mail:
+      enabled: false

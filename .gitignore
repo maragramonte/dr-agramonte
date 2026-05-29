@@ -1,0 +1,24 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.iml
+
+# Java / Maven
+**/target/
+*.log
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Cursor local artifacts
+.cursor/
+
+# OS / editor extra
+*.swp
+*~
+desktop.ini
+*.dia~

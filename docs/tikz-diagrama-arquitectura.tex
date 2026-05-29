@@ -1,0 +1,21 @@
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=1.2cm and 1.4cm, font=\small\sffamily]
+  \node[block, minimum width=2.6cm] (client) {Navegador\\Paciente / Médico};
+  \node[block, minimum width=2.4cm, right=of client] (nginx) {Nginx\\Frontend estático\\+ proxy \texttt{/api}};
+  \node[blockaccent, minimum width=2.8cm, right=of nginx] (api) {Spring Boot 3.5\\API REST + JWT\\Java 21};
+  \node[block, minimum width=2.4cm, below=of api] (db) {PostgreSQL 15\\Flyway + JPA};
+  \node[block, minimum width=2.2cm, above right=0.9cm and 1.1cm of api] (twilio) {Twilio\\SMS / WhatsApp};
+
+  \draw[arrow] (client) -- node[above, font=\scriptsize, text=graytext]{HTTPS :80} (nginx);
+  \draw[arrow] (nginx) -- node[above, font=\scriptsize, text=graytext]{/api} (api);
+  \draw[arrow] (api) -- node[right, font=\scriptsize, text=graytext]{JDBC} (db);
+  \draw[arrow] (api) -- node[above, font=\scriptsize, text=graytext]{REST API} (twilio);
+
+  \node[below=0.15cm of client, font=\scriptsize, text=graytext] {PWA + \texttt{service-worker.js}};
+  \node[below=0.15cm of nginx, font=\scriptsize, text=graytext] {HTML/CSS/JS};
+  \node[below=0.15cm of db, font=\scriptsize, text=graytext] {Perfil \texttt{postgres} o \texttt{mysql}};
+\end{tikzpicture}
+\caption{Arquitectura desplegada con Docker Compose (implementación actual)}
+\label{fig:arquitectura}
+\end{figure}

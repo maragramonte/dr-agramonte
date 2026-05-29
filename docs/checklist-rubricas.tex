@@ -1,0 +1,58 @@
+\enlargethispage{2\baselineskip}
+\begin{center}
+  {\large\bfseries\color{tealdark} Checklist de cumplimiento --- Módulo de Proyecto}\\[0.3em]
+  {\small Proceso (25\,\%) + contenido escrito (40\,\%) + defensa (35\,\%)}\\[0.2em]
+  {\footnotesize Memoria alineada con el repositorio (mayo 2026). Marcar al entregar.}
+\end{center}
+
+\vspace{0.3em}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.12}
+
+\begin{longtable}{@{}p{0.34\textwidth}ccp{0.36\textwidth}@{}}
+\toprule
+\textbf{Criterio} & \textbf{Mem.} & \textbf{Demo} & \textbf{Notas} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Criterio} & \textbf{Mem.} & \textbf{Demo} & \textbf{Notas} \\
+\midrule
+\endhead
+
+\multicolumn{4}{l}{\textbf{\color{tealdark}A. Proceso (25\,\%)}} \\
+\midrule
+Seguimiento con tutor documentado & $\square$ & --- & Anexar evidencias \\
+Gantt / hitos coherentes con el calendario real & $\checkmark$ & --- & Cap. planificación \\
+Coherencia memoria $\leftrightarrow$ código & $\checkmark$ & $\checkmark$ & Sin Mongo/Redis/Node en memoria \\
+\midrule
+
+\multicolumn{4}{l}{\textbf{\color{tealdark}B. Contenido escrito (40\,\%)}} \\
+\midrule
+Estructura guía (justificación, objetivos, sector, desarrollo, conclusiones) & $\checkmark$ & --- & \\
+PDF, márgenes, fuente, extensión & $\square$ & --- & Revisar 35--65 páginas \\
+Diagramas TikZ (paleta teal CSS) & $\checkmark$ & --- & Cap. arquitectura \\
+Referencias APA & $\square$ & --- & Ampliar bibliografía si tutor exige \\
+Anexos (capturas, manual usuario) & $\square$ & --- & Recomendado \\
+\midrule
+
+\multicolumn{4}{l}{\textbf{\color{tealdark}C. Defensa (35\,\%)}} \\
+\midrule
+Demo: login $\rightarrow$ reservar $\rightarrow$ cancelar & $\square$ & $\square$ & \texttt{docker compose up} \\
+Demo servicio preseleccionado + modo oscuro & $\square$ & $\square$ & \\
+Plan B (capturas / vídeo) & $\square$ & $\square$ & \\
+Twilio en sandbox (opcional) & $\square$ & $\square$ & \\
+\midrule
+
+\multicolumn{4}{l}{\textbf{\color{tealdark}D. Implementación verificada en repo}} \\
+\midrule
+PostgreSQL + Flyway + Spring Boot + JWT & $\checkmark$ & $\checkmark$ & \\
+\texttt{SELECT FOR UPDATE} + citas & $\checkmark$ & $\checkmark$ & \\
+Frontend PWA + reserva + servicios URL & $\checkmark$ & $\checkmark$ & \\
+Twilio Java (médico, paciente, recordatorio) & $\checkmark$ & $\square$ & Requiere \texttt{.env} \\
+Panel médico API historial & $\square$ & $\square$ & Solo demo estática \\
+Tests automatizados JUnit/E2E & $\square$ & $\square$ & Mejora futura \\
+\bottomrule
+\end{longtable}
+
+\normalsize

@@ -1,0 +1,16 @@
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=0.7cm, font=\small\sffamily]
+  \node[blockaccent, minimum width=3.2cm] (pages) {Páginas HTML\\index, servicios, reservar...};
+  \node[block, minimum width=3cm, below=of pages] (css) {\texttt{dr-agramonte.css}\\Tema claro/oscuro\\\texttt{data-theme}};
+  \node[block, minimum width=2.8cm, below left=0.6cm and 0.4cm of css] (js) {\texttt{reserva.js}\\\texttt{api-client.js}};
+  \node[block, minimum width=2.6cm, below right=0.6cm and 0.4cm of css] (pwa) {Service Worker\\modo offline};
+
+  \draw[arrow] (pages) -- (css);
+  \draw[arrow] (css) -- (js);
+  \draw[arrow] (css) -- (pwa);
+  \node[right=0.3cm of js, font=\scriptsize, text=graytext, align=left] {Centro $\rightarrow$ calendario\\$\rightarrow$ slots API $\rightarrow$ confirmar};
+\end{tikzpicture}
+\caption{Capas del frontend y flujo de reserva en cuatro pasos}
+\label{fig:frontend-capas}
+\end{figure}

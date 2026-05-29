@@ -1,0 +1,323 @@
+{
+  "info": {
+    "_postman_id": "dr-agramonte-api-collection",
+    "name": "Dr. Agramonte API (TFG)",
+    "description": "Colección alineada con el backend Spring Boot (mayo 2026).\n\n1. `docker compose up -d --build`\n2. Importa colección + entorno `Local-Docker`.\n3. Flujo invitado: **Reserva pública** → **Citas por email** → **Historial reservas prueba** (panel).\n4. Flujo JWT: **Login paciente** → **Crear cita** → **Mis citas**.\n\nVer postman/README.md y docs/SINCRONIZACION-CITAS.md.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Registro paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    if (body.token) pm.environment.set('jwt_token', body.token);",
+                  "    pm.test('Token recibido', () => pm.expect(body.token).to.be.a('string').and.not.empty);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{paciente_email}}\",\n  \"nombre\": \"Paciente Prueba Postman\",\n  \"password\": \"{{paciente_password}}\",\n  \"telefono\": \"+34600000001\"\n}"
+            },
+            "url": "{{base_url}}/api/auth/registro"
+          }
+        },
+        {
+          "name": "Login paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.environment.set('jwt_token', body.token);",
+                  "    pm.test('Login OK', () => {",
+                  "        pm.expect(body.rol).to.eql('PACIENTE');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{paciente_email}}\",\n  \"password\": \"{{paciente_password}}\"\n}"
+            },
+            "url": "{{base_url}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Login médico (V3)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.environment.set('jwt_token', body.token);",
+                  "    pm.test('Rol MEDICO', () => pm.expect(body.rol).to.eql('MEDICO'));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{medico_email}}\",\n  \"password\": \"{{medico_password}}\"\n}"
+            },
+            "url": "{{base_url}}/api/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Médicos y disponibilidad",
+      "item": [
+        {
+          "name": "Listar médicos",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{base_url}}/api/medicos"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));"],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Disponibilidad por fecha",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/disponibilidad?medicoId={{medico_id}}&fecha={{fecha_disponibilidad}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "disponibilidad"],
+              "query": [
+                { "key": "medicoId", "value": "{{medico_id}}" },
+                { "key": "fecha", "value": "{{fecha_disponibilidad}}" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Citas (paciente JWT)",
+      "item": [
+        {
+          "name": "Reserva pública (sin JWT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const body = pm.response.json();",
+                  "    if (body.cita && body.cita.id) pm.environment.set('ultima_cita_id', String(body.cita.id));",
+                  "    if (body.sesion && body.sesion.token) pm.environment.set('jwt_token', body.sesion.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Paciente Invitado\",\n  \"email\": \"{{invitado_email}}\",\n  \"telefono\": \"+34600000099\",\n  \"medicoId\": {{medico_id}},\n  \"fechaHora\": \"{{fecha_disponibilidad}}T11:00:00\",\n  \"motivo\": \"Reserva pública TFG\",\n  \"password\": \"Invitado123\"\n}"
+            },
+            "url": "{{base_url}}/api/citas/reserva-publica"
+          }
+        },
+        {
+          "name": "Crear cita",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const body = pm.response.json();",
+                  "    if (body.id) pm.environment.set('ultima_cita_id', String(body.id));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicoId\": {{medico_id}},\n  \"fechaHora\": \"{{fecha_disponibilidad}}T10:00:00\",\n  \"motivo\": \"Consulta de prueba Postman\",\n  \"telefono\": \"+34600000001\"\n}"
+            },
+            "url": "{{base_url}}/api/citas"
+          }
+        },
+        {
+          "name": "Mis citas",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/citas/mias"
+          }
+        },
+        {
+          "name": "Citas por email (invitado)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/citas/por-email?email={{invitado_email}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "citas", "por-email"],
+              "query": [{ "key": "email", "value": "{{invitado_email}}" }]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const rows = pm.response.json();",
+                  "if (rows.length && rows[0].id) pm.environment.set('ultima_cita_id', String(rows[0].id));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cancelar cita",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/api/citas/{{ultima_cita_id}}"
+          }
+        },
+        {
+          "name": "Cancelar cita pública (invitado)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/api/citas/publica/{{ultima_cita_id}}?email={{invitado_email}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "citas", "publica", "{{ultima_cita_id}}"],
+              "query": [{ "key": "email", "value": "{{invitado_email}}" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Agenda TFG (público demo)",
+      "item": [
+        {
+          "name": "Agenda pacientes",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/citas/agenda/pacientes?medicoId={{medico_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "citas", "agenda", "pacientes"],
+              "query": [{ "key": "medicoId", "value": "{{medico_id}}" }]
+            }
+          }
+        },
+        {
+          "name": "Historial reservas prueba",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/citas/agenda/reservas?medicoId={{medico_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "citas", "agenda", "reservas"],
+              "query": [{ "key": "medicoId", "value": "{{medico_id}}" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Contacto",
+      "item": [
+        {
+          "name": "Enviar formulario",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Prueba Postman\",\n  \"email\": \"prueba@example.com\",\n  \"telefono\": \"+34600000000\",\n  \"motivo\": \"otro\",\n  \"mensaje\": \"Mensaje de prueba desde la colección del TFG (mínimo 10 caracteres).\"\n}"
+            },
+            "url": "{{base_url}}/api/contact"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health (actuator)",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{base_url}}/actuator/health"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=0.55cm, font=\small\sffamily,
+  every node/.style={align=center}]
+  \node[draw=teal, fill=tealpale, rounded corners=6pt, inner sep=5pt] (fe) {Frontend\\\texttt{reserva.js}};
+  \node[draw=teal, fill=tealpale, rounded corners=6pt, inner sep=5pt, below=of fe] (api) {POST \texttt{/api/citas}\\JWT paciente};
+  \node[draw=teal, fill=tealpale, rounded corners=6pt, inner sep=5pt, below=of api] (svc) {\texttt{CitaService.crearCita}};
+  \node[draw=tealdark, fill=teal!20, rounded corners=6pt, inner sep=5pt, below=of svc] (lock) {SELECT ... FOR UPDATE\\horario disponible};
+  \node[draw=teal, fill=tealpale, rounded corners=6pt, inner sep=5pt, below=of lock] (save) {INSERT cita + UPDATE horario};
+  \node[draw=teallight, fill=teal!30, text=white, rounded corners=6pt, inner sep=5pt, below=of save] (tw) {Twilio: médico + paciente};
+
+  \draw[arrow] (fe) -- (api);
+  \draw[arrow] (api) -- (svc);
+  \draw[arrow] (svc) -- (lock);
+  \draw[arrow] (lock) -- (save);
+  \draw[arrow] (save) -- (tw);
+\end{tikzpicture}
+\caption{Flujo de reserva de cita con bloqueo pesimista y notificaciones}
+\label{fig:secuencia-reserva}
+\end{figure}

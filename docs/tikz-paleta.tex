@@ -1,0 +1,40 @@
+% Paleta alineada con frontend/css/dr-agramonte.css
+\definecolor{teal}{RGB}{15,118,110}
+\definecolor{tealdark}{RGB}{19,78,72}
+\definecolor{teallight}{RGB}{20,184,166}
+\definecolor{tealpale}{RGB}{240,253,250}
+\definecolor{silver}{RGB}{212,212,216}
+\definecolor{offwhite}{RGB}{249,250,251}
+\definecolor{graytext}{RGB}{107,114,128}
+\definecolor{graydark}{RGB}{31,41,55}
+\definecolor{carddark}{RGB}{30,41,59}
+\definecolor{bgdark}{RGB}{15,23,42}
+\definecolor{rowgray}{RGB}{243,244,246}
+\definecolor{bordergray}{RGB}{229,231,235}
+\definecolor{codebg}{RGB}{30,41,59}
+\definecolor{codefg}{RGB}{226,232,240}
+
+% Alias compatibles con el estilo anterior
+\colorlet{darkblue}{tealdark}
+\colorlet{medblue}{teal}
+\colorlet{lightblue}{tealpale}
+
+\tikzset{
+  block/.style={
+    draw=teal, rounded corners=10pt, line width=0.9pt,
+    fill=tealpale, text=graydark, font=\small\sffamily,
+    minimum height=1.1cm, align=center, inner sep=6pt
+  },
+  blockdark/.style={
+    block, fill=carddark, text=white, draw=teallight
+  },
+  blockaccent/.style={
+    block, fill=teal!85!black, text=white, draw=tealdark
+  },
+  arrow/.style={->, >=Stealth, line width=0.9pt, teal},
+  entity/.style={
+    draw=teal, fill=tealpale, rounded corners=6pt,
+    font=\small\sffamily, align=center, inner sep=5pt
+  },
+  rel/.style={->, >=Stealth, teal, line width=0.7pt}
+}

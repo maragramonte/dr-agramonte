@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Sin conexión - Dr. Agramonte</title>
+    <meta name="description" content="Página offline - Dr. Agramonte. Cuando recuperes la conexión podrás acceder a todos los servicios.">
+
+    <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
+    <link rel="apple-touch-icon" href="icons/app-icon.svg">
+    <meta name="theme-color" content="#0F766E">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Dr. Agramonte">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="css/dr-agramonte.css">
+    <link rel="stylesheet" href="css/pages-extra.css">
+    <script src="js/modules/theme-init.js"></script>
+</head>
+<body class="offline-page">
+<!-- HEADER UNIFICADO igual que el resto de páginas -->
+<header class="main-header" role="banner">
+    <div class="container">
+        <div class="header-content">
+            <div class="logo-section">
+                <a href="index.html" class="logo-link" aria-label="Inicio - Dr. Agramonte">
+                    <div class="logo-icon" aria-hidden="true"><i class="fas fa-user-md"></i></div>
+                    <div class="logo-text">
+                        <h1 class="logo-title">Dr. Agramonte</h1>
+                        <p class="logo-subtitle">Especialista en Medicina Interna</p>
+                    </div>
+                </a>
+            </div>
+            <div class="header-end">
+                <button type="button" class="theme-toggle" id="themeToggle" aria-label="Activar modo oscuro" title="Cambiar tema claro / oscuro" aria-pressed="false">
+                    <i class="fas fa-moon" id="themeToggleIcon" aria-hidden="true"></i>
+                </button>
+            <nav class="main-nav" aria-label="Navegación principal">
+                <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Menú de navegación">
+                    <span class="nav-toggle-icon" aria-hidden="true"></span>
+                </button>
+                <ul class="nav-menu" id="nav-menu">
+                    <li class="nav-item"><a href="index.html" class="nav-link">Inicio</a></li>
+                    <li class="nav-item"><a href="sobre-mi.html" class="nav-link">Sobre mí</a></li>
+                    <li class="nav-item"><a href="servicios.html" class="nav-link">Servicios</a></li>
+                    <li class="nav-item"><a href="testimonios.html" class="nav-link">Testimonios</a></li>
+                    <li class="nav-item"><a href="contacto.html" class="nav-link">Contacto</a></li>
+                    <li class="nav-item"><a href="reservar.html" class="nav-link nav-link--reserva"><i class="fas fa-calendar-plus" aria-hidden="true"></i> Reservar cita</a></li>
+                </ul>
+            </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="offline-container">
+        <div class="offline-card">
+            <div class="offline-icon"><i class="fas fa-wifi-slash"></i></div>
+            <h1 class="offline-title">Sin conexión a Internet</h1>
+            <p class="offline-text">No hay conexión en este momento. Pero no te preocupes, aún puedes acceder a la información básica de la consulta mientras se restablece la conexión.</p>
+            <div class="offline-features">
+                <h3><i class="fas fa-check-circle"></i> Contenido disponible offline:</h3>
+                <ul>
+                    <li><i class="fas fa-phone-alt"></i> Información de contacto</li>
+                    <li><i class="fas fa-clock"></i> Horarios de atención</li>
+                    <li><i class="fas fa-stethoscope"></i> Servicios médicos</li>
+                    <li><i class="fas fa-user-md"></i> Sobre el Dr. Agramonte</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Dirección y ubicación</li>
+                    <li><i class="fas fa-shield-alt"></i> Política de privacidad</li>
+                </ul>
+            </div>
+            <div class="btn-group">
+                <a href="index.html" class="btn-offline btn-primary-offline"><i class="fas fa-home"></i> Ir al Inicio</a>
+                <button onclick="window.location.reload()" class="btn-offline btn-secondary-offline"><i class="fas fa-sync-alt"></i> Reintentar conexión</button>
+            </div>
+            <div class="info-note">
+                <i class="fas fa-info-circle"></i>
+                <span>La conexión se restablecerá automáticamente cuando vuelvas a tener Internet</span>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section"><h3>Dr. Agramonte</h3><p>Especialista en Medicina Interna</p><p>Colegiado N° 12345</p><p>Madrid, España</p></div>
+        <div class="footer-section"><h3>Contacto</h3><a href="tel:+34748962648"><i class="fas fa-phone"></i> +34 748962648</a><a href="mailto:Dr.Agramonte@gmail.com"><i class="fas fa-envelope"></i> Dr.Agramonte@gmail.com</a><p><i class="fas fa-map-marker-alt"></i> Calle Salud, 123, Madrid</p></div>
+        <div class="footer-section"><h3>Horario</h3><p><strong>Lunes a Viernes</strong><br>9:00 - 14:00<br>16:00 - 19:00</p><p><strong>Sábados</strong><br>9:00 - 13:00 (con cita)</p></div>
+        <div class="footer-section"><h3>Enlaces</h3><a href="privacidad.html"><i class="fas fa-shield-alt"></i> Política de Privacidad</a><a href="offline.html"><i class="fas fa-wifi-slash"></i> Modo Offline</a><a href="panel-pruebas.html"><i class="fas fa-flask"></i> Pruebas TFG (reservas / médico)</a><p style="margin-top:.8rem;">Web: <a href="https://www.saludybienestarinterno.com/" target="_blank">www.saludybienestarinterno.com</a></p></div>
+    </div>
+    <div class="footer-bottom"><p>© 2025 Salud y Bienestar Interno – Dr. Juan Manuel Agramonte. <a href="privacidad.html" target="_blank">Política de Privacidad</a></p></div>
+</footer>
+
+<!-- Script para el menú responsive (igual que en index.html) -->
+<script>
+    (function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            const navToggle = document.querySelector('.nav-toggle');
+            const navMenu = document.querySelector('.nav-menu');
+            if (navToggle && navMenu) {
+                navToggle.addEventListener('click', function() {
+                    const isExpanded = this.getAttribute('aria-expanded') === 'true';
+                    this.setAttribute('aria-expanded', !isExpanded);
+                    navMenu.classList.toggle('nav-menu--open');
+                });
+                document.addEventListener('click', function(event) {
+                    if (navMenu.classList.contains('nav-menu--open') &&
+                        !navMenu.contains(event.target) &&
+                        !navToggle.contains(event.target)) {
+                        navToggle.setAttribute('aria-expanded', 'false');
+                        navMenu.classList.remove('nav-menu--open');
+                    }
+                });
+            }
+        });
+    })();
+</script>
+<script src="js/pages/dr-agramonte.js" defer></script>
+
+<!-- Script para reconexión automática (igual que antes) -->
+<script>
+    let reloadAttempts=0; const maxAttempts=30;
+    const reconnectInterval=setInterval(()=>{ if(navigator.onLine){ clearInterval(reconnectInterval); showNotification('¡Conexión restablecida! Redirigiendo...','success'); setTimeout(()=>{ window.location.href='index.html'; },2000); } else { reloadAttempts++; if(reloadAttempts>=maxAttempts) clearInterval(reconnectInterval); } },10000);
+    function showNotification(message,type='info'){ const notification=document.createElement('div'); const bgColor=type==='success'?'#10B981':'#F59E0B'; notification.innerHTML=`<div style="position:fixed;top:20px;right:20px;background:${bgColor};color:white;padding:1rem 1.5rem;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.2);z-index:10000;display:flex;align-items:center;gap:0.75rem;font-family:'DM Sans',sans-serif;animation:slideIn 0.3s ease-out;"><i class="fas ${type==='success'?'fa-check-circle':'fa-info-circle'}"></i><span>${message}</span></div>`; document.body.appendChild(notification); setTimeout(()=>notification.remove(),3000); }
+    window.addEventListener('online',()=>{ showNotification('¡Conexión restablecida! Redirigiendo al inicio...','success'); setTimeout(()=>{ window.location.href='index.html'; },2000); });
+    window.addEventListener('offline',()=>{ showNotification('Se ha perdido la conexión a Internet','info'); });
+    if('serviceWorker' in navigator && navigator.serviceWorker.controller) console.log('Service Worker activo - modo offline disponible');
+</script>
+
+</body>
+</html>

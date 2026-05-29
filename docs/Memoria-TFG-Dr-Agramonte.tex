@@ -1,0 +1,395 @@
+\documentclass[12pt,a4paper]{report}
+
+\usepackage[spanish,es-tabla]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage[
+  top=3cm, bottom=3cm, left=3cm, right=3cm,
+  headheight=15pt, headsep=10pt
+]{geometry}
+\usepackage{setspace}
+\setstretch{1.15}
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{0.5em}
+
+\usepackage[table]{xcolor}
+\input{tikz-paleta}
+
+\usepackage{amssymb}
+\usepackage{pifont}
+\DeclareUnicodeCharacter{2713}{\checkmark}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{tealdark}Mar Agramonte --- Proyecto DAM}
+\fancyhead[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+  {\normalfont\Large\bfseries\color{tealdark}}
+  {Capítulo \thechapter:}{16pt}{\Large}
+\titleformat{\section}{\normalfont\large\bfseries\color{tealdark}}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalfont\normalsize\bfseries\color{teal}}{\thesubsection}{1em}{}
+
+\usepackage{tocloft}
+\renewcommand{\cftchapfont}{\bfseries\color{tealdark}}
+\renewcommand{\cftchappagefont}{\bfseries\color{tealdark}}
+
+\usepackage{booktabs, array, longtable, float, caption}
+\captionsetup{font=small,labelfont={bf,color=tealdark}}
+
+\usepackage{listings}
+\lstdefinestyle{mycode}{
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\small\color{codefg},
+  breaklines=true, numbers=left, numbersep=8pt,
+  frame=single, framerule=0pt, xleftmargin=14pt,
+}
+\lstset{style=mycode}
+
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, shapes.geometric}
+
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true, linkcolor=tealdark, urlcolor=teal, citecolor=tealdark,
+  pdftitle={Dr. Agramonte - Gestión de Citas Médicas},
+  pdfauthor={Mar Agramonte},
+}
+
+\newcommand{\hrow}{\rowcolor{tealpale}}
+\newcommand{\grayrow}{\rowcolor{rowgray}}
+
+\begin{document}
+
+% --- Portada ---
+\begin{titlepage}
+  \pagestyle{empty}
+  \centering
+  \vspace*{1.5cm}
+  {\Large\bfseries\color{tealdark} TRABAJO DE FIN DE CICLO\\[0.8em]}
+  \vspace{0.8cm}
+  {\Huge\bfseries\color{teal} DR. AGRAMONTE\\[0.4em]}
+  {\Large\bfseries\color{teallight} Plataforma web de gestión de citas médicas\\[1.5em]}
+  \begin{tikzpicture}
+    \fill[tealpale, rounded corners=12pt] (0,0) rectangle (12,0.35);
+    \fill[teal] (0,0) rectangle (4,0.35);
+  \end{tikzpicture}
+  \vfill
+  \begin{tabular}{rl}
+    \textbf{Autora:} & Mar Agramonte \\
+    \textbf{Centro:} & CESUR \\
+    \textbf{Ciclo:} & Desarrollo de Aplicaciones Multiplataforma \\
+    \textbf{Tutores:} & Pascual Barrer -- Jaume Rossinrol \\
+    \textbf{Curso:} & 2024--2025 \\
+    \textbf{Fecha:} & Mayo 2026 \\
+  \end{tabular}
+\end{titlepage}
+
+\clearpage
+\tableofcontents
+\newpage
+
+% ============================================================================
+\chapter{Resumen ejecutivo}
+% ============================================================================
+
+\textbf{Dr. Agramonte} es una aplicación web para que pacientes reserven, consulten y cancelen citas médicas sin depender del teléfono del profesional. El sistema integra frontend estático (HTML, CSS y JavaScript), API REST con \textbf{Spring Boot 3.5.3} y \textbf{PostgreSQL}, autenticación \textbf{JWT}, control de concurrencia con \textbf{bloqueo pesimista}, notificaciones \textbf{Twilio} (SMS/WhatsApp) y despliegue con \textbf{Docker Compose}.
+
+La interfaz replica la identidad visual del consultorio: paleta \textbf{teal} (\#0F766E, \#14B8A6), tipografías DM Sans / DM Serif Display, modo claro/oscuro y diseño responsive. La reserva se organiza en pasos (centro, calendario, hora, datos y confirmación) y puede iniciarse desde \texttt{servicios.html} con el tipo de consulta preseleccionado.
+
+\textbf{Alcance real del repositorio} (mayo 2026): no incluye MongoDB, Redis ni microservicio Node.js; la agenda médico y las pruebas de reserva se consultan en \texttt{panel-pruebas.html}. Las mejoras futuras se documentan como evolución, no como funcionalidad entregada.
+
+% ============================================================================
+\chapter{Justificación y contexto}
+% ============================================================================
+
+\section{Origen del problema}
+
+La motivación proviene de la observación directa del sector sanitario: gran parte de las llamadas al móvil del médico no son urgencias clínicas, sino gestión de agenda. Una web accesible reduce interrupciones y devuelve tiempo al profesional.
+
+\section{Competidores y hueco de mercado}
+
+Plataformas como Doctoralia o Top Doctors cubren grandes centros, pero implican comisiones y dependencia de terceros. Consultas pequeñas o médicos autónomos necesitan una herramienta simple, bajo su control y adaptable a medicina interna.
+
+\section{Marco legal}
+
+Los datos de salud exigen cumplir \textbf{RGPD}, \textbf{LOPDGDD} y \textbf{Ley 41/2002}. La aplicación incluye política de privacidad, consentimiento en reserva y minimización de datos (solo los necesarios para la cita).
+
+% ============================================================================
+\chapter{Objetivos}
+% ============================================================================
+
+\section{Objetivo general}
+
+Desarrollar una aplicación web de gestión de citas médicas que permita al paciente reservar y cancelar de forma autónoma, con backend seguro y despliegue reproducible.
+
+\section{Objetivos específicos (alineados con la implementación)}
+
+\begin{enumerate}
+  \item Modelar y persistir usuarios, médicos, horarios y citas en \textbf{PostgreSQL} con migraciones \textbf{Flyway} y perfiles \texttt{postgres}/\texttt{mysql}.
+  \item Implementar API REST con \textbf{Spring Boot}, autenticación \textbf{JWT} y roles \texttt{PACIENTE}, \texttt{MEDICO} y \texttt{ADMIN} en \texttt{SecurityConfig}.
+  \item Garantizar integridad de reservas con \texttt{SELECT FOR UPDATE} sobre horarios disponibles.
+  \item Construir frontend responsive, PWA, modo oscuro y flujo de reserva accesible (\texttt{reserva.js}, \texttt{api-client.js}).
+  \item Enviar notificaciones al médico y al paciente vía \textbf{Twilio}, con recordatorio programado 24\,h antes (\texttt{CitaReminderScheduler}).
+  \item Desplegar con \textbf{Docker Compose} (nginx + backend + base de datos).
+  \item Documentar el proyecto y preparar defensa con demo reproducible.
+\end{enumerate}
+
+% ============================================================================
+\chapter{Análisis y contextualización del sector}
+% ============================================================================
+
+\section{Sector profesional}
+
+El ciclo DAM aporta competencias en desarrollo multiplataforma, bases de datos, interfaces y despliegue. Este proyecto las aplica al ámbito sanitario privado: agenda, relación paciente--médico y comunicación.
+
+\section{Riesgos laborales (resumen)}
+
+\begin{itemize}
+  \item \textbf{Ergonómicos:} posturas prolongadas ante pantalla; pausas y ergonomía en puesto de desarrollo y en consulta.
+  \item \textbf{Psicosociales:} estrés por interrupciones; la digitalización de citas reduce carga administrativa.
+  \item \textbf{Seguridad de la información:} tratamiento de datos de salud; cifrado en tránsito (HTTPS), contraseñas con BCrypt, secretos en variables de entorno.
+  \item \textbf{EPI / buenas prácticas:} control de accesos por rol, copias de seguridad de BD, no commitear credenciales.
+\end{itemize}
+
+% ============================================================================
+\chapter{Diseño y arquitectura del sistema}
+% ============================================================================
+
+\section{Arquitectura general}
+
+La solución sigue una arquitectura en capas desplegada con contenedores. El navegador consume el frontend servido por \textbf{nginx}; las peticiones \texttt{/api} se proxyan al backend Java. Twilio es un servicio externo invocado desde \texttt{TwilioMessageService}.
+
+\input{tikz-diagrama-arquitectura}
+
+\section{Stack tecnológico}
+
+\begin{table}[H]
+\centering
+\caption{Componentes implementados}
+\begin{tabular}{>{\bfseries\color{white}\columncolor{teal}}l >{\columncolor{white}}p{4.2cm} >{\columncolor{white}}p{5.5cm}}
+\toprule
+\color{white}Capa & \color{white}Tecnología & \color{white}Función \\
+\midrule
+Frontend & HTML5, CSS3, JS ES6+ & UI, PWA, \texttt{reserva.js} \\
+\rowcolor{rowgray}
+Proxy / estático & nginx (Docker) & Archivos + proxy \texttt{/api} \\
+Backend & Java 21, Spring Boot 3.5.3 & API, seguridad, negocio \\
+\rowcolor{rowgray}
+Persistencia & PostgreSQL 15, Flyway, JPA & Datos transaccionales \\
+Notificaciones & Twilio API (Java SDK) & SMS / WhatsApp \\
+\rowcolor{rowgray}
+Despliegue & Docker Compose & Entorno reproducible \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Modelo de datos}
+
+\input{tikz-diagrama-er}
+
+La migración \texttt{V2\_\_cita\_recordatorio} añade el campo \texttt{recordatorio\_enviado} para evitar duplicar avisos Twilio.
+
+\section{Frontend y paleta visual}
+
+Los colores del documento y de los diagramas coinciden con \texttt{dr-agramonte.css}: teal principal, fondos \texttt{off-white}, tarjetas blancas y variante oscura (\texttt{data-theme="dark"}, fondo \#0F172A).
+
+\input{tikz-diagrama-frontend}
+
+% ============================================================================
+\chapter{Desarrollo técnico}
+% ============================================================================
+
+\section{Backend}
+
+\subsection{Autenticación JWT}
+
+\texttt{AuthController} expone \texttt{POST /api/auth/login} y \texttt{/api/auth/registro}. El token se envía en cabecera \texttt{Authorization: Bearer}. \texttt{JwtAuthFilter} valida cada petición protegida.
+
+\subsection{Reserva y concurrencia}
+
+\begin{lstlisting}[language=Java]
+Horario horario = horarioRepository
+  .findByMedicoIdAndInicioAndDisponibleTrueForUpdate(...)
+  .orElseThrow(...);
+\end{lstlisting}
+
+Tras validar, se crea la \texttt{Cita}, se marca el horario no disponible y se invoca \texttt{CitaNotificationService}.
+
+\input{tikz-diagrama-reserva}
+
+\subsection{API principal}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{llp{6.2cm}}
+\toprule
+\textbf{Método} & \textbf{Ruta} & \textbf{Descripción} \\
+\midrule
+POST & /api/auth/login, /registro & Sesión JWT \\
+GET & /api/medicos & Listado de especialistas \\
+GET & /api/disponibilidad & Slots por médico y fecha \\
+POST & /api/citas & Crear cita (paciente autenticado) \\
+GET & /api/citas/mias & Citas del paciente \\
+DELETE & /api/citas/\{id\} & Cancelación \\
+POST & /api/contacto & Formulario de contacto \\
+\bottomrule
+\end{tabular}
+\caption{Endpoints principales}
+\end{table}
+
+\section{Notificaciones Twilio}
+
+\texttt{CitaNotificationService} envía:
+\begin{itemize}
+  \item Aviso al médico (\texttt{TWILIO\_NOTIFY\_TO}) en alta y cancelación.
+  \item Confirmación y cancelación al paciente si tiene teléfono.
+  \item Recordatorio $\sim$24\,h antes vía \texttt{@Scheduled} (ventana 23--25\,h).
+\end{itemize}
+
+Variables: \texttt{TWILIO\_ENABLED}, \texttt{TWILIO\_ACCOUNT\_SID}, \texttt{TWILIO\_AUTH\_TOKEN}, \texttt{TWILIO\_FROM}, \texttt{TWILIO\_CHANNEL} (whatsapp o sms).
+
+\section{Frontend}
+
+\begin{itemize}
+  \item \textbf{Reserva:} \texttt{reservar.html} + \texttt{reserva.js} (centros, calendario, slots desde API, fallback local).
+  \item \textbf{Servicios:} enlaces \texttt{reservar.html?servicio=...} preconfiguran tipo y motivo.
+  \item \textbf{Tema:} botón luna/sol, clase \texttt{btn--reserva} unificada en todo el sitio.
+  \item \textbf{PWA:} \texttt{manifest.json} y \texttt{service-worker.js}; página \texttt{offline.html}.
+\end{itemize}
+
+\section{Seguridad y RGPD}
+
+\begin{itemize}
+  \item Contraseñas con \texttt{BCryptPasswordEncoder(12)}.
+  \item CORS configurado para orígenes de desarrollo y producción.
+  \item Política de privacidad en \texttt{privacidad.html}.
+  \item Checkbox de aceptación en formulario de reserva.
+  \item Secretos (\texttt{JWT\_SECRET}, Twilio) en \texttt{.env}, no en el repositorio.
+\end{itemize}
+
+\section{Despliegue}
+
+\begin{lstlisting}[language=bash]
+docker compose up -d --build
+\end{lstlisting}
+
+Servicios: \texttt{postgres}, \texttt{backend} (:8080), \texttt{frontend} (:80). Perfil opcional MySQL con \texttt{--profile mysql}.
+
+% ============================================================================
+\chapter{Diagramas y modelos}
+% ============================================================================
+
+Los diagramas de este capítulo usan la paleta teal del CSS del proyecto. Para actualizarlos, editar los ficheros \texttt{docs/tikz-diagrama-*.tex}.
+
+% ============================================================================
+\chapter{Planificación temporal}
+% ============================================================================
+
+\begin{center}
+\begin{tikzpicture}[x=0.45cm, y=0.55cm, font=\scriptsize\sffamily]
+  \draw[very thin, bordergray] (0,0) grid (24,8);
+  \foreach \x/\txt in {2/M1, 8/M2, 14/M3, 20/M4}
+    \node at (\x+1,8.6) [font=\bfseries, text=tealdark] {\txt};
+  \node[left, text=tealdark] at (0,7) {Análisis};
+  \node[left, text=tealdark] at (0,6) {Diseño BD/API};
+  \node[left, text=tealdark] at (0,5) {Backend};
+  \node[left, text=tealdark] at (0,4) {Frontend};
+  \node[left, text=tealdark] at (0,3) {Twilio + pruebas};
+  \node[left, text=tealdark] at (0,2) {Docker};
+  \node[left, text=tealdark] at (0,1) {Memoria};
+  \fill[teal] (0,6.7) rectangle (4,7.3);
+  \fill[tealdark] (3,5.7) rectangle (7,6.3);
+  \fill[teal] (6,4.7) rectangle (13,5.3);
+  \fill[teallight] (12,3.7) rectangle (18,4.3);
+  \fill[teal] (11,2.7) rectangle (16,3.3);
+  \fill[tealdark] (17,1.7) rectangle (21,2.3);
+  \fill[tealpale, draw=teal] (18,0.7) rectangle (24,1.3);
+\end{tikzpicture}
+\end{center}
+
+% ============================================================================
+\chapter{Pruebas y validación}
+% ============================================================================
+
+\section{Pruebas realizadas}
+
+\begin{itemize}
+  \item Compilación Maven (\texttt{mvn -DskipTests compile}).
+  \item Arranque Docker Compose y health check API.
+  \item Flujo manual: registro/login $\rightarrow$ reservar $\rightarrow$ mis citas $\rightarrow$ cancelar.
+  \item Prueba de parámetro \texttt{?servicio=} desde servicios.
+  \item Validación de formularios (email, teléfono español).
+\end{itemize}
+
+\section{Pruebas pendientes (mejora futura)}
+
+\begin{itemize}
+  \item Suite JUnit + Testcontainers (dependencias ya en \texttt{pom.xml}).
+  \item Tests E2E (Playwright/Cypress).
+  \item Auditoría Lighthouse formal documentada.
+\end{itemize}
+
+% ============================================================================
+\chapter{Conclusiones}
+% ============================================================================
+
+Se ha entregado una aplicación funcional y desplegable que responde al problema de gestión de citas, con arquitectura clara y código mantenible. Los objetivos técnicos del repositorio se cumplen en PostgreSQL, Spring Boot, frontend PWA y Twilio integrado en Java.
+
+\textbf{Limitaciones honestas:} panel médico sin API de historial, sin refresh token, sin tests automatizados completos. Son líneas de evolución natural del TFG.
+
+\textbf{Reflexión:} la coherencia entre memoria, código y demo oral es tan importante como la funcionalidad; este documento describe la versión real del sistema a mayo de 2026.
+
+% ============================================================================
+\chapter{Agradecimientos}
+% ============================================================================
+
+A las personas del entorno sanitario que inspiraron el problema, a los tutores del ciclo, a quienes probaron la reserva en distintos dispositivos, y a mi familia por el apoyo durante el desarrollo.
+
+% ============================================================================
+\chapter{Checklist de cumplimiento (rúbricas)}
+% ============================================================================
+
+\input{checklist-rubricas}
+
+% ============================================================================
+\chapter{Bibliografía}
+% ============================================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{spring}
+Spring. (2024). \textit{Spring Boot 3.5 Reference}. \url{https://spring.io/projects/spring-boot}
+
+\bibitem{rgpd}
+Reglamento (UE) 2016/679 (RGPD).
+
+\bibitem{ley41}
+Ley 41/2002, autonomía del paciente e historia clínica (BOE).
+
+\bibitem{wcag}
+W3C (2021). \textit{WCAG 2.1}. \url{https://www.w3.org/WAI/WCAG21/quickref/}
+
+\bibitem{docker}
+Docker. \textit{Compose Documentation}. \url{https://docs.docker.com/compose/}
+
+\bibitem{twilio}
+Twilio. \textit{Messaging API}. \url{https://www.twilio.com/docs/messaging}
+
+\bibitem{flyway}
+Flyway. \textit{Documentation}. \url{https://documentation.red-gate.com/fd}
+
+\bibitem{doctoralia}
+Doctoralia. \textit{Plataforma para profesionales}. \url{https://www.doctoralia.es}
+
+\end{thebibliography}
+
+\end{document}

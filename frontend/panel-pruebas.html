@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Centro de pruebas TFG – reservas reales y vista del acceso médico.">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Pruebas TFG – Reservas y vista médico | Dr. Agramonte</title>
+    
+    <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
+    <link rel="apple-touch-icon" href="icons/app-icon.svg">
+    <meta name="theme-color" content="#0F766E">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Dr. Agramonte">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="css/dr-agramonte.css">
+    <link rel="stylesheet" href="css/pages-extra.css">
+    <script src="js/modules/theme-init.js"></script>
+</head>
+<body>
+<header class="main-header" role="banner">
+    <div class="container">
+        <div class="header-content">
+            <div class="logo-section">
+                <a href="index.html" class="logo-link" aria-label="Inicio - Dr. Agramonte">
+                    <div class="logo-icon" aria-hidden="true"><i class="fas fa-user-md"></i></div>
+                    <div class="logo-text">
+                        <h1 class="logo-title">Dr. Agramonte</h1>
+                        <p class="logo-subtitle">Pruebas TFG</p>
+                    </div>
+                </a>
+            </div>
+            <div class="header-end">
+                <button type="button" class="theme-toggle" id="themeToggle" aria-label="Activar modo oscuro" title="Cambiar tema">
+                    <i class="fas fa-moon" id="themeToggleIcon" aria-hidden="true"></i>
+                </button>
+            <nav class="main-nav" aria-label="Navegación principal">
+                <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Menú de navegación">
+                    <span class="nav-toggle-icon" aria-hidden="true"></span>
+                </button>
+                <ul class="nav-menu" id="nav-menu">
+                    <li class="nav-item"><a href="index.html" class="nav-link">Inicio</a></li>
+                    <li class="nav-item"><a href="sobre-mi.html" class="nav-link">Sobre mí</a></li>
+                    <li class="nav-item"><a href="servicios.html" class="nav-link">Servicios</a></li>
+                    <li class="nav-item"><a href="testimonios.html" class="nav-link">Testimonios</a></li>
+                    <li class="nav-item"><a href="contacto.html" class="nav-link">Contacto</a></li>
+                    <li class="nav-item"><a href="reservar.html" class="nav-link nav-link--reserva"><i class="fas fa-calendar-plus" aria-hidden="true"></i> Reservar cita</a></li>
+                </ul>
+            </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+<section class="page-hero page-hero--compact">
+    <div class="container">
+        <h1><i class="fas fa-flask"></i> Pruebas de reservas y acceso médico</h1>
+        <p>
+            Espacio técnico para el TFG: aquí ves <strong>todas las reservas reales</strong> guardadas en el servidor
+            cuando un paciente prueba <a href="reservar.html">reservar.html</a>,
+            y en la segunda pestaña la <strong>vista que tendría el médico</strong> (agenda de pacientes con cita).
+            No es el menú público para pacientes.
+        </p>
+    </div>
+</section>
+
+<main class="pruebas-wrap">
+    <div class="pruebas-toolbar">
+        <div class="field-inline">
+            <label for="medicoSelect">Médico</label>
+            <select id="medicoSelect" aria-label="Filtrar por médico"></select>
+        </div>
+        <span id="connStatus" class="pruebas-conn">Conectando…</span>
+    </div>
+
+    <div class="pruebas-tabs" role="tablist">
+        <button type="button" class="pruebas-tab active" data-tab="reservas" role="tab">
+            <i class="fas fa-calendar-check"></i> Pruebas de reservas
+        </button>
+        <button type="button" class="pruebas-tab" data-tab="medico" role="tab">
+            <i class="fas fa-stethoscope"></i> Vista y acceso médico
+        </button>
+    </div>
+
+    <div id="panel-reservas" class="pruebas-panel active" role="tabpanel">
+        <p style="font-size:.88rem;color:var(--gray-500);margin-bottom:1rem">
+            Cada fila es una cita creada en base de datos (pruebas de integración, demos del tribunal, reservas de pacientes registrados).
+            Se actualiza sola al reservar en otra pestaña.
+        </p>
+        <div class="stats-row">
+            <div class="stat-box"><div class="n" id="statTotal">—</div><div class="l">Total reservas</div></div>
+            <div class="stat-box"><div class="n" id="statConfirmadas">—</div><div class="l">Activas / confirmadas</div></div>
+            <div class="stat-box"><div class="n" id="statCanceladas">—</div><div class="l">Canceladas</div></div>
+        </div>
+        <div style="margin-bottom:.75rem">
+            <button type="button" class="btn-pruebas" id="btnRefreshReservas"><i class="fas fa-sync-alt"></i> Actualizar tabla</button>
+        </div>
+        <div class="table-wrap">
+            <table class="reservas-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Paciente</th>
+                        <th>Teléfono</th>
+                        <th>Fecha y hora</th>
+                        <th>Motivo</th>
+                        <th>Estado</th>
+                        <th>Médico</th>
+                    </tr>
+                </thead>
+                <tbody id="reservasBody"></tbody>
+            </table>
+        </div>
+        <p id="reservasEmpty" class="empty-msg" hidden>
+            <i class="fas fa-inbox"></i> Aún no hay reservas de prueba para este médico.
+            Crea una desde <a href="reservar.html">reservar.html</a> (inicia sesión como paciente).
+        </p>
+    </div>
+
+    <div id="panel-medico" class="pruebas-panel" role="tabpanel">
+        <div class="acceso-card" style="margin-bottom:1rem">
+            <h3><i class="fas fa-lock"></i> Acceso del rol MEDICO (prototipo TFG)</h3>
+            <p style="font-size:.82rem;color:var(--gray-500);margin-bottom:.5rem">
+                En producción: JWT + rol <code>MEDICO</code>. Aquí se usa <code>GET /api/citas/agenda/pacientes</code> (vista inferior)
+                y <code>GET /api/citas/agenda/reservas</code> (pestaña anterior). Historial clínico y alertas: evolución futura.
+            </p>
+        </div>
+        <div style="margin-bottom:.75rem">
+            <button type="button" class="btn-pruebas outline" id="btnRefreshMedico"><i class="fas fa-sync-alt"></i> Actualizar agenda médico</button>
+        </div>
+        <div class="medico-layout">
+            <div class="medico-list">
+                <div class="medico-list-header"><i class="fas fa-users"></i> Pacientes con cita</div>
+                <div class="medico-list-body" id="medicoListaPacientes">
+                    <p class="medico-placeholder"><i class="fas fa-spinner fa-spin"></i> Cargando…</p>
+                </div>
+            </div>
+            <div class="medico-detail" id="medicoDetalle">
+                <p class="medico-placeholder">Selecciona un paciente para ver su ficha y citas reservadas.</p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section"><h3>Dr. Agramonte</h3><p>Especialista en Medicina Interna</p><p>Colegiado N° 12345</p><p>Madrid, España</p></div>
+        <div class="footer-section"><h3>Contacto</h3><a href="tel:+34748962648"><i class="fas fa-phone"></i> +34 748 962 648</a><a href="mailto:Dr.Agramonte@gmail.com"><i class="fas fa-envelope"></i> Dr.Agramonte@gmail.com</a><p><i class="fas fa-map-marker-alt"></i> Calle Salud, 123, Madrid</p></div>
+        <div class="footer-section"><h3>Horario</h3><p><strong>Lunes a Viernes</strong><br>9:00 - 14:00<br>16:00 - 19:00</p><p><strong>Sábados</strong><br>9:00 - 13:00 (con cita)</p></div>
+        <div class="footer-section"><h3>Enlaces</h3><a href="privacidad.html"><i class="fas fa-shield-alt"></i> Política de Privacidad</a><a href="offline.html"><i class="fas fa-wifi-slash"></i> Modo Offline</a><a href="panel-pruebas.html"><i class="fas fa-flask"></i> Pruebas TFG (reservas / médico)</a><p style="margin-top:.8rem;">Web: <a href="https://www.saludybienestarinterno.com/" target="_blank" rel="noopener">www.saludybienestarinterno.com</a></p></div>
+    </div>
+    <div class="footer-bottom"><p>© 2025 Salud y Bienestar Interno – Dr. Juan Manuel Agramonte. <a href="privacidad.html">Política de privacidad</a></p></div>
+</footer>
+
+<script src="js/modules/api-config.js"></script>
+<script src="js/pages/dr-agramonte.js" defer></script>
+<script type="module" src="js/pages/panel-pruebas.js"></script>
+</body>
+</html>
