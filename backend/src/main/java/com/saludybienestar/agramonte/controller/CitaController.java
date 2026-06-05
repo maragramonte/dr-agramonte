@@ -65,8 +65,10 @@ public class CitaController {
 
     /** Historial de reservas para pruebas / demo TFG (no es el panel clínico en producción). */
     @GetMapping("/agenda/reservas")
-    public List<ReservaPruebaResponse> reservasPrueba(@RequestParam(defaultValue = "1") Long medicoId) {
-        return citaService.listarReservasPrueba(medicoId);
+    public List<ReservaPruebaResponse> reservasPrueba(
+            @RequestParam(defaultValue = "1") Long medicoId,
+            @RequestParam(required = false) String centroCodigo) {
+        return citaService.listarReservasPrueba(medicoId, centroCodigo);
     }
 
     @DeleteMapping("/{id}")

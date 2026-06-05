@@ -6,13 +6,16 @@
   \node[entity, minimum width=2.5cm, below=1.1cm of m] (h) {\textbf{horarios}\\\scriptsize medico\_id, inicio, fin\\disponible};
   \node[entity, minimum width=2.6cm, below=1.1cm of u] (c) {\textbf{citas}\\\scriptsize usuario\_id, medico\_id\\fecha\_hora, motivo, estado\\recordatorio\_enviado};
   \node[entity, minimum width=2.5cm, right=2.2cm of c] (n) {\textbf{notificaciones}\\\scriptsize usuario\_id, cita\_id\\canal, estado\_entrega};
+  \node[entity, minimum width=2.4cm, below=1.0cm of c] (ce) {\textbf{centros}\\\scriptsize codigo, nombre\\direccion, ciudad};
 
   \draw[rel] (u) -- node[above, sloped, font=\scriptsize]{1:N} (c);
   \draw[rel] (m) -- node[above, sloped, font=\scriptsize]{1:N} (c);
   \draw[rel] (m) -- node[right, font=\scriptsize]{1:N} (h);
   \draw[rel, dashed] (c) -- node[above, font=\scriptsize]{opc.} (n);
   \draw[rel, dashed] (u) -- (n);
+  \draw[rel, dashed] (ce) -- node[right, font=\scriptsize]{opc. 1:N} (c);
+  \draw[rel, dashed] (ce) to[bend left=20] node[left, font=\scriptsize]{opc. 1:N} (h);
 \end{tikzpicture}
-\caption{Modelo entidad-relación principal (PostgreSQL, migraciones Flyway V1--V2)}
+\caption{Modelo entidad-relación principal (PostgreSQL, migraciones Flyway V1--V6)}
 \label{fig:er}
 \end{figure}

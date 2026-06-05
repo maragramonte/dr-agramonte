@@ -19,7 +19,8 @@ public class DisponibilidadController {
     @GetMapping
     public List<LocalDateTime> horariosDisponibles(
             @RequestParam Long medicoId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
-        return disponibilidadService.obtenerHuecosLibres(medicoId, fecha.toString());
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
+            @RequestParam(required = false) String centroCodigo) {
+        return disponibilidadService.obtenerHuecosLibres(medicoId, fecha.toString(), centroCodigo);
     }
 }

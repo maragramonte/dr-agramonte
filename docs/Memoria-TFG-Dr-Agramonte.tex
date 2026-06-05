@@ -3,19 +3,26 @@
 \usepackage[spanish,es-tabla]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+% Helvetica como sustituto métrico de Arial (Arial real requiere XeLaTeX/Overleaf).
 \usepackage{helvet}
 \renewcommand{\familydefault}{\sfdefault}
+
+% Justificación a ambos lados (comportamiento por defecto de report; se deja explícito).
+\usepackage{ragged2e}
 
 \usepackage[
   top=3cm, bottom=3cm, left=3cm, right=3cm,
   headheight=15pt, headsep=10pt
 ]{geometry}
 \usepackage{setspace}
-\setstretch{1.15}
+\setstretch{1.15}              % Interlineado 1,15 (requisito de formato)
 \setlength{\parindent}{1.25cm}
 \setlength{\parskip}{0.5em}
 
 \usepackage[table]{xcolor}
+% tikz debe cargarse antes de tikz-paleta porque este usa \tikzset.
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, shapes.geometric}
 \input{tikz-paleta}
 
 \usepackage{amssymb}
@@ -41,20 +48,20 @@
 \renewcommand{\cftchappagefont}{\bfseries\color{tealdark}}
 
 \usepackage{booktabs, array, longtable, float, caption}
-\captionsetup{font=small,labelfont={bf,color=tealdark}}
+% Figuras, tablas y leyendas a tamaño 10 (requisito de formato).
+\captionsetup{font=footnotesize,labelfont={bf,color=tealdark}}
 
 \usepackage{listings}
 \lstdefinestyle{mycode}{
   backgroundcolor=\color{codebg},
-  basicstyle=\ttfamily\small\color{codefg},
+  basicstyle=\ttfamily\footnotesize\color{codefg},
   breaklines=true, numbers=left, numbersep=8pt,
   frame=single, framerule=0pt, xleftmargin=14pt,
 }
 \lstset{style=mycode}
 
 \usepackage{graphicx}
-\usepackage{tikz}
-\usetikzlibrary{positioning, arrows.meta, shapes.geometric}
+% tikz y sus librerías ya se cargan al inicio (antes de tikz-paleta).
 
 \usepackage{hyperref}
 \hypersetup{
@@ -68,7 +75,7 @@
 
 \begin{document}
 
-% --- Portada ---
+% --- Portada (sin número de página) ---
 \begin{titlepage}
   \pagestyle{empty}
   \centering
@@ -83,54 +90,112 @@
   \end{tikzpicture}
   \vfill
   \begin{tabular}{rl}
-    \textbf{Autora:} & Mar Agramonte \\
+    \textbf{Autora:} & Mar Agramonte Campos \\
     \textbf{Centro:} & CESUR \\
     \textbf{Ciclo:} & Desarrollo de Aplicaciones Multiplataforma \\
     \textbf{Tutores:} & Pascual Barrer -- Jaume Rossinrol \\
-    \textbf{Curso:} & 2024--2025 \\
-    \textbf{Fecha:} & Mayo 2026 \\
+    \textbf{Curso:} & 2025--2026 \\
+    \textbf{Fecha:} & Junio 2026 \\
   \end{tabular}
 \end{titlepage}
+
+\clearpage
+\pagestyle{fancy}
+\setcounter{page}{1}
+
+% ============================================================================
+% RESUMEN (se redacta al final; recoge ideas clave y conclusiones)
+% ============================================================================
+\chapter*{Resumen}
+\addcontentsline{toc}{chapter}{Resumen}
+
+\textbf{Dr. Agramonte} es una aplicación web para que pacientes reserven, consulten y cancelen citas médicas sin depender del teléfono del profesional. El sistema integra un frontend estático (HTML, CSS y JavaScript), una API REST con \textbf{Spring Boot 3.5.3}, base de datos \textbf{PostgreSQL}, autenticación \textbf{JWT}, control de concurrencia con \textbf{bloqueo pesimista}, notificaciones \textbf{Twilio} (SMS/WhatsApp) y despliegue reproducible con \textbf{Docker Compose}.
+
+El proyecto nace de una observación directa del sector sanitario: buena parte de las llamadas que recibe un médico fuera de su horario no son urgencias clínicas, sino gestión de agenda. Digitalizar esa parte administrativa devuelve tiempo al profesional sin sustituir el trato humano donde de verdad hace falta. Sobre esa idea se construye una herramienta pensada para consultas pequeñas y médicos autónomos, que mantienen la titularidad de sus datos en lugar de depender de plataformas de terceros.
+
+La interfaz replica la identidad visual del consultorio: paleta \textbf{teal} (\#0F766E, \#14B8A6), tipografías DM Sans / DM Serif Display, modo claro/oscuro y diseño responsive. La reserva se organiza en pasos (centro, calendario, hora, datos y confirmación) y puede iniciarse desde \texttt{servicios.html} con el tipo de consulta preseleccionado.
+
+La calidad se respalda con una batería de \textbf{pruebas automatizadas} (unitarias, de seguridad y de integración con Testcontainers) y con análisis de vulnerabilidades \textbf{OWASP dependency-check}. La principal conclusión es que la coherencia entre memoria, código y demostración es tan determinante como la propia funcionalidad: este documento describe la versión \emph{real} del sistema a junio de 2026, distinguiendo lo entregado de lo planificado como evolución.
 
 \clearpage
 \tableofcontents
 \newpage
 
 % ============================================================================
-\chapter{Resumen ejecutivo}
-% ============================================================================
-
-\textbf{Dr. Agramonte} es una aplicación web para que pacientes reserven, consulten y cancelen citas médicas sin depender del teléfono del profesional. El sistema integra frontend estático (HTML, CSS y JavaScript), API REST con \textbf{Spring Boot 3.5.3} y \textbf{PostgreSQL}, autenticación \textbf{JWT}, control de concurrencia con \textbf{bloqueo pesimista}, notificaciones \textbf{Twilio} (SMS/WhatsApp) y despliegue con \textbf{Docker Compose}.
-
-La interfaz replica la identidad visual del consultorio: paleta \textbf{teal} (\#0F766E, \#14B8A6), tipografías DM Sans / DM Serif Display, modo claro/oscuro y diseño responsive. La reserva se organiza en pasos (centro, calendario, hora, datos y confirmación) y puede iniciarse desde \texttt{servicios.html} con el tipo de consulta preseleccionado.
-
-\textbf{Alcance real del repositorio} (mayo 2026): no incluye MongoDB, Redis ni microservicio Node.js; la agenda médico y las pruebas de reserva se consultan en \texttt{panel-pruebas.html}. Las mejoras futuras se documentan como evolución, no como funcionalidad entregada.
-
-% ============================================================================
 \chapter{Justificación y contexto}
 % ============================================================================
 
-\section{Origen del problema}
+\section{De dónde viene este proyecto}
 
-La motivación proviene de la observación directa del sector sanitario: gran parte de las llamadas al móvil del médico no son urgencias clínicas, sino gestión de agenda. Una web accesible reduce interrupciones y devuelve tiempo al profesional.
+Me he criado rodeada de sanidad. La mayoría de mis familiares y amigos trabajan en el sector, así que lo que sé de esta profesión no viene de un libro: viene de haberla visto de cerca durante años. Y lo que he visto se repite con una regularidad que asusta: un médico no desconecta cuando cierra la consulta. El teléfono sigue sonando. En Navidad, en verano, en mitad de una cena, incluso en mitad de un viaje. Siempre hay alguien que llama, ya sea para confirmar una cita, preguntar por una receta o pedir un consejo que, sinceramente, podría esperar.
 
-\section{Competidores y hueco de mercado}
+La mayoría de esas llamadas no son urgencias. Son gestiones que, con la herramienta adecuada, el paciente podría resolver por su cuenta. Lo que muchas veces se pasa por alto es que ese médico también tiene familia, también necesita estar en una cena sin el teléfono encima y también tiene derecho a un domingo sin interrupciones. La tecnología no lo soluciona todo, pero sí puede encargarse de la parte administrativa que hoy recae directamente sobre el profesional. De ahí nace este proyecto: no es una idea inventada, es algo que observé durante años. Si el paciente puede gestionar sus citas solo, el médico recupera tiempo. Es así de simple.
 
-Plataformas como Doctoralia o Top Doctors cubren grandes centros, pero implican comisiones y dependencia de terceros. Consultas pequeñas o médicos autónomos necesitan una herramienta simple, bajo su control y adaptable a medicina interna.
+\section{La carga administrativa invisible}
 
-\section{Marco legal}
+El problema no es solo cuántas llamadas entran, es quién acaba cogiéndolas. En muchas consultas pequeñas, o en centros que van desbordados, no hay personal de administración, así que el médico termina haciendo también ese trabajo. Cada vez que descuelga el teléfono para confirmar una cita o resolver un trámite, deja a medias lo que estaba haciendo con el paciente que tiene delante.
 
-Los datos de salud exigen cumplir \textbf{RGPD}, \textbf{LOPDGDD} y \textbf{Ley 41/2002}. La aplicación incluye política de privacidad, consentimiento en reserva y minimización de datos (solo los necesarios para la cita).
+Este proyecto no quiere sustituir el trato humano ni apartar al profesional del teléfono. Hay momentos en los que quien llama está asustado, confuso o simplemente necesita que alguien lo escuche, y para eso no vale una aplicación. Lo que busco es que el médico no tenga que coger el teléfono cada vez que alguien llama para confirmar que su cita del jueves sigue siendo a las cinco, ni cada vez que un paciente aprovecha que tiene su número para preguntar una duda que podría esperar a la próxima consulta. Eso sí lo puede hacer un sistema, y liberar ese tiempo es, en el fondo, el objetivo de toda la plataforma.
+
+\section{El coste oculto para el profesional}
+
+Hay algo que casi nunca se dice en voz alta. Cuando el médico sale de la consulta por la tarde, no deja de ser médico: sigue pendiente. Si un paciente le llama a las diez de la noche porque le duele algo, coge el teléfono. Si alguien le escribe un domingo por la mañana, contesta. Y todas esas horas en las que está trabajando, aunque nadie lo llame trabajo, no las cobra: están fuera de su jornada, fuera de su sueldo y dentro de su vida.
+
+Y hay algo más que tampoco suele mirarse: nadie pregunta si el médico está bien, si ha dormido, si ha comido, si lleva semanas arrastrando un cansancio que no se permite parar. Como su oficio es cuidar, damos por hecho que ya se cuida solo, y muchas veces no es así. Lo he visto en gente de mi familia y en amigos del sector: pasan el día entero escuchando lo que le duele a todo el mundo y llegan a casa sin margen para contar lo suyo. Por eso entiendo esta aplicación no solo como un gestor de citas, sino como una pequeña forma de devolver un respiro a alguien que llevaba mucho tiempo sin pedirlo.
+
+\section{El hueco que existe en el mercado}
+
+En España, si trabajas en un hospital grande tienes sistemas de cita online; si formas parte de una clínica privada importante, tienes acceso a plataformas como Doctoralia o Top Doctors. Pero si eres un médico independiente o ejerces en una consulta pequeña, lo más probable es que sigas gestionando las citas por teléfono y agenda de papel. Las soluciones existentes presentan carencias para ese perfil:
+
+\begin{itemize}
+  \item \textbf{Comisiones y suscripciones} pensadas para grandes volúmenes, que no encajan con quien atiende a 40--50 pacientes a la semana.
+  \item \textbf{Dependencia de terceros:} el médico deja de ser dueño de sus propios datos, que pasan a alojarse en servidores ajenos.
+  \item \textbf{Personalización limitada:} no se adaptan con facilidad a una especialidad concreta ni al modo de trabajar de una consulta pequeña.
+\end{itemize}
+
+Existe un espacio entre ambas opciones donde caben muchos profesionales que necesitan una herramienta especializada, accesible y bajo su control. \textbf{Dr. Agramonte se diseña pensando precisamente en ese espacio.}
+
+\section{Viabilidad económica (estimación)}
+
+Como desarrolladora, una decisión técnica no se sostiene solo por ser elegante: tiene que tener sentido también en coste. Por eso conviene una estimación, con cifras aproximadas y a modo ilustrativo, de lo que aporta la herramienta frente a su coste.
+
+\textbf{Ahorro.} Si la reserva, confirmación y cancelación autónomas evitan en torno a \textbf{4 horas semanales} de gestión telefónica, y se valora la hora de consulta privada en unos 50\,€, el ahorro ronda los 200\,€ semanales, del orden de \textbf{10.000\,€ al año} en tiempo recuperado por el profesional.
+
+\textbf{Coste.} El desarrollo es un coste \emph{único} (este propio TFG), y la operación es deliberadamente barata gracias a las decisiones de arquitectura: un frontend estático sin dependencias, un único backend Java y una base de datos relacional caben de sobra en una VPS modesta (del orden de 10\,€/mes). No hay comisiones por cita ni cuotas de plataforma de terceros.
+
+\textbf{Conclusión.} Con estas cifras —que habría que afinar en un caso real— la inversión se amortiza en pocos meses. Más allá del número, la idea de fondo es que las decisiones de desarrollo (sin frameworks innecesarios, contenedores ligeros, una sola base de datos relacional) no solo simplifican el código: también hacen el sistema \textbf{sostenible} para una consulta pequeña.
+
+Conviene situar el proyecto frente a las alternativas reales. Las grandes plataformas del sector privado (Doctoralia, Top Doctors) están pensadas para clínicas y hospitales con volúmenes altos: aportan visibilidad y un directorio de pacientes, pero a cambio el profesional depende de un intermediario, asume sus condiciones económicas y deja de ser dueño de sus propios datos. En el otro extremo, las herramientas genéricas de gestión (agendas o CRM no sanitarios) son más baratas, pero no entienden las particularidades de la sanidad: no contemplan historial clínico, no se ajustan a la normativa de conservación de datos de salud ni manejan roles propios de la práctica médica. Dr.\ Agramonte no compite con ninguno de los dos en su terreno; ocupa el hueco intermedio, ofreciendo a una consulta pequeña una solución propia, simple y conforme a la normativa, sin comisiones por cita ni dependencia de un tercero.
+
+\section{Por qué y para qué}
+
+\textbf{Por qué:} las consultas pequeñas y los médicos autónomos carecen de una herramienta de reserva propia, simple y bajo su control. \textbf{Para qué:} ofrecer un canal de autoservicio 24/7 que descargue al profesional de la gestión telefónica y mejore la experiencia del paciente, manteniendo la titularidad de los datos en manos del propio consultorio.
+
+\section{Marco legal aplicable}
+
+Cualquier aplicación que gestione datos de salud en Europa está sujeta a un marco legal exigente, precisamente porque se trata de información sensible:
+
+\begin{itemize}
+  \item \textbf{RGPD} (Reglamento (UE) 2016/679): los datos de salud son una categoría especial de datos, con un nivel de protección reforzado.
+  \item \textbf{LOPDGDD} (Ley Orgánica 3/2018): la adaptación española del RGPD.
+  \item \textbf{Ley 41/2002}, básica reguladora de la autonomía del paciente, que regula la documentación clínica y sus plazos de conservación.
+\end{itemize}
+
+Esto significa que no basta con que la aplicación funcione: tiene que funcionar de forma segura y conforme a la ley. La plataforma incorpora política de privacidad, consentimiento explícito en la reserva y minimización de datos (solo se piden los necesarios para gestionar la cita). Los datos son la intimidad de alguien que ha confiado en el sistema, y tratarlos con cuidado no es un extra: es la base.
 
 % ============================================================================
 \chapter{Objetivos}
 % ============================================================================
 
+Los objetivos del proyecto se formularon con un criterio que ha guiado toda la memoria: que cada meta fuera \textbf{concreta, verificable y realmente alcanzable} dentro del alcance de un TFG. No se persigue prometer un producto enorme a medias, sino entregar un sistema más pequeño pero completo, coherente y demostrable.
+
 \section{Objetivo general}
 
-Desarrollar una aplicación web de gestión de citas médicas que permita al paciente reservar y cancelar de forma autónoma, con backend seguro y despliegue reproducible.
+Desarrollar una aplicación web de gestión de citas médicas que permita al paciente reservar y cancelar de forma autónoma, reduciendo la dependencia del teléfono y devolviendo al profesional el control de su tiempo, sobre un backend seguro y un despliegue reproducible.
 
 \section{Objetivos específicos (alineados con la implementación)}
+
+Cada objetivo específico se corresponde con código real del repositorio y, cuando aplica, con una prueba que lo respalda. Esa trazabilidad entre objetivo, implementación y prueba es deliberada: evita el riesgo de prometer en la memoria lo que no existe en el sistema.
 
 \begin{enumerate}
   \item Modelar y persistir usuarios, médicos, horarios y citas en \textbf{PostgreSQL} con migraciones \textbf{Flyway} y perfiles \texttt{postgres}/\texttt{mysql}.
@@ -139,37 +204,115 @@ Desarrollar una aplicación web de gestión de citas médicas que permita al pac
   \item Construir frontend responsive, PWA, modo oscuro y flujo de reserva accesible (\texttt{reserva.js}, \texttt{api-client.js}).
   \item Enviar notificaciones al médico y al paciente vía \textbf{Twilio}, con recordatorio programado 24\,h antes (\texttt{CitaReminderScheduler}).
   \item Desplegar con \textbf{Docker Compose} (nginx + backend + base de datos).
-  \item Documentar el proyecto y preparar defensa con demo reproducible.
+  \item Validar la calidad con pruebas automatizadas y análisis de vulnerabilidades, y preparar la defensa con una demo reproducible.
 \end{enumerate}
 
+Estos siete objetivos se retoman en el capítulo de conclusiones para comprobar, uno a uno, su grado de cumplimiento.
+
 % ============================================================================
-\chapter{Análisis y contextualización del sector}
+\chapter{Desarrollo}
 % ============================================================================
 
-\section{Sector profesional}
+% ----------------------------------------------------------------------------
+\section{Contextualización del sector}
+% ----------------------------------------------------------------------------
 
-El ciclo DAM aporta competencias en desarrollo multiplataforma, bases de datos, interfaces y despliegue. Este proyecto las aplica al ámbito sanitario privado: agenda, relación paciente--médico y comunicación.
+\subsection{Descripción del sector profesional}
 
-\section{Riesgos laborales (resumen)}
+El ciclo de Desarrollo de Aplicaciones Multiplataforma (DAM) aporta competencias en desarrollo multiplataforma, bases de datos, programación de servicios, diseño de interfaces y despliegue. Este proyecto las aplica a un ámbito muy concreto: el sanitario privado, y dentro de él, a la gestión de agenda, la relación paciente--médico y la comunicación entre ambos.
+
+El puesto de referencia para este TFG es el de \emph{desarrollador/a de aplicaciones} que da soporte a un consultorio de medicina interna. Es un perfil mixto: por un lado, trabajo de oficina propio del desarrollo de software (análisis, programación, pruebas, documentación); por otro, la necesidad de entender la realidad de un entorno clínico, donde los datos que se manejan son sensibles, los usuarios tienen edades y niveles digitales muy distintos, y un error no es un simple \emph{bug}, sino una persona afectada. Comprender ese sector —sus tiempos, sus prioridades y sus límites legales— es tan parte del trabajo como escribir el código, y de hecho condiciona casi todas las decisiones técnicas que aparecen más adelante en esta memoria.
+
+\subsection{Tipos de solución y dónde encaja el proyecto}
+
+Desde el punto de vista del desarrollo, una herramienta de gestión de citas puede abordarse de tres formas, cada una con sus compromisos:
 
 \begin{itemize}
-  \item \textbf{Ergonómicos:} posturas prolongadas ante pantalla; pausas y ergonomía en puesto de desarrollo y en consulta.
-  \item \textbf{Psicosociales:} estrés por interrupciones; la digitalización de citas reduce carga administrativa.
-  \item \textbf{Seguridad de la información:} tratamiento de datos de salud; cifrado en tránsito (HTTPS), contraseñas con BCrypt, secretos en variables de entorno.
-  \item \textbf{EPI / buenas prácticas:} control de accesos por rol, copias de seguridad de BD, no commitear credenciales.
+  \item \textbf{SaaS} (software como servicio): el proveedor aloja la aplicación y el cliente paga una suscripción (Doctoralia, Top Doctors). Cómodo y siempre actualizado, pero con costes recurrentes, comisiones y los datos en manos de un tercero.
+  \item \textbf{A medida} (\emph{open source} / propietario): la aplicación se desarrolla y se despliega en la infraestructura del propio profesional. Da control total, sin comisiones y permite personalizar, a cambio de requerir conocimiento técnico para mantenerla.
+  \item \textbf{Herramientas genéricas} (agendas o CRM no sanitarios): baratas, pero ajenas a las particularidades de la sanidad (historial clínico, normativa de conservación, roles).
 \end{itemize}
 
-% ============================================================================
-\chapter{Diseño y arquitectura del sistema}
-% ============================================================================
+\textbf{Dr. Agramonte} se sitúa en el modelo \emph{a medida}: una solución propia, sin comisiones, con los datos bajo control del consultorio y pensada para ser desplegable y mantenible por un perfil técnico.
 
-\section{Arquitectura general}
+\subsection{Competencias del desarrollador DAM aplicadas}
 
-La solución sigue una arquitectura en capas desplegada con contenedores. El navegador consume el frontend servido por \textbf{nginx}; las peticiones \texttt{/api} se proxyan al backend Java. Twilio es un servicio externo invocado desde \texttt{TwilioMessageService}.
+El proyecto no nace de un módulo concreto, sino de la integración de las competencias del ciclo, que es precisamente lo que se espera de un perfil de \emph{desarrollo}:
+
+\begin{itemize}
+  \item \textbf{Acceso a datos:} modelo relacional, JPA y transacciones (las tablas y el bloqueo de la reserva).
+  \item \textbf{Programación de servicios y procesos:} la API REST, la seguridad y la tarea programada de recordatorios.
+  \item \textbf{Desarrollo de interfaces:} el frontend accesible y la PWA.
+  \item \textbf{Sistemas y despliegue:} contenedores Docker, nginx y perfiles de configuración.
+  \item \textbf{Empresa e iniciativa emprendedora:} el análisis del hueco de mercado y la viabilidad económica.
+\end{itemize}
+
+Las salidas naturales de este perfil —desarrollo \emph{backend}, \emph{full-stack} o iniciación a \emph{DevOps}— se ven reflejadas en las distintas capas que ha sido necesario construir para este sistema.
+
+\subsection{Riesgos laborales}
+
+\begin{itemize}
+  \item \textbf{Ergonómicos:} posturas prolongadas ante pantalla, fatiga visual y movimientos repetitivos al teclear, tanto en el puesto de desarrollo como en la consulta.
+  \item \textbf{Psicosociales:} estrés por interrupciones y carga administrativa; la digitalización de citas reduce esa presión.
+  \item \textbf{Seguridad de la información:} el tratamiento de datos de salud (categoría especial RGPD) implica riesgo de fuga o acceso indebido.
+  \item \textbf{Medioambientales:} consumo energético de equipos y servidores; gestión responsable de residuos electrónicos (RAEE).
+\end{itemize}
+
+\subsection{Medidas preventivas}
+
+\begin{itemize}
+  \item \textbf{Ergonomía:} silla regulable, pantalla a la altura de los ojos, regla 20-20-20 para la vista y pausas activas periódicas.
+  \item \textbf{Organización:} la propia herramienta reduce el riesgo psicosocial al eliminar llamadas e interrupciones de agenda.
+  \item \textbf{Protección de datos:} cifrado en tránsito (HTTPS), contraseñas con \texttt{BCrypt}, secretos en variables de entorno, control de accesos por rol y copias de seguridad de la base de datos.
+  \item \textbf{Sostenibilidad:} despliegue en contenedores ligeros y apagado de servicios no usados.
+\end{itemize}
+
+\subsection{Equipos de protección y buenas prácticas (EPIs)}
+
+En un puesto de desarrollo software los EPIs físicos son limitados, por lo que la prevención se apoya en \textbf{equipamiento ergonómico} (reposamuñecas, filtro de luz azul, iluminación adecuada) y, sobre todo, en \textbf{buenas prácticas de seguridad} como ``EPI digital'': no commitear credenciales, principio de mínimo privilegio, actualización de dependencias y revisión de vulnerabilidades.
+
+% ----------------------------------------------------------------------------
+\section{Desarrollo principal}
+% ----------------------------------------------------------------------------
+
+\subsection{Del boceto inicial a la implementación}
+
+Antes de escribir una sola línea de código dibujé cómo debía sentirse la plataforma. El boceto inicial (figura~\ref{fig:boceto}) fijó las decisiones de fondo que luego se mantuvieron: un flujo de reserva guiado paso a paso, una estética sobria propia de un consultorio y una navegación pensada para que una persona mayor o poco habituada a la tecnología no se pierda. Ese boceto no fue un trámite: marcó la diferencia entre construir ``una web de citas'' y construir \emph{esta} web de citas, con su identidad y su tono.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{../frontend/pictures/Boceto.png}
+  \caption{Boceto inicial de la plataforma: mapa de secciones y primeras ideas de interfaz.}
+  \label{fig:boceto}
+\end{figure}
+
+Comparando el boceto con el resultado final se aprecia que las ideas centrales sobrevivieron al desarrollo (reserva por pasos, selección de centro, identidad visual del consultorio), mientras que otras se ajustaron a lo que el alcance de un TFG permite construir con garantías. Documentar esa evolución es parte del valor del proyecto: enseña no solo qué se hizo, sino por qué se decidió así.
+
+\subsection{Metodología de desarrollo}
+
+El proyecto no se construyó de una vez, sino de forma \textbf{iterativa e incremental}: primero una web estática que validaba la idea y la navegación, después el backend y la base de datos, luego la integración real entre frontend y API, y por último las notificaciones, la robustez para la demo y la documentación. Cada iteración partía de algo que ya funcionaba y le añadía una capa, lo que permitió detectar pronto los problemas reales —como la incoherencia entre las citas del navegador y las de la base de datos— en lugar de descubrirlos al final.
+
+Todo el código se gestionó con \textbf{control de versiones Git}, lo que aportó un historial de cambios, la posibilidad de volver atrás ante un error y una separación clara entre lo que es código fuente y lo que son secretos o configuración local (estos últimos excluidos del repositorio mediante \texttt{.gitignore}). Se trabajó además con la distinción entre \textbf{entornos}: una configuración para desarrollo y otra preparada para producción, seleccionables por perfiles, de modo que la misma base de código se comporta de forma adecuada en cada contexto sin tocar el código. Esta forma de trabajar es, en sí misma, una de las competencias que el ciclo busca consolidar.
+
+\subsection{Arquitectura general}
+
+La solución sigue una arquitectura en capas desplegada con contenedores, de forma que cada pieza tiene una responsabilidad clara y puede sustituirse o escalarse sin arrastrar a las demás. El navegador consume el frontend (HTML, CSS y JavaScript) servido por \textbf{nginx}; las peticiones a \texttt{/api} se redirigen mediante proxy inverso al backend Java, lo que evita problemas de CORS en producción y permite presentar todo bajo un mismo origen. El backend de \textbf{Spring Boot} concentra la lógica de negocio, la seguridad y el acceso a datos sobre \textbf{PostgreSQL}, y delega en \textbf{Twilio} (servicio externo invocado desde \texttt{TwilioMessageService}) el envío de SMS y mensajes de WhatsApp. Esta separación en capas (presentación, API, persistencia y servicios externos) es la que sostiene el resto de decisiones técnicas de la memoria.
 
 \input{tikz-diagrama-arquitectura}
 
-\section{Stack tecnológico}
+\subsection{Organización del backend en capas y DTOs}
+
+Dentro del backend, el código sigue el patrón clásico de \textbf{tres capas} de Spring, con responsabilidades bien separadas:
+
+\begin{itemize}
+  \item \textbf{Controladores} (\texttt{controller}): reciben las peticiones HTTP, validan la entrada y devuelven la respuesta. No contienen lógica de negocio; solo orquestan. Ejemplos: \texttt{AuthController}, \texttt{CitaController}, \texttt{MedicoController}, \texttt{DisponibilidadController}.
+  \item \textbf{Servicios} (\texttt{service}): concentran las reglas de negocio (crear una cita, comprobar disponibilidad, decidir si una cancelación es legítima) y abren las transacciones.
+  \item \textbf{Repositorios} (\texttt{repository}): acceden a la base de datos mediante Spring Data JPA, incluida la consulta con bloqueo pesimista para la reserva.
+\end{itemize}
+
+Una decisión importante fue \textbf{no exponer nunca las entidades JPA directamente} en la API. Las respuestas usan objetos de transferencia de datos (\emph{DTO}) como \texttt{CitaResponse} o \texttt{ReservaPublicaResponse}, y las peticiones se modelan con clases como \texttt{CrearCitaRequest} o \texttt{ReservaPublicaRequest}. Esto tiene tres ventajas: evita filtrar al exterior campos internos o sensibles, desacopla el modelo de base de datos del contrato público de la API (se puede cambiar la entidad sin romper a los clientes) y permite validar la entrada de forma declarativa con anotaciones. Es una práctica que el tribunal reconoce de inmediato como código profesional, no de juguete.
+
+\subsection{Stack tecnológico}
 
 \begin{table}[H]
 \centering
@@ -191,29 +334,52 @@ Despliegue & Docker Compose & Entorno reproducible \\
 \end{tabular}
 \end{table}
 
-\section{Modelo de datos}
+\subsection{Justificación de las tecnologías}
+
+Cada pieza del stack se eligió por una razón concreta, no por moda:
+
+\begin{itemize}
+  \item \textbf{Java + Spring Boot.} El tipado fuerte de Java detecta en tiempo de compilación errores que en un lenguaje dinámico aparecerían en producción, algo especialmente valioso cuando se manejan datos de salud. Spring Boot aporta, además, un ecosistema maduro: Spring Security como estándar de facto para autenticación y autorización, Spring Data JPA para el acceso a datos y transacciones ACID que garantizan que una reserva se complete entera o no se complete en absoluto.
+  \item \textbf{PostgreSQL.} Para datos críticos (usuarios, médicos, horarios y citas) hace falta integridad referencial real, transacciones fiables y bloqueo a nivel de fila. PostgreSQL ofrece las tres cosas y permite implementar el control de concurrencia con \texttt{SELECT \ldots FOR UPDATE}, núcleo de la garantía de ``no doble reserva''.
+  \item \textbf{Flyway.} Versiona el esquema en migraciones numeradas (V1 a V6), de modo que cualquier entorno —el de desarrollo, el del tribunal o uno futuro en producción— se reconstruye exactamente igual al arrancar.
+  \item \textbf{Twilio.} En lugar de montar infraestructura propia de mensajería, se delega el envío de SMS y WhatsApp en un proveedor consolidado, invocado directamente desde el backend Java.
+  \item \textbf{Docker Compose.} Levanta todo el sistema con un único comando, eliminando el clásico ``en mi máquina funciona''.
+\end{itemize}
+
+\subsection{Modelo de datos}
 
 \input{tikz-diagrama-er}
 
-La migración \texttt{V2\_\_cita\_recordatorio} añade el campo \texttt{recordatorio\_enviado} para evitar duplicar avisos Twilio.
+El modelo relacional gira en torno a cuatro entidades centrales —\texttt{usuarios}, \texttt{medicos}, \texttt{horarios} y \texttt{citas}— más \texttt{notificaciones} para el registro de avisos. Un \texttt{usuario} (paciente) puede tener muchas \texttt{citas}; un \texttt{medico} tiene muchos \texttt{horarios} y muchas \texttt{citas}; cada \texttt{cita} enlaza un usuario con un médico en una fecha y hora concretas. Cada tabla cumple un papel preciso:
 
-\section{Frontend y paleta visual}
+\begin{itemize}
+  \item \texttt{usuarios}: identidad y credenciales (email único, contraseña cifrada, nombre, teléfono, rol). El campo \texttt{rol} discrimina entre \texttt{PACIENTE}, \texttt{MEDICO} y \texttt{ADMIN}, y \texttt{cuenta\_invitada} marca las cuentas creadas en una reserva sin registro.
+  \item \texttt{medicos}: datos profesionales (nombre, especialidad, email de contacto del facultativo).
+  \item \texttt{horarios}: la disponibilidad real, como franjas con \texttt{inicio}, \texttt{fin}, un indicador \texttt{disponible} y el centro donde se atiende (\texttt{centro\_id}, V6). Un índice único sobre \texttt{(medico\_id, inicio)} impide crear dos franjas idénticas para el mismo médico.
+  \item \texttt{citas}: las reservas, que vinculan \texttt{usuario\_id} y \texttt{medico\_id} con \texttt{fecha\_hora}, \texttt{motivo} y \texttt{estado}. La cancelación no borra la fila: cambia su \texttt{estado} (mediante el enumerado \texttt{EstadoCita}), preservando la trazabilidad.
+  \item \texttt{notificaciones}: el registro auditable de los avisos enviados, con su canal y estado de entrega.
+  \item \texttt{centros}: los centros o consultas donde se atiende (\texttt{codigo} único, nombre, dirección, ciudad). Cada \texttt{cita} referencia opcionalmente su centro mediante \texttt{centro\_id}.
+\end{itemize}
+
+La evolución del esquema queda reflejada en las migraciones Flyway: la \texttt{V2\_\_cita\_recordatorio} añade el campo \texttt{recordatorio\_enviado} para evitar duplicar avisos Twilio, la \texttt{V3} extiende los horarios y crea el usuario médico de prueba, la \texttt{V4} introduce \texttt{cuenta\_invitada} para la reserva sin registro previo, la \texttt{V5} crea la tabla \texttt{centros} (con sus datos iniciales) y añade \texttt{centro\_id} a \texttt{citas}, y la \texttt{V6} añade \texttt{centro\_id} a \texttt{horarios} (repartiendo la agenda por centro). Versionar el esquema de esta forma garantiza que la base de datos del tribunal se construya exactamente igual que la de desarrollo.
+
+\subsection{Frontend y paleta visual}
 
 Los colores del documento y de los diagramas coinciden con \texttt{dr-agramonte.css}: teal principal, fondos \texttt{off-white}, tarjetas blancas y variante oscura (\texttt{data-theme="dark"}, fondo \#0F172A).
 
 \input{tikz-diagrama-frontend}
 
-% ============================================================================
-\chapter{Desarrollo técnico}
-% ============================================================================
-
-\section{Backend}
-
 \subsection{Autenticación JWT}
 
-\texttt{AuthController} expone \texttt{POST /api/auth/login} y \texttt{/api/auth/registro}. El token se envía en cabecera \texttt{Authorization: Bearer}. \texttt{JwtAuthFilter} valida cada petición protegida.
+La autenticación se resuelve con \textbf{JSON Web Tokens} en modo \emph{stateless}: el servidor no guarda sesiones en base de datos, sino que confía en un token firmado que el cliente presenta en cada petición. \texttt{AuthController} expone \texttt{POST /api/auth/login} y \texttt{POST /api/auth/registro}; al autenticarse correctamente, \texttt{JwtProvider} genera un token firmado con clave secreta (algoritmo HMAC-SHA) que incluye el identificador del usuario y una fecha de expiración. A partir de ahí, el token viaja en la cabecera \texttt{Authorization: Bearer} y \texttt{JwtAuthFilter} lo valida en cada petición protegida antes de que esta llegue al controlador.
+
+Elegí este modelo por tres motivos concretos. Primero, \textbf{rendimiento}: al no consultar sesiones en BD, cada validación es una comprobación de firma en memoria. Segundo, \textbf{escalabilidad horizontal}: varios contenedores del backend pueden validar el mismo token sin compartir estado entre ellos. Tercero, \textbf{simplicidad de integración}: cualquier cliente (la web actual o, en el futuro, una app móvil) consume la API igual. La contrapartida honesta es que un token \emph{stateless} no se puede revocar antes de que caduque; por eso la duración es corta y la introducción de un \emph{refresh token} queda recogida como mejora futura. Las contraseñas nunca se almacenan en claro: se cifran con \texttt{BCryptPasswordEncoder} con factor de coste 12, de modo que incluso ante una fuga de la base de datos los hashes resultan costosísimos de revertir.
 
 \subsection{Reserva y concurrencia}
+
+El problema más interesante de toda la aplicación es aparentemente trivial: ¿qué pasa si dos pacientes intentan reservar la misma franja en el mismo instante? Sin control, ambos verían el hueco como libre, ambos confirmarían y el médico acabaría con dos personas citadas a la misma hora. Esto no es una hipótesis de laboratorio: en una agenda real ocurre justo en las franjas más demandadas. La solución no puede ser ``cruzar los dedos'', tiene que ser determinista.
+
+La estrategia elegida es el \textbf{bloqueo pesimista} a nivel de base de datos. Cuando llega una reserva, el repositorio recupera el horario con un \texttt{SELECT \ldots FOR UPDATE}, que bloquea esa fila concreta hasta que termina la transacción:
 
 \begin{lstlisting}[language=Java]
 Horario horario = horarioRepository
@@ -221,9 +387,22 @@ Horario horario = horarioRepository
   .orElseThrow(...);
 \end{lstlisting}
 
-Tras validar, se crea la \texttt{Cita}, se marca el horario no disponible y se invoca \texttt{CitaNotificationService}.
+Tras validar, se crea la \texttt{Cita}, se marca el horario no disponible y se invoca \texttt{CitaNotificationService}. El control de concurrencia es \textbf{bloqueo pesimista} (\texttt{SELECT \ldots FOR UPDATE} sobre \texttt{Horario}): si dos pacientes reservan la misma franja, una operación gana y la otra recibe \textbf{409 Conflict}, de forma determinista y sin reintentos.
 
 \input{tikz-diagrama-reserva}
+
+\subsection{Reserva como invitado}
+
+No todos los pacientes quieren —o saben— crearse una cuenta antes de pedir cita, y obligar a registrarse es una de las principales causas de abandono en cualquier formulario. Por eso la plataforma ofrece \textbf{dos vías de reserva que persisten en la misma tabla \texttt{citas}}:
+
+\begin{itemize}
+  \item \textbf{Paciente autenticado:} \texttt{POST /api/citas} con su token JWT.
+  \item \textbf{Reserva pública (invitado):} \texttt{POST /api/citas/reserva-publica}, sin login previo.
+\end{itemize}
+
+En la reserva de invitado, el backend crea o reutiliza una cuenta de paciente marcada como \texttt{cuenta\_invitada} (introducida en la migración Flyway V4); la contraseña es opcional, de modo que el invitado puede ``ascender'' más adelante a cuenta completa sin perder su historial de citas. Si el email ya pertenece a una cuenta con contraseña, el sistema responde con \textbf{HTTP 409} invitando a iniciar sesión, evitando que un tercero reserve en nombre de un usuario registrado. El invitado consulta y cancela sus citas mediante su email (\texttt{GET /api/citas/por-email} y \texttt{DELETE /api/citas/publica/\{id\}}).
+
+Es importante presentarlo con honestidad: este mecanismo es \textbf{adecuado para un prototipo de TFG}, pero en producción la consulta y cancelación por email deberían reforzarse con un enlace firmado, un código de un solo uso (OTP) o login obligatorio, para impedir que alguien acceda a las citas de otra persona conociendo solo su dirección de correo. Reconocer esa limitación forma parte del rigor del proyecto.
 
 \subsection{API principal}
 
@@ -236,19 +415,28 @@ Tras validar, se crea la \texttt{Cita}, se marca el horario no disponible y se i
 \midrule
 POST & /api/auth/login, /registro & Sesión JWT \\
 GET & /api/medicos & Listado de especialistas \\
-GET & /api/disponibilidad & Slots por médico y fecha \\
+GET & /api/centros & Listado de centros / consultas \\
+GET & /api/disponibilidad & Slots por médico, fecha y centro \\
 POST & /api/citas & Crear cita (paciente autenticado) \\
-GET & /api/citas/mias & Citas del paciente \\
-DELETE & /api/citas/\{id\} & Cancelación \\
-POST & /api/contacto & Formulario de contacto \\
+POST & /api/citas/reserva-publica & Reserva sin login (cuenta invitada) \\
+GET & /api/citas/mias & Citas del paciente (JWT) \\
+GET & /api/citas/por-email & Citas del invitado por email \\
+DELETE & /api/citas/\{id\} & Cancelación (paciente autenticado) \\
+POST & /api/contact & Formulario de contacto \\
 \bottomrule
 \end{tabular}
 \caption{Endpoints principales}
 \end{table}
 
-\section{Notificaciones Twilio}
+\subsection{Manejo centralizado de errores}
 
-\texttt{CitaNotificationService} envía:
+Una API es tan buena como sus errores: si cada fallo se devuelve de una forma distinta, el frontend se vuelve frágil y difícil de mantener. Para evitarlo, el backend usa un \texttt{GlobalExceptionHandler} que captura las excepciones de forma centralizada y las traduce a respuestas JSON consistentes, con su código HTTP adecuado. Así, una franja ya ocupada devuelve siempre \textbf{409 Conflict}, una acción sin permiso \textbf{403 Forbidden} y un recurso inexistente \textbf{404 Not Found}, todos con el mismo formato (marca de tiempo, estado, mensaje y ruta).
+
+La ventaja es doble. Por un lado, el frontend puede confiar en una estructura de error predecible y mostrar mensajes claros al usuario (por ejemplo, ``esa hora acaba de ocuparse, elige otra'' ante un 409). Por otro, se evita filtrar trazas internas o detalles de implementación al exterior, lo que también es una cuestión de seguridad. Centralizar el manejo de errores en un único punto, en lugar de repetir bloques \texttt{try-catch} por todos los controladores, mantiene el código limpio y coherente.
+
+\subsection{Notificaciones Twilio}
+
+Las notificaciones son la otra mitad de la promesa del proyecto: si la web evita llamadas, tiene que avisar de forma fiable de lo que ocurre con cada cita. El envío se realiza \textbf{directamente desde el backend Java} mediante el SDK de Twilio, sin un servicio intermedio de colas. Es una arquitectura más simple y perfectamente adecuada al volumen de una consulta; un sistema de mensajería asíncrona con reintentos desacoplados sería justificable a mayor escala y se contempla como evolución futura. \texttt{CitaNotificationService} envía:
 \begin{itemize}
   \item Aviso al médico (\texttt{TWILIO\_NOTIFY\_TO}) en alta y cancelación.
   \item Confirmación y cancelación al paciente si tiene teléfono.
@@ -257,42 +445,66 @@ POST & /api/contacto & Formulario de contacto \\
 
 Variables: \texttt{TWILIO\_ENABLED}, \texttt{TWILIO\_ACCOUNT\_SID}, \texttt{TWILIO\_AUTH\_TOKEN}, \texttt{TWILIO\_FROM}, \texttt{TWILIO\_CHANNEL} (whatsapp o sms).
 
-\section{Frontend}
+\subsection{Implementación del frontend}
+
+El frontend se construyó con HTML5, CSS3 y JavaScript nativo, sin frameworks como React o Vue. No fue la primera idea: al principio valoré usar React o incluso Python en el cliente, en parte por mi formación y por el \emph{feedback} de profesionales del sector (OmniAccess). Sin embargo, tras un análisis de necesidades reales del proyecto, decidí prescindir de esa maquinaria. Fue una decisión consciente de ingeniería: la aplicación no maneja un estado global tan complejo como para justificarla, y evitarla reduce dependencias, acelera la carga inicial y permite que cualquier persona lea y modifique el código sin aprender antes una librería ni arrastrar un \texttt{node\_modules} de cientos de megas. El JavaScript se organiza en módulos reutilizables (\texttt{api-client.js} para las llamadas REST con JWT, y la lógica de reserva en \texttt{reserva.js}), lo que evita duplicar código entre páginas. Saber \emph{cuándo no} añadir una tecnología es, para un perfil de desarrollo, tan importante como saber usarla.
 
 \begin{itemize}
-  \item \textbf{Reserva:} \texttt{reservar.html} + \texttt{reserva.js} (centros, calendario, slots desde API, fallback local).
-  \item \textbf{Servicios:} enlaces \texttt{reservar.html?servicio=...} preconfiguran tipo y motivo.
-  \item \textbf{Tema:} botón luna/sol, clase \texttt{btn--reserva} unificada en todo el sitio.
-  \item \textbf{PWA:} \texttt{manifest.json} y \texttt{service-worker.js}; página \texttt{offline.html}.
+  \item \textbf{Reserva:} \texttt{reservar.html} + \texttt{reserva.js} (centros, calendario, franjas desde la API y \emph{fallback} local).
+  \item \textbf{Servicios:} los enlaces \texttt{reservar.html?servicio=...} preconfiguran tipo de consulta y motivo.
+  \item \textbf{Tema:} botón luna/sol con preferencia recordada, y clase \texttt{btn--reserva} unificada en todo el sitio.
+  \item \textbf{PWA:} \texttt{manifest.json} y \texttt{service-worker.js}; página \texttt{offline.html} para cuando no hay conexión.
 \end{itemize}
 
-\section{Seguridad y RGPD}
+\paragraph{Aplicación web progresiva (PWA).} La web es instalable en el móvil como si fuera una app, sin pasar por una tienda de aplicaciones. Esto se logra con tres piezas: un \texttt{manifest.json} que define nombre, iconos y color de tema; un \emph{service worker} que cachea los recursos críticos para que la navegación siga funcionando aunque la conexión falle, mostrando una página \texttt{offline.html} cuando no hay red; y el requisito de servir bajo HTTPS en producción. Para un paciente, la diferencia práctica es poder tener ``Dr. Agramonte'' como un icono más en su pantalla de inicio, reforzando justamente la idea de un canal propio y cercano al consultorio.
+
+\paragraph{Selección de centro (multi-ubicación).} El flujo de reserva permite elegir entre dos centros antes de fijar la hora: \emph{Clínica Salamanca} (Madrid) y \emph{Consulta Palma de Mallorca}, cada uno con sus propios días de atención. Esto refleja una realidad habitual: un mismo profesional atiende en más de una ubicación. El centro \textbf{se persiste en la base de datos}: existe una entidad \texttt{Centro} (tabla \texttt{centros}, creada en la migración Flyway V5) con un \texttt{codigo} estable —\texttt{madrid}, \texttt{palma}— que coincide con el identificador que ya empleaba el frontend, de modo que no hubo que reescribir la web. El backend expone el listado mediante \texttt{GET /api/centros}.
+
+\paragraph{Agenda del médico por centro.} La multi-ubicación se llevó hasta el final: cada \texttt{horario} pertenece a un centro (columna \texttt{centro\_id}, migración V6), repartiendo la agenda del médico por día de la semana —Madrid los lunes, martes y jueves; Palma los miércoles, viernes y sábados— de forma que cada día el profesional está en un único sitio. A partir de ahí, todo encaja de manera coherente:
+\begin{itemize}
+  \item La \textbf{disponibilidad se filtra por centro}: \texttt{GET /api/disponibilidad?medicoId=\&fecha=\&centroCodigo=} solo devuelve los huecos de ese centro (un miércoles no ofrece horas de Madrid).
+  \item La \textbf{cita hereda el centro de su horario}: al reservar, el centro no se deduce de lo que diga el cliente, sino de la franja realmente reservada, lo que evita incoherencias.
+  \item La \textbf{agenda del médico muestra el centro} de cada cita y puede filtrarse por ubicación.
+\end{itemize}
+Todas las relaciones con \texttt{centro} son \emph{nullable} a propósito: las citas y horarios anteriores a esta funcionalidad siguen siendo válidos.
+
+\paragraph{Reserva guiada por pasos.} La experiencia se divide en pasos pequeños (centro $\rightarrow$ calendario $\rightarrow$ hora $\rightarrow$ datos $\rightarrow$ confirmación) para reducir la carga cognitiva y no abrumar al usuario con todos los campos a la vez. Esta decisión, heredada del boceto inicial, es especialmente importante para pacientes mayores o poco habituados a la tecnología.
+
+\paragraph{Accesibilidad.} La interfaz cuida el uso de etiquetas HTML semánticas, atributos ARIA, un orden de tabulación lógico para navegar solo con teclado y un contraste de color suficiente entre texto y fondo, tanto en modo claro como oscuro. La accesibilidad no se entendió como un requisito formal, sino como la diferencia entre que una persona mayor pueda usar la aplicación o no.
+
+\paragraph{Validación de datos.} La entrada del usuario se valida en dos niveles, porque ninguno de los dos basta por sí solo. En el \textbf{frontend} se comprueban formato de email, teléfono español y campos obligatorios antes de enviar, dando un aviso inmediato y evitando viajes innecesarios al servidor; esto mejora la experiencia, pero no es una garantía de seguridad porque puede manipularse. Por eso la validación se repite en el \textbf{backend} con las anotaciones de \emph{Bean Validation} sobre los DTO de entrada: el servidor nunca confía en que el cliente haya validado bien. Esta doble barrera —comodidad en el cliente, seguridad en el servidor— es un principio básico de cualquier aplicación web seria.
+
+\subsection{Sincronización de citas: una sola fuente de verdad}
+
+Uno de los problemas más instructivos del desarrollo no fue de algoritmos, sino de \emph{coherencia de datos} entre vistas. Al principio, la lista ``Mis citas programadas'' que veía el paciente vivía solo en el \texttt{localStorage} del navegador, mientras que el panel de pruebas del médico leía de la base de datos. El resultado eran incoherencias desconcertantes: citas que aparecían para el paciente pero no en el panel, cancelaciones que solo existían en un navegador, e incluso reservas antiguas con identificadores locales que nunca habían llegado al servidor.
+
+La solución fue establecer una \textbf{única fuente de verdad}: PostgreSQL. La función \texttt{syncMisCitas()} de \texttt{reserva.js} sustituye la caché local por lo que realmente hay en el servidor, consultando \texttt{GET /api/citas/mias} para el paciente autenticado o \texttt{GET /api/citas/por-email} para el invitado. Esta sincronización se dispara en los momentos clave: al cargar la página de reserva, tras confirmar o cancelar una cita, al escribir el email (con \emph{debounce}) y tras iniciar o cerrar sesión. Así, lo que ve el paciente y lo que ve el panel siempre coinciden, porque ambos derivan del mismo origen. La regla de diseño es sencilla y se defiende bien ante el tribunal: \emph{el navegador nunca es la verdad; solo refleja la base de datos tras cada sincronización.}
+
+\subsection{Seguridad y RGPD}
+
+La seguridad no se añadió al final, se diseñó desde el principio, porque manejar datos de salud obliga a ello. El acceso está gobernado por roles (\texttt{PACIENTE}, \texttt{MEDICO}, \texttt{ADMIN}) declarados en \texttt{SecurityConfig}: cada ruta exige el rol mínimo necesario, de modo que un paciente no puede asomarse a la agenda del médico ni un usuario anónimo crear citas en nombre de otro. Sobre esa base se aplican las medidas concretas de protección de datos:
 
 \begin{itemize}
   \item Contraseñas con \texttt{BCryptPasswordEncoder(12)}.
   \item CORS configurado para orígenes de desarrollo y producción.
-  \item Política de privacidad en \texttt{privacidad.html}.
-  \item Checkbox de aceptación en formulario de reserva.
+  \item Política de privacidad en \texttt{privacidad.html} y checkbox de aceptación en el formulario de reserva.
   \item Secretos (\texttt{JWT\_SECRET}, Twilio) en \texttt{.env}, no en el repositorio.
+  \item \textbf{Análisis de vulnerabilidades:} \texttt{OWASP dependency-check} configurado en \texttt{pom.xml}, que hace fallar el build con CVSS\,$\geq$\,7.
 \end{itemize}
 
-\section{Despliegue}
+\subsection{Despliegue}
+
+Uno de los objetivos era que el sistema completo se pudiera levantar sin instalar nada manualmente, ni siquiera por alguien sin experiencia previa. Por eso todo el despliegue se reduce a un único comando, que construye las imágenes y arranca los contenedores en el orden correcto:
 
 \begin{lstlisting}[language=bash]
 docker compose up -d --build
 \end{lstlisting}
 
-Servicios: \texttt{postgres}, \texttt{backend} (:8080), \texttt{frontend} (:80). Perfil opcional MySQL con \texttt{--profile mysql}.
+Esto levanta tres servicios coordinados: \texttt{postgres} (la base de datos), \texttt{backend} en el puerto 8080 (la API Spring Boot) y \texttt{frontend} en el puerto 80 (nginx sirviendo la web y haciendo de proxy de \texttt{/api}). El \texttt{docker-compose} define dependencias y comprobaciones de salud, de modo que el backend no se da por listo hasta que la base de datos responde. El artefacto del backend es un \textbf{JAR de Spring Boot con servidor embebido} (generado por \texttt{spring-boot-maven-plugin}), el esquema de la base de datos se versiona con Flyway —que aplica las migraciones pendientes en el primer arranque— y la configuración se separa por perfiles (\texttt{application-postgres.yml} y \texttt{application-mysql.yml}), existiendo además un perfil opcional de MySQL con \texttt{--profile mysql}. La ventaja práctica es enorme de cara a la defensa: el entorno del tribunal será idéntico al de desarrollo, eliminando el clásico ``en mi máquina funciona''.
 
-% ============================================================================
-\chapter{Diagramas y modelos}
-% ============================================================================
+\subsection{Planificación temporal}
 
-Los diagramas de este capítulo usan la paleta teal del CSS del proyecto. Para actualizarlos, editar los ficheros \texttt{docs/tikz-diagrama-*.tex}.
-
-% ============================================================================
-\chapter{Planificación temporal}
-% ============================================================================
+El desarrollo se organizó en fases encadenadas a lo largo de cuatro meses, partiendo del análisis y el diseño de datos antes de escribir el grueso del backend, y dejando la redacción de la memoria como una tarea transversal que acompañó a todo el proyecto. El diagrama de Gantt de la figura siguiente resume esa planificación por hitos; en la práctica algunas fases se solaparon (por ejemplo, las pruebas se fueron escribiendo a la vez que avanzaban backend y frontend), algo habitual y deseable en un desarrollo iterativo.
 
 \begin{center}
 \begin{tikzpicture}[x=0.45cm, y=0.55cm, font=\scriptsize\sffamily]
@@ -314,82 +526,162 @@ Los diagramas de este capítulo usan la paleta teal del CSS del proyecto. Para a
   \fill[tealdark] (17,1.7) rectangle (21,2.3);
   \fill[tealpale, draw=teal] (18,0.7) rectangle (24,1.3);
 \end{tikzpicture}
+\captionof{figure}{Diagrama de Gantt por hitos (M1--M4).}
 \end{center}
 
-% ============================================================================
-\chapter{Pruebas y validación}
-% ============================================================================
+\subsection{Pruebas y validación}
 
-\section{Pruebas realizadas}
+La estrategia de pruebas se centró en los \textbf{caminos críticos}, aquellos en los que un fallo tendría consecuencias reales: la no duplicación de reservas, el respeto de los permisos por rol y la validez del token de autenticación. La filosofía no fue ``probarlo todo'' de forma superficial, sino probar bien lo que importa, combinando tres niveles —unitario, de seguridad e integración— para cubrir el comportamiento desde distintos ángulos. El proyecto incorpora una batería de pruebas automatizadas, ejecutable con \texttt{mvn test} desde \texttt{backend/}:
 
 \begin{itemize}
-  \item Compilación Maven (\texttt{mvn -DskipTests compile}).
-  \item Arranque Docker Compose y health check API.
-  \item Flujo manual: registro/login $\rightarrow$ reservar $\rightarrow$ mis citas $\rightarrow$ cancelar.
-  \item Prueba de parámetro \texttt{?servicio=} desde servicios.
-  \item Validación de formularios (email, teléfono español).
+  \item \textbf{Unitarias (caja blanca):} \texttt{CitaServiceTest} (reserva sobre franja libre confirma y bloquea el horario; franja ocupada $\rightarrow$ 409 sin persistir; cancelación por no propietario $\rightarrow$ 403; re-cancelación $\rightarrow$ 409). \texttt{JwtProviderTest} (generación, validación y expiración del token firmado).
+  \item \textbf{Seguridad / RBAC (caja negra, WebMvc):} \texttt{CitaControllerWebMvcTest} importa la \texttt{SecurityConfig} real: rol MEDICO sobre rutas de paciente $\rightarrow$ 403; acceso anónimo bloqueado; rol PACIENTE $\rightarrow$ 201.
+  \item \textbf{Integración end-to-end (Testcontainers + PostgreSQL real):} \texttt{ReservaPublicaIntegrationTest}: dos reservas sobre la misma franja $\rightarrow$ la segunda 409; reserva pública persistida y consultable por email.
+  \item \textbf{Análisis de vulnerabilidades:} \texttt{OWASP dependency-check} (\texttt{mvn org.owasp:dependency-check-maven:check}).
+  \item \textbf{Manuales:} compilación Maven, arranque Docker Compose y health check; flujo registro/login $\rightarrow$ reservar $\rightarrow$ mis citas $\rightarrow$ cancelar; parámetro \texttt{?servicio=}; validación de formularios (email, teléfono español).
 \end{itemize}
 
-\section{Pruebas pendientes (mejora futura)}
+\begin{table}[H]
+\centering
+\small
+\caption{Matriz de trazabilidad requisito $\leftrightarrow$ prueba (RTM)}
+\begin{tabular}{llll}
+\toprule
+\textbf{Requisito} & \textbf{Prueba} & \textbf{Tipo} & \textbf{Resultado} \\
+\midrule
+No doble reserva concurrente & \texttt{ReservaPublicaIntegrationTest} & Integración & 409 \checkmark \\
+\rowcolor{rowgray}
+RBAC / menor privilegio & \texttt{CitaControllerWebMvcTest} & Seguridad & 403 \checkmark \\
+JWT firmado válido & \texttt{JwtProviderTest} & Unitaria & \checkmark \\
+\rowcolor{rowgray}
+Solo el dueño cancela & \texttt{CitaServiceTest} & Unitaria & 403 \checkmark \\
+No re-cancelar & \texttt{CitaServiceTest} & Unitaria & 409 \checkmark \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\begin{itemize}
-  \item Suite JUnit + Testcontainers (dependencias ya en \texttt{pom.xml}).
-  \item Tests E2E (Playwright/Cypress).
-  \item Auditoría Lighthouse formal documentada.
-\end{itemize}
+\paragraph{Mejoras futuras de calidad.} Informe de cobertura formal con \textbf{JaCoCo} ($\geq$\,80\,\% medido), pruebas E2E (Playwright/Cypress), auditoría \textbf{Lighthouse} documentada y escenario de alta disponibilidad (réplicas/failover), hoy contemplado como diseño y no ejecutado en esta infraestructura.
 
 % ============================================================================
 \chapter{Conclusiones}
 % ============================================================================
 
-Se ha entregado una aplicación funcional y desplegable que responde al problema de gestión de citas, con arquitectura clara y código mantenible. Los objetivos técnicos del repositorio se cumplen en PostgreSQL, Spring Boot, frontend PWA y Twilio integrado en Java.
+Se ha entregado una aplicación funcional y desplegable que responde al problema de gestión de citas, con arquitectura clara, código mantenible y \textbf{pruebas automatizadas} que cubren los caminos críticos (409 por doble reserva, 403 por rol, JWT firmado, cancelación). Los objetivos técnicos del repositorio se cumplen en PostgreSQL, Spring Boot, frontend PWA y Twilio integrado en Java.
 
-\textbf{Limitaciones honestas:} panel médico sin API de historial, sin refresh token, sin tests automatizados completos. Son líneas de evolución natural del TFG.
+\textbf{Cumplimiento de los objetivos.} Retomando los siete objetivos específicos planteados al inicio, el balance es el siguiente:
 
-\textbf{Reflexión:} la coherencia entre memoria, código y demo oral es tan importante como la funcionalidad; este documento describe la versión real del sistema a mayo de 2026.
+\begin{enumerate}
+  \item \emph{Modelo de datos en PostgreSQL con Flyway.} \textbf{Cumplido:} seis tablas, migraciones V1--V6 y perfiles \texttt{postgres}/\texttt{mysql}.
+  \item \emph{API REST con Spring Boot, JWT y roles.} \textbf{Cumplido:} controladores por recurso, autenticación JWT y autorización por rol en \texttt{SecurityConfig}.
+  \item \emph{Integridad de reservas con \texttt{SELECT FOR UPDATE}.} \textbf{Cumplido y verificado:} la prueba de integración confirma que la segunda reserva concurrente recibe 409.
+  \item \emph{Frontend responsive, PWA y reserva accesible.} \textbf{Cumplido:} reserva por pasos, modo oscuro, selección de centro y service worker.
+  \item \emph{Notificaciones por Twilio con recordatorio programado.} \textbf{Cumplido:} avisos a médico y paciente y recordatorio a $\sim$24\,h vía \texttt{@Scheduled}.
+  \item \emph{Despliegue reproducible con Docker Compose.} \textbf{Cumplido:} un único comando levanta base de datos, backend y frontend.
+  \item \emph{Validación de la calidad.} \textbf{Cumplido parcialmente:} pruebas unitarias, de seguridad e integración más \texttt{OWASP dependency-check}; queda pendiente medir la cobertura con JaCoCo y añadir pruebas E2E.
+\end{enumerate}
+
+\textbf{Limitaciones honestas:} la cobertura no está medida con JaCoCo (se valida cualitativamente por ramas críticas), el panel médico no expone API de historial, no hay refresh token ni escenario de réplicas/failover. Son líneas de evolución natural del TFG, no carencias del alcance entregado.
+
+\textbf{Líneas de trabajo futuras.} El proyecto está pensado para seguir creciendo más allá de la entrega. Las evoluciones más coherentes con lo ya construido son:
+
+\begin{itemize}
+  \item \textbf{Panel clínico multi-centro:} con la agenda por centro ya implementada (horarios y citas asociados a su centro, disponibilidad filtrada), el siguiente paso sería un panel médico visual que conmute entre ubicaciones y muestre la ocupación de cada centro de un vistazo.
+  \item \textbf{Recordatorios con confirmación previa:} permitir que el paciente confirme o cancele desde el propio aviso, reduciendo ausencias.
+  \item \textbf{Historial de cambios de la cita:} que el paciente vea reprogramaciones y cancelaciones.
+  \item \textbf{Página de ayuda / preguntas frecuentes:} apoyo específico para pacientes mayores o poco digitales.
+  \item \textbf{Calidad:} informe de cobertura con JaCoCo, pruebas E2E (Playwright) y auditoría de accesibilidad documentada.
+  \item \textbf{Seguridad y escalado:} \emph{refresh token}, despliegue en la nube con HTTPS y réplicas de base de datos.
+  \item \textbf{Historial clínico:} API y panel clínico reales, con almacenamiento flexible por especialidad.
+\end{itemize}
+
+\textbf{Aprendizajes:} el proyecto ha consolidado competencias de los módulos de DAM (acceso a datos, programación de servicios, interfaces, sistemas de gestión empresarial y empresa e iniciativa emprendedora) en un caso real, integrando seguridad, concurrencia y despliegue.
+
+\textbf{Reflexión:} la coherencia entre memoria, código y demo oral es tan importante como la funcionalidad; este documento describe la versión real del sistema a junio de 2026.
 
 % ============================================================================
-\chapter{Agradecimientos}
+\chapter*{Agradecimientos}
+\addcontentsline{toc}{chapter}{Agradecimientos}
 % ============================================================================
 
-A las personas del entorno sanitario que inspiraron el problema, a los tutores del ciclo, a quienes probaron la reserva en distintos dispositivos, y a mi familia por el apoyo durante el desarrollo.
+Este proyecto no es solo horas frente a una pantalla: es el reflejo de conversaciones, experiencias y realidades observadas durante años.
+
+A mi \textbf{familia}, por el apoyo y la paciencia durante todo el desarrollo, y por ser quienes me enseñaron de cerca lo que significa cuidar de los demás.
+
+A mis \textbf{amigos y conocidos del entorno sanitario}, que compartieron sus experiencias y sus días difíciles y, sin pretenderlo, inspiraron el problema que este proyecto intenta aliviar. Esta herramienta es, en el fondo, para ellos.
+
+A mis \textbf{profesores del ciclo}, por darme las herramientas necesarias —técnicas y de criterio— para convertir una idea observada en la realidad en una aplicación funcional, y por ayudarme a entender que un proyecto pequeño y sólido vale más que una idea enorme a medias.
+
+Y a mis \textbf{compañeras y compañeros de DAM}, que probaron la aplicación sin filtros y dieron un \emph{feedback} honesto que mejoró el resultado.
 
 % ============================================================================
-\chapter{Checklist de cumplimiento (rúbricas)}
-% ============================================================================
-
-\input{checklist-rubricas}
-
-% ============================================================================
-\chapter{Bibliografía}
+\chapter*{Bibliografía}
+\addcontentsline{toc}{chapter}{Bibliografía}
 % ============================================================================
 
 \begin{thebibliography}{99}
 
 \bibitem{spring}
-Spring. (2024). \textit{Spring Boot 3.5 Reference}. \url{https://spring.io/projects/spring-boot}
+Spring. (2024). \textit{Spring Boot 3.5 reference documentation}. \url{https://spring.io/projects/spring-boot}
+
+\bibitem{springsec}
+Spring. (2024). \textit{Spring Security reference}. \url{https://docs.spring.io/spring-security/reference/}
 
 \bibitem{rgpd}
-Reglamento (UE) 2016/679 (RGPD).
+Parlamento Europeo y Consejo de la Unión Europea. (2016). \textit{Reglamento (UE) 2016/679, de 27 de abril de 2016, relativo a la protección de las personas físicas (RGPD)}. Diario Oficial de la Unión Europea. \url{https://eur-lex.europa.eu/eli/reg/2016/679/oj}
 
 \bibitem{ley41}
-Ley 41/2002, autonomía del paciente e historia clínica (BOE).
+Jefatura del Estado. (2002). \textit{Ley 41/2002, de 14 de noviembre, básica reguladora de la autonomía del paciente y de derechos y obligaciones en materia de información y documentación clínica}. BOE núm. 274. \url{https://www.boe.es/eli/es/l/2002/11/14/41}
 
 \bibitem{wcag}
-W3C (2021). \textit{WCAG 2.1}. \url{https://www.w3.org/WAI/WCAG21/quickref/}
+World Wide Web Consortium. (2021). \textit{Web Content Accessibility Guidelines (WCAG) 2.1}. \url{https://www.w3.org/WAI/WCAG21/quickref/}
 
 \bibitem{docker}
-Docker. \textit{Compose Documentation}. \url{https://docs.docker.com/compose/}
+Docker, Inc. (s.f.). \textit{Docker Compose documentation}. Recuperado en junio de 2026, de \url{https://docs.docker.com/compose/}
 
 \bibitem{twilio}
-Twilio. \textit{Messaging API}. \url{https://www.twilio.com/docs/messaging}
+Twilio. (s.f.). \textit{Messaging API documentation}. Recuperado en junio de 2026, de \url{https://www.twilio.com/docs/messaging}
 
 \bibitem{flyway}
-Flyway. \textit{Documentation}. \url{https://documentation.red-gate.com/fd}
+Redgate. (s.f.). \textit{Flyway documentation}. Recuperado en junio de 2026, de \url{https://documentation.red-gate.com/fd}
+
+\bibitem{testcontainers}
+Testcontainers. (s.f.). \textit{Testcontainers for Java}. Recuperado en junio de 2026, de \url{https://java.testcontainers.org/}
 
 \bibitem{doctoralia}
-Doctoralia. \textit{Plataforma para profesionales}. \url{https://www.doctoralia.es}
+Doctoralia. (s.f.). \textit{Plataforma para profesionales}. Recuperado en junio de 2026, de \url{https://www.doctoralia.es}
 
 \end{thebibliography}
+
+% ============================================================================
+\chapter*{Anexos}
+\addcontentsline{toc}{chapter}{Anexos}
+% ============================================================================
+
+\section*{Anexo A. Checklist de cumplimiento (rúbricas del módulo)}
+
+\input{checklist-rubricas}
+
+\section*{Anexo B. Manual de usuario (resumen)}
+
+\begin{enumerate}
+  \item \textbf{Registro / acceso:} desde \texttt{login.html}, crear cuenta (rol PACIENTE) o iniciar sesión. El sistema devuelve un token JWT que el navegador guarda para las peticiones protegidas.
+  \item \textbf{Elegir servicio (opcional):} en \texttt{servicios.html}, pulsar un servicio abre la reserva con el tipo de consulta preseleccionado (\texttt{reservar.html?servicio=...}).
+  \item \textbf{Reservar:} en \texttt{reservar.html} seguir los pasos centro $\rightarrow$ calendario $\rightarrow$ hora $\rightarrow$ datos $\rightarrow$ confirmación, aceptando la política de privacidad.
+  \item \textbf{Mis citas:} consultar las citas propias y su estado; el paciente recibe confirmación (y recordatorio $\sim$24\,h antes) por Twilio si tiene teléfono.
+  \item \textbf{Cancelar:} desde ``Mis citas'', cancelar libera la franja y notifica al médico.
+  \item \textbf{Tema claro/oscuro:} el botón luna/sol alterna el modo y se recuerda la preferencia.
+\end{enumerate}
+
+\section*{Anexo C. Capturas de pantalla}
+
+Incluir aquí las capturas de la demo (inicio, servicios, flujo de reserva, mis citas y modo oscuro). Cada captura debe ir numerada y con su leyenda. Ejemplo de inclusión:
+
+\begin{verbatim}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{capturas/reserva-paso1.png}
+  \caption{Primer paso del flujo de reserva: selección de centro.}
+\end{figure}
+\end{verbatim}
 
 \end{document}

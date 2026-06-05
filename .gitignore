@@ -9,10 +9,24 @@ Thumbs.db
 **/target/
 *.log
 
+# LaTeX (intermedios; se conserva el .pdf como entregable)
+*.aux
+*.toc
+*.out
+*.lof
+*.lot
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
 # Env / secrets
 .env
 .env.*
 !.env.example
+# Scripts locales con credenciales (no subir al repo)
+*.local.ps1
+# Volcados de base de datos
+/backups/
 
 # Cursor local artifacts
 .cursor/

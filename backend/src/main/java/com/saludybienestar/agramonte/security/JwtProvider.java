@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.Optional;
 
 @Component
 public class JwtProvider {
@@ -53,6 +54,24 @@ public class JwtProvider {
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
+        }
+    }
+
+    /**
+     * Valida la firma y la expiración y devuelve el subject (email) en una sola lectura del token.
+     * Devuelve {@link Optional#empty()} si el token es inválido, así el filtro no parsea dos veces.
+     */
+    public Optional<String> getUsernameIfValid(String token) {
+        try {
+            String subject = Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .getSubject();
+            return Optional.ofNullable(subject);
+        } catch (JwtException | IllegalArgumentException e) {
+            return Optional.empty();
         }
     }
 }

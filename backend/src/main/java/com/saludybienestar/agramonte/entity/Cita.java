@@ -10,13 +10,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "citas")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Cita {
@@ -33,6 +36,11 @@ public class Cita {
     @JoinColumn(name = "medico_id", nullable = false)
     private Medico medico;
 
+    /** Centro donde se atiende la cita. Nullable: las citas antiguas no lo tienen. */
+    @ManyToOne
+    @JoinColumn(name = "centro_id")
+    private Centro centro;
+
     private LocalDateTime fechaHora;
 
     private String motivo;
@@ -42,4 +50,17 @@ public class Cita {
 
     /** Evita reenviar el recordatorio Twilio 24 h antes. */
     private boolean recordatorioEnviado = false;
+
+    // Igualdad por identidad (id): segura para JPA y para usar la entidad en colecciones.
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Cita other)) return false;
+        return id != null && id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getClass());
+    }
 }

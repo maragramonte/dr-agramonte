@@ -16,6 +16,10 @@ public class CrearCitaRequest {
     @Size(max = 500)
     private String motivo;
 
+    /** Código del centro donde se atiende ('madrid', 'palma'...). Opcional. */
+    @Size(max = 50)
+    private String centroCodigo;
+
     /** Actualiza el teléfono del paciente para avisos Twilio (formato +34...). */
     @Size(max = 20)
     private String telefono;

@@ -60,12 +60,21 @@ class ApiClient {
     }
 
     /*
+     - Devuelve los centros/consultas persistidos en el backend.
+     - GET /api/centros
+     */
+    getCentros() {
+        return this.get('/centros');
+    }
+
+    /*
      - Devuelve los slots disponibles para un médico + centro + fecha.
-     - GET /api/disponibilidad?medicoId=X&fecha=YYYY-MM-DD
-     - Nota: centroId se mantiene como parámetro opcional de compatibilidad UI.
+     - GET /api/disponibilidad?medicoId=X&fecha=YYYY-MM-DD[&centroCodigo=palma]
+     - Si se indica centro, el backend solo devuelve los huecos de ese centro.
      */
     getDisponibilidad(medicoId, centroId, fecha) {
-        return this.get(`/disponibilidad?medicoId=${medicoId}&fecha=${fecha}`);
+        const centro = centroId ? `&centroCodigo=${encodeURIComponent(centroId)}` : '';
+        return this.get(`/disponibilidad?medicoId=${medicoId}&fecha=${fecha}${centro}`);
     }
 
     /*

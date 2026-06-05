@@ -32,6 +32,7 @@ public class CitaService {
     private final MedicoRepository medicoRepository;
     private final UsuarioRepository usuarioRepository;
     private final HorarioRepository horarioRepository;
+    private final CentroRepository centroRepository;
     private final CitaNotificationService citaNotificationService;
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
@@ -82,6 +83,7 @@ public class CitaService {
         citaRequest.setFechaHora(request.getFechaHora());
         citaRequest.setMotivo(request.getMotivo());
         citaRequest.setTelefono(request.getTelefono());
+        citaRequest.setCentroCodigo(request.getCentroCodigo());
 
         CitaResponse cita = crearCita(paciente.getId(), citaRequest);
 
@@ -109,10 +111,22 @@ public class CitaService {
             usuarioRepository.save(paciente);
         }
 
+        // El centro de la cita lo determina el horario reservado (agenda por centro):
+        // cada franja pertenece a un centro. Si el horario no tiene centro (datos
+        // antiguos), se usa el código del request como respaldo (compatibilidad).
+        Centro centro = horario.getCentro();
+        if (centro == null) {
+            String centroCodigo = request.getCentroCodigo();
+            if (centroCodigo != null && !centroCodigo.isBlank()) {
+                centro = centroRepository.findByCodigo(centroCodigo.trim().toLowerCase()).orElse(null);
+            }
+        }
+
         // Si llegamos aquí, el horario está libre y lo hemos bloqueado para esta transacción
         Cita cita = new Cita();
         cita.setUsuario(paciente);
         cita.setMedico(medico);
+        cita.setCentro(centro);
         cita.setFechaHora(request.getFechaHora());
         cita.setMotivo(request.getMotivo());
         cita.setEstado(EstadoCita.CONFIRMADA);
@@ -161,11 +175,14 @@ public class CitaService {
                             new ArrayList<>()
                     )
             );
+            Centro centroCita = cita.getCentro();
             entry.getCitas().add(new CitaAgendaItemResponse(
                     cita.getId(),
                     cita.getFechaHora(),
                     cita.getMotivo(),
-                    cita.getEstado()
+                    cita.getEstado(),
+                    centroCita != null ? centroCita.getCodigo() : null,
+                    centroCita != null ? centroCita.getNombre() : null
             ));
         }
 
@@ -176,12 +193,19 @@ public class CitaService {
         return new ArrayList<>(porUsuario.values());
     }
 
-    /** Todas las reservas del médico (incluye canceladas) para el panel de pruebas del TFG. */
-    public List<ReservaPruebaResponse> listarReservasPrueba(Long medicoId) {
+    /**
+     * Todas las reservas del médico (incluye canceladas) para el panel de pruebas del TFG.
+     * Si {@code centroCodigo} no es nulo/vacío, filtra por ese centro (agenda por ubicación).
+     */
+    public List<ReservaPruebaResponse> listarReservasPrueba(Long medicoId, String centroCodigo) {
         if (!medicoRepository.existsById(medicoId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Medico no encontrado");
         }
+        final String centro = (centroCodigo == null || centroCodigo.isBlank())
+                ? null : centroCodigo.trim().toLowerCase();
         return citaRepository.findAllByMedicoIdWithPaciente(medicoId).stream()
+                .filter(c -> centro == null
+                        || (c.getCentro() != null && centro.equals(c.getCentro().getCodigo())))
                 .map(c -> new ReservaPruebaResponse(
                         c.getId(),
                         c.getUsuario().getId(),
@@ -192,7 +216,9 @@ public class CitaService {
                         c.getMedico().getNombre(),
                         c.getFechaHora(),
                         c.getMotivo(),
-                        c.getEstado()
+                        c.getEstado(),
+                        c.getCentro() != null ? c.getCentro().getCodigo() : null,
+                        c.getCentro() != null ? c.getCentro().getNombre() : null
                 ))
                 .toList();
     }
@@ -238,6 +264,7 @@ public class CitaService {
     }
 
     private CitaResponse toResponse(Cita cita) {
+        Centro centro = cita.getCentro();
         return new CitaResponse(
                 cita.getId(),
                 cita.getUsuario().getId(),
@@ -245,7 +272,9 @@ public class CitaService {
                 cita.getMedico().getNombre(),
                 cita.getFechaHora(),
                 cita.getMotivo(),
-                cita.getEstado()
+                cita.getEstado(),
+                centro != null ? centro.getCodigo() : null,
+                centro != null ? centro.getNombre() : null
         );
     }
 

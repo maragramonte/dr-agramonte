@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,13 +23,23 @@ public class DisponibilidadService {
     private final CitaRepository citaRepository;
 
     /**
-     * Devuelve los huecos libres para un médico en una fecha concreta.
-     * Asume que los horarios están predefinidos en la tabla Horario (rango horario del médico).
+     * Devuelve los huecos libres para un médico en una fecha concreta (todos los centros).
      */
     public List<LocalDateTime> obtenerHuecosLibres(Long medicoId, String fecha) {
+        return obtenerHuecosLibres(medicoId, fecha, null);
+    }
+
+    /**
+     * Devuelve los huecos libres para un médico en una fecha concreta.
+     * Si {@code centroCodigo} no es nulo/vacío, solo devuelve los huecos de ese centro
+     * (agenda del médico por ubicación).
+     */
+    public List<LocalDateTime> obtenerHuecosLibres(Long medicoId, String fecha, String centroCodigo) {
         LocalDate fechaDate = LocalDate.parse(fecha);  // espera formato "YYYY-MM-DD"
         LocalDateTime inicioDia = fechaDate.atStartOfDay();
-        LocalDateTime finDia = fechaDate.atTime(LocalTime.MAX);
+        // 23:59:59 (sin nanos): LocalTime.MAX (…999999999) lo redondea PostgreSQL a
+        // 00:00:00 del día siguiente y colaría el primer hueco del día siguiente.
+        LocalDateTime finDia = fechaDate.atTime(23, 59, 59);
 
         // Obtener todos los horarios del médico para ese día (rango de horas)
         List<Horario> horariosDia = horarioRepository.findByMedicoIdAndInicioBetween(medicoId, inicioDia, finDia);
@@ -41,9 +50,14 @@ public class DisponibilidadService {
         // Obtener las horas ya ocupadas (citas confirmadas para ese médico y día)
         List<LocalDateTime> ocupadas = citaRepository.findHorasOcupadas(medicoId, inicioDia, finDia);
 
-        // Filtrar los horarios disponibles (disponible = true) y que no estén en la lista de ocupadas
+        final String centro = (centroCodigo == null || centroCodigo.isBlank())
+                ? null : centroCodigo.trim().toLowerCase();
+
+        // Filtrar: disponibles, no ocupados y (si se pidió) del centro indicado
         return horariosDia.stream()
                 .filter(Horario::isDisponible)
+                .filter(h -> centro == null
+                        || (h.getCentro() != null && centro.equals(h.getCentro().getCodigo())))
                 .map(Horario::getInicio)
                 .filter(inicio -> !ocupadas.contains(inicio))
                 .sorted()

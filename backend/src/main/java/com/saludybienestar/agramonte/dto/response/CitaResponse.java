@@ -16,4 +16,6 @@ public class CitaResponse {
     private LocalDateTime fechaHora;
     private String motivo;
     private EstadoCita estado;
+    private String centroCodigo;
+    private String centroNombre;
 }

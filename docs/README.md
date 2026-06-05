@@ -14,7 +14,7 @@ Este directorio concentra la **memoria del TFG**, los **diagramas LaTeX** y guí
 |---------|----------------|
 | [SINCRONIZACION-CITAS.md](SINCRONIZACION-CITAS.md) | **Control Mis citas ↔ Panel ↔ BD** (pruebas, fallos, Postman) |
 | [DOCKER-TROUBLESHOOTING.md](DOCKER-TROUBLESHOOTING.md) | Arranque Docker, 502, healthchecks |
-| [Memoria-TFG-Dr-Agramonte.tex](Memoria-TFG-Dr-Agramonte.tex) | Memoria en LaTeX (alineada con el código real, mayo 2026) |
+| [Memoria-TFG-Dr-Agramonte.tex](Memoria-TFG-Dr-Agramonte.tex) | Memoria en LaTeX (alineada con el código real, junio 2026) |
 | [INSTRUCCIONES-MEMORIA-LATEX.md](INSTRUCCIONES-MEMORIA-LATEX.md) | Cómo compilar el PDF (`pdflatex`) |
 | [checklist-rubricas.tex](checklist-rubricas.tex) | Checklist 25 % / 40 % / 35 % (rúbricas módulo) |
 | [tikz-paleta.tex](tikz-paleta.tex) | Colores teal del CSS (`#0F766E`, `#14B8A6`) |
@@ -22,7 +22,6 @@ Este directorio concentra la **memoria del TFG**, los **diagramas LaTeX** y guí
 | [tikz-diagrama-er.tex](tikz-diagrama-er.tex) | Modelo entidad-relación |
 | [tikz-diagrama-reserva.tex](tikz-diagrama-reserva.tex) | Flujo reserva + concurrencia |
 | [tikz-diagrama-frontend.tex](tikz-diagrama-frontend.tex) | Capas frontend y PWA |
-| [Boceto WEBAPP.tex](Boceto%20WEBAPP.tex) | Boceto inicial (especificación funcional antigua) |
 
 ---
 

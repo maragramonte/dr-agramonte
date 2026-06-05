@@ -451,7 +451,7 @@ Mientras arranca: explicar capas (nginx → Spring → PostgreSQL).
 
 **Twilio:** opcional; médico + paciente; recordatorio 24 h con `@Scheduled`.
 
-**Limitaciones honestas:** `panel-pruebas.html` muestra reservas reales y agenda médico básica; historial clínico completo es evolución futura; sin suite de tests completa; sin MongoDB/Redis.
+**Limitaciones honestas:** `panel-pruebas.html` muestra reservas reales y agenda médico básica; historial clínico completo es evolución futura; suite de tests **inicial** (unitarios de `JwtProvider` y `CitaService` + integración con Testcontainers), falta ampliar cobertura y añadir E2E; sin MongoDB/Redis.
 
 ---
 
@@ -467,7 +467,9 @@ Mientras arranca: explicar capas (nginx → Spring → PostgreSQL).
 ### Mejora futura (post-TFG)
 
 - [ ] API de historial clínico + panel médico real  
-- [ ] Tests JUnit + Testcontainers (ya en `pom.xml`)  
+- [x] Tests JUnit (unitarios) + Testcontainers (integración) — suite en `backend/src/test`  
+- [x] Capa REST + seguridad por rol con `@WebMvcTest` (`CitaControllerWebMvcTest`)  
+- [ ] Ampliar cobertura (resto de controllers y servicios)  
 - [ ] Tests E2E (Playwright)  
 - [ ] Refresh token JWT  
 - [ ] Despliegue cloud (HTTPS, dominio)  

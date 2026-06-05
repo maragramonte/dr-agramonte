@@ -103,4 +103,39 @@ docker compose restart backend
 ```powershell
 curl http://localhost:8080/actuator/health
 curl http://localhost/api/medicos
+curl http://localhost:8080/api/centros
+```
+
+---
+
+## Tests de integración (Testcontainers) que se "omiten" o dan HTTP 400
+
+Los tests de integración (`ReservaPublicaIntegrationTest`) levantan un **PostgreSQL real con Testcontainers**. Con un **Docker Engine muy reciente** (aquí 29.x, API 1.54) puede pasar que:
+
+- el test quede **omitido** (*skipped*) con el mensaje `Could not find a valid Docker environment`, o
+- aparezca un error `BadRequestException (Status 400)` aunque `docker version` / `docker ps` funcionen sin problema.
+
+**Causa:** Testcontainers 1.21.x arrastra `docker-java 3.4.2`, que no se entiende con la API 1.54 del Engine.
+
+**Solución aplicada en `backend/pom.xml`:** se mantiene Testcontainers en `1.21.4` (la 2.x reorganizó los módulos `postgresql`/`junit-jupiter`) y se **fuerza `docker-java` a 3.7.1** como dependencia directa de test:
+
+```xml
+<dependency>
+  <groupId>com.github.docker-java</groupId>
+  <artifactId>docker-java-api</artifactId>
+  <version>3.7.1</version>
+  <scope>test</scope>
+</dependency>
+<dependency>
+  <groupId>com.github.docker-java</groupId>
+  <artifactId>docker-java-transport-zerodep</artifactId>
+  <version>3.7.1</version>
+  <scope>test</scope>
+</dependency>
+```
+
+Con esto, `mvn test` ejecuta los 4 tests de integración (Flyway aplica V1–V5, incluida la tabla `centros`) sin necesidad de variables de entorno manuales. Requisito: **Docker Desktop en marcha**.
+
+```powershell
+mvn -f backend/pom.xml test
 ```

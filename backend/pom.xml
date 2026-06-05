@@ -28,6 +28,10 @@
         <mysql.version>9.0.0</mysql.version>
         <lombok.version>1.18.36</lombok.version>
         <flyway.version>11.8.0</flyway.version>
+        <testcontainers.version>1.21.4</testcontainers.version>
+        <!-- docker-java más reciente que el que trae Testcontainers 1.21.x (3.4.2):
+             necesario para hablar con Docker Engine 29 / API 1.54. -->
+        <dockerjava.version>3.7.1</dockerjava.version>
     </properties>
 
     <dependencies>
@@ -155,7 +159,30 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
-            <version>1.20.6</version>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Integración Testcontainers ↔ JUnit 5 (@Testcontainers / @Container) -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Forzamos docker-java 3.7.1 (Testcontainers 1.21.x trae 3.4.2, que da
+             HTTP 400 contra Docker Engine 29 / API 1.54). Al ser dependencia directa,
+             Maven la prioriza sobre la transitiva de Testcontainers. -->
+        <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java-api</artifactId>
+            <version>${dockerjava.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java-transport-zerodep</artifactId>
+            <version>${dockerjava.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

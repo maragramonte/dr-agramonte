@@ -601,6 +601,7 @@ async function onSubmit(e) {
         if (isAuthenticated()) {
             await apiClient.postReserva({
                 medicoId: state.medicoId,
+                centroCodigo: state.centroId || null,
                 fechaHora: `${state.dateISO}T${state.hour}:00`,
                 motivo: cita.motivo || null,
                 telefono: cita.paciente.telefono || null
@@ -612,6 +613,7 @@ async function onSubmit(e) {
                 email: cita.paciente.email,
                 telefono: cita.paciente.telefono,
                 medicoId: state.medicoId,
+                centroCodigo: state.centroId || null,
                 fechaHora: `${state.dateISO}T${state.hour}:00`,
                 motivo: cita.motivo || null
             };

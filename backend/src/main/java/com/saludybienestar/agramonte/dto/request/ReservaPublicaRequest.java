@@ -35,4 +35,8 @@ public class ReservaPublicaRequest {
 
     @Size(max = 500)
     private String motivo;
+
+    /** Código del centro donde se atiende ('madrid', 'palma'...). Opcional. */
+    @Size(max = 50)
+    private String centroCodigo;
 }

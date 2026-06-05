@@ -48,6 +48,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/medicos/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/centros").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/disponibilidad/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/citas/agenda/pacientes").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/citas/agenda/reservas").permitAll()
@@ -114,8 +115,9 @@ public class SecurityConfig {
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Collections.singletonList("*"));
 
-        // Corrección del error: Usamos la propiedad Boolean orientada a objetos explícita
-        config.setAllowCredentials(Boolean.TRUE);
+        // La autenticación viaja en la cabecera Authorization: Bearer (no cookies),
+        // así que no necesitamos credenciales CORS. Mantenerlo en false = menor superficie.
+        config.setAllowCredentials(false);
 
         // Optimización: Evita peticiones OPTIONS duplicadas cacheando la respuesta preflight 1 hora
         config.setMaxAge(3600L);

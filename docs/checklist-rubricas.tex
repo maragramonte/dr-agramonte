@@ -29,11 +29,11 @@ Coherencia memoria $\leftrightarrow$ código & $\checkmark$ & $\checkmark$ & Sin
 
 \multicolumn{4}{l}{\textbf{\color{tealdark}B. Contenido escrito (40\,\%)}} \\
 \midrule
-Estructura guía (justificación, objetivos, sector, desarrollo, conclusiones) & $\checkmark$ & --- & \\
-PDF, márgenes, fuente, extensión & $\square$ & --- & Revisar 35--65 páginas \\
-Diagramas TikZ (paleta teal CSS) & $\checkmark$ & --- & Cap. arquitectura \\
-Referencias APA & $\square$ & --- & Ampliar bibliografía si tutor exige \\
-Anexos (capturas, manual usuario) & $\square$ & --- & Recomendado \\
+Estructura guía (justificación, objetivos, sector 5.1, desarrollo 5.2, conclusiones) & $\checkmark$ & --- & Orden oficial \\
+PDF, márgenes 3\,cm, fuente, interlineado 1,15 & $\checkmark$ & --- & Falta confirmar 35--65 pág. \\
+Diagramas TikZ (paleta teal CSS) & $\checkmark$ & --- & Cap. desarrollo \\
+Referencias APA & $\checkmark$ & --- & Bibliografía en APA \\
+Anexos (checklist, manual, capturas) & $\checkmark$ & --- & Faltan insertar capturas \\
 \midrule
 
 \multicolumn{4}{l}{\textbf{\color{tealdark}C. Defensa (35\,\%)}} \\
@@ -51,7 +51,8 @@ PostgreSQL + Flyway + Spring Boot + JWT & $\checkmark$ & $\checkmark$ & \\
 Frontend PWA + reserva + servicios URL & $\checkmark$ & $\checkmark$ & \\
 Twilio Java (médico, paciente, recordatorio) & $\checkmark$ & $\square$ & Requiere \texttt{.env} \\
 Panel médico API historial & $\square$ & $\square$ & Solo demo estática \\
-Tests automatizados JUnit/E2E & $\square$ & $\square$ & Mejora futura \\
+Tests automatizados JUnit + Testcontainers & $\checkmark$ & $\checkmark$ & E2E (Playwright) pendiente \\
+OWASP dependency-check (CVSS$\geq$7) & $\checkmark$ & $\square$ & \texttt{pom.xml} \\
 \bottomrule
 \end{longtable}
 

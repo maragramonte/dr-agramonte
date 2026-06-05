@@ -10,13 +10,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "notificaciones")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Notificacion {
@@ -45,4 +48,17 @@ public class Notificacion {
     private String estadoEntrega;      // ENVIADO, FALLIDO, PENDIENTE
     private String respuestaPaciente;  // texto libre que llegará del webhook
     private LocalDateTime fechaRespuesta;
+
+    // Igualdad por identidad (id): segura para JPA y para usar la entidad en colecciones.
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Notificacion other)) return false;
+        return id != null && id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getClass());
+    }
 }
