@@ -3,6 +3,7 @@
 # aquí Spring Boot sirve la API y el frontend juntos en un solo servicio.
 # Esto evita CORS, simplifica el despliegue y gasta menos crédito.
 # El despliegue local con docker-compose sigue usando backend/Dockerfile.
+# Lee la conexión de la BD desde DATABASE_URL (ver DatabaseUrlEnvironmentPostProcessor).
 
 FROM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /workspace
