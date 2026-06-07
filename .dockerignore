@@ -1,0 +1,8 @@
+# Acelera el build en la nube: no subimos lo que la imagen no necesita
+.git
+.gitignore
+docs
+*.md
+.env
+.env.*
+backend/target

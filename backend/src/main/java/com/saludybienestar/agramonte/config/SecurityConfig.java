@@ -38,6 +38,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                // Esta cadena de seguridad solo cubre la API y actuator.
+                // Los archivos estáticos del frontend (/, *.html, css, js...) quedan
+                // fuera y se sirven públicamente, necesario al servir web + API juntos.
+                .securityMatcher("/api/**", "/actuator/**")
                 .csrf(AbstractHttpConfigurer::disable)
                 // Usamos el método local unificado
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -61,6 +65,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/citas/*").hasAnyRole("PACIENTE", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/citas/mias").hasRole("PACIENTE")
                         // Permisos de Médicos y Administradores
+                        .requestMatchers(HttpMethod.GET, "/api/estadisticas").hasAnyRole("MEDICO", "ADMIN")
                         .requestMatchers("/api/citas/agenda/**").hasAnyRole("MEDICO", "ADMIN")
                         .requestMatchers("/api/historial/**").hasAnyRole("MEDICO", "ADMIN")
                         .requestMatchers("/api/alertas/**").hasAnyRole("MEDICO", "ADMIN")
@@ -109,7 +114,7 @@ public class SecurityConfig {
                 "http://localhost:3456",
                 "http://127.0.0.1:5500",
                 "http://127.0.0.1:3456",
-                "https://www.saludybienestarinterno.com"
+                "https://dragramonte.com"
         ));
 
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));

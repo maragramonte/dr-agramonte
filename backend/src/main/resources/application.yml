@@ -27,7 +27,8 @@ server:
     include-binding-errors: always
     include-exception: false
     include-stacktrace: never
-  port: 8080
+  # En la nube (Railway) el puerto lo asigna la plataforma con $PORT; en local cae a 8080
+  port: ${PORT:8080}
 
 app:
   contact:

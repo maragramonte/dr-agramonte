@@ -1,8 +1,9 @@
-const CACHE_NAME = 'dr-agramonte-v5';
+const CACHE_NAME = 'dr-agramonte-v12';
 const urlsToCache = [
     '/',
     '/index.html',
     '/panel-pruebas.html',
+    '/estadisticas.html',
     '/reservar.html',
     '/contacto.html',
     '/servicios.html',
@@ -13,6 +14,7 @@ const urlsToCache = [
     '/css/dr-agramonte.css',
     '/css/pages-extra.css',
     '/css/reserva-page.css',
+    '/css/estadisticas.css',
     '/icons/favicon.svg',
     '/js/modules/theme-init.js',
     '/js/modules/api-config.js',
@@ -22,6 +24,8 @@ const urlsToCache = [
     '/js/pages/reserva.js',
     '/js/pages/contacto.js',
     '/js/pages/panel-pruebas.js',
+    '/js/pages/estadisticas.js',
+    '/js/vendor/chart.umd.min.js',
     '/icons/app-icon.svg'
 ];
 

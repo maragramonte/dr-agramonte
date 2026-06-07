@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Cuadro de mando de gestión de la clínica: carga por médico, demanda por especialidad y tasa de cancelación.">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Cuadro de mando de gestión | Dr. Agramonte</title>
+
+    <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
+    <link rel="apple-touch-icon" href="icons/app-icon.svg">
+    <meta name="theme-color" content="#0F766E">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Dr. Agramonte">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="css/dr-agramonte.css">
+    <link rel="stylesheet" href="css/pages-extra.css">
+    <link rel="stylesheet" href="css/estadisticas.css">
+    <script src="js/modules/theme-init.js"></script>
+</head>
+<body>
+<header class="main-header" role="banner">
+    <div class="container">
+        <div class="header-content">
+            <div class="logo-section">
+                <a href="index.html" class="logo-link" aria-label="Inicio - Dr. Agramonte">
+                    <div class="logo-icon" aria-hidden="true"><i class="fas fa-user-md"></i></div>
+                    <div class="logo-text">
+                        <h1 class="logo-title">Dr. Agramonte</h1>
+                        <p class="logo-subtitle">Cuadro de mando</p>
+                    </div>
+                </a>
+            </div>
+            <div class="header-end">
+                <button type="button" class="theme-toggle" id="themeToggle" aria-label="Activar modo oscuro" title="Cambiar tema">
+                    <i class="fas fa-moon" id="themeToggleIcon" aria-hidden="true"></i>
+                </button>
+            <nav class="main-nav" aria-label="Navegación principal">
+                <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Menú de navegación">
+                    <span class="nav-toggle-icon" aria-hidden="true"></span>
+                </button>
+                <ul class="nav-menu" id="nav-menu">
+                    <li class="nav-item"><a href="index.html" class="nav-link">Inicio</a></li>
+                    <li class="nav-item"><a href="sobre-mi.html" class="nav-link">Sobre mí</a></li>
+                    <li class="nav-item"><a href="servicios.html" class="nav-link">Servicios</a></li>
+                    <li class="nav-item"><a href="testimonios.html" class="nav-link">Testimonios</a></li>
+                    <li class="nav-item"><a href="contacto.html" class="nav-link">Contacto</a></li>
+                    <li class="nav-item"><a href="reservar.html" class="nav-link nav-link--reserva"><i class="fas fa-calendar-plus" aria-hidden="true"></i> Reservar cita</a></li>
+                </ul>
+            </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+<section class="page-hero page-hero--compact">
+    <div class="container">
+        <h1><i class="fas fa-chart-line"></i> Cuadro de mando de gestión</h1>
+        <p>
+            La clínica vista como empresa: <strong>carga de trabajo por médico</strong>, especialidades más
+            demandadas, reparto por centro, evolución temporal de citas y <strong>tasa de cancelación</strong>.
+            Acceso restringido al rol <code>MEDICO</code> / <code>ADMIN</code> (datos desde <code>GET /api/estadisticas</code>).
+        </p>
+    </div>
+</section>
+
+<main class="dash-wrap">
+    <!-- Aviso si no hay sesión de profesional -->
+    <div id="dashGate" class="dash-gate" hidden>
+        <i class="fas fa-lock gate-icon" aria-hidden="true"></i>
+        <h2>Acceso para profesionales</h2>
+        <p id="dashGateMsg">
+            El cuadro de mando solo es visible para el personal de la clínica.
+            Inicia sesión con una cuenta de rol <code>MEDICO</code> o <code>ADMIN</code> para verlo.
+        </p>
+        <button type="button" class="btn btn--reserva" data-auth-trigger>
+            <i class="fas fa-right-to-bracket" aria-hidden="true"></i> Iniciar sesión
+        </button>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashContent" hidden>
+        <div class="dash-toolbar">
+            <button type="button" class="btn-pruebas" id="btnRefresh"><i class="fas fa-sync-alt"></i> Actualizar datos</button>
+            <span id="dashConn" class="dash-conn">Cargando…</span>
+        </div>
+
+        <section class="kpi-grid" aria-label="Indicadores principales">
+            <div class="kpi-card"><div class="kpi-value" id="kpiTotal">—</div><div class="kpi-label">Total de citas</div></div>
+            <div class="kpi-card"><div class="kpi-value" id="kpiActivas">—</div><div class="kpi-label">Activas (pend. + confirmadas)</div></div>
+            <div class="kpi-card"><div class="kpi-value" id="kpiCompletadas">—</div><div class="kpi-label">Completadas</div></div>
+            <div class="kpi-card kpi-alert"><div class="kpi-value" id="kpiTasa">—</div><div class="kpi-label">Tasa de cancelación</div></div>
+        </section>
+
+        <section class="charts-grid">
+            <div class="chart-card">
+                <h3><i class="fas fa-user-doctor"></i> Carga de trabajo por médico</h3>
+                <div class="chart-box"><canvas id="chartMedicos" aria-label="Citas por médico" role="img"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-stethoscope"></i> Demanda por especialidad</h3>
+                <div class="chart-box"><canvas id="chartEspecialidades" aria-label="Citas por especialidad" role="img"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-hospital"></i> Citas por centro</h3>
+                <div class="chart-box"><canvas id="chartCentros" aria-label="Citas por centro" role="img"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-pie"></i> Reparto por estado</h3>
+                <div class="chart-box"><canvas id="chartEstados" aria-label="Citas por estado" role="img"></canvas></div>
+            </div>
+            <div class="chart-card" style="grid-column: 1 / -1;">
+                <h3><i class="fas fa-calendar-days"></i> Evolución temporal de citas</h3>
+                <div class="chart-box"><canvas id="chartMeses" aria-label="Citas por mes" role="img"></canvas></div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section"><h3>Dr. Agramonte</h3><p>Especialista en Medicina Interna</p><p>Colegiado N° 12345</p><p>Madrid, España</p></div>
+        <div class="footer-section"><h3>Contacto</h3><a href="tel:+34748962648"><i class="fas fa-phone"></i> +34 748 962 648</a><a href="mailto:contacto@dragramonte.com"><i class="fas fa-envelope"></i> contacto@dragramonte.com</a><p><i class="fas fa-map-marker-alt"></i> Calle Salud, 123, Madrid</p></div>
+        <div class="footer-section"><h3>Horario</h3><p><strong>Lunes a Viernes</strong><br>9:00 - 14:00<br>16:00 - 19:00</p><p><strong>Sábados</strong><br>9:00 - 13:00 (con cita)</p></div>
+        <div class="footer-section"><h3>Enlaces</h3><a href="privacidad.html"><i class="fas fa-shield-alt"></i> Política de Privacidad</a><a href="offline.html"><i class="fas fa-wifi-slash"></i> Modo Offline</a><a href="panel-pruebas.html"><i class="fas fa-flask"></i> Pruebas TFG</a><a href="estadisticas.html"><i class="fas fa-chart-line"></i> Cuadro de mando</a><p style="margin-top:.8rem;">Web: <a href="https://dragramonte.com/" target="_blank" rel="noopener">dragramonte.com</a></p></div>
+    </div>
+    <div class="footer-bottom"><p>© 2025 Salud y Bienestar Interno – Dr. Juan Manuel Agramonte. <a href="privacidad.html">Política de privacidad</a></p></div>
+</footer>
+
+<script src="js/modules/api-config.js"></script>
+<script src="js/modules/auth-ui.js" defer></script>
+<script src="js/pages/dr-agramonte.js" defer></script>
+<script src="js/vendor/chart.umd.min.js"></script>
+<script type="module" src="js/pages/estadisticas.js"></script>
+</body>
+</html>

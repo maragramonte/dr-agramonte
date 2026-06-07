@@ -139,47 +139,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const contacto = new ContactoManager();
     contacto.init();
 
-    // Nota: Telemedicina se inicializa desde dr-agramonte.js (singleton)
+    // Nota: la videollamada (clase Telemedicina) y el menú móvil (clase Navegacion)
+    // los gestiona dr-agramonte.js de forma global. No los dupliques aquí para
+    // evitar handlers en conflicto (doble acción / toggles que se anulan).
 
     console.log('✅ Servicios inicializados');
-});
-// Script para el botón de videollamada
-document.addEventListener('DOMContentLoaded', function() {
-    const btnVideollamada = document.getElementById('btnVideollamada');
-    if (btnVideollamada) {
-        btnVideollamada.addEventListener('click', function() {
-            // Generar ID único para la videollamada
-            const meetingId = 'dr-agramonte-' + Math.random().toString(36).substring(2, 10);
-            const meetingLink = `https://meet.jit.si/${meetingId}`;
-
-            // Mostrar modal o copiar al portapapeles
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(meetingLink);
-                alert('Enlace de videollamada copiado al portapapeles:\n' + meetingLink);
-            } else {
-                prompt('Copia este enlace para la videollamada:', meetingLink);
-            }
-        });
-    }
-
-    // Navegación móvil
-    const navToggle = document.querySelector('.nav-toggle');
-    const navMenu = document.querySelector('.nav-menu');
-
-    if (navToggle && navMenu) {
-        navToggle.addEventListener('click', function() {
-            const expanded = this.getAttribute('aria-expanded') === 'true';
-            this.setAttribute('aria-expanded', !expanded);
-            navMenu.classList.toggle('nav-menu--open');
-        });
-
-        document.addEventListener('click', function(e) {
-            if (navMenu.classList.contains('nav-menu--open') &&
-                !navMenu.contains(e.target) &&
-                !navToggle.contains(e.target)) {
-                navToggle.setAttribute('aria-expanded', 'false');
-                navMenu.classList.remove('nav-menu--open');
-            }
-        });
-    }
 });

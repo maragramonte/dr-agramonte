@@ -113,9 +113,28 @@
 
 El proyecto nace de una observación directa del sector sanitario: buena parte de las llamadas que recibe un médico fuera de su horario no son urgencias clínicas, sino gestión de agenda. Digitalizar esa parte administrativa devuelve tiempo al profesional sin sustituir el trato humano donde de verdad hace falta. Sobre esa idea se construye una herramienta pensada para consultas pequeñas y médicos autónomos, que mantienen la titularidad de sus datos en lugar de depender de plataformas de terceros.
 
-La interfaz replica la identidad visual del consultorio: paleta \textbf{teal} (\#0F766E, \#14B8A6), tipografías DM Sans / DM Serif Display, modo claro/oscuro y diseño responsive. La reserva se organiza en pasos (centro, calendario, hora, datos y confirmación) y puede iniciarse desde \texttt{servicios.html} con el tipo de consulta preseleccionado.
+La interfaz replica la identidad visual del consultorio: paleta \textbf{teal} (\#0F766E, \#14B8A6), tipografías DM Sans / DM Serif Display, modo claro/oscuro y diseño responsive. La reserva se organiza en pasos (centro, calendario, hora, datos y confirmación) y puede iniciarse desde \texttt{servicios.html} con el tipo de consulta preseleccionado. Un \textbf{cuadro de mando} restringido por rol convierte los datos operativos en información de gestión (carga por médico, demanda por especialidad, tasa de cancelación) y la interfaz sigue las pautas de accesibilidad \textbf{WCAG 2.1 AA}.
 
 La calidad se respalda con una batería de \textbf{pruebas automatizadas} (unitarias, de seguridad y de integración con Testcontainers) y con análisis de vulnerabilidades \textbf{OWASP dependency-check}. La principal conclusión es que la coherencia entre memoria, código y demostración es tan determinante como la propia funcionalidad: este documento describe la versión \emph{real} del sistema a junio de 2026, distinguiendo lo entregado de lo planificado como evolución.
+
+\vspace{0.5em}
+\noindent\textbf{Palabras clave:} citas médicas, aplicación web, Spring Boot, API REST, PostgreSQL, JWT, concurrencia, Twilio, Docker, PWA, accesibilidad.
+
+% ============================================================================
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+% ============================================================================
+
+\textbf{Dr. Agramonte} is a web application that lets patients book, review and cancel medical appointments without depending on the practitioner's phone line. The system integrates a static frontend (HTML, CSS and JavaScript), a REST API built with \textbf{Spring Boot 3.5.3}, a \textbf{PostgreSQL} database, \textbf{JWT} authentication, concurrency control through \textbf{pessimistic locking}, \textbf{Twilio} notifications (SMS/WhatsApp) and reproducible deployment with \textbf{Docker Compose}.
+
+The project stems from direct observation of the healthcare sector: many of the calls a doctor receives outside working hours are not clinical emergencies but scheduling tasks. Digitising that administrative layer gives time back to the professional without replacing human contact where it is truly needed. On this premise, the tool is designed for small practices and self-employed doctors, who retain ownership of their data instead of relying on third-party platforms.
+
+The interface mirrors the practice's visual identity: a \textbf{teal} palette (\#0F766E, \#14B8A6), DM Sans / DM Serif Display typefaces, light/dark mode and responsive design. Booking is organised in steps (centre, calendar, time, details and confirmation) and can be started from \texttt{servicios.html} with the appointment type preselected. A role-restricted \textbf{management dashboard} turns operational data into business insight (workload per doctor, demand per specialty, cancellation rate), and the interface follows \textbf{WCAG 2.1 AA} accessibility guidelines.
+
+Quality is backed by a suite of \textbf{automated tests} (unit, security and Testcontainers-based integration) and \textbf{OWASP dependency-check} vulnerability analysis. The main conclusion is that consistency between report, code and demonstration is as decisive as functionality itself: this document describes the \emph{real} state of the system as of June 2026, distinguishing what has been delivered from what is planned as future work.
+
+\vspace{0.5em}
+\noindent\textbf{Keywords:} medical appointments, web application, Spring Boot, REST API, PostgreSQL, JWT, concurrency, Twilio, Docker, PWA, accessibility.
 
 \clearpage
 \tableofcontents
@@ -205,9 +224,10 @@ Cada objetivo específico se corresponde con código real del repositorio y, cua
   \item Enviar notificaciones al médico y al paciente vía \textbf{Twilio}, con recordatorio programado 24\,h antes (\texttt{CitaReminderScheduler}).
   \item Desplegar con \textbf{Docker Compose} (nginx + backend + base de datos).
   \item Validar la calidad con pruebas automatizadas y análisis de vulnerabilidades, y preparar la defensa con una demo reproducible.
+  \item Ofrecer un \textbf{cuadro de mando de gestión} (módulo SGE) con analítica agregada —carga por médico, demanda por especialidad, reparto por centro y tasa de cancelación— restringido a los roles \texttt{MEDICO}/\texttt{ADMIN}.
 \end{enumerate}
 
-Estos siete objetivos se retoman en el capítulo de conclusiones para comprobar, uno a uno, su grado de cumplimiento.
+Estos ocho objetivos se retoman en el capítulo de conclusiones para comprobar, uno a uno, su grado de cumplimiento.
 
 % ============================================================================
 \chapter{Desarrollo}
@@ -330,6 +350,7 @@ Persistencia & PostgreSQL 15, Flyway, JPA & Datos transaccionales \\
 Notificaciones & Twilio API (Java SDK) & SMS / WhatsApp \\
 \rowcolor{rowgray}
 Despliegue & Docker Compose & Entorno reproducible \\
+Analítica & Chart.js 4 (vendorizado) & Cuadro de mando de gestión \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -362,6 +383,16 @@ El modelo relacional gira en torno a cuatro entidades centrales —\texttt{usuar
 \end{itemize}
 
 La evolución del esquema queda reflejada en las migraciones Flyway: la \texttt{V2\_\_cita\_recordatorio} añade el campo \texttt{recordatorio\_enviado} para evitar duplicar avisos Twilio, la \texttt{V3} extiende los horarios y crea el usuario médico de prueba, la \texttt{V4} introduce \texttt{cuenta\_invitada} para la reserva sin registro previo, la \texttt{V5} crea la tabla \texttt{centros} (con sus datos iniciales) y añade \texttt{centro\_id} a \texttt{citas}, y la \texttt{V6} añade \texttt{centro\_id} a \texttt{horarios} (repartiendo la agenda por centro). Versionar el esquema de esta forma garantiza que la base de datos del tribunal se construya exactamente igual que la de desarrollo.
+
+\subsection{Persistencia relacional frente a NoSQL}
+
+La elección de la base de datos no fue automática: se valoró expresamente un enfoque \textbf{NoSQL documental} (MongoDB) frente al \textbf{relacional} (PostgreSQL) antes de decidir. Ambos paradigmas son válidos, pero resuelven problemas distintos, y conviene justificar por qué uno encaja mejor en este caso.
+
+Una base de datos documental como MongoDB brilla cuando los datos son heterogéneos y poco estructurados, cuando el esquema cambia con frecuencia y cuando se prioriza la escalabilidad horizontal sobre la consistencia inmediata; guarda documentos JSON flexibles y evita las uniones (\emph{joins}). Una base relacional, en cambio, destaca cuando los datos están fuertemente interrelacionados, cuando la integridad referencial y las transacciones \textbf{ACID} son innegociables y cuando hace falta bloqueo a nivel de fila.
+
+En este proyecto los datos son intrínsecamente relacionales —un \texttt{usuario} reserva con un \texttt{medico} en un \texttt{horario} de un \texttt{centro}, generando una \texttt{cita}— y la invariante crítica del sistema es que \textbf{dos pacientes no reserven la misma franja}. Garantizar eso exige una transacción con bloqueo (\texttt{SELECT \ldots FOR UPDATE}), justo donde el modelo relacional es más fuerte y el documental obligaría a soluciones más artificiales. Además, el volumen de una consulta médica es modesto, de modo que la escalabilidad horizontal de NoSQL no aporta una ventaja real aquí. Por todo ello, PostgreSQL es la opción correcta para el \emph{núcleo transaccional}.
+
+Esto no descarta NoSQL: simplemente lo reserva para donde sí encaja. El \textbf{historial clínico} es el candidato natural a un almacén documental, porque cada especialidad registra campos distintos (no hay un esquema único razonable) y los datos se añaden más que se modifican; lo mismo aplicaría a un \emph{registro de auditoría} de accesos. La evolución coherente del sistema sería, por tanto, una \textbf{persistencia políglota}: PostgreSQL para el núcleo de citas (consistencia) y MongoDB para el historial clínico (flexibilidad), una línea ya recogida entre los trabajos futuros. La decisión, en resumen, no fue ``relacional porque sí'', sino elegir la herramienta adecuada para cada tipo de dato.
 
 \subsection{Frontend y paleta visual}
 
@@ -422,6 +453,7 @@ POST & /api/citas/reserva-publica & Reserva sin login (cuenta invitada) \\
 GET & /api/citas/mias & Citas del paciente (JWT) \\
 GET & /api/citas/por-email & Citas del invitado por email \\
 DELETE & /api/citas/\{id\} & Cancelación (paciente autenticado) \\
+GET & /api/estadisticas & Cuadro de mando de gestión (rol MEDICO/ADMIN) \\
 POST & /api/contact & Formulario de contacto \\
 \bottomrule
 \end{tabular}
@@ -470,15 +502,68 @@ Todas las relaciones con \texttt{centro} son \emph{nullable} a propósito: las c
 
 \paragraph{Reserva guiada por pasos.} La experiencia se divide en pasos pequeños (centro $\rightarrow$ calendario $\rightarrow$ hora $\rightarrow$ datos $\rightarrow$ confirmación) para reducir la carga cognitiva y no abrumar al usuario con todos los campos a la vez. Esta decisión, heredada del boceto inicial, es especialmente importante para pacientes mayores o poco habituados a la tecnología.
 
-\paragraph{Accesibilidad.} La interfaz cuida el uso de etiquetas HTML semánticas, atributos ARIA, un orden de tabulación lógico para navegar solo con teclado y un contraste de color suficiente entre texto y fondo, tanto en modo claro como oscuro. La accesibilidad no se entendió como un requisito formal, sino como la diferencia entre que una persona mayor pueda usar la aplicación o no.
+\paragraph{Accesibilidad.} La interfaz cuida el uso de etiquetas HTML semánticas, atributos ARIA, un orden de tabulación lógico para navegar solo con teclado y un contraste de color suficiente entre texto y fondo, tanto en modo claro como oscuro. La accesibilidad no se entendió como un requisito formal, sino como la diferencia entre que una persona mayor pueda usar la aplicación o no. Por su importancia en un contexto sanitario, se detalla en su propia sección a continuación.
 
 \paragraph{Validación de datos.} La entrada del usuario se valida en dos niveles, porque ninguno de los dos basta por sí solo. En el \textbf{frontend} se comprueban formato de email, teléfono español y campos obligatorios antes de enviar, dando un aviso inmediato y evitando viajes innecesarios al servidor; esto mejora la experiencia, pero no es una garantía de seguridad porque puede manipularse. Por eso la validación se repite en el \textbf{backend} con las anotaciones de \emph{Bean Validation} sobre los DTO de entrada: el servidor nunca confía en que el cliente haya validado bien. Esta doble barrera —comodidad en el cliente, seguridad en el servidor— es un principio básico de cualquier aplicación web seria.
+
+\subsection{Accesibilidad y usabilidad (WCAG)}
+
+En una aplicación de salud, la accesibilidad no es un extra: una parte importante de los pacientes son personas mayores o con dificultades visuales o motrices, y si no pueden usar la herramienta, esta sencillamente no cumple su función. Por eso la interfaz se diseñó tomando como referencia las \textbf{Pautas de Accesibilidad para el Contenido Web (WCAG 2.1)} en su nivel \textbf{AA}, organizadas en torno a sus cuatro principios: perceptible, operable, comprensible y robusto.
+
+\paragraph{Perceptible: contraste de color verificado.} El contraste entre texto y fondo se comprobó con la fórmula de luminancia relativa de la WCAG, no a ojo. El texto principal y los elementos interactivos superan con holgura el umbral AA de 4{,}5:1 para texto normal. Durante la revisión se detectó que el gris más claro usado para textos secundarios se quedaba en 2{,}5:1 (no cumplía) y se oscureció hasta cumplir, manteniendo en el modo oscuro un tono claro que conserva el contraste sobre fondo oscuro. La tabla siguiente recoge las medidas reales tras el ajuste:
+
+\begin{table}[H]
+\centering
+\small
+\caption{Ratios de contraste medidos (modo claro, sobre fondo blanco)}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Uso} & \textbf{Ratio} & \textbf{WCAG AA} \\
+\midrule
+Texto principal (gris oscuro) & 14{,}7:1 & \checkmark \\
+Botones (blanco sobre teal) & 5{,}5:1 & \checkmark \\
+Enlaces y acentos (teal) & 5{,}5:1 & \checkmark \\
+Texto secundario (gris medio) & 4{,}8:1 & \checkmark \\
+Texto auxiliar / hints (ajustado) & 4{,}6:1 & \checkmark \\
+Mensajes de error (rojo) & 4{,}8:1 & \checkmark \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Operable: teclado y navegación.} Toda la aplicación se puede manejar solo con teclado, con un orden de tabulación lógico y un \textbf{foco visible} reforzado (un contorno claro con \texttt{:focus-visible} de 2\,px sobre cada elemento al recibir el foco). Se añadió además un \textbf{enlace para saltar al contenido} (``Ir al contenido principal''), oculto hasta que recibe el foco, que permite a quien navega con teclado o lector de pantalla evitar la cabecera repetida en cada página y llegar directamente al contenido; esto cubre el criterio WCAG 2.4.1 (\emph{Evitar bloques}). El flujo de reserva se divide en pasos cortos para exigir los mínimos clics posibles y no abrumar.
+
+\paragraph{Comprensible: estructura y ayuda.} El marcado es HTML semántico (encabezados jerárquicos, \texttt{nav}, \texttt{main}, \texttt{footer}), con el idioma declarado (\texttt{lang="es"}) para que los lectores de pantalla lo pronuncien correctamente, atributos ARIA donde el componente lo requiere y una etiqueta asociada a cada campo de formulario. La validación de los datos es inmediata y con mensajes claros, y la reserva guiada por pasos reduce la carga cognitiva, algo especialmente valioso para usuarios poco habituados a la tecnología.
+
+\paragraph{Robusto: preferencias del usuario y zoom.} La maquetación usa unidades relativas (\texttt{rem}, \texttt{clamp}) que permiten ampliar el tamaño de letra del navegador sin que la interfaz se rompa, y respeta la preferencia del sistema \texttt{prefers-reduced-motion}, desactivando las animaciones para quienes sufren mareo con el movimiento (problemas vestibulares). El modo claro/oscuro, además de comodidad, ofrece una alternativa a personas sensibles al brillo.
+
+\paragraph{Limitación honesta.} La accesibilidad se ha trabajado por diseño y se ha verificado el contraste de forma manual, pero no se ha pasado todavía una auditoría automática completa (por ejemplo, \emph{Lighthouse} o \emph{axe}) ni se ha probado con usuarios reales de lector de pantalla. Documentar esa auditoría y realizar pruebas con usuarios es la evolución natural de este apartado, ya recogida entre las líneas futuras de calidad.
 
 \subsection{Sincronización de citas: una sola fuente de verdad}
 
 Uno de los problemas más instructivos del desarrollo no fue de algoritmos, sino de \emph{coherencia de datos} entre vistas. Al principio, la lista ``Mis citas programadas'' que veía el paciente vivía solo en el \texttt{localStorage} del navegador, mientras que el panel de pruebas del médico leía de la base de datos. El resultado eran incoherencias desconcertantes: citas que aparecían para el paciente pero no en el panel, cancelaciones que solo existían en un navegador, e incluso reservas antiguas con identificadores locales que nunca habían llegado al servidor.
 
 La solución fue establecer una \textbf{única fuente de verdad}: PostgreSQL. La función \texttt{syncMisCitas()} de \texttt{reserva.js} sustituye la caché local por lo que realmente hay en el servidor, consultando \texttt{GET /api/citas/mias} para el paciente autenticado o \texttt{GET /api/citas/por-email} para el invitado. Esta sincronización se dispara en los momentos clave: al cargar la página de reserva, tras confirmar o cancelar una cita, al escribir el email (con \emph{debounce}) y tras iniciar o cerrar sesión. Así, lo que ve el paciente y lo que ve el panel siempre coinciden, porque ambos derivan del mismo origen. La regla de diseño es sencilla y se defiende bien ante el tribunal: \emph{el navegador nunca es la verdad; solo refleja la base de datos tras cada sincronización.}
+
+\subsection{Cuadro de mando de gestión (analítica)}
+
+Una consulta médica no es solo una agenda: es una pequeña empresa que genera datos cada día. Esos datos, si se quedan dispersos en filas de una tabla, no le dicen nada al profesional; pero agregados y representados visualmente revelan información útil para tomar decisiones: qué especialidad se demanda más, cómo se reparte la carga de trabajo, qué centro concentra más actividad o cuántas citas se cancelan. Con esa idea —entender la clínica como un negocio que se puede medir y optimizar— se incorporó un \textbf{cuadro de mando de gestión}, accesible solo para el personal interno.
+
+La pieza clave es que toda la analítica se calcula \textbf{en la base de datos}, no en memoria. El endpoint \texttt{GET /api/estadisticas} se apoya en consultas de agregación \texttt{GROUP BY} (con \texttt{COUNT}, \texttt{JOIN}, \texttt{LEFT JOIN}, \texttt{COALESCE} para los valores nulos y las funciones de fecha \texttt{YEAR()}/\texttt{MONTH()}) que devuelven directamente los totales ya calculados. Para no traer las entidades completas a memoria, cada consulta usa una \emph{proyección} ligera de Spring Data —una interfaz con solo los campos necesarios (etiqueta y total)—, lo que mantiene la respuesta pequeña y la consulta eficiente. El servicio que orquesta estas consultas se marca como \texttt{@Transactional(readOnly = true)}, una señal explícita de que solo lee datos y nunca los modifica. El cálculo de indicadores derivados, como la tasa de cancelación, se hace en el servicio a partir del reparto por estado, evitando consultas redundantes.
+
+El cuadro de mando presenta primero cuatro indicadores resumen (KPIs) y, debajo, cinco gráficos:
+
+\begin{itemize}
+  \item \textbf{Indicadores:} total de citas, citas activas (pendientes y confirmadas), completadas y \textbf{tasa de cancelación} como aproximación al ausentismo.
+  \item \textbf{Carga de trabajo por médico} (barras): cuántas citas gestiona cada facultativo, de mayor a menor.
+  \item \textbf{Demanda por especialidad} (barras): las áreas más solicitadas.
+  \item \textbf{Distribución por centro} (barras): el reparto de actividad entre ubicaciones.
+  \item \textbf{Reparto por estado} (anillo): la proporción de confirmadas, pendientes, completadas y canceladas.
+  \item \textbf{Evolución temporal} (línea): el volumen de citas mes a mes, para detectar tendencias.
+\end{itemize}
+
+En el frontend, los gráficos se dibujan con \textbf{Chart.js}, una librería ligera que se incorporó \emph{vendorizada} en el propio repositorio (\texttt{js/vendor/}) en lugar de cargarse desde una CDN externa. La decisión es deliberada: el sistema no depende de una conexión a internet ajena para funcionar —coherente con la filosofía PWA y \emph{offline first} del proyecto— y la demo ante el tribunal es reproducible aunque no haya red. La página respeta el modo claro/oscuro recalculando los colores al cambiar de tema, y \textbf{degrada con elegancia}: si quien la abre no ha iniciado sesión como personal autorizado, en lugar de un error muestra un aviso claro invitando a identificarse.
+
+El acceso está restringido en \texttt{SecurityConfig} a los roles \texttt{MEDICO} y \texttt{ADMIN}: las analíticas de negocio son una herramienta interna y no deben ser visibles para un paciente ni para un usuario anónimo. Esta restricción se verificó en vivo —una petición sin token recibe \textbf{403 Forbidden}, mientras que con el token de un médico el endpoint devuelve los datos agregados—, lo que conecta este módulo directamente con la política de autorización por rol descrita más adelante. En conjunto, el cuadro de mando demuestra la competencia de \emph{sistemas de gestión empresarial}: convertir los datos operativos del día a día en información de gestión accionable.
 
 \subsection{Seguridad y RGPD}
 
@@ -501,6 +586,29 @@ docker compose up -d --build
 \end{lstlisting}
 
 Esto levanta tres servicios coordinados: \texttt{postgres} (la base de datos), \texttt{backend} en el puerto 8080 (la API Spring Boot) y \texttt{frontend} en el puerto 80 (nginx sirviendo la web y haciendo de proxy de \texttt{/api}). El \texttt{docker-compose} define dependencias y comprobaciones de salud, de modo que el backend no se da por listo hasta que la base de datos responde. El artefacto del backend es un \textbf{JAR de Spring Boot con servidor embebido} (generado por \texttt{spring-boot-maven-plugin}), el esquema de la base de datos se versiona con Flyway —que aplica las migraciones pendientes en el primer arranque— y la configuración se separa por perfiles (\texttt{application-postgres.yml} y \texttt{application-mysql.yml}), existiendo además un perfil opcional de MySQL con \texttt{--profile mysql}. La ventaja práctica es enorme de cara a la defensa: el entorno del tribunal será idéntico al de desarrollo, eliminando el clásico ``en mi máquina funciona''.
+
+\paragraph{Dominio e identidad de marca.} De cara al salto a producción se ha registrado el dominio \textbf{\texttt{dragramonte.com}}, una marca personal corta, profesional y fácil de dictar por teléfono (frente a alternativas más largas que se descartaron). La aplicación ya está preparada para ese dominio: los pies de página, la página de contacto, las etiquetas \texttt{Open Graph} y la política de CORS del backend apuntan a \texttt{dragramonte.com}, y el correo de contacto utiliza la propia marca (\texttt{contacto@dragramonte.com}). El despliegue real bajo ese dominio —con un certificado HTTPS y alojamiento en la nube— queda recogido entre las líneas de trabajo futuras; la migración de identidad, en cambio, ya está hecha en el código.
+
+\subsection{Sostenibilidad y eficiencia (green computing)}
+
+La sostenibilidad de este proyecto no es una etiqueta añadida al final, sino una consecuencia directa de las decisiones de diseño. Un software es sostenible cuando consume los recursos justos —energía, ancho de banda, hardware y, en última instancia, dinero— para hacer su trabajo, y cuando además \emph{sustituye} procesos físicos más costosos. Dr.\ Agramonte actúa en los dos frentes: reduce el gasto material de la consulta y se ha construido para gastar poco al ejecutarse.
+
+\paragraph{Digitalización y ahorro de papel.} El primer impacto es el más evidente: la aplicación elimina la agenda de papel y los apuntes manuales que hoy usan muchas consultas pequeñas. Las citas, sus cambios y su historial viven en la base de datos, y los avisos llegan por canales digitales (SMS o WhatsApp vía Twilio) en lugar de recordatorios impresos o llamadas que consumen tiempo y, a veces, desplazamientos. Menos papel significa menos impresión, menos almacenamiento físico y menos residuos; y al evitar visitas o llamadas innecesarias para gestionar una cita, se reduce también el desplazamiento del paciente, con su correspondiente huella. Es la traducción concreta del objetivo de desarrollo sostenible \textbf{ODS 12} (producción y consumo responsables) a una consulta médica.
+
+\paragraph{Software eficiente, menos energía.} La eficiencia técnica es, en la práctica, eficiencia energética: cada ciclo de CPU y cada byte transferido que se ahorran se traducen en menos consumo, tanto en el servidor como en los miles de dispositivos de los pacientes. Varias decisiones del proyecto van en esa dirección:
+\begin{itemize}
+  \item \textbf{Frontend sin framework.} Prescindir de React o Vue evita arrastrar un \texttt{node\_modules} de cientos de megas y enviar grandes paquetes de JavaScript al navegador. La web carga más rápido y exige menos CPU al cliente, lo que en un parque grande de dispositivos no es despreciable.
+  \item \textbf{Recursos vendorizados.} Servir Chart.js desde el propio dominio en lugar de una CDN externa reduce peticiones de red a terceros y dependencias innecesarias.
+  \item \textbf{Cálculo en la base de datos.} El cuadro de mando agrega los datos con consultas \texttt{GROUP BY} en PostgreSQL en lugar de traer todas las filas a memoria y procesarlas en la aplicación. Mover el cálculo a donde están los datos transfiere menos información y gasta menos memoria y CPU en el backend.
+  \item \textbf{Una sola base de datos relacional.} No hay un clúster de servicios (Redis, Mongo) corriendo y consumiendo energía en reposo: un único PostgreSQL cubre las necesidades reales del volumen de una consulta.
+  \item \textbf{Autenticación \emph{stateless}.} El token JWT evita guardar sesiones en el servidor, reduciendo el estado que hay que almacenar y mantener.
+\end{itemize}
+
+\paragraph{Infraestructura ligera y escalable a la baja.} El backend se empaqueta con un \texttt{Dockerfile} \emph{multi-stage}, de modo que la imagen final solo contiene el JRE y el JAR, sin las herramientas de compilación: imágenes más pequeñas significan menos disco, descargas más rápidas y menos energía en cada despliegue. El sistema completo cabe holgadamente en un servidor modesto (un VPS pequeño basta para una consulta), y los contenedores pueden apagarse cuando no se usan. Frente a la tendencia de sobredimensionar (\emph{just in case}), aquí se dimensiona para la necesidad real (\emph{just enough}), que es la forma más directa de \textbf{green computing}: no encender lo que no hace falta.
+
+\paragraph{Sostenibilidad del propio software.} Un sistema también es sostenible si dura. La reproducibilidad con Docker y Flyway evita reconstrucciones manuales propensas a error; el análisis de vulnerabilidades con OWASP \texttt{dependency-check} mantiene las dependencias sanas en el tiempo; y un código legible, sin capas innecesarias, es más fácil de mantener durante años por otra persona. Un software que se mantiene vivo y seguro no hay que reescribirlo desde cero cada poco, lo que es una forma de no malgastar esfuerzo ni recursos.
+
+\paragraph{Limitación honesta.} No se ha realizado una medición formal de la huella de carbono ni del consumo energético real (con herramientas como auditorías de \emph{Lighthouse} o medidores de consumo del contenedor); las afirmaciones anteriores son cualitativas y se apoyan en las decisiones de arquitectura, no en métricas instrumentadas. Cuantificar ese ahorro —por ejemplo, comparar el consumo del frontend frente a una versión con framework— es una línea de mejora natural y coherente con el resto del proyecto.
 
 \subsection{Planificación temporal}
 
@@ -568,7 +676,7 @@ No re-cancelar & \texttt{CitaServiceTest} & Unitaria & 409 \checkmark \\
 
 Se ha entregado una aplicación funcional y desplegable que responde al problema de gestión de citas, con arquitectura clara, código mantenible y \textbf{pruebas automatizadas} que cubren los caminos críticos (409 por doble reserva, 403 por rol, JWT firmado, cancelación). Los objetivos técnicos del repositorio se cumplen en PostgreSQL, Spring Boot, frontend PWA y Twilio integrado en Java.
 
-\textbf{Cumplimiento de los objetivos.} Retomando los siete objetivos específicos planteados al inicio, el balance es el siguiente:
+\textbf{Cumplimiento de los objetivos.} Retomando los ocho objetivos específicos planteados al inicio, el balance es el siguiente:
 
 \begin{enumerate}
   \item \emph{Modelo de datos en PostgreSQL con Flyway.} \textbf{Cumplido:} seis tablas, migraciones V1--V6 y perfiles \texttt{postgres}/\texttt{mysql}.
@@ -578,6 +686,7 @@ Se ha entregado una aplicación funcional y desplegable que responde al problema
   \item \emph{Notificaciones por Twilio con recordatorio programado.} \textbf{Cumplido:} avisos a médico y paciente y recordatorio a $\sim$24\,h vía \texttt{@Scheduled}.
   \item \emph{Despliegue reproducible con Docker Compose.} \textbf{Cumplido:} un único comando levanta base de datos, backend y frontend.
   \item \emph{Validación de la calidad.} \textbf{Cumplido parcialmente:} pruebas unitarias, de seguridad e integración más \texttt{OWASP dependency-check}; queda pendiente medir la cobertura con JaCoCo y añadir pruebas E2E.
+  \item \emph{Cuadro de mando de gestión (SGE).} \textbf{Cumplido:} endpoint \texttt{/api/estadisticas} con agregaciones \texttt{GROUP BY}, restringido por rol y representado con Chart.js (carga por médico, demanda por especialidad, reparto por centro y estado, evolución temporal y tasa de cancelación).
 \end{enumerate}
 
 \textbf{Limitaciones honestas:} la cobertura no está medida con JaCoCo (se valida cualitativamente por ramas críticas), el panel médico no expone API de historial, no hay refresh token ni escenario de réplicas/failover. Son líneas de evolución natural del TFG, no carencias del alcance entregado.
@@ -590,8 +699,8 @@ Se ha entregado una aplicación funcional y desplegable que responde al problema
   \item \textbf{Historial de cambios de la cita:} que el paciente vea reprogramaciones y cancelaciones.
   \item \textbf{Página de ayuda / preguntas frecuentes:} apoyo específico para pacientes mayores o poco digitales.
   \item \textbf{Calidad:} informe de cobertura con JaCoCo, pruebas E2E (Playwright) y auditoría de accesibilidad documentada.
-  \item \textbf{Seguridad y escalado:} \emph{refresh token}, despliegue en la nube con HTTPS y réplicas de base de datos.
-  \item \textbf{Historial clínico:} API y panel clínico reales, con almacenamiento flexible por especialidad.
+  \item \textbf{Seguridad y escalado:} \emph{refresh token}, despliegue en la nube bajo el dominio ya registrado \texttt{dragramonte.com} con certificado HTTPS, y réplicas de base de datos.
+  \item \textbf{Historial clínico:} API y panel clínico reales, con almacenamiento documental flexible por especialidad (p.\ ej.\ MongoDB), avanzando hacia una persistencia políglota.
 \end{itemize}
 
 \textbf{Aprendizajes:} el proyecto ha consolidado competencias de los módulos de DAM (acceso a datos, programación de servicios, interfaces, sistemas de gestión empresarial y empresa e iniciativa emprendedora) en un caso real, integrando seguridad, concurrencia y despliegue.

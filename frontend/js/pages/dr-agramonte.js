@@ -214,7 +214,7 @@ class Navegacion {
 
     _bindEventos() {
         // Abrir/cerrar con el botón hamburguesa
-        this._toggle.addEventListener('click', () => this._toggle());
+        this._toggle.addEventListener('click', () => this._alternar());
 
         // Cerrar al pulsar un enlace del menú
         this._menu.querySelectorAll('a').forEach(a =>
@@ -236,7 +236,7 @@ class Navegacion {
         });
     }
 
-    _toggle() {
+    _alternar() {
         this._abierto ? this._cerrar() : this._abrir();
     }
 
@@ -345,7 +345,7 @@ class Autocompletado {
         Object.assign(lista.style, {
             position: 'absolute', top: '100%', left: '0', right: '0', zIndex: '1000',
             maxHeight: '220px', overflowY: 'auto', background: 'var(--card)',
-            border: '2px solid var(--primary)', borderTop: 'none',
+            border: '2px solid var(--teal)', borderTop: 'none',
             borderRadius: '0 0 8px 8px', listStyle: 'none', margin: '0', padding: '.4rem 0'
         });
 
@@ -418,7 +418,7 @@ class Telemedicina {
         modal.setAttribute('aria-modal', 'true');
         modal.innerHTML = `
             <div style="padding:2rem;max-width:480px">
-                <h3 style="margin-bottom:1rem;color:var(--primary-dark)">
+                <h3 style="margin-bottom:1rem;color:var(--teal-dark)">
                     <i class="fas fa-video" aria-hidden="true"></i> Videoconsulta
                 </h3>
                 <p>Código: <strong>${Utils.escape(codigo)}</strong></p>
@@ -577,7 +577,7 @@ class Accesibilidad {
         link.textContent = 'Ir al contenido principal';
         link.style.cssText = `
             position:absolute; top:-40px; left:0;
-            background:var(--primary); color:#fff;
+            background:var(--teal); color:#fff;
             padding:8px 16px; z-index:9999;
             border-radius:0 0 8px 0; transition:top .2s;
             text-decoration:none; font-weight:600;

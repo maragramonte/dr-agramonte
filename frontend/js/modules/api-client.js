@@ -120,6 +120,14 @@ class ApiClient {
     getReservasPrueba(medicoId = 1) {
         return this.get(`/citas/agenda/reservas?medicoId=${medicoId}`);
     }
+
+    /**
+     * Cuadro de mando de gestión (módulo SGE). Requiere JWT con rol MEDICO/ADMIN.
+     * GET /api/estadisticas
+     */
+    getEstadisticas() {
+        return this.get('/estadisticas');
+    }
 }
 
 export default new ApiClient();

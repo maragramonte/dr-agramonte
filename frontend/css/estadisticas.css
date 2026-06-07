@@ -1,0 +1,88 @@
+/* Cuadro de mando de gestión (módulo SGE) — reutiliza variables de dr-agramonte.css */
+
+.dash-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+}
+
+/* Aviso de acceso restringido (sin sesión de profesional) */
+.dash-gate {
+    max-width: 560px;
+    margin: 2rem auto;
+    background: var(--card);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 2rem 1.75rem;
+    text-align: center;
+}
+.dash-gate i.gate-icon {
+    font-size: 2.5rem;
+    color: var(--teal);
+    margin-bottom: .75rem;
+}
+.dash-gate h2 { margin: 0 0 .5rem; font-size: 1.3rem; }
+.dash-gate p { color: var(--gray-500); font-size: .9rem; margin: 0 0 1.25rem; line-height: 1.5; }
+.dash-gate code { font-size: .8rem; background: var(--gray-100); padding: .1rem .35rem; border-radius: 5px; }
+
+/* Tarjetas de KPI */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+.kpi-card {
+    background: var(--card);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 1.1rem 1rem;
+    text-align: center;
+}
+.kpi-card .kpi-value { font-size: 1.9rem; font-weight: 700; color: var(--teal); line-height: 1; }
+.kpi-card .kpi-label { font-size: .78rem; color: var(--gray-500); margin-top: .4rem; }
+.kpi-card.kpi-alert .kpi-value { color: #dc2626; }
+
+/* Rejilla de gráficos */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.25rem;
+}
+.chart-card {
+    background: var(--card);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    min-width: 0;
+}
+.chart-card h3 {
+    font-size: .95rem;
+    margin: 0 0 1rem;
+    color: var(--gray-700);
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+.chart-card h3 i { color: var(--teal); }
+.chart-box { position: relative; height: 280px; }
+.chart-empty { color: var(--gray-400); font-size: .85rem; text-align: center; padding: 2rem 0; }
+
+.dash-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    margin-bottom: 1.25rem;
+}
+.dash-conn { font-size: .8rem; color: var(--gray-500); }
+.dash-conn.ok { color: var(--teal); }
+.dash-conn.err { color: #dc2626; }
+
+[data-theme="dark"] .kpi-card,
+[data-theme="dark"] .chart-card,
+[data-theme="dark"] .dash-gate {
+    background: var(--card);
+    border-color: var(--gray-200);
+}
