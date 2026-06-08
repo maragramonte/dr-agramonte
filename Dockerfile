@@ -17,4 +17,7 @@ FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 COPY --from=build /workspace/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# En Railway (plan de prueba) la RAM es muy justa. Limitamos el heap de la JVM
+# a un % de la memoria del contenedor para evitar que el SO mate el proceso (OOM, exit 137).
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0"
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
