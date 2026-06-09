@@ -281,7 +281,7 @@ a {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--space-5);
-    align-items: start;
+    align-items: stretch;
 }
 @media (max-width: 768px) {
     .sobre-mi-resumen .sobre-mi-content {
@@ -301,6 +301,7 @@ a {
     background: var(--card);
     border-radius: var(--radius);
     border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
 }
 .valor-item i {
     font-size: 1.5rem;
@@ -319,6 +320,7 @@ a {
 .sobre-mi-stats {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 1fr;
     gap: var(--space-2);
 }
 .stat-card {
@@ -327,6 +329,12 @@ a {
     padding: var(--space-3);
     text-align: center;
     border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
 }
 .stat-number {
     font-size: 1.8rem;
@@ -369,6 +377,7 @@ a {
     border-radius: var(--radius-lg);
     padding: var(--space-4);
     border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
     transition: var(--transition);
 }
 .cta-option:hover {
@@ -671,6 +680,21 @@ a {
 
 .grid--3 {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+/* Rejilla de servicios (index): mosaico responsivo de tarjetas iguales */
+.grid--services {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+/* Tarjeta de servicio: misma altura y botón anclado abajo para una
+   cuadrícula limpia y alineada (estilo mosaico moderno). */
+.card--service {
+    display: flex;
+    flex-direction: column;
+}
+.card--service .btn {
+    margin-top: auto;
 }
 
 /* ========== 6. HEADER Y NAVEGACIÓN (sticky + hamburguesa) ========== */
@@ -1001,6 +1025,7 @@ a {
     border-radius: var(--radius-lg);
     padding: var(--space-4);
     border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
     transition: var(--transition);
 }
 
@@ -1116,9 +1141,9 @@ a {
 
 .hero-features {
     margin: var(--space-4) 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: var(--space-2) var(--space-3);
     animation: fadeInUp 0.7s ease-out 0.15s both;
 }
 
@@ -1957,6 +1982,15 @@ a {
 .sobre-mi-imagen:hover {
     box-shadow: 0 20px 48px rgba(15, 118, 110, 0.18);
     transform: translateY(-4px);
+}
+
+/* La foto rellena y se centra en la tarjeta 4:5 (igual que el hero de inicio);
+   sin esto la imagen apaisada deja un bloque vacío de tarjeta debajo. */
+.sobre-mi-imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
 }
 
 .sobre-mi-heading {
