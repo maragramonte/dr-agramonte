@@ -148,7 +148,7 @@
 /* --- Offline --- */
 /* Estilos específicos de la página offline */
         *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'DM Sans',sans-serif;background:linear-gradient(135deg,#e8f3f3 0%,#d4eaea 100%);min-height:100vh;}
+        body.offline-page{font-family:'DM Sans',sans-serif;min-height:100vh;}
         .offline-container{min-height:calc(100vh - 70px);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;text-align:center;}
         .offline-card{background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:24px;padding:3rem 2rem;max-width:550px;width:100%;box-shadow:0 20px 40px rgba(0,0,0,0.1);animation:fadeInUp 0.6s ease-out;}
         @keyframes fadeInUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}

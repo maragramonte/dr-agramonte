@@ -31,6 +31,11 @@
     --teal-glow: rgba(15, 118, 110, 0.2);
     --teal-pale: rgba(15, 118, 110, 0.08);
 
+    /* Color de títulos. En claro = teal oscuro; en modo oscuro se aclara
+       (ver bloque [data-theme="dark"]) para que sean legibles sobre fondos
+       oscuros sin tocar el teal-dark usado en footer y banners. */
+    --heading: var(--teal-dark);
+
     --silver: #D4D4D8;
     --silver-light: #E8E8EC;
     --silver-dark: #A1A1AA;
@@ -102,6 +107,7 @@
     --gray-400: #9CA3AF; /* en oscuro vuelve al tono claro: 7:1 sobre fondo oscuro */
     --teal: #14B8A6;
     --teal-dark: #0F766E;
+    --heading: var(--teal-light); /* títulos legibles sobre superficies oscuras (~6.5:1) */
     --silver: #3F3F46;
     --silver-light: #52525B;
     --glass-bg: rgba(30, 41, 59, 0.85);
@@ -270,7 +276,7 @@ a {
 }
 .card__link:hover {
     gap: 0.6rem;
-    color: var(--teal-dark);
+    color: var(--heading);
 }
 .card__link:hover i {
     transform: translateX(4px);
@@ -311,7 +317,7 @@ a {
 .valor-title {
     font-size: 1rem;
     font-weight: 600;
-    color: var(--teal-dark);
+    color: var(--heading);
 }
 .valor-text {
     font-size: 0.85rem;
@@ -360,7 +366,7 @@ a {
 .cta-title {
     font-family: var(--font-display);
     font-size: 1.8rem;
-    color: var(--teal-dark);
+    color: var(--heading);
 }
 .cta-text {
     color: var(--text-light);
@@ -391,7 +397,7 @@ a {
 }
 .cta-option__title {
     font-size: 1.1rem;
-    color: var(--teal-dark);
+    color: var(--heading);
 }
 .cta-option__action {
     margin-top: var(--space-3);
@@ -464,7 +470,7 @@ a {
 .faq-item summary {
     font-weight: 600;
     cursor: pointer;
-    color: var(--teal-dark);
+    color: var(--heading);
 }
 .aviso-reservas {
     background: var(--teal-pale);
@@ -540,7 +546,7 @@ a {
 
 .section-title {
     font-size: clamp(1.8rem, 5vw, 2.4rem);
-    color: var(--teal-dark);
+    color: var(--heading);
     margin-bottom: var(--space-2);
     font-family: var(--font-display);
     font-weight: 500;
@@ -752,7 +758,7 @@ a {
 .logo-text h1 {
     font-family: var(--font-display);
     font-size: 1.15rem;
-    color: var(--teal-dark);
+    color: var(--heading);
     font-weight: 500;
     line-height: 1.2;
 }
@@ -830,7 +836,7 @@ a {
 .theme-toggle:focus-visible {
     background: rgba(15, 118, 110, 0.08);
     border-color: var(--teal-light);
-    color: var(--teal-dark);
+    color: var(--heading);
     outline: none;
     box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
 }
@@ -1012,7 +1018,7 @@ a {
 }
 
 .nav-link--panel:hover {
-    color: var(--teal-dark) !important;
+    color: var(--heading) !important;
 }
 
 .nav-link--panel.active::after {
@@ -1056,7 +1062,7 @@ a {
 
 .card__title {
     font-size: 1.2rem;
-    color: var(--teal-dark);
+    color: var(--heading);
     margin-bottom: var(--space-2);
     font-family: var(--font-display);
     font-weight: 500;
@@ -1274,7 +1280,7 @@ a {
 
 .testimonial__author {
     font-weight: 600;
-    color: var(--teal-dark);
+    color: var(--heading);
 }
 
 /* ========== 11. CONTACTO Y FORMULARIOS ========== */
@@ -1687,7 +1693,7 @@ a {
 }
 
 .summary-item strong {
-    color: var(--teal-dark);
+    color: var(--heading);
 }
 
 .btn-reserva {
@@ -1884,7 +1890,7 @@ a {
 
 ::selection {
     background: var(--teal-glow);
-    color: var(--teal-dark);
+    color: var(--heading);
 }
 
 /* ========== 17. RESPONSIVE AJUSTES FINOS ========== */
@@ -1996,7 +2002,7 @@ a {
 .sobre-mi-heading {
     font-family: var(--font-display);
     font-size: clamp(1.7rem, 3.5vw, 2.3rem);
-    color: var(--teal-dark);
+    color: var(--heading);
     margin-bottom: var(--space-2);
 }
 
