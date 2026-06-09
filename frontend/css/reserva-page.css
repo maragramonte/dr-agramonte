@@ -65,4 +65,16 @@ body.reserva-page {
         .toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:2000;padding:.75rem 1.1rem;border-radius:12px;font-size:.85rem;display:flex;align-items:center;gap:.6rem;max-width:340px;transform:translateX(120%);transition:transform .3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 8px 24px rgba(0,0,0,.15);color:#fff;}.toast.show{transform:translateX(0);}.toast.success{background:#059669;}.toast.error{background:#dc2626;}.toast.warning{background:#d97706;}.toast.info{background:#2563eb;}@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
         .form-hint{font-size:.78rem;color:var(--gray-500);line-height:1.45;margin-bottom:.75rem;}.link-btn{background:none;border:none;padding:0;color:var(--teal);font-weight:600;cursor:pointer;text-decoration:underline;font-size:inherit;font-family:inherit;}
         .apts-sync-hint{font-size:.72rem;color:var(--gray-500);margin:.35rem 0 .5rem;line-height:1.4;}
+
+        /* ── Responsive móvil: evitar desbordamiento horizontal ── */
+        /* minmax(0,1fr) deja que las columnas encojan por debajo del contenido */
+        .modality-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);}
+        .field input,.field select,.field textarea{min-width:0;}
+        @media(max-width:480px){
+            .field-row{grid-template-columns:1fr;}   /* Teléfono y Email apilados en móvil */
+        }
+        @media(max-width:400px){
+            .stepper .step span{display:none;}        /* en pantallas muy estrechas, solo números 1·2·3·4 */
+            .stepper .step:not(:last-child)::after{margin:0 .35rem;}
+        }
     

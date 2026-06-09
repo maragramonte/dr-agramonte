@@ -981,6 +981,26 @@ a {
     width: 100%;
 }
 
+/* Grupos de botones y enlaces de acción: más aire para que no se vean
+   apretados (evita la sensación de agobio). */
+.btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+}
+.section-footer {
+    margin-top: var(--space-5);
+    text-align: center;
+}
+.sobre-mi-actions {
+    margin-top: var(--space-4);
+}
+/* En las tarjetas de servicio, separación garantizada texto -> botón */
+.card--service .card__text {
+    margin-bottom: var(--space-3);
+}
+
 /* Botón de reserva unificado en todo el sitio */
 .btn--reserva {
     background: linear-gradient(135deg, var(--teal) 0%, var(--teal-light) 100%);
@@ -1140,7 +1160,7 @@ a {
 
 .hero-actions {
     display: flex;
-    gap: var(--space-2);
+    gap: var(--space-2) var(--space-3);
     flex-wrap: wrap;
     animation: fadeInUp 0.7s ease-out 0.2s both;
 }
