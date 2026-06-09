@@ -6,4 +6,4 @@ Disallow: /panel-pruebas.html
 Disallow: /estadisticas.html
 Disallow: /offline.html
 
-Sitemap: https://dragramonte.com/sitemap.xml
+Sitemap: https://www.dragramonte.com/sitemap.xml
