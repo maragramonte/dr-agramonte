@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.saludybienestar.agramonte.dto.response.CitaAgendaItemResponse;
@@ -135,7 +137,7 @@ public class CitaService {
         horarioRepository.save(horario);
 
         Cita guardada = citaRepository.save(cita);
-        citaNotificationService.notifyNuevaCita(guardada);
+        notificarTrasCommit(() -> citaNotificationService.notifyNuevaCita(guardada));
         return toResponse(guardada);
     }
 
@@ -260,7 +262,26 @@ public class CitaService {
         ).ifPresent(h -> h.setDisponible(true));
 
         citaRepository.save(cita);
-        citaNotificationService.notifyCancelacion(cita);
+        notificarTrasCommit(() -> citaNotificationService.notifyCancelacion(cita));
+    }
+
+    /**
+     * Ejecuta el envío de notificaciones DESPUÉS de confirmarse la transacción (commit).
+     * Así no se mantiene el bloqueo pesimista del horario durante la llamada de red a Twilio
+     * y nunca se notifica una cita que finalmente no se persiste (si la transacción revierte).
+     * Si no hay transacción activa (p. ej. pruebas unitarias) se ejecuta en el acto.
+     */
+    private void notificarTrasCommit(Runnable notificacion) {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    notificacion.run();
+                }
+            });
+        } else {
+            notificacion.run();
+        }
     }
 
     private CitaResponse toResponse(Cita cita) {

@@ -418,7 +418,7 @@ Horario horario = horarioRepository
   .orElseThrow(...);
 \end{lstlisting}
 
-Tras validar, se crea la \texttt{Cita}, se marca el horario no disponible y se invoca \texttt{CitaNotificationService}. El control de concurrencia es \textbf{bloqueo pesimista} (\texttt{SELECT \ldots FOR UPDATE} sobre \texttt{Horario}): si dos pacientes reservan la misma franja, una operación gana y la otra recibe \textbf{409 Conflict}, de forma determinista y sin reintentos.
+Tras validar, se crea la \texttt{Cita} y se marca el horario como no disponible. El envío de la notificación (\texttt{CitaNotificationService}) se aplaza deliberadamente al \emph{commit} de la transacción (vía \texttt{TransactionSynchronizationManager}, fase \texttt{afterCommit}): de este modo no se mantiene el bloqueo de la fila durante la llamada de red a Twilio y, si la transacción se revierte, nunca se envía un aviso de una cita que en realidad no llegó a persistirse. El control de concurrencia es \textbf{bloqueo pesimista} (\texttt{SELECT \ldots FOR UPDATE} sobre \texttt{Horario}): si dos pacientes reservan la misma franja, una operación gana y la otra recibe \textbf{409 Conflict}, de forma determinista y sin reintentos. Esta garantía no se afirma sobre el papel: está \textbf{verificada bajo concurrencia real} —dos transacciones simultáneas en hilos distintos compitiendo por la misma franja sobre una base PostgreSQL real— como se detalla en la sección de pruebas.
 
 \input{tikz-diagrama-reserva}
 
@@ -644,7 +644,7 @@ La estrategia de pruebas se centró en los \textbf{caminos críticos}, aquellos 
 \begin{itemize}
   \item \textbf{Unitarias (caja blanca):} \texttt{CitaServiceTest} (reserva sobre franja libre confirma y bloquea el horario; franja ocupada $\rightarrow$ 409 sin persistir; cancelación por no propietario $\rightarrow$ 403; re-cancelación $\rightarrow$ 409). \texttt{JwtProviderTest} (generación, validación y expiración del token firmado).
   \item \textbf{Seguridad / RBAC (caja negra, WebMvc):} \texttt{CitaControllerWebMvcTest} importa la \texttt{SecurityConfig} real: rol MEDICO sobre rutas de paciente $\rightarrow$ 403; acceso anónimo bloqueado; rol PACIENTE $\rightarrow$ 201.
-  \item \textbf{Integración end-to-end (Testcontainers + PostgreSQL real):} \texttt{ReservaPublicaIntegrationTest}: dos reservas sobre la misma franja $\rightarrow$ la segunda 409; reserva pública persistida y consultable por email.
+  \item \textbf{Integración end-to-end (Testcontainers + PostgreSQL real):} \texttt{ReservaPublicaIntegrationTest}: \emph{(a)} \textbf{concurrencia real}: dos transacciones simultáneas, en hilos distintos sincronizados con una \texttt{CyclicBarrier}, compiten por la misma franja; exactamente una confirma (201) y la otra recibe 409, demostrando el bloqueo pesimista sobre PostgreSQL —algo que un H2 en memoria no reproduce y que un \emph{mock} no prueba—; \emph{(b)} segunda reserva secuencial sobre la franja ya ocupada $\rightarrow$ 409; \emph{(c)} reserva pública persistida y consultable por email; \emph{(d)} agenda por centro: el hueco se filtra por ubicación y la cita hereda el centro del horario.
   \item \textbf{Análisis de vulnerabilidades:} \texttt{OWASP dependency-check} (\texttt{mvn org.owasp:dependency-check-maven:check}).
   \item \textbf{Manuales:} compilación Maven, arranque Docker Compose y health check; flujo registro/login $\rightarrow$ reservar $\rightarrow$ mis citas $\rightarrow$ cancelar; parámetro \texttt{?servicio=}; validación de formularios (email, teléfono español).
 \end{itemize}
@@ -657,7 +657,7 @@ La estrategia de pruebas se centró en los \textbf{caminos críticos}, aquellos 
 \toprule
 \textbf{Requisito} & \textbf{Prueba} & \textbf{Tipo} & \textbf{Resultado} \\
 \midrule
-No doble reserva concurrente & \texttt{ReservaPublicaIntegrationTest} & Integración & 409 \checkmark \\
+No doble reserva (2 hilos a la vez) & \texttt{ReservaPublicaIntegrationTest} & Integración & 201/409 \checkmark \\
 \rowcolor{rowgray}
 RBAC / menor privilegio & \texttt{CitaControllerWebMvcTest} & Seguridad & 403 \checkmark \\
 JWT firmado válido & \texttt{JwtProviderTest} & Unitaria & \checkmark \\
@@ -681,7 +681,7 @@ Se ha entregado una aplicación funcional y desplegable que responde al problema
 \begin{enumerate}
   \item \emph{Modelo de datos en PostgreSQL con Flyway.} \textbf{Cumplido:} seis tablas, migraciones V1--V6 y perfiles \texttt{postgres}/\texttt{mysql}.
   \item \emph{API REST con Spring Boot, JWT y roles.} \textbf{Cumplido:} controladores por recurso, autenticación JWT y autorización por rol en \texttt{SecurityConfig}.
-  \item \emph{Integridad de reservas con \texttt{SELECT FOR UPDATE}.} \textbf{Cumplido y verificado:} la prueba de integración confirma que la segunda reserva concurrente recibe 409.
+  \item \emph{Integridad de reservas con \texttt{SELECT FOR UPDATE}.} \textbf{Cumplido y verificado:} la prueba de integración confirma que, ante dos transacciones simultáneas en hilos distintos sobre la misma franja, exactamente una reserva prospera (201) y la otra recibe 409.
   \item \emph{Frontend responsive, PWA y reserva accesible.} \textbf{Cumplido:} reserva por pasos, modo oscuro, selección de centro y service worker.
   \item \emph{Notificaciones por Twilio con recordatorio programado.} \textbf{Cumplido:} avisos a médico y paciente y recordatorio a $\sim$24\,h vía \texttt{@Scheduled}.
   \item \emph{Despliegue reproducible con Docker Compose.} \textbf{Cumplido:} un único comando levanta base de datos, backend y frontend.

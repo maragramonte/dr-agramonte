@@ -2,17 +2,24 @@ package com.saludybienestar.agramonte.integration;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.saludybienestar.agramonte.dto.request.CrearCitaRequest;
 import com.saludybienestar.agramonte.entity.Horario;
+import com.saludybienestar.agramonte.entity.Rol;
+import com.saludybienestar.agramonte.entity.Usuario;
 import com.saludybienestar.agramonte.repository.HorarioRepository;
+import com.saludybienestar.agramonte.repository.UsuarioRepository;
+import com.saludybienestar.agramonte.service.CitaService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.server.ResponseStatusException;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -23,6 +30,12 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -59,6 +72,8 @@ class ReservaPublicaIntegrationTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
     @Autowired private HorarioRepository horarioRepository;
+    @Autowired private UsuarioRepository usuarioRepository;
+    @Autowired private CitaService citaService;
 
     private LocalDateTime primeraFranjaLibre() {
         List<Horario> libres = horarioRepository.findByMedicoIdAndDisponibleTrue(1L);
@@ -135,6 +150,70 @@ class ReservaPublicaIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(cuerpoReserva("segundo@example.com", franja)))
                 .andExpect(status().isConflict());
+    }
+
+    @Test
+    @DisplayName("Concurrencia real: dos transacciones simultáneas sobre la MISMA franja → solo una cita confirmada, la otra 409")
+    void crearCita_dosHilosSimultaneos_soloUnoPrevalece() throws Exception {
+        // Franja en disputa y dos pacientes reales que la pelean a la vez.
+        LocalDateTime franja = primeraFranjaLibre();
+        Long pacienteA = crearPaciente("concurrente.a@example.com");
+        Long pacienteB = crearPaciente("concurrente.b@example.com");
+
+        // Una barrera de 2 hilos hace que ambos invoquen crearCita() en el mismo instante,
+        // maximizando la colisión sobre la fila del horario (que el SELECT ... FOR UPDATE protege).
+        CyclicBarrier salida = new CyclicBarrier(2);
+        ExecutorService pool = Executors.newFixedThreadPool(2);
+        try {
+            Future<Integer> reservaA = pool.submit(reservaConcurrente(pacienteA, franja, salida));
+            Future<Integer> reservaB = pool.submit(reservaConcurrente(pacienteB, franja, salida));
+
+            int estadoA = reservaA.get(30, TimeUnit.SECONDS);
+            int estadoB = reservaB.get(30, TimeUnit.SECONDS);
+
+            // Exactamente una transacción confirma la cita (201) y la otra es rechazada (409).
+            // Sin el bloqueo pesimista, ambas verían la franja libre y se crearía una doble reserva.
+            assertThat(List.of(estadoA, estadoB))
+                    .as("una transacción gana la franja (201) y la otra recibe 409 (anti doble reserva)")
+                    .containsExactlyInAnyOrder(HttpStatus.CREATED.value(), HttpStatus.CONFLICT.value());
+        } finally {
+            pool.shutdownNow();
+        }
+
+        // La franja disputada queda ocupada: ya no figura entre los huecos libres del médico.
+        assertThat(horarioRepository.findByMedicoIdAndDisponibleTrue(1L).stream()
+                        .map(Horario::getInicio).toList())
+                .as("tras la carrera la franja queda reservada una sola vez")
+                .doesNotContain(franja);
+    }
+
+    /** Crea un paciente persistido y devuelve su id (las reservas concurrentes necesitan dueños reales). */
+    private Long crearPaciente(String email) {
+        Usuario u = new Usuario();
+        u.setEmail(email);
+        u.setPassword("hash-de-prueba");
+        u.setNombre("Paciente Concurrencia");
+        u.setTelefono("+34600333444");
+        u.setRol(Rol.PACIENTE);
+        u.setEnabled(true);
+        return usuarioRepository.save(u).getId();
+    }
+
+    /** Tarea que, tras sincronizar en la barrera, reserva la franja y devuelve el código HTTP resultante. */
+    private Callable<Integer> reservaConcurrente(Long pacienteId, LocalDateTime franja, CyclicBarrier salida) {
+        return () -> {
+            CrearCitaRequest req = new CrearCitaRequest();
+            req.setMedicoId(1L);
+            req.setFechaHora(franja);
+            req.setMotivo("Reserva concurrente");
+            salida.await(10, TimeUnit.SECONDS);   // ambos hilos arrancan a la vez
+            try {
+                citaService.crearCita(pacienteId, req);
+                return HttpStatus.CREATED.value();
+            } catch (ResponseStatusException ex) {
+                return ex.getStatusCode().value();
+            }
+        };
     }
 
     @Test
