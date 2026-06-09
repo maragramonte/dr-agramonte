@@ -384,6 +384,8 @@ Coincide con el email del médico seed (`medicos.id = 1`). La migración V3 tamb
 
 ## 7. Demo y defensa (resumen)
 
+> **Guion de defensa completo (discurso cronometrado minuto a minuto para 15 min + banco de preguntas):** ver **[docs/DEFENSA-ENSAYO.md](docs/DEFENSA-ENSAYO.md)**. Esta sección es solo el resumen del flujo de demo.
+
 ### Flujo a mostrar (5–7 min)
 
 1. `docker compose up -d --build`  
@@ -451,7 +453,9 @@ Mientras arranca: explicar capas (nginx → Spring → PostgreSQL).
 
 **Twilio:** opcional; médico + paciente; recordatorio 24 h con `@Scheduled`.
 
-**Limitaciones honestas:** `panel-pruebas.html` muestra reservas reales y agenda médico básica; historial clínico completo es evolución futura; suite de tests **inicial** (unitarios de `JwtProvider` y `CitaService` + integración con Testcontainers), falta ampliar cobertura y añadir E2E; sin MongoDB/Redis.
+**Pruebas / calidad:** suite de **25 tests en 3 niveles** — unitarios (`CitaServiceTest`, `JwtProviderTest`, `DatabaseUrlEnvironmentPostProcessorTest`), seguridad/RBAC (`CitaControllerWebMvcTest`) e integración end-to-end con **Testcontainers + PostgreSQL real** (`ReservaPublicaIntegrationTest`) — cubriendo las ramas críticas (409 doble reserva, 403 por rol, JWT, cancelación). Cobertura **no medida con JaCoCo** todavía y E2E (Playwright) como línea futura.
+
+**Limitaciones honestas:** `panel-pruebas.html` muestra reservas reales y agenda médico básica; historial clínico completo es evolución futura; sin MongoDB/Redis.
 
 ---
 
@@ -461,7 +465,7 @@ Mientras arranca: explicar capas (nginx → Spring → PostgreSQL).
 
 - [ ] Capturas reales en anexo de memoria PDF  
 - [ ] Pruebas manuales documentadas (tabla de casos)  
-- [ ] Ensayo defensa oral 30 min  
+- [ ] Ensayo defensa oral 15 min (guion: `docs/DEFENSA-ENSAYO.md`)  
 - [ ] Probar Twilio sandbox antes del tribunal  
 
 ### Mejora futura (post-TFG)
@@ -488,6 +492,7 @@ Mientras arranca: explicar capas (nginx → Spring → PostgreSQL).
 | **Memoria PDF (LaTeX)** | `docs/Memoria-TFG-Dr-Agramonte.tex` |
 | **Compilar memoria** | `docs/INSTRUCCIONES-MEMORIA-LATEX.md` |
 | **Integraciones (Twilio, sin secretos)** | `frontend/js/modules/API.md` |
+| **Guion de defensa (15 min cronometrado + preguntas)** | `docs/DEFENSA-ENSAYO.md` |
 | **Demo contingencia** | Sección 8 aquí (antes `GUIA-DEMO-CONTINGENCIA.md`) |
 | **Preguntas tribunal** | Sección 9 aquí (antes `PREGUNTAS-TRIBUNAL-DEMO.md`) |
 

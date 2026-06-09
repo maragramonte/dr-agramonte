@@ -199,6 +199,25 @@ window.addEventListener('auth-changed', cargar);
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && tieneAccesoLocal()) cargar();
 });
+
+// ── Sincronización entre pestañas ────────────────────────────────────────────
+// El cuadro de mando debe reflejar en vivo las reservas nuevas. Al crearse o
+// cancelarse una cita, reserva.js emite por el mismo canal que escucha el panel
+// de pruebas; aquí recargamos los agregados (solo si la cuenta tiene acceso de
+// gestión, para no provocar 401/403 en cuentas sin permiso).
+function iniciarSyncEntrePestanas() {
+    const refrescarSiAcceso = () => { if (tieneAccesoLocal()) cargar(); };
+    try {
+        const ch = new BroadcastChannel('dr-agramonte-citas');
+        ch.addEventListener('message', (ev) => {
+            if (ev.data?.type === 'cita-creada') refrescarSiAcceso();
+        });
+    } catch (_) { /* navegadores sin BroadcastChannel */ }
+    window.addEventListener('storage', (ev) => {
+        if (ev.key === 'dr-agramonte-cita-creada') refrescarSiAcceso();
+    });
+}
+iniciarSyncEntrePestanas();
 // Repintar al cambiar de tema claro/oscuro (cambian los colores de texto/borde).
 // El toggle solo cambia el atributo data-theme; lo observamos directamente.
 new MutationObserver(() => {

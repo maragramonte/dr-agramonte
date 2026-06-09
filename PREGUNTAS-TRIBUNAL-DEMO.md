@@ -4,4 +4,4 @@
 
 Este archivo conserva el detalle extendido de preguntas y respuestas para estudiar la defensa. Para el día de la demo, prioriza el checklist del README (secciones 7–8).
 
-**➡️ Guion de defensa completo y actualizado (discurso con tiempos + banco de preguntas):** ver **[docs/DEFENSA-ENSAYO.md](docs/DEFENSA-ENSAYO.md)**.
+**➡️ Guion de defensa completo y actualizado (discurso **cronometrado minuto a minuto para 15 min** + banco de preguntas):** ver **[docs/DEFENSA-ENSAYO.md](docs/DEFENSA-ENSAYO.md)**.
