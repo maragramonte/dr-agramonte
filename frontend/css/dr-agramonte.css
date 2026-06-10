@@ -981,6 +981,8 @@ a {
 .btn-row {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
     gap: var(--space-3);
     margin-top: var(--space-4);
 }
@@ -989,6 +991,11 @@ a {
     text-align: center;
 }
 .sobre-mi-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--space-3);
     margin-top: var(--space-4);
 }
 /* En las tarjetas de servicio, separación garantizada texto -> botón */
@@ -1155,8 +1162,10 @@ a {
 
 .hero-actions {
     display: flex;
-    gap: var(--space-2) var(--space-3);
     flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--space-3);
     animation: fadeInUp 0.7s ease-out 0.2s both;
 }
 
@@ -1983,6 +1992,27 @@ a {
     .sobre-mi-layout {
         grid-template-columns: 1fr;
         gap: var(--space-5);
+    }
+}
+
+/* Banda de estadísticas (página Sobre el Dr. Agramonte) */
+.sobre-mi-band {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+}
+.sobre-mi-band .stat-card {
+    transition: var(--transition);
+}
+.sobre-mi-band .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--teal-light);
+}
+@media (max-width: 720px) {
+    .sobre-mi-band {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
