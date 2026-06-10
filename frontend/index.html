@@ -87,7 +87,7 @@
                     <span class="nav-toggle-icon" aria-hidden="true"></span>
                 </button>
                 <ul class="nav-menu" id="nav-menu">
-                    <li class="nav-item"><a href="index.html" class="nav-link">Inicio</a></li>
+                    <li class="nav-item"><a href="index.html" class="nav-link active" aria-current="page">Inicio</a></li>
                     <li class="nav-item"><a href="sobre-mi.html" class="nav-link">El Dr. Agramonte</a></li>
                     <li class="nav-item"><a href="servicios.html" class="nav-link">Servicios</a></li>
                     <li class="nav-item"><a href="testimonios.html" class="nav-link">Testimonios</a></li>
@@ -196,17 +196,11 @@
 <script src="js/modules/auth-ui.js" defer></script>
 <script src="js/pages/dr-agramonte.js" defer></script>
 <script>
+    // Precarga de la imagen del hero (LCP). El menú móvil lo gestiona dr-agramonte.js
+    // para todas las páginas; no se duplica aquí.
     (function() {
         const preloadLinks = [{ href: 'pictures/hero-doctor.svg', as: 'image' }];
         preloadLinks.forEach(link => { const preload = document.createElement('link'); preload.rel = 'preload'; preload.href = link.href; preload.as = link.as; document.head.appendChild(preload); });
-        document.addEventListener('DOMContentLoaded', function() {
-            const navToggle = document.querySelector('.nav-toggle');
-            const navMenu = document.querySelector('.nav-menu');
-            if (navToggle && navMenu) {
-                navToggle.addEventListener('click', function() { const isExpanded = this.getAttribute('aria-expanded') === 'true'; this.setAttribute('aria-expanded', !isExpanded); navMenu.classList.toggle('nav-menu--open'); });
-                document.addEventListener('click', function(event) { if (navMenu.classList.contains('nav-menu--open') && !navMenu.contains(event.target) && !navToggle.contains(event.target)) { navToggle.setAttribute('aria-expanded', 'false'); navMenu.classList.remove('nav-menu--open'); } });
-            }
-        });
     })();
 </script>
 </body>
