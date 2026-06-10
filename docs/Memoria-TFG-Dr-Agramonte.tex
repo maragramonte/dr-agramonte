@@ -362,7 +362,7 @@ Cada pieza del stack se eligió por una razón concreta, no por moda:
 \begin{itemize}
   \item \textbf{Java + Spring Boot.} El tipado fuerte de Java detecta en tiempo de compilación errores que en un lenguaje dinámico aparecerían en producción, algo especialmente valioso cuando se manejan datos de salud. Spring Boot aporta, además, un ecosistema maduro: Spring Security como estándar de facto para autenticación y autorización, Spring Data JPA para el acceso a datos y transacciones ACID que garantizan que una reserva se complete entera o no se complete en absoluto.
   \item \textbf{PostgreSQL.} Para datos críticos (usuarios, médicos, horarios y citas) hace falta integridad referencial real, transacciones fiables y bloqueo a nivel de fila. PostgreSQL ofrece las tres cosas y permite implementar el control de concurrencia con \texttt{SELECT \ldots FOR UPDATE}, núcleo de la garantía de ``no doble reserva''.
-  \item \textbf{Flyway.} Versiona el esquema en migraciones numeradas (V1 a V6), de modo que cualquier entorno —el de desarrollo, el del tribunal o uno futuro en producción— se reconstruye exactamente igual al arrancar.
+  \item \textbf{Flyway.} Versiona el esquema en migraciones numeradas (V1 a V7), de modo que cualquier entorno —el de desarrollo, el del tribunal o uno futuro en producción— se reconstruye exactamente igual al arrancar.
   \item \textbf{Twilio.} En lugar de montar infraestructura propia de mensajería, se delega el envío de SMS y WhatsApp en un proveedor consolidado, invocado directamente desde el backend Java.
   \item \textbf{Docker Compose.} Levanta todo el sistema con un único comando, eliminando el clásico ``en mi máquina funciona''.
 \end{itemize}
@@ -492,9 +492,9 @@ El frontend se construyó con HTML5, CSS3 y JavaScript nativo, sin frameworks co
 
 \paragraph{Selección de centro (multi-ubicación).} El flujo de reserva permite elegir entre dos centros antes de fijar la hora: \emph{Clínica Salamanca} (Madrid) y \emph{Consulta Palma de Mallorca}, cada uno con sus propios días de atención. Esto refleja una realidad habitual: un mismo profesional atiende en más de una ubicación. El centro \textbf{se persiste en la base de datos}: existe una entidad \texttt{Centro} (tabla \texttt{centros}, creada en la migración Flyway V5) con un \texttt{codigo} estable —\texttt{madrid}, \texttt{palma}— que coincide con el identificador que ya empleaba el frontend, de modo que no hubo que reescribir la web. El backend expone el listado mediante \texttt{GET /api/centros}.
 
-\paragraph{Agenda del médico por centro.} La multi-ubicación se llevó hasta el final: cada \texttt{horario} pertenece a un centro (columna \texttt{centro\_id}, migración V6), repartiendo la agenda del médico por día de la semana —Madrid los lunes, martes y jueves; Palma los miércoles, viernes y sábados— de forma que cada día el profesional está en un único sitio. A partir de ahí, todo encaja de manera coherente:
+\paragraph{Agenda del médico por centro.} La multi-ubicación se llevó hasta el final: cada \texttt{horario} pertenece a un centro (columna \texttt{centro\_id}, migración V6; la V7 actualizó los centros a sus ubicaciones reales en Palma de Mallorca), repartiendo la agenda del médico por día de la semana —la consulta de General Riera los lunes, martes y jueves; la de Avenidas los miércoles, viernes y sábados— de forma que cada día el profesional está en un único sitio. A partir de ahí, todo encaja de manera coherente:
 \begin{itemize}
-  \item La \textbf{disponibilidad se filtra por centro}: \texttt{GET /api/disponibilidad?medicoId=\&fecha=\&centroCodigo=} solo devuelve los huecos de ese centro (un miércoles no ofrece horas de Madrid).
+  \item La \textbf{disponibilidad se filtra por centro}: \texttt{GET /api/disponibilidad?medicoId=\&fecha=\&centroCodigo=} solo devuelve los huecos de ese centro (un miércoles no ofrece horas de General Riera).
   \item La \textbf{cita hereda el centro de su horario}: al reservar, el centro no se deduce de lo que diga el cliente, sino de la franja realmente reservada, lo que evita incoherencias.
   \item La \textbf{agenda del médico muestra el centro} de cada cita y puede filtrarse por ubicación.
 \end{itemize}
@@ -679,7 +679,7 @@ Se ha entregado una aplicación funcional y desplegable que responde al problema
 \textbf{Cumplimiento de los objetivos.} Retomando los ocho objetivos específicos planteados al inicio, el balance es el siguiente:
 
 \begin{enumerate}
-  \item \emph{Modelo de datos en PostgreSQL con Flyway.} \textbf{Cumplido:} seis tablas, migraciones V1--V6 y perfiles \texttt{postgres}/\texttt{mysql}.
+  \item \emph{Modelo de datos en PostgreSQL con Flyway.} \textbf{Cumplido:} seis tablas, migraciones V1--V7 y perfiles \texttt{postgres}/\texttt{mysql}.
   \item \emph{API REST con Spring Boot, JWT y roles.} \textbf{Cumplido:} controladores por recurso, autenticación JWT y autorización por rol en \texttt{SecurityConfig}.
   \item \emph{Integridad de reservas con \texttt{SELECT FOR UPDATE}.} \textbf{Cumplido y verificado:} la prueba de integración confirma que, ante dos transacciones simultáneas en hilos distintos sobre la misma franja, exactamente una reserva prospera (201) y la otra recibe 409.
   \item \emph{Frontend responsive, PWA y reserva accesible.} \textbf{Cumplido:} reserva por pasos, modo oscuro, selección de centro y service worker.
