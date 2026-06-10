@@ -113,13 +113,14 @@ public class CitaNotificationService {
                 Fecha: %s
                 Médico: %s
                 Motivo: %s
-                Dirección: Calle Salud 123, Madrid
+                Dirección: %s
                 Para cambios o cancelación, use la web de reservas.
                 """.formatted(
                 cita.getUsuario().getNombre(),
                 cita.getFechaHora().format(FECHA),
                 cita.getMedico().getNombre(),
-                motivo
+                motivo,
+                direccionCita(cita)
         ).trim();
     }
 
@@ -141,12 +142,28 @@ public class CitaNotificationService {
                 Hola %s, le recordamos su cita:
                 %s
                 Médico: %s
-                Calle Salud 123, Madrid
+                %s
                 Si no puede acudir, cancele desde la web.
                 """.formatted(
                 cita.getUsuario().getNombre(),
                 cita.getFechaHora().format(FECHA),
-                cita.getMedico().getNombre()
+                cita.getMedico().getNombre(),
+                direccionCita(cita)
         ).trim();
+    }
+
+    /**
+     * Dirección legible del centro de la cita (nombre, calle y ciudad).
+     * Las citas antiguas pueden no tener centro: en ese caso se indica Palma de Mallorca.
+     */
+    private String direccionCita(Cita cita) {
+        var centro = cita.getCentro();
+        if (centro == null) {
+            return "Palma de Mallorca";
+        }
+        var partes = java.util.stream.Stream.of(centro.getNombre(), centro.getDireccion(), centro.getCiudad())
+                .filter(p -> p != null && !p.isBlank())
+                .toList();
+        return partes.isEmpty() ? "Palma de Mallorca" : String.join(", ", partes);
     }
 }

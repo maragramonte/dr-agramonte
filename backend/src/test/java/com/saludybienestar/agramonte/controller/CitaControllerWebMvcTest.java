@@ -72,7 +72,7 @@ class CitaControllerWebMvcTest {
     private CitaResponse citaConfirmada() {
         return new CitaResponse(1L, 10L, 1L, "Dr. Agramonte",
                 LocalDateTime.now().plusDays(1), "Revisión", EstadoCita.CONFIRMADA,
-                "madrid", "Clinica Salamanca");
+                "madrid", "Consulta General Riera");
     }
 
     private String json(Map<String, Object> body) throws Exception {

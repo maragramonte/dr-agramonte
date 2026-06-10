@@ -226,18 +226,18 @@ class ReservaPublicaIntegrationTest {
     }
 
     @Test
-    @DisplayName("Agenda por centro: el miércoles es de Palma (no de Madrid) y la cita hereda el centro del horario")
+    @DisplayName("Agenda por centro: el miércoles es de Avenidas (no de General Riera) y la cita hereda el centro del horario")
     void agendaPorCentro_disponibilidadFiltradaYCitaHeredaCentro() throws Exception {
-        // Reparto de la V6: miércoles -> Palma; lunes/martes/jueves -> Madrid.
+        // Reparto de la V6: miércoles -> palma (Avenidas); lunes/martes/jueves -> madrid (General Riera).
         String miercoles = proximoDiaSemana(DayOfWeek.WEDNESDAY).toString();
 
         List<String> huecosPalma = huecos(miercoles, "palma");
         List<String> huecosMadrid = huecos(miercoles, "madrid");
 
-        assertThat(huecosPalma).as("el miércoles el médico atiende en Palma").isNotEmpty();
-        assertThat(huecosMadrid).as("el miércoles no hay agenda en Madrid").isEmpty();
+        assertThat(huecosPalma).as("el miércoles el médico atiende en Avenidas").isNotEmpty();
+        assertThat(huecosMadrid).as("el miércoles no hay agenda en General Riera").isEmpty();
 
-        // Reservar el primer hueco de Palma: la cita debe HEREDAR el centro del horario,
+        // Reservar el primer hueco de Avenidas: la cita debe HEREDAR el centro del horario,
         // sin que el cliente envíe centroCodigo.
         LocalDateTime franja = LocalDateTime.parse(huecosPalma.get(0));
         String email = "agenda.centro@example.com";
@@ -247,7 +247,7 @@ class ReservaPublicaIntegrationTest {
                         .content(cuerpoReserva(email, franja)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.cita.centroCodigo").value("palma"))
-                .andExpect(jsonPath("$.cita.centroNombre").value("Consulta Palma"));
+                .andExpect(jsonPath("$.cita.centroNombre").value("Consulta Avenidas"));
 
         // Al releer por email (otra lectura desde PostgreSQL) el centro persiste.
         mockMvc.perform(get("/api/citas/por-email").param("email", email))
