@@ -1996,22 +1996,22 @@ a {
 }
 
 /* Banda de estadísticas (página Sobre el Dr. Agramonte) */
-.sobre-mi-band {
+.stats-band {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: var(--space-3);
     margin-top: var(--space-6);
 }
-.sobre-mi-band .stat-card {
+.stats-band .stat-card {
     transition: var(--transition);
 }
-.sobre-mi-band .stat-card:hover {
+.stats-band .stat-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-lg);
     border-color: var(--teal-light);
 }
 @media (max-width: 720px) {
-    .sobre-mi-band {
+    .stats-band {
         grid-template-columns: repeat(2, 1fr);
     }
 }
