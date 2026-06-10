@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 
-# Páginas internas / de pruebas: no indexar
+# Paginas internas / de pruebas: no indexar
 Disallow: /panel-pruebas.html
 Disallow: /estadisticas.html
 Disallow: /offline.html
