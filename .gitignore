@@ -36,3 +36,6 @@ Thumbs.db
 *~
 desktop.ini
 *.dia~
+
+# Carpeta de descartes (revisar y borrar a mano)
+/_a-eliminar/

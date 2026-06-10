@@ -244,9 +244,8 @@
 > Pediste incluirlas para tenerlas presentes. Ordenadas por impacto en la defensa.
 
 ### Prioridad alta — coherencia memoria ↔ código ↔ demo (la regla de oro)
-1. **Centros en la memoria:** el código y la app en vivo ya usan **dos consultas en Palma de Mallorca (General Riera y Avenidas)**, pero la **memoria LaTeX** (secciones de migraciones V5/V6) todavía describe centros **"Madrid/Palma"**. **Hay que actualizar la memoria** para que coincida con lo que el tribunal verá en la demo. *(Te lo puedo corregir en el `.tex` si me dices que adelante.)*
-2. **Recuento de migraciones:** la memoria cita Flyway **V1–V6**; ahora hay **V7** (centros de Mallorca). Actualizar el número.
-3. **Suite de tests en verde:** re-ejecutar `mvn test` completo y **guardar la captura del verde** para la diapositiva 11 (el recuento exacto de `@Test` conviene confirmarlo, no citarlo de memoria).
+- ✅ **Resuelto (junio 2026):** la memoria LaTeX se alineó con el código — los centros pasan a **Palma de Mallorca (General Riera y Avenidas)** y el recuento de migraciones a **V1–V7**; PDF recompilado sin errores.
+- ✅ **Suite de tests verificada:** **24/24 en verde** (`mvn test`, incluida la de integración con Testcontainers). Lleva la captura del verde a la diapositiva 11.
 
 ### Prioridad media — credibilidad del producto
 4. **Datos reales del doctor:** siguen como *placeholder* el **colegiado N.º 12345** y los **teléfonos**. En una web de salud real conviene sustituirlos por los reales (o neutralizarlos) antes de enseñarla. *(Necesito que me pases los datos.)*

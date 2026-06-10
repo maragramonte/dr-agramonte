@@ -453,7 +453,7 @@ Mientras arranca: explicar capas (nginx → Spring → PostgreSQL).
 
 **Twilio:** opcional; médico + paciente; recordatorio 24 h con `@Scheduled`.
 
-**Pruebas / calidad:** suite de **25 tests en 3 niveles** — unitarios (`CitaServiceTest`, `JwtProviderTest`, `DatabaseUrlEnvironmentPostProcessorTest`), seguridad/RBAC (`CitaControllerWebMvcTest`) e integración end-to-end con **Testcontainers + PostgreSQL real** (`ReservaPublicaIntegrationTest`) — cubriendo las ramas críticas (409 doble reserva, 403 por rol, JWT, cancelación). Cobertura **no medida con JaCoCo** todavía y E2E (Playwright) como línea futura.
+**Pruebas / calidad:** suite de **24 tests en 3 niveles** — unitarios (`CitaServiceTest`, `JwtProviderTest`, `DatabaseUrlEnvironmentPostProcessorTest`), seguridad/RBAC (`CitaControllerWebMvcTest`) e integración end-to-end con **Testcontainers + PostgreSQL real** (`ReservaPublicaIntegrationTest`) — cubriendo las ramas críticas (409 doble reserva, 403 por rol, JWT, cancelación). Cobertura **no medida con JaCoCo** todavía y E2E (Playwright) como línea futura.
 
 **Limitaciones honestas:** `panel-pruebas.html` muestra reservas reales y agenda médico básica; historial clínico completo es evolución futura; sin MongoDB/Redis.
 
@@ -493,10 +493,11 @@ Mientras arranca: explicar capas (nginx → Spring → PostgreSQL).
 | **Compilar memoria** | `docs/INSTRUCCIONES-MEMORIA-LATEX.md` |
 | **Integraciones (Twilio, sin secretos)** | `frontend/js/modules/API.md` |
 | **Guion de defensa (15 min cronometrado + preguntas)** | `docs/DEFENSA-ENSAYO.md` |
+| **Guion del PowerPoint (diapositivas)** | `docs/Defensa-TFG-PowerPoint-Guion.md` |
 | **Demo contingencia** | Sección 8 aquí (antes `GUIA-DEMO-CONTINGENCIA.md`) |
 | **Preguntas tribunal** | Sección 9 aquí (antes `PREGUNTAS-TRIBUNAL-DEMO.md`) |
 
-Los archivos `GUIA-DEMO-CONTINGENCIA.md` y `PREGUNTAS-TRIBUNAL-DEMO.md` en la raíz se mantienen como copia de trabajo pero **la versión consolidada y actualizada es este README**.
+Los antiguos `GUIA-DEMO-CONTINGENCIA.md` y `PREGUNTAS-TRIBUNAL-DEMO.md` eran solo punteros al README; se retiraron del repositorio (quedan en la carpeta local `_a-eliminar/`). **La versión consolidada y actualizada es este README** y `docs/DEFENSA-ENSAYO.md`.
 
 ---
 
