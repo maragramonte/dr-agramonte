@@ -539,12 +539,14 @@ a {
     padding: clamp(3rem, 10vw, 5rem) 0;
 }
 
-.section-header {
+.section-header,
+.section__header {
     text-align: center;
     margin-bottom: var(--space-5);
 }
 
-.section-title {
+.section-title,
+.section__title {
     font-size: clamp(1.8rem, 5vw, 2.4rem);
     color: var(--heading);
     margin-bottom: var(--space-2);
@@ -554,7 +556,8 @@ a {
     display: inline-block;
 }
 
-.section-title::after {
+.section-title::after,
+.section__title::after {
     content: '';
     position: absolute;
     bottom: -12px;
@@ -566,12 +569,42 @@ a {
     border-radius: 2px;
 }
 
-.section-subtitle {
+.section-subtitle,
+.section__subtitle {
     font-size: clamp(0.95rem, 2vw, 1.1rem);
     color: var(--text-light);
     max-width: 600px;
     margin: var(--space-3) auto 0;
     line-height: 1.7;
+}
+
+/* Selector de idioma (ES / CA) en la cabecera */
+.lang-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    margin-right: 0.4rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 2px;
+    background: var(--card);
+}
+.lang-btn {
+    border: 0;
+    background: transparent;
+    color: var(--text-light);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    line-height: 1;
+    transition: var(--transition);
+}
+.lang-btn:hover { color: var(--teal); }
+.lang-btn--active {
+    background: var(--teal);
+    color: #fff;
 }
 
 /* Hero interior – teal + plateado, animación suave */
@@ -2048,7 +2081,29 @@ a {
     font-family: var(--font-display);
     font-size: clamp(1.7rem, 3.5vw, 2.3rem);
     color: var(--heading);
-    margin-bottom: var(--space-2);
+    margin-bottom: var(--space-3);
+    line-height: 1.25;
+}
+
+/* Aire en el bloque de texto de "Sobre el doctor": mejor legibilidad,
+   con separación clara entre párrafos y antes de cada subapartado. */
+.sobre-mi-texto > p {
+    line-height: 1.8;
+    margin-bottom: var(--space-4);
+    color: var(--text);
+}
+.sobre-mi-subheading {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    color: var(--heading);
+    margin-top: var(--space-5);
+    margin-bottom: var(--space-3);
+}
+.sobre-mi-subheading i {
+    color: var(--teal);
 }
 
 .experiencia-badge {

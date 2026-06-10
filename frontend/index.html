@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="css/dr-agramonte.css">
     <link rel="stylesheet" href="css/pages-extra.css">
     <script src="js/modules/theme-init.js"></script>
+    <script src="js/modules/i18n.js"></script>
     <meta name="robots" content="index, follow">
     <meta name="author" content="Dr. Juan Manuel Agramonte">
     <meta name="keywords" content="medicina interna, médico internista, Palma de Mallorca, Mallorca, Baleares, consulta médica, especialista, doctor Agramonte, salud, chequeos preventivos">
@@ -74,11 +75,15 @@
                     <div class="logo-icon" aria-hidden="true"><i class="fas fa-user-md"></i></div>
                     <div class="logo-text">
                         <h1 class="logo-title">Dr. Agramonte</h1>
-                        <p class="logo-subtitle">Especialista en Medicina Interna</p>
+                        <p class="logo-subtitle" data-i18n="logo.subtitle">Especialista en Medicina Interna</p>
                     </div>
                 </a>
             </div>
             <div class="header-end">
+                <div class="lang-switch" role="group" aria-label="Idioma" data-i18n-attr="aria-label:lang.aria">
+                    <button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" aria-pressed="true">ES</button>
+                    <button type="button" class="lang-btn" data-lang-btn="ca" aria-pressed="false">CA</button>
+                </div>
                 <button type="button" class="theme-toggle" id="themeToggle" aria-label="Activar modo oscuro" title="Cambiar tema claro / oscuro" aria-pressed="false">
                     <i class="fas fa-moon" id="themeToggleIcon" aria-hidden="true"></i>
                 </button>
@@ -87,12 +92,12 @@
                     <span class="nav-toggle-icon" aria-hidden="true"></span>
                 </button>
                 <ul class="nav-menu" id="nav-menu">
-                    <li class="nav-item"><a href="index.html" class="nav-link active" aria-current="page">Inicio</a></li>
-                    <li class="nav-item"><a href="sobre-mi.html" class="nav-link">El Dr. Agramonte</a></li>
-                    <li class="nav-item"><a href="servicios.html" class="nav-link">Servicios</a></li>
-                    <li class="nav-item"><a href="testimonios.html" class="nav-link">Testimonios</a></li>
-                    <li class="nav-item"><a href="contacto.html" class="nav-link">Contacto</a></li>
-                    <li class="nav-item"><a href="reservar.html" class="nav-link nav-link--reserva"><i class="fas fa-calendar-plus" aria-hidden="true"></i> Reservar cita</a></li>
+                    <li class="nav-item"><a href="index.html" class="nav-link active" aria-current="page" data-i18n="nav.inicio">Inicio</a></li>
+                    <li class="nav-item"><a href="sobre-mi.html" class="nav-link" data-i18n="nav.sobre">El Dr. Agramonte</a></li>
+                    <li class="nav-item"><a href="servicios.html" class="nav-link" data-i18n="nav.servicios">Servicios</a></li>
+                    <li class="nav-item"><a href="testimonios.html" class="nav-link" data-i18n="nav.testimonios">Testimonios</a></li>
+                    <li class="nav-item"><a href="contacto.html" class="nav-link" data-i18n="nav.contacto">Contacto</a></li>
+                    <li class="nav-item"><a href="reservar.html" class="nav-link nav-link--reserva"><i class="fas fa-calendar-plus" aria-hidden="true"></i> <span data-i18n="nav.reservar">Reservar cita</span></a></li>
                 </ul>
             </nav>
             </div>
@@ -107,18 +112,18 @@
             <div class="hero-content">
                 <div class="hero-text">
                     <header class="hero-header">
-                        <h2 id="hero-title" class="hero-title">Atención Médica Integral en Medicina Interna</h2>
-                        <p class="hero-subtitle">El Dr. Agramonte cuida de su salud con profesionalidad, cercanía y seguimiento personalizado en Mallorca.</p>
+                        <h2 id="hero-title" class="hero-title" data-i18n="home.hero.title">Atención Médica Integral en Medicina Interna</h2>
+                        <p class="hero-subtitle" data-i18n="home.hero.subtitle">El Dr. Agramonte cuida de su salud con profesionalidad, cercanía y seguimiento personalizado en Mallorca.</p>
                     </header>
                     <div class="hero-features" role="list" aria-label="Características del servicio">
-                        <div class="feature-item" role="listitem"><i class="fas fa-check-circle"></i><span>Especialista certificado con más de 35 años de experiencia</span></div>
-                        <div class="feature-item" role="listitem"><i class="fas fa-check-circle"></i><span>Diagnóstico preciso y tratamiento personalizado</span></div>
-                        <div class="feature-item" role="listitem"><i class="fas fa-check-circle"></i><span>Seguimiento continuo y comunicación accesible</span></div>
-                        <div class="feature-item" role="listitem"><i class="fas fa-check-circle"></i><span>Consulta presencial y telemedicina disponible</span></div>
+                        <div class="feature-item" role="listitem"><i class="fas fa-check-circle"></i><span data-i18n="home.feature.1">Especialista certificado con más de 35 años de experiencia</span></div>
+                        <div class="feature-item" role="listitem"><i class="fas fa-check-circle"></i><span data-i18n="home.feature.2">Diagnóstico preciso y tratamiento personalizado</span></div>
+                        <div class="feature-item" role="listitem"><i class="fas fa-check-circle"></i><span data-i18n="home.feature.3">Seguimiento continuo y comunicación accesible</span></div>
+                        <div class="feature-item" role="listitem"><i class="fas fa-check-circle"></i><span data-i18n="home.feature.4">Consulta presencial y telemedicina disponible</span></div>
                     </div>
                     <div class="hero-actions">
-                        <a href="reservar.html" class="btn btn--primary btn--reserva btn--large hero-action"><i class="fas fa-calendar-plus" aria-hidden="true"></i> Solicitar cita</a>
-                        <a href="tel:+34748962648" class="btn btn--secondary hero-action"><i class="fas fa-phone"></i> Llamar Ahora</a>
+                        <a href="reservar.html" class="btn btn--primary btn--reserva btn--large hero-action"><i class="fas fa-calendar-plus" aria-hidden="true"></i> <span data-i18n="btn.solicitar">Solicitar cita</span></a>
+                        <a href="tel:+34748962648" class="btn btn--secondary hero-action"><i class="fas fa-phone"></i> <span data-i18n="btn.llamar">Llamar Ahora</span></a>
                     </div>
                 </div>
                 <div class="hero-media">
