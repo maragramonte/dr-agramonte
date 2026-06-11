@@ -495,6 +495,7 @@ Mientras arranca: explicar capas (nginx → Spring → PostgreSQL).
 | **Integraciones (Twilio, sin secretos)** | `frontend/js/modules/API.md` |
 | **Guion de defensa (15 min cronometrado + preguntas)** | `docs/DEFENSA-ENSAYO.md` |
 | **Guion del PowerPoint (diapositivas)** | `docs/Defensa-TFG-PowerPoint-Guion.md` |
+| **Ficha esencial de la defensa (pitch + números)** | `docs/PRESENTACION-DEFENSA.md` |
 | **Demo contingencia** | Sección 8 aquí (antes `GUIA-DEMO-CONTINGENCIA.md`) |
 | **Preguntas tribunal** | Sección 9 aquí (antes `PREGUNTAS-TRIBUNAL-DEMO.md`) |
 
