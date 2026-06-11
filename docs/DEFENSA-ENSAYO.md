@@ -178,6 +178,65 @@ Gracias por vuestra atención; quedo a vuestra disposición para las preguntas.�
 - **¿Qué son los DTO y por qué los usas?** → Objetos de transferencia que desacoplan la API de las entidades JPA: no expongo el modelo interno y controlo exactamente qué viaja.
 
 ### Acceso a datos / base de datos
+
+> **Modelo relacional (6 tablas, Flyway V1–V8).** Referencia completa en [BASE-DE-DATOS.md](BASE-DE-DATOS.md). Si el tribunal lo pide, enseña este diagrama:
+
+```mermaid
+erDiagram
+    USUARIOS ||--o{ CITAS : "reserva"
+    MEDICOS  ||--o{ CITAS : "atiende"
+    MEDICOS  ||--o{ HORARIOS : "ofrece"
+    CENTROS  ||--o{ CITAS : "ubica (opc.)"
+    CENTROS  ||--o{ HORARIOS : "alberga (opc.)"
+    USUARIOS ||--o{ NOTIFICACIONES : "recibe (opc.)"
+    CITAS    ||--o{ NOTIFICACIONES : "genera (opc.)"
+
+    USUARIOS {
+        bigint   id PK
+        varchar  email UK "NOT NULL"
+        varchar  password "BCrypt"
+        varchar  rol "PACIENTE|MEDICO|ADMIN"
+        boolean  cuenta_invitada "V4"
+    }
+    MEDICOS {
+        bigint   id PK
+        varchar  nombre "NOT NULL"
+        varchar  especialidad
+    }
+    CENTROS {
+        bigint   id PK
+        varchar  codigo UK "interno"
+        varchar  nombre "NOT NULL"
+        varchar  ciudad
+    }
+    HORARIOS {
+        bigint   id PK
+        bigint   medico_id FK "NOT NULL"
+        bigint   centro_id FK "V6 (null)"
+        timestamp inicio
+        boolean  disponible
+    }
+    CITAS {
+        bigint   id PK
+        bigint   usuario_id FK "NOT NULL"
+        bigint   medico_id FK "NOT NULL"
+        bigint   centro_id FK "V5 (null)"
+        timestamp fecha_hora
+        varchar  estado "PENDIENTE|CONFIRMADA|CANCELADA|COMPLETADA"
+        varchar  cobertura "V8"
+        varchar  preferencia_pago "V8 (null)"
+    }
+    NOTIFICACIONES {
+        bigint   id PK
+        bigint   usuario_id FK "(null)"
+        bigint   cita_id FK "(null)"
+        varchar  canal "EMAIL|SMS|VOICE"
+        boolean  leida
+    }
+```
+
+> **Clave anti-doble-reserva:** índice `UNIQUE (medico_id, inicio)` en `horarios` + `SELECT … FOR UPDATE`. **Integridad:** citas/horarios en `CASCADE` (no existen sin su usuario/médico); `centro_id` y notificaciones en `SET NULL` (conservar histórico).
+
 - **¿Por qué relacional y no MongoDB?** → Los datos son fuertemente relacionales (usuario–médico–horario–centro–cita) y la invariante crítica (no doble reserva) exige transacciones y bloqueo de fila, donde el relacional es más fuerte. MongoDB lo reservo para el historial clínico (documentos flexibles): una persistencia políglota futura.
 - **¿Qué es Flyway?** → Versiona el esquema en migraciones numeradas (V1–V8); cualquier entorno se reconstruye igual al arrancar.
 - **¿Cómo evitas perder trazabilidad al cancelar?** → No borro la fila; cambio el `estado` (enumerado `EstadoCita`).
