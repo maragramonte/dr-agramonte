@@ -194,6 +194,71 @@
                             </div>
                         </div>
 
+                        <!-- Cobertura / pago -->
+                        <div class="form-section">
+                            <p class="form-section-title">Cobertura</p>
+                            <div class="modality-grid">
+                                <div class="modality-opt">
+                                    <input type="radio" name="cobertura" id="cobPrivada" value="privada" checked>
+                                    <label for="cobPrivada">
+                                        <i class="fas fa-euro-sign"></i>
+                                        <span>Consulta privada</span>
+                                        <small>80&nbsp;&euro; por consulta</small>
+                                    </label>
+                                </div>
+                                <div class="modality-opt">
+                                    <input type="radio" name="cobertura" id="cobSeguro" value="seguro">
+                                    <label for="cobSeguro">
+                                        <i class="fas fa-id-card"></i>
+                                        <span>Seguro m&eacute;dico</span>
+                                        <small>Con tu aseguradora</small>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Si elige seguro -->
+                            <div id="bloqueSeguro" class="field" style="display:none">
+                                <select id="aseguradora">
+                                    <option value="">Selecciona tu aseguradora...</option>
+                                    <option value="Sanitas">Sanitas</option>
+                                    <option value="Adeslas">Adeslas (SegurCaixa)</option>
+                                    <option value="Asisa">Asisa</option>
+                                    <option value="DKV">DKV</option>
+                                    <option value="Mapfre">Mapfre Salud</option>
+                                    <option value="Cigna">Cigna</option>
+                                    <option value="Caser">Caser</option>
+                                    <option value="Otra">Otra</option>
+                                </select>
+                                <input type="text" id="numTarjeta" placeholder="N&ordm; de tarjeta sanitaria / p&oacute;liza" autocomplete="off" style="margin-top:.6rem">
+                            </div>
+
+                            <!-- Si elige privada -->
+                            <div id="bloquePrivada" class="field">
+                                <p class="form-hint" style="margin-bottom:.5rem">Importe de la consulta privada: <strong>80&nbsp;&euro;</strong>. &iquest;C&oacute;mo prefieres pagar?</p>
+                                <div class="modality-grid">
+                                    <div class="modality-opt">
+                                        <input type="radio" name="preferenciaPago" id="pagoConsulta" value="en-consulta" checked>
+                                        <label for="pagoConsulta">
+                                            <i class="fas fa-hand-holding-medical"></i>
+                                            <span>En la consulta</span>
+                                            <small>Pagas tras la visita</small>
+                                        </label>
+                                    </div>
+                                    <div class="modality-opt">
+                                        <input type="radio" name="preferenciaPago" id="pagoOnline" value="online">
+                                        <label for="pagoOnline">
+                                            <i class="fas fa-credit-card"></i>
+                                            <span>Online</span>
+                                            <small>Pr&oacute;ximamente</small>
+                                        </label>
+                                    </div>
+                                </div>
+                                <p id="notaPagoOnline" class="form-hint" style="display:none;margin-top:.5rem">
+                                    <i class="fas fa-info-circle"></i> El pago online se habilitar&aacute; pronto; de momento la reserva queda registrada y se abona en la consulta. Si no acudes, no se cobra nada.
+                                </p>
+                            </div>
+                        </div>
+
                         <!-- Datos personales -->
                         <div class="form-section">
                             <p class="form-section-title">Datos personales</p>

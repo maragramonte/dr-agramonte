@@ -86,6 +86,10 @@ public class CitaService {
         citaRequest.setMotivo(request.getMotivo());
         citaRequest.setTelefono(request.getTelefono());
         citaRequest.setCentroCodigo(request.getCentroCodigo());
+        citaRequest.setCobertura(request.getCobertura());
+        citaRequest.setAseguradora(request.getAseguradora());
+        citaRequest.setNumeroTarjetaSanitaria(request.getNumeroTarjetaSanitaria());
+        citaRequest.setPreferenciaPago(request.getPreferenciaPago());
 
         CitaResponse cita = crearCita(paciente.getId(), citaRequest);
 
@@ -131,6 +135,10 @@ public class CitaService {
         cita.setCentro(centro);
         cita.setFechaHora(request.getFechaHora());
         cita.setMotivo(request.getMotivo());
+        cita.setCobertura(request.getCobertura());
+        cita.setAseguradora(request.getAseguradora());
+        cita.setNumeroTarjetaSanitaria(request.getNumeroTarjetaSanitaria());
+        cita.setPreferenciaPago(request.getPreferenciaPago());
         cita.setEstado(EstadoCita.CONFIRMADA);
 
         horario.setDisponible(false);
@@ -295,7 +303,11 @@ public class CitaService {
                 cita.getMotivo(),
                 cita.getEstado(),
                 centro != null ? centro.getCodigo() : null,
-                centro != null ? centro.getNombre() : null
+                centro != null ? centro.getNombre() : null,
+                cita.getCobertura(),
+                cita.getAseguradora(),
+                cita.getNumeroTarjetaSanitaria(),
+                cita.getPreferenciaPago()
         );
     }
 

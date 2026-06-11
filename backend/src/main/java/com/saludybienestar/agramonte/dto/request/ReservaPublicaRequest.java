@@ -39,4 +39,20 @@ public class ReservaPublicaRequest {
     /** Código del centro donde se atiende ('madrid', 'palma'...). Opcional. */
     @Size(max = 50)
     private String centroCodigo;
+
+    /** Cobertura: 'privada' o 'seguro'. */
+    @Size(max = 20)
+    private String cobertura;
+
+    /** Aseguradora si paga por seguro. */
+    @Size(max = 100)
+    private String aseguradora;
+
+    /** Nº de tarjeta sanitaria / póliza si paga por seguro. */
+    @Size(max = 100)
+    private String numeroTarjetaSanitaria;
+
+    /** Preferencia de pago si es privada: 'en-consulta' u 'online'. */
+    @Size(max = 20)
+    private String preferenciaPago;
 }

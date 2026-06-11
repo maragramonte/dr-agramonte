@@ -18,4 +18,8 @@ public class CitaResponse {
     private EstadoCita estado;
     private String centroCodigo;
     private String centroNombre;
+    private String cobertura;
+    private String aseguradora;
+    private String numeroTarjetaSanitaria;
+    private String preferenciaPago;
 }

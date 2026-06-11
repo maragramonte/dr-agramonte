@@ -578,10 +578,19 @@ async function onSubmit(e) {
     if (!state.dateISO) return showToast('Selecciona una fecha', 'error');
     if (!state.hour) return showToast('Selecciona una hora', 'error');
     if (!validarCampos()) return;
+    if ((document.querySelector('input[name="cobertura"]:checked')?.value) === 'seguro' && !$('aseguradora').value) {
+        return showToast('Selecciona tu aseguradora', 'error');
+    }
     const btn = $('btnSubmit');
     btn.disabled = true; btn.classList.add('loading');
     await new Promise((r) => setTimeout(r, 300));
     const modalidad = document.querySelector('input[name="modalidad"]:checked').value;
+    const cobertura = document.querySelector('input[name="cobertura"]:checked')?.value || 'privada';
+    const aseguradora = cobertura === 'seguro' ? ($('aseguradora').value || null) : null;
+    const numeroTarjetaSanitaria = cobertura === 'seguro' ? ($('numTarjeta').value.trim() || null) : null;
+    const preferenciaPago = cobertura === 'privada'
+        ? (document.querySelector('input[name="preferenciaPago"]:checked')?.value || 'en-consulta')
+        : null;
     const cita = {
         id: `CITA-${Date.now().toString(36).toUpperCase()}`,
         centroId: state.centroId,
@@ -592,6 +601,10 @@ async function onSubmit(e) {
         paciente: { nombre: $('nombre').value.trim(), telefono: $('telefono').value.trim(), email: $('email').value.trim() },
         tipo: $('tipoConsulta').value,
         modalidad,
+        cobertura,
+        aseguradora,
+        numeroTarjetaSanitaria,
+        preferenciaPago,
         motivo: $('motivo').value.trim(),
         notas: $('notas').value.trim(),
         estado: 'pendiente',
@@ -605,7 +618,11 @@ async function onSubmit(e) {
                 centroCodigo: state.centroId || null,
                 fechaHora: `${state.dateISO}T${state.hour}:00`,
                 motivo: cita.motivo || null,
-                telefono: cita.paciente.telefono || null
+                telefono: cita.paciente.telefono || null,
+                cobertura,
+                aseguradora,
+                numeroTarjetaSanitaria,
+                preferenciaPago
             });
         } else {
             const pwd = $('passwordInvitado')?.value?.trim();
@@ -616,7 +633,11 @@ async function onSubmit(e) {
                 medicoId: state.medicoId,
                 centroCodigo: state.centroId || null,
                 fechaHora: `${state.dateISO}T${state.hour}:00`,
-                motivo: cita.motivo || null
+                motivo: cita.motivo || null,
+                cobertura,
+                aseguradora,
+                numeroTarjetaSanitaria,
+                preferenciaPago
             };
             if (pwd) body.password = pwd;
             const resp = await apiClient.postReservaPublica(body);
@@ -643,6 +664,20 @@ async function onSubmit(e) {
     }
 }
 
+// Muestra el bloque de aseguradora o el de pago según la cobertura elegida.
+function actualizarCobertura() {
+    const esSeguro = (document.querySelector('input[name="cobertura"]:checked')?.value) === 'seguro';
+    const bloqueSeguro = $('bloqueSeguro');
+    const bloquePrivada = $('bloquePrivada');
+    if (bloqueSeguro) bloqueSeguro.style.display = esSeguro ? 'block' : 'none';
+    if (bloquePrivada) bloquePrivada.style.display = esSeguro ? 'none' : 'block';
+    const nota = $('notaPagoOnline');
+    if (nota) {
+        const pagoOnline = (document.querySelector('input[name="preferenciaPago"]:checked')?.value) === 'online';
+        nota.style.display = (!esSeguro && pagoOnline) ? 'block' : 'none';
+    }
+}
+
 function bindEvents() {
     $('btnPrevMonth').addEventListener('click', () => { state.month--; if (state.month < 0) { state.month = 11; state.year--; } renderCalendar(); });
     $('btnNextMonth').addEventListener('click', () => { state.month++; if (state.month > 11) { state.month = 0; state.year++; } renderCalendar(); });
@@ -653,6 +688,9 @@ function bindEvents() {
         const loaded = await renderSlotsFromBackend();
         if (!loaded) renderSlots();
     }));
+    document.querySelectorAll('input[name="cobertura"], input[name="preferenciaPago"]')
+        .forEach((rad) => rad.addEventListener('change', actualizarCobertura));
+    actualizarCobertura();
     $('medicoSelect').addEventListener('change', async (e) => {
         state.medicoId = e.target.value ? Number(e.target.value) : null;
         state.medicoNombre = e.target.options[e.target.selectedIndex]?.text || null;

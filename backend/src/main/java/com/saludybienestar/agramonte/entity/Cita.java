@@ -51,6 +51,18 @@ public class Cita {
     /** Evita reenviar el recordatorio Twilio 24 h antes. */
     private boolean recordatorioEnviado = false;
 
+    /** Cobertura elegida en la reserva: 'privada' o 'seguro'. */
+    private String cobertura;
+
+    /** Aseguradora si la cobertura es seguro (Sanitas, Adeslas...). Nullable. */
+    private String aseguradora;
+
+    /** Nº de tarjeta sanitaria / póliza si paga por seguro. Nullable. */
+    private String numeroTarjetaSanitaria;
+
+    /** Preferencia de pago si es privada: 'en-consulta' u 'online'. Nullable. */
+    private String preferenciaPago;
+
     // Igualdad por identidad (id): segura para JPA y para usar la entidad en colecciones.
     @Override
     public boolean equals(Object o) {
