@@ -1005,15 +1005,6 @@ a {
         display: none;
     }
 
-    /* CTA compacto (solo icono) para no saturar la barra en móvil */
-    .nav-cta {
-        padding: 0.55rem 0.7rem;
-    }
-
-    .nav-cta-text {
-        display: none;
-    }
-
     .nav-menu {
         display: none;
         position: fixed;
@@ -1037,6 +1028,13 @@ a {
     .nav-link {
         padding: 0.8rem 1rem;
         width: 100%;
+        justify-content: center;
+    }
+
+    /* Centrar todos los ítems del desplegable, incluido el CTA Reservar
+       (el ítem flex es el <li>, no el <a> interior). */
+    .nav-menu .nav-item {
+        display: flex;
         justify-content: center;
     }
 }
