@@ -109,7 +109,7 @@
 \chapter*{Resumen}
 \addcontentsline{toc}{chapter}{Resumen}
 
-\textbf{Dr. Agramonte} es una aplicación web para que pacientes reserven, consulten y cancelen citas médicas sin depender del teléfono del profesional. El sistema integra un frontend estático (HTML, CSS y JavaScript), una API REST con \textbf{Spring Boot 3.5.3}, base de datos \textbf{PostgreSQL}, autenticación \textbf{JWT}, control de concurrencia con \textbf{bloqueo pesimista}, notificaciones \textbf{Twilio} (SMS/WhatsApp) y despliegue reproducible con \textbf{Docker Compose}.
+\textbf{Dr. Agramonte} es una aplicación web para que pacientes reserven, consulten y cancelen citas médicas sin depender del teléfono del profesional. El sistema integra un frontend estático (HTML, CSS y JavaScript), una API REST con \textbf{Spring Boot 3.5.3}, base de datos \textbf{PostgreSQL}, autenticación \textbf{JWT}, control de concurrencia con \textbf{bloqueo pesimista}, notificaciones \textbf{Twilio} (SMS/WhatsApp) y despliegue reproducible con \textbf{Docker Compose}. La aplicación está además \textbf{desplegada en la nube y es accesible públicamente con HTTPS} en \url{https://www.dragramonte.com}.
 
 El proyecto nace de una observación directa del sector sanitario: buena parte de las llamadas que recibe un médico fuera de su horario no son urgencias clínicas, sino gestión de agenda. Digitalizar esa parte administrativa devuelve tiempo al profesional sin sustituir el trato humano donde de verdad hace falta. Sobre esa idea se construye una herramienta pensada para consultas pequeñas y médicos autónomos, que mantienen la titularidad de sus datos en lugar de depender de plataformas de terceros.
 
@@ -118,14 +118,14 @@ La interfaz replica la identidad visual del consultorio: paleta \textbf{teal} (\
 La calidad se respalda con una batería de \textbf{pruebas automatizadas} (unitarias, de seguridad y de integración con Testcontainers) y con análisis de vulnerabilidades \textbf{OWASP dependency-check}. La principal conclusión es que la coherencia entre memoria, código y demostración es tan determinante como la propia funcionalidad: este documento describe la versión \emph{real} del sistema a junio de 2026, distinguiendo lo entregado de lo planificado como evolución.
 
 \vspace{0.5em}
-\noindent\textbf{Palabras clave:} citas médicas, aplicación web, Spring Boot, API REST, PostgreSQL, JWT, concurrencia, Twilio, Docker, PWA, accesibilidad.
+\noindent\textbf{Palabras clave:} citas médicas, aplicación web, Spring Boot, API REST, PostgreSQL, JWT, concurrencia, Twilio, Docker, despliegue en la nube, HTTPS, PWA, accesibilidad.
 
 % ============================================================================
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
 % ============================================================================
 
-\textbf{Dr. Agramonte} is a web application that lets patients book, review and cancel medical appointments without depending on the practitioner's phone line. The system integrates a static frontend (HTML, CSS and JavaScript), a REST API built with \textbf{Spring Boot 3.5.3}, a \textbf{PostgreSQL} database, \textbf{JWT} authentication, concurrency control through \textbf{pessimistic locking}, \textbf{Twilio} notifications (SMS/WhatsApp) and reproducible deployment with \textbf{Docker Compose}.
+\textbf{Dr. Agramonte} is a web application that lets patients book, review and cancel medical appointments without depending on the practitioner's phone line. The system integrates a static frontend (HTML, CSS and JavaScript), a REST API built with \textbf{Spring Boot 3.5.3}, a \textbf{PostgreSQL} database, \textbf{JWT} authentication, concurrency control through \textbf{pessimistic locking}, \textbf{Twilio} notifications (SMS/WhatsApp) and reproducible deployment with \textbf{Docker Compose}. The application is also \textbf{deployed to the cloud and publicly accessible over HTTPS} at \url{https://www.dragramonte.com}.
 
 The project stems from direct observation of the healthcare sector: many of the calls a doctor receives outside working hours are not clinical emergencies but scheduling tasks. Digitising that administrative layer gives time back to the professional without replacing human contact where it is truly needed. On this premise, the tool is designed for small practices and self-employed doctors, who retain ownership of their data instead of relying on third-party platforms.
 
@@ -134,7 +134,7 @@ The interface mirrors the practice's visual identity: a \textbf{teal} palette (\
 Quality is backed by a suite of \textbf{automated tests} (unit, security and Testcontainers-based integration) and \textbf{OWASP dependency-check} vulnerability analysis. The main conclusion is that consistency between report, code and demonstration is as decisive as functionality itself: this document describes the \emph{real} state of the system as of June 2026, distinguishing what has been delivered from what is planned as future work.
 
 \vspace{0.5em}
-\noindent\textbf{Keywords:} medical appointments, web application, Spring Boot, REST API, PostgreSQL, JWT, concurrency, Twilio, Docker, PWA, accessibility.
+\noindent\textbf{Keywords:} medical appointments, web application, Spring Boot, REST API, PostgreSQL, JWT, concurrency, Twilio, Docker, cloud deployment, HTTPS, PWA, accessibility.
 
 \clearpage
 \tableofcontents
