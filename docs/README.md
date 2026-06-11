@@ -16,7 +16,6 @@ Este directorio concentra la **memoria del TFG**, los **diagramas LaTeX** y guí
 | [DEFENSA-ENSAYO.md](DEFENSA-ENSAYO.md) | Guion hablado de la defensa (15 min) + banco de preguntas |
 | [BASE-DE-DATOS.md](BASE-DE-DATOS.md) | **Referencia de BD para la defensa**: esquema (V1–V8), diagrama relacional (Mermaid), integridad referencial, concurrencia y Q&A |
 | [Defensa-TFG-PowerPoint-Guion.md](Defensa-TFG-PowerPoint-Guion.md) | Contenido **diapositiva a diapositiva** para el PowerPoint |
-| [DATOS-DR-AGRAMONTE.md](DATOS-DR-AGRAMONTE.md) | Inventario de datos reales del doctor (placeholders a sustituir) |
 | [DOCKER-TROUBLESHOOTING.md](DOCKER-TROUBLESHOOTING.md) | Arranque Docker, 502, healthchecks |
 | [Memoria-TFG-Dr-Agramonte.tex](Memoria-TFG-Dr-Agramonte.tex) | Memoria en LaTeX (alineada con el código real, junio 2026) |
 | [INSTRUCCIONES-MEMORIA-LATEX.md](INSTRUCCIONES-MEMORIA-LATEX.md) | Cómo compilar el PDF (`pdflatex`) |
