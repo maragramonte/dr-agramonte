@@ -583,7 +583,6 @@ a {
     display: inline-flex;
     align-items: center;
     gap: 2px;
-    margin-right: 0.4rem;
     border: 1px solid var(--border);
     border-radius: var(--radius-full);
     padding: 2px;
@@ -754,7 +753,6 @@ a {
     padding: 0.75rem var(--space-3);
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: var(--space-3);
 }
 
@@ -789,11 +787,19 @@ a {
     color: var(--heading);
     font-weight: 500;
     line-height: 1.2;
+    white-space: nowrap;
 }
 
 .logo-text p {
     font-size: 0.7rem;
     color: var(--text-light);
+}
+
+/* Zona central: navegación. Crece para centrarse entre logo y utilidades. */
+.main-nav {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: center;
 }
 
 .nav-menu {
@@ -810,6 +816,7 @@ a {
     color: var(--text-light);
     font-weight: 500;
     font-size: 0.9rem;
+    white-space: nowrap;
     border-radius: var(--radius-full);
     transition: var(--transition-fast);
 }
@@ -837,12 +844,45 @@ a {
     border-radius: 1px;
 }
 
-/* Tema claro / oscuro */
-.header-end {
+/* Zona derecha: utilidades (idioma/tema) + CTA, separadas del menú por un divisor */
+.header-actions {
     display: flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.5rem;
+    flex-shrink: 0;
 }
+
+.header-actions::before {
+    content: '';
+    width: 1px;
+    height: 26px;
+    background: var(--border);
+    margin-right: 0.15rem;
+}
+
+/* CTA "Reservar cita": acción principal como botón sólido, no como enlace */
+.nav-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 1.15rem;
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-light) 100%);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.88rem;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-fast);
+    white-space: nowrap;
+}
+
+.nav-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+    color: #fff;
+}
+
+/* Tema claro / oscuro */
 
 .theme-toggle {
     flex-shrink: 0;
@@ -933,16 +973,55 @@ a {
 
 @media (max-width: 992px) {
     .nav-toggle {
-        display: block;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* El menú deja de crecer; las utilidades se pegan a la derecha */
+    .main-nav {
+        flex: 0 0 auto;
+    }
+
+    /* Gap y padding más ajustados en móvil para que quepan
+       logo + utilidades + hamburguesa sin que nada se salga. */
+    .header-content {
+        gap: 0.5rem;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+
+    .logo-section,
+    .logo-link {
+        gap: 0.5rem;
+    }
+
+    .header-actions {
+        margin-left: auto;
+        gap: 0.35rem;
+    }
+
+    .header-actions::before {
+        display: none;
+    }
+
+    /* CTA compacto (solo icono) para no saturar la barra en móvil */
+    .nav-cta {
+        padding: 0.55rem 0.7rem;
+    }
+
+    .nav-cta-text {
+        display: none;
     }
 
     .nav-menu {
         display: none;
         position: fixed;
-        top: 70px;
+        top: 66px;
         left: 0;
         right: 0;
         flex-direction: column;
+        gap: 0.25rem;
         background: var(--card);
         padding: var(--space-3);
         box-shadow: var(--shadow-lg);
@@ -959,6 +1038,43 @@ a {
         padding: 0.8rem 1rem;
         width: 100%;
         justify-content: center;
+    }
+}
+
+/* En pantallas estrechas el subtítulo del logo (el texto más ancho) se oculta
+   para liberar espacio horizontal en la barra. */
+@media (max-width: 600px) {
+    .logo-text p {
+        display: none;
+    }
+
+    /* En móvil el selector de idioma se oculta para que la barra respire
+       (la i18n se gestiona desde index; se recupera al ampliar pantalla). */
+    .lang-switch {
+        display: none;
+    }
+}
+
+/* Móviles muy estrechos: encoge logo e iconos para que nada se recorte. */
+@media (max-width: 380px) {
+    .header-content {
+        padding-left: 0.6rem;
+        padding-right: 0.6rem;
+    }
+
+    .logo-icon {
+        width: 38px;
+        height: 38px;
+        font-size: 1.1rem;
+    }
+
+    .logo-text h1 {
+        font-size: 1.05rem;
+    }
+
+    .theme-toggle {
+        width: 38px;
+        height: 38px;
     }
 }
 

@@ -79,29 +79,26 @@
                     </div>
                 </a>
             </div>
-            <div class="header-end">
-                <div class="lang-switch" role="group" aria-label="Idioma" data-i18n-attr="aria-label:lang.aria">
+            <nav class="main-nav" aria-label="Navegación principal">
+                <ul class="nav-menu" id="nav-menu">
+                    <li class="nav-item"><a href="index.html" class="nav-link active" aria-current="page" data-i18n="nav.inicio">Inicio</a></li>
+                    <li class="nav-item"><a href="sobre-mi.html" class="nav-link" data-i18n="nav.sobre">Sobre el Dr.</a></li>
+                    <li class="nav-item"><a href="servicios.html" class="nav-link" data-i18n="nav.servicios">Servicios</a></li>
+                    <li class="nav-item"><a href="testimonios.html" class="nav-link" data-i18n="nav.testimonios">Testimonios</a></li>
+                    <li class="nav-item"><a href="contacto.html" class="nav-link" data-i18n="nav.contacto">Contacto</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <div class="lang-switch" role="group" aria-label="Idioma">
                     <button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" aria-pressed="true">ES</button>
                     <button type="button" class="lang-btn" data-lang-btn="ca" aria-pressed="false">CA</button>
                 </div>
                 <button type="button" class="theme-toggle" id="themeToggle" aria-label="Activar modo oscuro" title="Cambiar tema claro / oscuro" aria-pressed="false">
                     <i class="fas fa-moon" id="themeToggleIcon" aria-hidden="true"></i>
                 </button>
-            <nav class="main-nav" aria-label="Navegación principal">
-                <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Menú de navegación">
-                    <span class="nav-toggle-icon" aria-hidden="true"></span>
-                </button>
-                <ul class="nav-menu" id="nav-menu">
-                    <li class="nav-item"><a href="index.html" class="nav-link active" aria-current="page" data-i18n="nav.inicio">Inicio</a></li>
-                    <li class="nav-item"><a href="sobre-mi.html" class="nav-link" data-i18n="nav.sobre">El Dr. Agramonte</a></li>
-                    <li class="nav-item"><a href="servicios.html" class="nav-link" data-i18n="nav.servicios">Servicios</a></li>
-                    <li class="nav-item"><a href="testimonios.html" class="nav-link" data-i18n="nav.testimonios">Testimonios</a></li>
-                    <li class="nav-item"><a href="contacto.html" class="nav-link" data-i18n="nav.contacto">Contacto</a></li>
-                    <li class="nav-item"><a href="reservar.html" class="nav-link nav-link--reserva"><i class="fas fa-calendar-plus" aria-hidden="true"></i> <span data-i18n="nav.reservar">Reservar cita</span></a></li>
-                </ul>
-            </nav>
+                <a href="reservar.html" class="nav-cta" aria-label="Reservar cita"><i class="fas fa-calendar-plus" aria-hidden="true"></i><span class="nav-cta-text" data-i18n="nav.reservar">Reservar cita</span></a>
+                <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Menú de navegación"><span class="nav-toggle-icon" aria-hidden="true"></span></button>
             </div>
-
         </div>
     </div>
 </header>
