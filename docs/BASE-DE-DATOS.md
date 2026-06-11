@@ -80,7 +80,7 @@ erDiagram
     }
 ```
 
-> En GitHub este bloque se dibuja solo. Para el PowerPoint: ábrelo en GitHub o en <https://mermaid.live>, y haz captura. El mismo modelo está, en versión TikZ, en la memoria (figura «Modelo entidad-relación», `docs/tikz-diagrama-er.tex`).
+> En GitHub este bloque se dibuja solo. Para el PowerPoint tienes el diagrama **ya exportado**: [`diagrama-er.svg`](diagrama-er.svg) (vectorial, escala sin pixelarse) y [`diagrama-er.png`](diagrama-er.png) (alta resolución) — incrústalos directamente sin depender del render de GitHub. El mismo modelo está, en versión TikZ, en la memoria (figura «Modelo entidad-relación», `docs/tikz-diagrama-er.tex`).
 
 ---
 
