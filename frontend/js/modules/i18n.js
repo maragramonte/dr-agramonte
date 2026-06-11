@@ -19,7 +19,7 @@
     const CA = {
         // ---- Cabecera / navegación (compartido) ----
         'nav.inicio': 'Inici',
-        'nav.sobre': 'Sobre el Dr.',
+        'nav.sobre': 'El Dr.',
         'nav.servicios': 'Serveis',
         'nav.testimonios': 'Testimonis',
         'nav.contacto': 'Contacte',

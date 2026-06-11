@@ -750,7 +750,7 @@ a {
 .header-content {
     max-width: var(--maxw);
     margin: 0 auto;
-    padding: 0.75rem var(--space-3);
+    padding: 1.1rem var(--space-3);
     display: flex;
     align-items: center;
     gap: var(--space-3);
@@ -764,8 +764,8 @@ a {
 }
 
 .logo-icon {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
     background: linear-gradient(135deg, var(--teal) 0%, var(--teal-light) 100%);
     border-radius: var(--radius);
     display: flex;
@@ -783,7 +783,7 @@ a {
 
 .logo-text h1 {
     font-family: var(--font-display);
-    font-size: 1.15rem;
+    font-size: 1.25rem;
     color: var(--heading);
     font-weight: 500;
     line-height: 1.2;
@@ -1017,7 +1017,7 @@ a {
     .nav-menu {
         display: none;
         position: fixed;
-        top: 66px;
+        top: 80px;
         left: 0;
         right: 0;
         flex-direction: column;
