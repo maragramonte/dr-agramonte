@@ -114,7 +114,9 @@ public class SecurityConfig {
                 "http://localhost:3456",
                 "http://127.0.0.1:5500",
                 "http://127.0.0.1:3456",
-                "https://dragramonte.com"
+                "https://www.dragramonte.com",
+                "https://dragramonte.com",
+                "https://dr-agramonte-production.up.railway.app"
         ));
 
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
