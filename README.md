@@ -490,6 +490,7 @@ Mientras arranca: explicar capas (nginx → Spring → PostgreSQL).
 | **Postman (colección API)** | `postman/README.md` |
 | **Docker / 502 al arrancar** | `docs/DOCKER-TROUBLESHOOTING.md` |
 | **Memoria PDF (LaTeX)** | `docs/Memoria-TFG-Dr-Agramonte.tex` |
+| **Base de datos (esquema, diagrama, Q&A defensa)** | `docs/BASE-DE-DATOS.md` |
 | **Compilar memoria** | `docs/INSTRUCCIONES-MEMORIA-LATEX.md` |
 | **Integraciones (Twilio, sin secretos)** | `frontend/js/modules/API.md` |
 | **Guion de defensa (15 min cronometrado + preguntas)** | `docs/DEFENSA-ENSAYO.md` |
