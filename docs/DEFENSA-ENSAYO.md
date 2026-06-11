@@ -82,7 +82,7 @@ La idea no es inventada: nace de un problema real que he observado de cerca, dur
   **nginx** (sirve la web y hace de proxy inverso de `/api`) → **Spring Boot** (API, seguridad, negocio) → **PostgreSQL** (datos transaccionales). Twilio es un servicio externo para SMS/WhatsApp.
 - **Backend: Java 21 + Spring Boot 3.5.3**, patrón clásico *controller → service → repository*, con **DTOs**: nunca expongo entidades JPA al exterior (desacopla la API del modelo y no filtra campos internos).
 - **Frontend: HTML, CSS y JavaScript nativo, sin framework.** Fue una decisión consciente: la app no tiene un estado global tan complejo como para justificar React; evitarlo reduce dependencias, acelera la carga y mantiene el código legible.
-- **Persistencia versionada con Flyway** (migraciones V1–V6): cualquier entorno —el mío o el del tribunal— se reconstruye **idéntico** al arrancar.
+- **Persistencia versionada con Flyway** (migraciones V1–V8): cualquier entorno —el mío o el del tribunal— se reconstruye **idéntico** al arrancar.
 - **Docker Compose** levanta todo con un único comando → se acabó el «en mi máquina funciona».
 
 > «Saber **cuándo no** añadir una tecnología, como React, es tan importante como saber usarla.»
@@ -179,7 +179,7 @@ Gracias por vuestra atención; quedo a vuestra disposición para las preguntas.�
 
 ### Acceso a datos / base de datos
 - **¿Por qué relacional y no MongoDB?** → Los datos son fuertemente relacionales (usuario–médico–horario–centro–cita) y la invariante crítica (no doble reserva) exige transacciones y bloqueo de fila, donde el relacional es más fuerte. MongoDB lo reservo para el historial clínico (documentos flexibles): una persistencia políglota futura.
-- **¿Qué es Flyway?** → Versiona el esquema en migraciones numeradas (V1–V6); cualquier entorno se reconstruye igual al arrancar.
+- **¿Qué es Flyway?** → Versiona el esquema en migraciones numeradas (V1–V8); cualquier entorno se reconstruye igual al arrancar.
 - **¿Cómo evitas perder trazabilidad al cancelar?** → No borro la fila; cambio el `estado` (enumerado `EstadoCita`).
 
 ### Seguridad / RGPD
@@ -204,7 +204,7 @@ Gracias por vuestra atención; quedo a vuestra disposición para las preguntas.�
 - **¿Lo has medido?** → No con instrumentos; es una justificación cualitativa por arquitectura. Medir la huella sería el siguiente paso.
 
 ### Pruebas / calidad
-- **¿Qué pruebas tienes?** → 24 tests en 3 niveles: unitarias (`CitaServiceTest`, `JwtProviderTest`, `DatabaseUrlEnvironmentPostProcessorTest`), de seguridad/RBAC (`CitaControllerWebMvcTest`) e integración end-to-end con **Testcontainers + PostgreSQL real** (`ReservaPublicaIntegrationTest`).
+- **¿Qué pruebas tienes?** → 25 tests en 3 niveles: unitarias (`CitaServiceTest`, `JwtProviderTest`, `DatabaseUrlEnvironmentPostProcessorTest`), de seguridad/RBAC (`CitaControllerWebMvcTest`, `GlobalExceptionHandlerTest`) e integración end-to-end con **Testcontainers + PostgreSQL real** (`ReservaPublicaIntegrationTest`).
 - **¿Cobertura?** → No la mido con JaCoCo todavía; cubro las ramas críticas (409 doble reserva, 403 por rol, JWT, cancelación). Añadir JaCoCo es una mejora pendiente.
 - **¿Pruebas E2E?** → No automatizadas aún (Playwright es línea futura); las hago manualmente.
 

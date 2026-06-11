@@ -71,7 +71,7 @@
 
 **En pantalla:**
 - Entidades en español: `usuarios`, `medicos`, `horarios`, `citas`, `notificaciones`, `centros`
-- Migraciones **Flyway versionadas (V1–V7)**, perfiles `postgres` / `mysql`
+- Migraciones **Flyway versionadas (V1–V8)**, perfiles `postgres` / `mysql`
 - Multi-centro: la cita **hereda** el centro de su horario
 - Esquema validado en arranque (`ddl-auto: validate`)
 
@@ -101,6 +101,7 @@
 - Reserva **como invitado** (sin registro) o con cuenta
 - Selección de **centro → fecha → hora** con disponibilidad real por centro
 - Modalidad **presencial / videoconsulta**
+- **Cobertura**: privada (precio **80 €** visible) o **seguro médico** (aseguradora + nº de tarjeta), con preferencia de pago (en consulta / online)
 - Confirmación + email con los datos del centro elegido
 
 **Visual:** captura del `reservar.html` (stepper Centro/Fecha/Hora/Datos).
@@ -154,7 +155,7 @@
 ## Diapositiva 11 — Calidad y verificación
 
 **En pantalla:**
-- **24 pruebas** automatizadas (unitarias, WebMvc e integración) — verificadas en verde
+- **25 pruebas** automatizadas (unitarias, WebMvc e integración) — verificadas en verde
 - **Testcontainers** (PostgreSQL real en contenedor) para la prueba de integración
 - **OWASP Dependency-Check** (análisis de vulnerabilidades de dependencias)
 - Migraciones probadas: la suite de integración levanta la BD y corre Flyway
@@ -199,7 +200,7 @@
 - Notificaciones por SMS/WhatsApp (**Twilio**) y asistente IA: **aplazados** (líneas futuras, no implementados en producción)
 - Persistencia políglota (NoSQL para historial clínico)
 - Auditoría formal de accesibilidad (Lighthouse/axe) y de huella energética
-- Pasarela de pago para videoconsulta
+- **Cobro online** (Stripe, captura manual: "si no acude, no se cobra") — la cobertura, el precio y la preferencia de pago **ya se muestran y se registran**; falta solo la pasarela
 
 **Visual:** roadmap sencillo (hecho ✓ / futuro ○).
 
@@ -245,11 +246,11 @@
 
 ### Prioridad alta — coherencia memoria ↔ código ↔ demo (la regla de oro)
 - ✅ **Resuelto (junio 2026):** la memoria LaTeX se alineó con el código — los centros pasan a **Palma de Mallorca (General Riera y Avenidas)** y el recuento de migraciones a **V1–V7**; PDF recompilado sin errores.
-- ✅ **Suite de tests verificada:** **24/24 en verde** (`mvn test`, incluida la de integración con Testcontainers). Lleva la captura del verde a la diapositiva 11.
+- ✅ **Suite de tests verificada:** **25/25 en verde** (`mvn test`, incluida la de integración con Testcontainers). Lleva la captura del verde a la diapositiva 11.
 
 ### Prioridad media — credibilidad del producto
 4. **Datos reales del doctor:** siguen como *placeholder* el **colegiado N.º 12345** y los **teléfonos**. En una web de salud real conviene sustituirlos por los reales (o neutralizarlos) antes de enseñarla. *(Necesito que me pases los datos.)*
-5. **Redirección 301** de `dragramonte.com` (sin www) → `https://www.dragramonte.com` en **Ionos** (3er crítico del informe SEO). Es configuración del panel de Ionos.
+5. **Dominio canónico = `www`** (decisión, no pendiente): la web vive en `https://www.dragramonte.com` (CNAME → Railway, cert válido). El apex `dragramonte.com` sin `www` no redirige: el reenvío de Ionos sobrescribía el registro de `www` y tiraba la web, así que se optó por dejar solo `www` (todo el contenido ya canonicaliza ahí). Redirección apex→www "bien hecha" = línea futura (p. ej. apex como 2º dominio en Railway).
 
 ### Prioridad baja — limpieza (no afecta a la demo)
 6. **Infra Railway:** queda un **TCP Proxy sobrante** en el servicio web y un **servicio MySQL sin usar** en el proyecto; se pueden eliminar desde el panel para dejarlo limpio.

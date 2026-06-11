@@ -362,7 +362,7 @@ Cada pieza del stack se eligió por una razón concreta, no por moda:
 \begin{itemize}
   \item \textbf{Java + Spring Boot.} El tipado fuerte de Java detecta en tiempo de compilación errores que en un lenguaje dinámico aparecerían en producción, algo especialmente valioso cuando se manejan datos de salud. Spring Boot aporta, además, un ecosistema maduro: Spring Security como estándar de facto para autenticación y autorización, Spring Data JPA para el acceso a datos y transacciones ACID que garantizan que una reserva se complete entera o no se complete en absoluto.
   \item \textbf{PostgreSQL.} Para datos críticos (usuarios, médicos, horarios y citas) hace falta integridad referencial real, transacciones fiables y bloqueo a nivel de fila. PostgreSQL ofrece las tres cosas y permite implementar el control de concurrencia con \texttt{SELECT \ldots FOR UPDATE}, núcleo de la garantía de ``no doble reserva''.
-  \item \textbf{Flyway.} Versiona el esquema en migraciones numeradas (V1 a V7), de modo que cualquier entorno —el de desarrollo, el del tribunal o uno futuro en producción— se reconstruye exactamente igual al arrancar.
+  \item \textbf{Flyway.} Versiona el esquema en migraciones numeradas (V1 a V8), de modo que cualquier entorno —el de desarrollo, el del tribunal o uno futuro en producción— se reconstruye exactamente igual al arrancar.
   \item \textbf{Twilio.} En lugar de montar infraestructura propia de mensajería, se delega el envío de SMS y WhatsApp en un proveedor consolidado, invocado directamente desde el backend Java.
   \item \textbf{Docker Compose.} Levanta todo el sistema con un único comando, eliminando el clásico ``en mi máquina funciona''.
 \end{itemize}
@@ -434,6 +434,8 @@ No todos los pacientes quieren —o saben— crearse una cuenta antes de pedir c
 En la reserva de invitado, el backend crea o reutiliza una cuenta de paciente marcada como \texttt{cuenta\_invitada} (introducida en la migración Flyway V4); la contraseña es opcional, de modo que el invitado puede ``ascender'' más adelante a cuenta completa sin perder su historial de citas. Si el email ya pertenece a una cuenta con contraseña, el sistema responde con \textbf{HTTP 409} invitando a iniciar sesión, evitando que un tercero reserve en nombre de un usuario registrado. El invitado consulta y cancela sus citas mediante su email (\texttt{GET /api/citas/por-email} y \texttt{DELETE /api/citas/publica/\{id\}}).
 
 Es importante presentarlo con honestidad: este mecanismo es \textbf{adecuado para un prototipo de TFG}, pero en producción la consulta y cancelación por email deberían reforzarse con un enlace firmado, un código de un solo uso (OTP) o login obligatorio, para impedir que alguien acceda a las citas de otra persona conociendo solo su dirección de correo. Reconocer esa limitación forma parte del rigor del proyecto.
+
+\paragraph{Cobertura y preferencia de pago.} A raíz del \emph{feedback} de los primeros usuarios de prueba —que echaban en falta saber el precio y los seguros aceptados antes de confirmar— el formulario de reserva captura también la \textbf{cobertura}: consulta privada, con su precio visible (80 euros), o seguro médico, con la aseguradora y el número de tarjeta sanitaria. En el caso privado se recoge además la \textbf{preferencia de pago} (en consulta u online). Estos datos se persisten en la cita mediante la migración Flyway \textbf{V8} (\texttt{cobertura}, \texttt{aseguradora}, \texttt{numero\_tarjeta\_sanitaria}, \texttt{preferencia\_pago}) y se devuelven al profesional al gestionar la agenda. El \emph{cobro} en sí no se procesa todavía: la pasarela de pago en línea se documenta como línea futura.
 
 \subsection{API principal}
 
@@ -679,7 +681,7 @@ Se ha entregado una aplicación funcional y desplegable que responde al problema
 \textbf{Cumplimiento de los objetivos.} Retomando los ocho objetivos específicos planteados al inicio, el balance es el siguiente:
 
 \begin{enumerate}
-  \item \emph{Modelo de datos en PostgreSQL con Flyway.} \textbf{Cumplido:} seis tablas, migraciones V1--V7 y perfiles \texttt{postgres}/\texttt{mysql}.
+  \item \emph{Modelo de datos en PostgreSQL con Flyway.} \textbf{Cumplido:} seis tablas, migraciones V1--V8 y perfiles \texttt{postgres}/\texttt{mysql}.
   \item \emph{API REST con Spring Boot, JWT y roles.} \textbf{Cumplido:} controladores por recurso, autenticación JWT y autorización por rol en \texttt{SecurityConfig}.
   \item \emph{Integridad de reservas con \texttt{SELECT FOR UPDATE}.} \textbf{Cumplido y verificado:} la prueba de integración confirma que, ante dos transacciones simultáneas en hilos distintos sobre la misma franja, exactamente una reserva prospera (201) y la otra recibe 409.
   \item \emph{Frontend responsive, PWA y reserva accesible.} \textbf{Cumplido:} reserva por pasos, modo oscuro, selección de centro y service worker.
@@ -699,6 +701,7 @@ Se ha entregado una aplicación funcional y desplegable que responde al problema
   \item \textbf{Historial de cambios de la cita:} que el paciente vea reprogramaciones y cancelaciones.
   \item \textbf{Página de ayuda / preguntas frecuentes:} apoyo específico para pacientes mayores o poco digitales.
   \item \textbf{Calidad:} informe de cobertura con JaCoCo, pruebas E2E (Playwright) y auditoría de accesibilidad documentada.
+  \item \textbf{Cobro en línea:} integración de una pasarela de pago (por ejemplo Stripe con \emph{captura manual}: se autoriza el importe al reservar y solo se cobra si la consulta se realiza, de modo que una ausencia no genera cargo), partiendo de la cobertura y la preferencia de pago que ya se capturan en la reserva.
   \item \textbf{Seguridad y escalado:} \emph{refresh token}, despliegue en la nube bajo el dominio ya registrado \texttt{dragramonte.com} con certificado HTTPS, y réplicas de base de datos.
   \item \textbf{Historial clínico:} API y panel clínico reales, con almacenamiento documental flexible por especialidad (p.\ ej.\ MongoDB), avanzando hacia una persistencia políglota.
 \end{itemize}
