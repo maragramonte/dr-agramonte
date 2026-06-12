@@ -37,8 +37,5 @@ Thumbs.db
 desktop.ini
 *.dia~
 
-# Carpeta de descartes (revisar y borrar a mano)
-/_a-eliminar/
-
 # Copia local de docs retirados del repo (datos personales / notas internas)
 /_private/
