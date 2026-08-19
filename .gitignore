@@ -31,6 +31,9 @@ Thumbs.db
 # Cursor local artifacts
 .cursor/
 
+# Config local de servidores MCP (apunta a puertos de la maquina, no es del proyecto)
+.mcp.json
+
 # OS / editor extra
 *.swp
 *~
