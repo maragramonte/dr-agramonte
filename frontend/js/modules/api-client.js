@@ -122,6 +122,28 @@ class ApiClient {
     }
 
     /**
+     * Estado del canal Telegram del usuario en sesión.
+     * GET /api/telegram/vinculacion → { vinculado, vinculacionPendiente, canalActivo }.
+     */
+    getEstadoTelegram() {
+        return this.get('/telegram/vinculacion');
+    }
+
+    /**
+     * Genera el código con el que vincular el chat de Telegram del usuario en sesión.
+     * POST /api/telegram/vinculacion — requiere JWT (el backend lo emite para el usuario del token).
+     * Devuelve { token, enlace, expiraEn, yaVinculado }.
+     */
+    crearVinculacionTelegram() {
+        return this.post('/telegram/vinculacion', {});
+    }
+
+    /** Deja de recibir avisos por Telegram: DELETE /api/telegram/vinculacion (204). */
+    eliminarVinculacionTelegram() {
+        return this.delete('/telegram/vinculacion');
+    }
+
+    /**
      * Cuadro de mando de gestión (módulo SGE). Requiere JWT con rol MEDICO/ADMIN.
      * GET /api/estadisticas
      */

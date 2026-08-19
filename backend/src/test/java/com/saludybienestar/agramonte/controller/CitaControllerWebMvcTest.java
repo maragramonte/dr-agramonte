@@ -133,18 +133,40 @@ class CitaControllerWebMvcTest {
         verify(citaService, never()).cancelarCita(anyLong(), anyLong());
     }
 
-    // ── Rutas públicas (demo TFG) ───────────────────────────────────────────
+    @Test
+    @DisplayName("GET /api/citas/agenda/pacientes sin autenticación queda bloqueado: expone datos personales")
+    void agendaPacientes_anonimo_bloqueado() throws Exception {
+        mockMvc.perform(get("/api/citas/agenda/pacientes").param("medicoId", "1"))
+                .andExpect(status().is4xxClientError());
+
+        verify(citaService, never()).listarPacientesAgenda(anyLong());
+    }
 
     @Test
-    @DisplayName("GET /api/citas/agenda/pacientes es público (200) aun sin autenticación")
-    void agendaPacientes_anonimo_permitido() throws Exception {
+    @DisplayName("GET /api/citas/agenda/pacientes con rol MEDICO devuelve la agenda (200)")
+    void agendaPacientes_comoMedico_permitido() throws Exception {
         when(citaService.listarPacientesAgenda(1L)).thenReturn(List.of());
 
-        mockMvc.perform(get("/api/citas/agenda/pacientes").param("medicoId", "1"))
+        mockMvc.perform(get("/api/citas/agenda/pacientes")
+                        .param("medicoId", "1")
+                        .with(user(userDetails(7L, Rol.MEDICO))))
                 .andExpect(status().isOk());
 
         verify(citaService).listarPacientesAgenda(1L);
     }
+
+    @Test
+    @DisplayName("GET /api/citas/agenda/reservas con rol PACIENTE se rechaza (403)")
+    void agendaReservas_comoPaciente_prohibido() throws Exception {
+        mockMvc.perform(get("/api/citas/agenda/reservas")
+                        .param("medicoId", "1")
+                        .with(user(userDetails(10L, Rol.PACIENTE))))
+                .andExpect(status().isForbidden());
+
+        verify(citaService, never()).listarReservasPrueba(anyLong(), any());
+    }
+
+    // ── Rutas públicas (reserva sin cuenta) ─────────────────────────────────
 
     @Test
     @DisplayName("POST /api/citas/reserva-publica es público y crea la cita (201)")

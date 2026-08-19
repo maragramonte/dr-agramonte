@@ -131,9 +131,9 @@ Cronología de evolución del repositorio (orden lógico de trabajo).
 | Servidor estático | nginx (contenedor Docker) |
 | Backend | Java 21, Spring Boot 3.5.3, Spring Security, JPA |
 | BD | PostgreSQL 15 (perfil por defecto), MySQL 8 opcional |
-| Migraciones | Flyway V1–V4 (esquema, recordatorio, horarios + médico, `cuenta_invitada`) |
+| Migraciones | Flyway V1–V10 (esquema, recordatorio, horarios + médico, `cuenta_invitada`, centros, cobertura, Telegram) |
 | Auth | JWT en cabecera `Authorization: Bearer` |
-| Notificaciones | Twilio (SMS/WhatsApp), activable por `.env` |
+| Notificaciones | Twilio (SMS/WhatsApp) y Telegram (bot), activables por `.env` |
 | Despliegue | Docker Compose |
 
 ### API principal
@@ -148,11 +148,15 @@ Cronología de evolución del repositorio (orden lógico de trabajo).
 | POST | `/api/citas/reserva-publica` | Reserva sin login (cuenta invitado + cita en BD) |
 | GET | `/api/citas/por-email?email=` | Citas del paciente (invitado, prototipo TFG) |
 | DELETE | `/api/citas/publica/{id}?email=` | Cancelar cita invitado por email |
-| GET | `/api/citas/agenda/pacientes?medicoId=1` | Pacientes con citas (vista médico) |
-| GET | `/api/citas/agenda/reservas?medicoId=1` | Historial de reservas (panel de pruebas TFG) |
+| GET | `/api/citas/agenda/pacientes?medicoId=1` | Pacientes con citas (**rol MEDICO/ADMIN**) |
+| GET | `/api/citas/agenda/reservas?medicoId=1` | Historial de reservas (**rol MEDICO/ADMIN**) |
 | GET | `/api/citas/mias` | Citas del paciente |
 | DELETE | `/api/citas/{id}` | Cancelar |
 | POST | `/api/contact` | Formulario contacto |
+| GET | `/api/telegram/vinculacion` | Estado del canal Telegram (autenticado) |
+| POST | `/api/telegram/vinculacion` | Genera el enlace/token de vinculación (autenticado) |
+| DELETE | `/api/telegram/vinculacion` | Deja de recibir avisos por Telegram (autenticado) |
+| POST | `/api/telegram/webhook` | Lo llama Telegram; valida el secreto de `setWebhook` |
 
 ### Páginas frontend
 
@@ -165,7 +169,7 @@ Cronología de evolución del repositorio (orden lógico de trabajo).
 | `sobre-mi.html`, `testimonios.html` | Contenido informativo |
 | `privacidad.html` | RGPD |
 | `offline.html` | PWA sin conexión |
-| `panel-pruebas.html` | **TFG:** reservas de prueba + vista médico (agenda pacientes) |
+| `panel-pruebas.html` | **TFG:** reservas de prueba + vista médico (requiere sesión con rol MEDICO/ADMIN) |
 
 ### JavaScript clave
 
@@ -174,7 +178,7 @@ Cronología de evolución del repositorio (orden lógico de trabajo).
 | `js/modules/api-config.js` | URL base del API (`/api` en Docker) |
 | `js/modules/api-client.js` | Cliente REST + JWT |
 | `js/modules/auth-ui.js` | Login/registro en menú |
-| `js/pages/reserva.js` | Reserva, `syncMisCitas()`, lista «Mis citas» |
+| `js/pages/reserva.js` | Reserva, `syncMisCitas()`, lista «Mis citas», vinculación con Telegram |
 | `js/pages/panel-pruebas.js` | Panel TFG: tabla reservas + vista médico |
 | `js/pages/dr-agramonte.js` | Navegación, PWA, tema, utilidades |
 | `js/pages/contacto.js` | Formulario contacto |
@@ -281,13 +285,13 @@ Consecuencias antiguas: citas que aparecían en «Mis citas» pero no en el pane
 | GET | `/api/citas/por-email` | Invitado (email) | — | Sí |
 | DELETE | `/api/citas/{id}` | Paciente JWT | Sí | Sí |
 | DELETE | `/api/citas/publica/{id}?email=` | Invitado | Sí | Sí |
-| GET | `/api/citas/agenda/reservas` | Público demo TFG | Sí | — |
+| GET | `/api/citas/agenda/reservas` | Médico/Admin JWT | Sí | — |
 
 ### Limitaciones (decirlas en la defensa)
 
 - **`por-email` y cancelación pública** son aceptables en un **prototipo TFG**; en producción harían falta enlace firmado, OTP o login obligatorio.  
 - «Mis citas» en otro navegador u otro PC solo se ven si usas el **mismo email** (el API filtra por email) o inicias sesión.  
-- El panel lista **todas** las reservas del médico (demo); no es el panel clínico final con rol `MEDICO` en todas las rutas.
+- El panel lista **todas** las reservas del médico; ya exige rol `MEDICO`/`ADMIN`, pero sigue siendo una vista de demo, no el panel clínico final.
 
 **Más detalle operativo:** [docs/SINCRONIZACION-CITAS.md](docs/SINCRONIZACION-CITAS.md)
 
@@ -366,9 +370,31 @@ Copia `.env.example` → `.env`:
 | `TWILIO_CHANNEL` | `whatsapp` o `sms` |
 | `TWILIO_NOTIFY_PATIENTS` | Avisos al paciente |
 | `TWILIO_REMINDER_HOURS` | Horas antes del recordatorio (24) |
+| `TELEGRAM_ENABLED` | `true` para enviar avisos por Telegram |
+| `TELEGRAM_BOT_TOKEN` | Token del bot (@BotFather) |
+| `TELEGRAM_BOT_USERNAME` | Usuario del bot sin `@`, para el enlace de vinculación |
+| `TELEGRAM_WEBHOOK_SECRET` | Secreto que valida las llamadas al webhook |
 | `MAIL_*` / `CONTACT_INBOX` | Email formulario contacto (opcional) |
 
-Si `TWILIO_ENABLED=false`, las citas funcionan igual; solo no se envían mensajes.
+Si `TWILIO_ENABLED=false`, las citas funcionan igual; solo no se envían mensajes. Lo mismo con `TELEGRAM_ENABLED`.
+
+### Canal Telegram
+
+Los avisos al paciente (confirmación, cancelación y recordatorio) salen por Twilio y por Telegram; cada canal es independiente y el que esté apagado simplemente no envía.
+
+1. Crear el bot con **@BotFather** y guardar el token en `TELEGRAM_BOT_TOKEN`.  
+2. Registrar el webhook con el mismo secreto que lleve `TELEGRAM_WEBHOOK_SECRET`:
+
+   ```bash
+   curl -X POST "https://api.telegram.org/bot<BOT_TOKEN>/setWebhook" \
+     -d "url=https://<tu-dominio>/api/telegram/webhook" \
+     -d "secret_token=<TELEGRAM_WEBHOOK_SECRET>"
+   ```
+
+3. El paciente, con sesión iniciada, pulsa **Recibir avisos por Telegram** en «Mis citas programadas» (`reservar.html`). El backend emite un token de un solo uso, válido 15 minutos, y el enlace `https://t.me/<bot>?start=<token>`.  
+4. Al abrirlo, Telegram envía `/start <token>` al webhook, que asocia el `chat_id` al usuario. Desde ahí, el botón pasa a **Dejar de recibir avisos** (`DELETE /api/telegram/vinculacion`).
+
+El token se emite siempre para el usuario del JWT, nunca a partir de un email recibido por parámetro: de otro modo cualquiera podría desviar a su chat los avisos de otro paciente.
 
 ### Usuario médico de prueba (migración V3)
 
@@ -451,9 +477,9 @@ Mientras arranca: explicar capas (nginx → Spring → PostgreSQL).
 
 **Seguridad:** BCrypt; CORS configurado; rutas por rol; no commitear `.env`.
 
-**Twilio:** opcional; médico + paciente; recordatorio 24 h con `@Scheduled`.
+**Notificaciones:** Twilio (SMS/WhatsApp) y Telegram, ambos opcionales; médico + paciente; recordatorio 24 h con `@Scheduled`. Si un canal falla o está apagado, el otro sigue enviando.
 
-**Pruebas / calidad:** suite de **24 tests en 3 niveles** — unitarios (`CitaServiceTest`, `JwtProviderTest`, `DatabaseUrlEnvironmentPostProcessorTest`), seguridad/RBAC (`CitaControllerWebMvcTest`) e integración end-to-end con **Testcontainers + PostgreSQL real** (`ReservaPublicaIntegrationTest`) — cubriendo las ramas críticas (409 doble reserva, 403 por rol, JWT, cancelación). Cobertura **no medida con JaCoCo** todavía y E2E (Playwright) como línea futura.
+**Pruebas / calidad:** suite de **47 tests en 3 niveles** — unitarios (`CitaServiceTest`, `TelegramVinculacionServiceTest`, `JwtProviderTest`, `DatabaseUrlEnvironmentPostProcessorTest`), seguridad/RBAC (`CitaControllerWebMvcTest`, `TelegramVinculacionControllerWebMvcTest`, `TelegramWebhookControllerWebMvcTest`) e integración end-to-end con **Testcontainers + PostgreSQL real** (`ReservaPublicaIntegrationTest`) — cubriendo las ramas críticas (409 doble reserva, 403 por rol, JWT, cancelación, secreto del webhook). Cobertura **no medida con JaCoCo** todavía y E2E (Playwright) como línea futura.
 
 **Limitaciones honestas:** `panel-pruebas.html` muestra reservas reales y agenda médico básica; historial clínico completo es evolución futura; sin MongoDB/Redis.
 

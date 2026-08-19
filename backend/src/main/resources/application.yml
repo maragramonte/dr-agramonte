@@ -43,6 +43,11 @@ app:
     notify-patients: ${TWILIO_NOTIFY_PATIENTS:true}
     reminder-hours-before: ${TWILIO_REMINDER_HOURS:24}
     reminder-cron: ${TWILIO_REMINDER_CRON:0 */15 * * * *}
+  telegram:
+    enabled: ${TELEGRAM_ENABLED:false}
+    bot-token: ${TELEGRAM_BOT_TOKEN:}
+    bot-username: ${TELEGRAM_BOT_USERNAME:}
+    secret-token: ${TELEGRAM_WEBHOOK_SECRET:}
 
 # Sin MAIL_HOST el indicador de correo falla y /actuator/health devuelve 503 (DOWN).
 # El formulario de contacto sigue funcionando (solo logs) sin SMTP.

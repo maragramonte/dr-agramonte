@@ -19,6 +19,7 @@ public class CitaNotificationService {
 
     private final TwilioProperties twilio;
     private final TwilioMessageService twilioMessageService;
+    private final TelegramMessageService telegramMessageService;
 
     public void notifyNuevaCita(Cita cita) {
         sendToMedico(buildNuevaCitaMedicoMessage(cita));
@@ -46,13 +47,31 @@ public class CitaNotificationService {
         twilioMessageService.send(twilio.getNotifyTo(), body);
     }
 
+    /**
+     * Avisa al paciente por todos los canales que tenga vinculados (Telegram y
+     * SMS/WhatsApp). Un canal caído o sin configurar no impide el envío por el otro.
+     *
+     * @return true si al menos un canal aceptó el mensaje
+     */
     private boolean sendToPaciente(Cita cita, String body) {
+        boolean enviadoTelegram = sendTelegramToPaciente(cita, body);
+
         String phone = resolveTelefonoPaciente(cita.getUsuario());
         if (phone == null) {
             log.info("Paciente sin teléfono (cita {}), no se envía SMS/WhatsApp", cita.getId());
+            return enviadoTelegram;
+        }
+        boolean enviadoTwilio = twilioMessageService.send(phone, body);
+        return enviadoTwilio || enviadoTelegram;
+    }
+
+    private boolean sendTelegramToPaciente(Cita cita, String body) {
+        String chatId = cita.getUsuario().getTelegramChatId();
+        if (chatId == null || chatId.isBlank()) {
+            log.debug("Paciente sin Telegram vinculado (cita {}), no se envía por ese canal", cita.getId());
             return false;
         }
-        return twilioMessageService.send(phone, body);
+        return telegramMessageService.send(chatId, body);
     }
 
     private String resolveTelefonoPaciente(Usuario paciente) {

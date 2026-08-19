@@ -44,6 +44,18 @@ public class Usuario {
     @Column(nullable = false)
     private boolean cuentaInvitada = false;
 
+    /** Chat de Telegram vinculado; si es null el paciente no recibe avisos por ese canal. */
+    @Column(name = "telegram_chat_id", unique = true)
+    private String telegramChatId;
+
+    /** Token de un solo uso que el paciente envía como «/start &lt;token&gt;» para vincular su chat. */
+    @Column(name = "telegram_link_token", unique = true)
+    private String telegramLinkToken;
+
+    /** Caducidad del token de vinculación; pasada esa fecha el webhook lo rechaza. */
+    @Column(name = "telegram_link_token_expira_en")
+    private LocalDateTime telegramLinkTokenExpiraEn;
+
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;

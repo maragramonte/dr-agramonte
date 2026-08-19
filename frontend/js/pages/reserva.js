@@ -119,6 +119,101 @@ function updateGuestAccountUi() {
     block.style.display = isAuthenticated() ? 'none' : 'block';
 }
 
+// Los endpoints de vinculación exigen JWT: sin sesión el bloque no se muestra.
+// Con sesión, el backend dice si el canal está activo y si el paciente ya lo tiene vinculado.
+async function updateTelegramUi() {
+    const block = $('telegramBlock');
+    if (!block) return;
+
+    if (!isAuthenticated()) {
+        block.style.display = 'none';
+        limpiarResultadoTelegram();
+        return;
+    }
+
+    let estado;
+    try {
+        estado = await apiClient.getEstadoTelegram();
+    } catch (err) {
+        console.error(err);
+        block.style.display = 'none';   // Sin estado no ofrecemos algo que puede fallar
+        return;
+    }
+
+    if (!estado.canalActivo) {
+        block.style.display = 'none';
+        return;
+    }
+
+    block.style.display = 'block';
+    $('btnTelegramVincular').style.display = estado.vinculado ? 'none' : 'flex';
+    $('btnTelegramDesvincular').style.display = estado.vinculado ? 'flex' : 'none';
+
+    const hint = $('telegramHint');
+    if (estado.vinculado) {
+        hint.textContent = 'Avisos activos: confirmaciones, cancelaciones y recordatorio del día anterior.';
+        limpiarResultadoTelegram();
+    } else if (estado.vinculacionPendiente) {
+        hint.textContent = 'Vinculación pendiente: abre el enlace en Telegram para activarla.';
+    } else {
+        hint.textContent = 'Confirmaciones, cancelaciones y recordatorio del día anterior.';
+    }
+}
+
+function limpiarResultadoTelegram() {
+    const result = $('telegramResult');
+    if (!result) return;
+    result.hidden = true;
+    result.innerHTML = '';
+}
+
+async function solicitarVinculacionTelegram() {
+    const btn = $('btnTelegramVincular');
+    const result = $('telegramResult');
+    if (!btn || !result) return;
+
+    btn.disabled = true;
+    try {
+        const data = await apiClient.crearVinculacionTelegram();
+        const caduca = data.expiraEn
+            ? new Date(data.expiraEn).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+            : null;
+        const aviso = data.yaVinculado
+            ? '<p class="telegram-note">Ya tenías un chat vinculado: seguirá recibiendo los avisos hasta que completes esta nueva vinculación.</p>'
+            : '';
+        const enlace = data.enlace
+            ? `<a class="telegram-open" href="${data.enlace}" target="_blank" rel="noopener"><i class="fab fa-telegram"></i> Abrir Telegram y vincular</a>`
+            : '';
+        result.innerHTML = `${aviso}${enlace}
+            <p class="telegram-note">O escribe al bot <code>/start ${data.token}</code>${caduca ? ` — caduca a las ${caduca}.` : '.'}</p>`;
+        result.hidden = false;
+        showToast('Enlace de vinculación generado', 'success');
+    } catch (err) {
+        console.error(err);
+        showToast(err.message || 'No se pudo generar el enlace de Telegram', 'error');
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+async function eliminarVinculacionTelegram() {
+    if (!confirm('¿Dejar de recibir avisos de citas por Telegram?')) return;
+
+    const btn = $('btnTelegramDesvincular');
+    if (!btn) return;
+    btn.disabled = true;
+    try {
+        await apiClient.eliminarVinculacionTelegram();
+        showToast('Avisos por Telegram desactivados', 'success');
+        await updateTelegramUi();
+    } catch (err) {
+        console.error(err);
+        showToast(err.message || 'No se pudo desvincular Telegram', 'error');
+    } finally {
+        btn.disabled = false;
+    }
+}
+
 function guardarSesionDesdeReserva(sesion, telefono) {
     if (!sesion?.token) return;
     localStorage.setItem('token', sesion.token);
@@ -704,6 +799,8 @@ function bindEvents() {
     });
     $('chipEditBtn').addEventListener('click', () => { state.dateISO = null; state.hour = null; $('timePanel').style.display = 'none'; updateSummaryChip(); });
     $('aptsToggle').addEventListener('click', function () { const open = $('aptsList').style.display !== 'flex'; $('aptsList').style.display = open ? 'flex' : 'none'; this.classList.toggle('open', open); });
+    $('btnTelegramVincular')?.addEventListener('click', solicitarVinculacionTelegram);
+    $('btnTelegramDesvincular')?.addEventListener('click', eliminarVinculacionTelegram);
     $('btnModalClose').addEventListener('click', () => $('confirmModal').classList.remove('open'));
     $('acepto').addEventListener('change', updateSubmitState);
     $('nombre').addEventListener('input', updateSubmitState);
@@ -762,10 +859,12 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCentros();
     updateConnectionBanner();
     updateGuestAccountUi();
+    updateTelegramUi();
     bindEvents();
     window.addEventListener('auth-changed', () => {
         updateConnectionBanner();
         updateGuestAccountUi();
+        updateTelegramUi();
         syncMisCitas().finally(() => renderAppointments());
     });
     cargarMedicos().finally(() => {

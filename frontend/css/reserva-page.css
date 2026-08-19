@@ -66,6 +66,9 @@ body.reserva-page {
         .form-hint{font-size:.78rem;color:var(--gray-500);line-height:1.45;margin-bottom:.75rem;}.link-btn{background:none;border:none;padding:0;color:var(--teal);font-weight:600;cursor:pointer;text-decoration:underline;font-size:inherit;font-family:inherit;}
         .apts-sync-hint{font-size:.72rem;color:var(--gray-500);margin:.35rem 0 .5rem;line-height:1.4;}
 
+        /* ── Vinculación con Telegram ── */
+        .telegram-block{margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--gray-200);}.telegram-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.65rem 1rem;border-radius:10px;border:1.5px solid var(--gray-200);background:var(--card);cursor:pointer;font-size:.8rem;font-weight:600;color:var(--gray-700);transition:var(--transition);}.telegram-btn:hover:not(:disabled){border-color:var(--teal-border);background:var(--teal-pale);color:var(--teal);}.telegram-btn:disabled{opacity:.6;cursor:progress;}.telegram-btn i{color:#229ED9;}.telegram-btn.danger:hover:not(:disabled){border-color:#fecaca;background:#fef2f2;color:#dc2626;}.telegram-btn.danger:hover:not(:disabled) i{color:#dc2626;}.telegram-result{margin-top:.5rem;padding:.7rem .85rem;border-radius:10px;background:var(--gray-50);border:1px solid var(--gray-200);}.telegram-open{display:inline-flex;align-items:center;gap:.45rem;font-size:.8rem;font-weight:600;color:var(--teal);text-decoration:none;}.telegram-open:hover{text-decoration:underline;}.telegram-note{font-size:.72rem;color:var(--gray-500);line-height:1.45;margin:.35rem 0 0;}.telegram-note code{font-size:.7rem;word-break:break-all;background:var(--card);border:1px solid var(--gray-200);border-radius:5px;padding:.1rem .3rem;}
+
         /* ── Responsive móvil: evitar desbordamiento horizontal ── */
         /* minmax(0,1fr) deja que las columnas encojan por debajo del contenido */
         .modality-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);}

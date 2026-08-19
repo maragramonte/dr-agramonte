@@ -263,7 +263,7 @@ erDiagram
 - **¿Lo has medido?** → No con instrumentos; es una justificación cualitativa por arquitectura. Medir la huella sería el siguiente paso.
 
 ### Pruebas / calidad
-- **¿Qué pruebas tienes?** → 25 tests en 3 niveles: unitarias (`CitaServiceTest`, `JwtProviderTest`, `DatabaseUrlEnvironmentPostProcessorTest`), de seguridad/RBAC (`CitaControllerWebMvcTest`, `GlobalExceptionHandlerTest`) e integración end-to-end con **Testcontainers + PostgreSQL real** (`ReservaPublicaIntegrationTest`).
+- **¿Qué pruebas tienes?** → 47 tests en 3 niveles: unitarias (`CitaServiceTest`, `TelegramVinculacionServiceTest`, `JwtProviderTest`, `DatabaseUrlEnvironmentPostProcessorTest`), de seguridad/RBAC (`CitaControllerWebMvcTest`, `TelegramVinculacionControllerWebMvcTest`, `TelegramWebhookControllerWebMvcTest`, `GlobalExceptionHandlerTest`) e integración end-to-end con **Testcontainers + PostgreSQL real** (`ReservaPublicaIntegrationTest`).
 - **¿Cobertura?** → No la mido con JaCoCo todavía; cubro las ramas críticas (409 doble reserva, 403 por rol, JWT, cancelación). Añadir JaCoCo es una mejora pendiente.
 - **¿Pruebas E2E?** → No automatizadas aún (Playwright es línea futura); las hago manualmente.
 

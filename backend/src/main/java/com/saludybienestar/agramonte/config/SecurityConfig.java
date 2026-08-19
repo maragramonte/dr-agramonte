@@ -54,11 +54,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/medicos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/centros").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/disponibilidad/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/citas/agenda/pacientes").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/citas/agenda/reservas").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/citas/reserva-publica").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/citas/por-email").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/citas/publica/**").permitAll()
+                        // Lo llama Telegram, no un usuario: no puede presentar JWT.
+                        .requestMatchers(HttpMethod.POST, "/api/telegram/webhook").permitAll()
                         // Permisos de Pacientes
                         .requestMatchers(HttpMethod.POST, "/api/citas").hasAnyRole("PACIENTE", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/citas").hasAnyRole("PACIENTE", "ADMIN")
@@ -66,6 +66,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/citas/mias").hasRole("PACIENTE")
                         // Permisos de Médicos y Administradores
                         .requestMatchers(HttpMethod.GET, "/api/estadisticas").hasAnyRole("MEDICO", "ADMIN")
+                        // Cubre /agenda/pacientes y /agenda/reservas: exponen datos personales
+                        // (nombre, email, teléfono y citas), así que nunca deben ser públicos.
                         .requestMatchers("/api/citas/agenda/**").hasAnyRole("MEDICO", "ADMIN")
                         .requestMatchers("/api/historial/**").hasAnyRole("MEDICO", "ADMIN")
                         .requestMatchers("/api/alertas/**").hasAnyRole("MEDICO", "ADMIN")

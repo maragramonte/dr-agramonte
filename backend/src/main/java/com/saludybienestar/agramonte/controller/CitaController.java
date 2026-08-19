@@ -55,15 +55,20 @@ public class CitaController {
     }
 
     /**
-     * Lista pacientes con citas del médico (panel médico). Público en lectura para el prototipo del TFG;
-     * en producción conviene exigir rol MEDICO/ADMIN.
+     * Lista pacientes con citas del médico (panel médico). Devuelve datos personales
+     * (nombre, email, teléfono y citas), por lo que exige JWT con rol MEDICO o ADMIN:
+     * lo aplica la regla {@code /api/citas/agenda/**} de {@code SecurityConfig}.
      */
     @GetMapping("/agenda/pacientes")
     public List<PacienteAgendaResponse> pacientesAgenda(@RequestParam(defaultValue = "1") Long medicoId) {
         return citaService.listarPacientesAgenda(medicoId);
     }
 
-    /** Historial de reservas para pruebas / demo TFG (no es el panel clínico en producción). */
+    /**
+     * Historial de reservas del médico (vista de seguimiento, no es el panel clínico).
+     * Contiene datos identificativos del paciente, así que exige JWT con rol MEDICO o ADMIN
+     * por la regla {@code /api/citas/agenda/**} de {@code SecurityConfig}.
+     */
     @GetMapping("/agenda/reservas")
     public List<ReservaPruebaResponse> reservasPrueba(
             @RequestParam(defaultValue = "1") Long medicoId,

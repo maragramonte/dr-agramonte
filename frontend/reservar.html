@@ -325,6 +325,18 @@
                         </button>
                         <p class="apts-sync-hint" id="aptsSyncHint">Las citas se sincronizan con el servidor (mismo listado que el panel TFG).</p>
                         <div class="appointments-list" id="aptsList"></div>
+
+                        <!-- Solo con sesión iniciada y canal activo; el estado lo decide el backend -->
+                        <div class="telegram-block" id="telegramBlock" style="display:none">
+                            <button type="button" class="telegram-btn" id="btnTelegramVincular">
+                                <i class="fab fa-telegram"></i> Recibir avisos por Telegram
+                            </button>
+                            <button type="button" class="telegram-btn danger" id="btnTelegramDesvincular" style="display:none">
+                                <i class="fab fa-telegram"></i> Dejar de recibir avisos por Telegram
+                            </button>
+                            <p class="apts-sync-hint" id="telegramHint">Confirmaciones, cancelaciones y recordatorio del día anterior.</p>
+                            <div class="telegram-result" id="telegramResult" hidden></div>
+                        </div>
                     </div>
 
                 </div>
