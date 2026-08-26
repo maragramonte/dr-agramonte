@@ -1,6 +1,6 @@
 # Base de datos — referencia para la defensa
 
-> **TFG DAM · Dr. Agramonte · junio 2026.** Esquema real reconstruido de las migraciones **Flyway V1–V10** (`backend/src/main/resources/db/migration/postgresql/`). **PostgreSQL 15.** Hibernate arranca con `ddl-auto: validate`, así que el esquema de esta referencia coincide exactamente con las entidades JPA.
+> **TFG DAM · Dr. Agramonte.** Esquema real reconstruido de las migraciones **Flyway V1–V10** (`backend/src/main/resources/db/migration/postgresql/`). **PostgreSQL 15.** Hibernate arranca con `ddl-auto: validate`, así que el esquema de esta referencia coincide exactamente con las entidades JPA.
 
 ## Resumen en una frase
 6 tablas en **3ª forma normal**, claves `BIGSERIAL`, integridad referencial con **claves foráneas** (unas en `CASCADE`, otras en `SET NULL` según convenga conservar o no el dato), un **índice único** que —junto al bloqueo pesimista— evita las dobles reservas, e **índices** sobre las consultas más frecuentes.
