@@ -81,7 +81,7 @@ Comprueba que invitado, «Mis citas» (vía `por-email`) y panel (`agenda/reserv
 5. **Cancelar cita pública (invitado)** — query `email` = el del paso 2.  
 6. Repetir **Historial reservas prueba** — estado `CANCELADA`.
 
-Documentación ampliada: [docs/SINCRONIZACION-CITAS.md](../docs/SINCRONIZACION-CITAS.md) y [README sección 3.1](../README.md).
+Documentación ampliada: [docs/SINCRONIZACION-CITAS.md](../docs/SINCRONIZACION-CITAS.md).
 
 ### Médico de prueba (V3)
 

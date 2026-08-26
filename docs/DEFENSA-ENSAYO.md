@@ -82,7 +82,7 @@ La idea no es inventada: nace de un problema real que he observado de cerca, dur
   **nginx** (sirve la web y hace de proxy inverso de `/api`) → **Spring Boot** (API, seguridad, negocio) → **PostgreSQL** (datos transaccionales). Twilio es un servicio externo para SMS/WhatsApp.
 - **Backend: Java 21 + Spring Boot 3.5.3**, patrón clásico *controller → service → repository*, con **DTOs**: nunca expongo entidades JPA al exterior (desacopla la API del modelo y no filtra campos internos).
 - **Frontend: HTML, CSS y JavaScript nativo, sin framework.** Fue una decisión consciente: la app no tiene un estado global tan complejo como para justificar React; evitarlo reduce dependencias, acelera la carga y mantiene el código legible.
-- **Persistencia versionada con Flyway** (migraciones V1–V8): cualquier entorno —el mío o el del tribunal— se reconstruye **idéntico** al arrancar.
+- **Persistencia versionada con Flyway** (migraciones V1–V10): cualquier entorno —el mío o el del tribunal— se reconstruye **idéntico** al arrancar.
 - **Docker Compose** levanta todo con un único comando → se acabó el «en mi máquina funciona».
 
 > «Saber **cuándo no** añadir una tecnología, como React, es tan importante como saber usarla.»
@@ -179,7 +179,7 @@ Gracias por vuestra atención; quedo a vuestra disposición para las preguntas.�
 
 ### Acceso a datos / base de datos
 
-> **Modelo relacional (6 tablas, Flyway V1–V8).** Referencia completa en [BASE-DE-DATOS.md](BASE-DE-DATOS.md). Si el tribunal lo pide, enseña este diagrama:
+> **Modelo relacional (6 tablas, Flyway V1–V10).** Referencia completa en [BASE-DE-DATOS.md](BASE-DE-DATOS.md). Si el tribunal lo pide, enseña este diagrama:
 
 ```mermaid
 erDiagram
@@ -238,7 +238,7 @@ erDiagram
 > **Clave anti-doble-reserva:** índice `UNIQUE (medico_id, inicio)` en `horarios` + `SELECT … FOR UPDATE`. **Integridad:** citas/horarios en `CASCADE` (no existen sin su usuario/médico); `centro_id` y notificaciones en `SET NULL` (conservar histórico).
 
 - **¿Por qué relacional y no MongoDB?** → Los datos son fuertemente relacionales (usuario–médico–horario–centro–cita) y la invariante crítica (no doble reserva) exige transacciones y bloqueo de fila, donde el relacional es más fuerte. MongoDB lo reservo para el historial clínico (documentos flexibles): una persistencia políglota futura.
-- **¿Qué es Flyway?** → Versiona el esquema en migraciones numeradas (V1–V8); cualquier entorno se reconstruye igual al arrancar.
+- **¿Qué es Flyway?** → Versiona el esquema en migraciones numeradas (V1–V10); cualquier entorno se reconstruye igual al arrancar.
 - **¿Cómo evitas perder trazabilidad al cancelar?** → No borro la fila; cambio el `estado` (enumerado `EstadoCita`).
 
 ### Seguridad / RGPD

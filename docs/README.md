@@ -1,31 +1,38 @@
-# Documentación académica — Dr. Agramonte
+# Documentación — Dr. Agramonte
 
-La **historia completa del proyecto**, arranque técnico, API, Twilio y guía de demo están en el README principal del repositorio:
-
-**[../README.md](../README.md)**
-
-Este directorio concentra la **memoria del TFG**, los **diagramas LaTeX** y guías operativas.
+El **README principal** ([../README.md](../README.md)) cubre qué es el proyecto, cómo
+arrancarlo, la API y las decisiones técnicas. Aquí está todo lo demás: la memoria del
+proyecto, los diagramas y las guías de detalle.
 
 ---
 
-## Contenido de `docs/`
+## Proyecto
 
-| Archivo | Para qué sirve |
-|---------|----------------|
-| [SINCRONIZACION-CITAS.md](SINCRONIZACION-CITAS.md) | **Control Mis citas ↔ Panel ↔ BD** (pruebas, fallos, Postman) |
-| [DEFENSA-ENSAYO.md](DEFENSA-ENSAYO.md) | Guion hablado de la defensa (15 min) + banco de preguntas |
-| [BASE-DE-DATOS.md](BASE-DE-DATOS.md) | **Referencia de BD para la defensa**: esquema (V1–V8), diagrama relacional (Mermaid), integridad referencial, concurrencia y Q&A |
-| [Defensa-TFG-PowerPoint-Guion.md](Defensa-TFG-PowerPoint-Guion.md) | Contenido **diapositiva a diapositiva** para el PowerPoint |
-| [PRESENTACION-DEFENSA.md](PRESENTACION-DEFENSA.md) | **Ficha esencial**: pitch de 60 s, números a memorizar, ideas fuerza y checklist |
-| [DOCKER-TROUBLESHOOTING.md](DOCKER-TROUBLESHOOTING.md) | Arranque Docker, 502, healthchecks |
-| [Memoria-TFG-Dr-Agramonte.tex](Memoria-TFG-Dr-Agramonte.tex) | Memoria en LaTeX (alineada con el código real, junio 2026) |
-| [INSTRUCCIONES-MEMORIA-LATEX.md](INSTRUCCIONES-MEMORIA-LATEX.md) | Cómo compilar el PDF (`pdflatex`) |
-| [checklist-rubricas.tex](checklist-rubricas.tex) | Checklist 25 % / 40 % / 35 % (rúbricas módulo) |
-| [tikz-paleta.tex](tikz-paleta.tex) | Colores teal del CSS (`#0F766E`, `#14B8A6`) |
-| [tikz-diagrama-arquitectura.tex](tikz-diagrama-arquitectura.tex) | Diagrama Docker + nginx + Spring + PostgreSQL |
-| [tikz-diagrama-er.tex](tikz-diagrama-er.tex) | Modelo entidad-relación |
-| [tikz-diagrama-reserva.tex](tikz-diagrama-reserva.tex) | Flujo reserva + concurrencia |
-| [tikz-diagrama-frontend.tex](tikz-diagrama-frontend.tex) | Capas frontend y PWA |
+| Documento | Contenido |
+|-----------|-----------|
+| [EVOLUCION.md](EVOLUCION.md) | Cómo creció el repositorio, fase a fase, y qué problema resolvió cada una |
+| [BASE-DE-DATOS.md](BASE-DE-DATOS.md) | Esquema tabla a tabla, diagrama relacional, integridad referencial, concurrencia y preguntas frecuentes |
+| [SINCRONIZACION-CITAS.md](SINCRONIZACION-CITAS.md) | Una sola fuente de verdad entre «Mis citas», el panel y la base de datos |
+| [DOCKER-TROUBLESHOOTING.md](DOCKER-TROUBLESHOOTING.md) | Arranque de Docker, errores 502 y healthchecks |
+
+## Memoria (LaTeX)
+
+| Archivo | Contenido |
+|---------|-----------|
+| [Memoria-TFG-Dr-Agramonte.tex](Memoria-TFG-Dr-Agramonte.tex) | Memoria completa, alineada con el código real |
+| [INSTRUCCIONES-MEMORIA-LATEX.md](INSTRUCCIONES-MEMORIA-LATEX.md) | Requisitos de formato y cómo compilar |
+| [checklist-rubricas.tex](checklist-rubricas.tex) | Checklist de cumplimiento (anexo A) |
+| `tikz-*.tex` | Diagramas vectoriales: arquitectura, modelo E-R, flujo de reserva, capas del frontend y paleta |
+| [diagrama-er.svg](diagrama-er.svg) · [diagrama-er.png](diagrama-er.png) | Modelo entidad-relación exportado, para presentaciones |
+
+## Defensa del proyecto
+
+| Documento | Contenido |
+|-----------|-----------|
+| [PRESENTACION-DEFENSA.md](PRESENTACION-DEFENSA.md) | Ficha esencial: pitch de 60 s, números clave e ideas fuerza |
+| [DEFENSA-ENSAYO.md](DEFENSA-ENSAYO.md) | Guion hablado cronometrado (15 min) y banco de preguntas |
+| [Defensa-TFG-PowerPoint-Guion.md](Defensa-TFG-PowerPoint-Guion.md) | Contenido diapositiva a diapositiva |
+| [GUIA-DEMO.md](GUIA-DEMO.md) | Flujo de la demo en vivo y qué hacer si algo se cae |
 
 ---
 
@@ -37,19 +44,20 @@ pdflatex Memoria-TFG-Dr-Agramonte.tex
 pdflatex Memoria-TFG-Dr-Agramonte.tex
 ```
 
-Salida: `Memoria-TFG-Dr-Agramonte.pdf`
-
-Requiere MiKTeX o TeX Live. También puedes subir la carpeta `docs/` a [Overleaf](https://www.overleaf.com/).
+Dos pasadas: la primera genera el índice y las referencias, la segunda las coloca.
+Salida: `Memoria-TFG-Dr-Agramonte.pdf`. Requiere MiKTeX o TeX Live; también funciona
+subiendo la carpeta `docs/` a [Overleaf](https://www.overleaf.com/).
 
 ---
 
 ## Coherencia memoria ↔ código
 
-La memoria describe **solo lo implementado**: PostgreSQL, Spring Boot, Twilio en Java, PWA, Docker.  
-No incluye MongoDB, Redis ni worker Node (no están en el repositorio).
+La memoria describe **solo lo implementado**. Lo que no está construido va en «líneas
+futuras», nunca en el cuerpo. Es la regla que mantiene el documento defendible.
 
-Si cambias el código de reservas o del panel, actualiza:
+Si cambias el flujo de reservas, el panel o el esquema, actualiza en el mismo momento:
 
-- [README raíz](../README.md) — sección **3.1** y línea de tiempo (Fase 7).  
-- Este archivo [SINCRONIZACION-CITAS.md](SINCRONIZACION-CITAS.md) si cambian endpoints o `syncMisCitas`.  
-- La memoria LaTeX si el tribunal debe leer el flujo invitado/sincronización.
+- El [README principal](../README.md), si cambia la API o la puesta en marcha.
+- [SINCRONIZACION-CITAS.md](SINCRONIZACION-CITAS.md), si cambian los endpoints o `syncMisCitas()`.
+- [BASE-DE-DATOS.md](BASE-DE-DATOS.md) y el diagrama E-R, si añades una migración.
+- La memoria LaTeX, y recompílala.

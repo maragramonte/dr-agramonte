@@ -1,388 +1,170 @@
-# Dr. Agramonte — Plataforma de gestión de citas médicas
+# Dr. Agramonte
 
-**TFG · DAM · Mar Agramonte**  
-Documento único del proyecto: de la idea inicial al estado actual y hacia dónde va.
+Plataforma de gestión de citas médicas para la consulta de un internista real en Palma de Mallorca.
+Los pacientes reservan, consultan y cancelan sus citas por su cuenta, sin depender del teléfono.
 
----
+**En producción:** [www.dragramonte.com](https://www.dragramonte.com)
 
-## 1. Idea principal
-
-### Problema
-
-Muchos médicos en consulta pequeña o autónoma gestionan citas por **teléfono y agenda en papel**. Eso genera interrupciones fuera del horario, errores de coordinación y pérdida de tiempo clínico.
-
-### Propuesta
-
-**Dr. Agramonte** es una webapp donde el paciente puede:
-
-- Registrarse e iniciar sesión **o reservar como invitado** (sin cuenta previa)  
-- Ver servicios y elegir especialista  
-- Reservar, consultar y cancelar citas online (datos en servidor, no solo en el navegador)  
-- Recibir confirmación (y, si está configurado, aviso al móvil vía Twilio)
-
-El médico recibe alertas de nuevas reservas sin depender solo del teléfono.
-
-### Alcance del TFG (realista)
-
-| Incluido en el repositorio | Fuera de alcance / demo estática |
-|--------------------------|----------------------------------|
-| Frontend multi-página + PWA | Historial clínico real en panel médico |
-| API REST Spring Boot + JWT | Pasarela de pago |
-| PostgreSQL + Flyway | App móvil nativa |
-| Docker Compose | Microservicios Redis/Node (no implementados) |
-| Twilio SMS/WhatsApp desde Java | |
+`Java 21` · `Spring Boot 3.5` · `PostgreSQL 15` · `JavaScript` · `Docker` · `Railway`
 
 ---
 
-## 2. Línea de tiempo — de dónde empezamos a dónde estamos
+## El problema
 
-Cronología de evolución del repositorio (orden lógico de trabajo).
+Buena parte de las llamadas que recibe un médico fuera de su horario no son urgencias
+clínicas: son gestión de agenda. Cambiar una hora, preguntar por un hueco, cancelar.
+Esa carga administrativa se come tiempo que no está pagado ni contabilizado como trabajo.
 
-### Fase 0 — Web estática (inicio)
+Este proyecto digitaliza esa parte concreta, sin tocar lo que sí requiere trato humano.
 
-- Páginas HTML: inicio, sobre mí, servicios, contacto, testimonios, reservar.  
-- Estilos en `frontend/css/dr-agramonte.css` (paleta **teal** `#0F766E` / `#14B8A6`, modo claro/oscuro).  
-- Reserva solo en **localStorage** (sin backend real). *Sustituido en fases posteriores.*  
-- `panel-pruebas.html` (enlace pie de página): historial de reservas de prueba + vista del acceso médico.
+## Qué hace
 
-### Fase 1 — Backend y base de datos
+- **Reserva sin registro previo** o con cuenta: centro → fecha → hora → datos.
+- **Disponibilidad real** calculada en el servidor, repartida por centro y día.
+- **Cobertura y pago**: consulta privada con precio visible, o seguro médico con aseguradora.
+- **Avisos automáticos** de confirmación, cancelación y recordatorio 24 h antes.
+- **Cuadro de mando** para el profesional: carga por médico, demanda por especialidad,
+  reparto por centro y tasa de cancelación.
+- **PWA instalable**, accesible (WCAG 2.1 AA), con modo oscuro y modo sin conexión.
 
-- Proyecto **Spring Boot 3.5** + **Java 21** + **Maven**.  
-- Modelo: usuarios, médicos, horarios, citas, notificaciones.  
-- **Flyway** con migraciones separadas PostgreSQL / MySQL (`APP_PROFILE`).  
-- Autenticación **JWT** y roles `PACIENTE`, `MEDICO`, `ADMIN`.  
-- **Dockerfile** multi-stage y **docker-compose** (postgres + backend + nginx).
-
-### Fase 2 — Integración frontend ↔ backend (citas)
-
-**Problema detectado:** el front llamaba a rutas antiguas (`/api/reservas`, parámetros distintos) y el backend exponía `/api/citas`.
-
-**Solución:**
-
-- Cliente unificado `frontend/js/modules/api-client.js`  
-- `POST/GET/DELETE /api/citas`, `GET /api/citas/mias`  
-- `GET /api/medicos`, `GET /api/disponibilidad?medicoId=&fecha=`  
-- Lógica de reserva centralizada en `frontend/js/pages/reserva.js`  
-- DTO `CitaResponse` (no exponer entidades JPA)  
-- `GlobalExceptionHandler` y `ResponseStatusException`  
-- Bloqueo pesimista: `SELECT FOR UPDATE` en horarios  
-
-### Fase 3 — Robustez para demo y seguridad
-
-- Banner de conexión con el servidor (reserva y sincronización)  
-- Autocompletado de paciente desde sesión (`auth-ui.js`)  
-- Botón confirmar deshabilitado hasta completar el flujo  
-- Limpieza: `.gitignore`, configs duplicadas, secretos fuera de docs  
-- `application-postgres.yml` / `application-mysql.yml`  
-- Política de privacidad y formulario de contacto (`ContactoService`)  
-- Service Worker y `offline.html`  
-- Health mail desactivado en Actuator (evitar 503 en `/actuator/health`)
-
-### Fase 4 — Notificaciones Twilio
-
-- SDK Twilio en backend (`TwilioMessageService`, `CitaNotificationService`)  
-- Aviso al **médico** al crear/cancelar cita  
-- Aviso al **paciente** (confirmación, cancelación, recordatorio ~24 h)  
-- Job programado `CitaReminderScheduler` + campo `recordatorio_enviado` (Flyway V2)  
-- Variables en `.env.example` y `docker-compose.yml`
-
-### Fase 5 — UX y coherencia visual (última iteración UI)
-
-- Imagen hero: `frontend/pictures/hero-doctor.svg` (antes faltaban ficheros en `pictures/`)  
-- Botón **Reservar cita** unificado: clase `btn--reserva` + `nav-link--reserva` en todas las páginas  
-- **Servicios → reserva:** `reservar.html?servicio=consulta-general` (etc.) preselecciona tipo y motivo  
-- Toggle tema claro/oscuro en cabecera (`ThemeToggle` en `dr-agramonte.js`)
-
-### Fase 6 — Documentación académica
-
-- Memoria LaTeX alineada con el código real: `docs/Memoria-TFG-Dr-Agramonte.tex`  
-- Diagramas TikZ con la misma paleta teal del CSS  
-- Checklist de rúbricas del módulo de proyecto  
-
-### Fase 7 — Reserva invitado y sincronización unificada
-
-- **`POST /api/citas/reserva-publica`**: reserva sin JWT; cuenta invitada (`cuenta_invitada` en BD, Flyway **V4**); contraseña opcional.  
-- **`GET /api/citas/por-email`** y **`DELETE /api/citas/publica/{id}`**: el invitado consulta y cancela citas con su email (prototipo TFG).  
-- **`syncMisCitas()`** en `reserva.js`: alinea **Mis citas programadas** con PostgreSQL (misma fuente que el panel).  
-- Eliminación de reservas antiguas solo locales (ids `CITA-...`).  
-- Cancelación invitado actualiza el servidor → el panel refleja el cambio.  
-- Sincronización entre pestañas: `BroadcastChannel` + evento `storage` hacia `panel-pruebas.html`.  
-- Colección Postman ampliada (`postman/`).  
-
----
-
-## 3. Estado actual (mayo 2026)
-
-### Arquitectura
+## Arquitectura
 
 ```
-[Navegador] → [nginx :80] → HTML/CSS/JS + proxy /api
-                ↓
-         [Spring Boot :8080] → [PostgreSQL :5432]
-                ↓
-            [Twilio] (opcional)
+[Navegador]  →  [nginx]  →  HTML/CSS/JS + proxy /api
+                              ↓
+                     [Spring Boot]  →  [PostgreSQL]
+                              ↓
+                   [Twilio]   [Telegram]
 ```
 
-### Stack
+En local son tres contenedores (nginx, backend, base de datos). En la nube, un único
+servicio de Railway sirve la API y el frontend juntos: evita CORS y consume menos recursos.
 
-| Capa | Tecnología |
-|------|------------|
-| Frontend | HTML5, CSS3, JavaScript (sin React) |
-| Servidor estático | nginx (contenedor Docker) |
-| Backend | Java 21, Spring Boot 3.5.3, Spring Security, JPA |
-| BD | PostgreSQL 15 (perfil por defecto), MySQL 8 opcional |
-| Migraciones | Flyway V1–V10 (esquema, recordatorio, horarios + médico, `cuenta_invitada`, centros, cobertura, Telegram) |
-| Auth | JWT en cabecera `Authorization: Bearer` |
-| Notificaciones | Twilio (SMS/WhatsApp) y Telegram (bot), activables por `.env` |
-| Despliegue | Docker Compose |
+---
 
-### API principal
+## Decisiones técnicas
+
+Las cuatro que más me costaron y mejor explican el proyecto.
+
+### Dos pacientes, el mismo hueco, el mismo segundo
+
+La reserva bloquea la fila del horario con `SELECT ... FOR UPDATE` (bloqueo pesimista)
+dentro de la transacción, sobre un índice `UNIQUE (medico_id, inicio)`. La primera
+transacción gana y marca el hueco como ocupado; la segunda recibe **409 Conflict** sin
+persistir nada.
+
+No es teoría: hay un test que lanza dos hilos sincronizados con `CyclicBarrier` contra la
+misma franja, sobre un PostgreSQL real levantado con Testcontainers, y comprueba que sale
+exactamente un 201 y un 409. Un H2 en memoria no reproduce este comportamiento.
+
+### El aviso se envía después del commit, no durante
+
+Las notificaciones se aplazan a la fase `afterCommit` de la transacción. Así no se mantiene
+la fila bloqueada durante una llamada de red, y si la transacción se revierte nunca se
+avisa de una cita que en realidad no llegó a existir.
+
+### Dos canales de aviso independientes
+
+Twilio (SMS/WhatsApp) y un bot de Telegram. Twilio en cuenta de prueba obliga al paciente a
+darse de alta en un *sandbox*, lo cual no vale para un producto real; Telegram es gratuito y
+no exige alta previa. Ninguno de los dos puede tumbar una reserva: los servicios de
+mensajería no propagan la excepción, solo la registran. Si uno está caído o apagado, el otro
+sigue avisando.
+
+La vinculación del bot usa un token de un solo uso con 15 minutos de validez, emitido
+siempre para el usuario del JWT en sesión, nunca para un email recibido por parámetro.
+
+### Frontend sin framework
+
+Al principio valoré React. La aplicación no maneja un estado global que lo justifique, así
+que preferí JavaScript modular: menos dependencias, carga más rápida y código que se lee sin
+aprender antes una librería. Saber cuándo *no* añadir una tecnología también es una decisión.
+
+---
+
+## Puesta en marcha
+
+Requiere **Docker Desktop**. Para compilar el backend por separado, JDK 21 y Maven 3.9+.
+
+```bash
+cp .env.example .env          # editar JWT_SECRET
+docker compose up -d --build
+```
+
+- Web: <http://localhost>
+- API: <http://localhost:8080>
+
+Usuario médico de prueba (lo crea la migración V3): `dr.agramonte@example.com` / `Medico123!`
+
+<details>
+<summary>Backend sin Docker · perfil MySQL</summary>
+
+```bash
+cd backend
+mvn spring-boot:run
+
+# Perfil MySQL alternativo (API en :8081)
+docker compose --profile mysql up -d --build
+```
+
+</details>
+
+## Pruebas
+
+```bash
+cd backend && mvn test
+```
+
+**47 pruebas en tres niveles**: unitarias de servicio, de seguridad y roles sobre la capa
+REST (`@WebMvcTest` con la `SecurityConfig` real) y de integración end-to-end contra un
+PostgreSQL levantado con Testcontainers. Cubren las ramas críticas: 409 por doble reserva,
+403 por rol, validez del JWT, cancelación y el secreto del webhook.
+
+Las 5 de integración necesitan Docker en marcha; si no lo hay se marcan como saltadas en
+lugar de fallar. La cobertura todavía no está medida con JaCoCo.
+
+También hay análisis de vulnerabilidades de dependencias con **OWASP dependency-check**,
+configurado para hacer fallar el build con CVSS ≥ 7.
+
+---
+
+## API
 
 | Método | Ruta | Uso |
 |--------|------|-----|
-| POST | `/api/auth/login` | Login |
-| POST | `/api/auth/registro` | Registro paciente |
-| GET | `/api/medicos` | Listado especialistas |
-| GET | `/api/disponibilidad` | Slots por médico y fecha |
-| POST | `/api/citas` | Crear cita (autenticado) |
-| POST | `/api/citas/reserva-publica` | Reserva sin login (cuenta invitado + cita en BD) |
-| GET | `/api/citas/por-email?email=` | Citas del paciente (invitado, prototipo TFG) |
-| DELETE | `/api/citas/publica/{id}?email=` | Cancelar cita invitado por email |
-| GET | `/api/citas/agenda/pacientes?medicoId=1` | Pacientes con citas (**rol MEDICO/ADMIN**) |
-| GET | `/api/citas/agenda/reservas?medicoId=1` | Historial de reservas (**rol MEDICO/ADMIN**) |
-| GET | `/api/citas/mias` | Citas del paciente |
-| DELETE | `/api/citas/{id}` | Cancelar |
-| POST | `/api/contact` | Formulario contacto |
-| GET | `/api/telegram/vinculacion` | Estado del canal Telegram (autenticado) |
-| POST | `/api/telegram/vinculacion` | Genera el enlace/token de vinculación (autenticado) |
-| DELETE | `/api/telegram/vinculacion` | Deja de recibir avisos por Telegram (autenticado) |
-| POST | `/api/telegram/webhook` | Lo llama Telegram; valida el secreto de `setWebhook` |
+| `POST` | `/api/auth/login`, `/api/auth/registro` | Sesión JWT |
+| `GET` | `/api/medicos`, `/api/centros` | Catálogos |
+| `GET` | `/api/disponibilidad` | Huecos por médico, fecha y centro |
+| `POST` | `/api/citas` | Crear cita (paciente autenticado) |
+| `POST` | `/api/citas/reserva-publica` | Reservar sin cuenta previa |
+| `GET` | `/api/citas/mias` · `/api/citas/por-email` | Citas del paciente / del invitado |
+| `DELETE` | `/api/citas/{id}` · `/api/citas/publica/{id}` | Cancelación |
+| `GET` | `/api/citas/agenda/reservas`, `/agenda/pacientes` | Agenda del médico — rol `MEDICO`/`ADMIN` |
+| `GET` | `/api/estadisticas` | Cuadro de mando — rol `MEDICO`/`ADMIN` |
+| `GET`&nbsp;`POST`&nbsp;`DELETE` | `/api/telegram/vinculacion` | Alta y baja del canal Telegram |
+| `POST` | `/api/telegram/webhook` | Lo invoca Telegram; valida el secreto de `setWebhook` |
+| `POST` | `/api/contact` | Formulario de contacto |
 
-### Páginas frontend
+Colección de Postman lista para importar en [`postman/`](postman/README.md).
 
-| Archivo | Función |
-|---------|---------|
-| `index.html` | Inicio, hero, resumen servicios |
-| `servicios.html` | Catálogo + enlace a reserva por servicio |
-| `reservar.html` | Flujo de cita (calendario, slots, formulario) |
-| `contacto.html` | Datos y formulario |
-| `sobre-mi.html`, `testimonios.html` | Contenido informativo |
-| `privacidad.html` | RGPD |
-| `offline.html` | PWA sin conexión |
-| `panel-pruebas.html` | **TFG:** reservas de prueba + vista médico (requiere sesión con rol MEDICO/ADMIN) |
+## Configuración
 
-### JavaScript clave
+Todo lo sensible vive en `.env` (plantilla en [`.env.example`](.env.example)), nunca en el
+repositorio.
 
-| Archivo | Rol |
-|---------|-----|
-| `js/modules/api-config.js` | URL base del API (`/api` en Docker) |
-| `js/modules/api-client.js` | Cliente REST + JWT |
-| `js/modules/auth-ui.js` | Login/registro en menú |
-| `js/pages/reserva.js` | Reserva, `syncMisCitas()`, lista «Mis citas», vinculación con Telegram |
-| `js/pages/panel-pruebas.js` | Panel TFG: tabla reservas + vista médico |
-| `js/pages/dr-agramonte.js` | Navegación, PWA, tema, utilidades |
-| `js/pages/contacto.js` | Formulario contacto |
-| `service-worker.js` | Caché offline |
+| Variable | Para qué |
+|----------|----------|
+| `JWT_SECRET` | Firma de los tokens (mínimo 32 caracteres) |
+| `TWILIO_*` | Credenciales, canal (`whatsapp`/`sms`) y horas del recordatorio |
+| `TELEGRAM_*` | Token del bot, usuario del bot y secreto del webhook |
+| `MAIL_*`, `CONTACT_INBOX` | Correo del formulario de contacto |
 
----
+Con los canales desactivados la aplicación funciona igual; simplemente no envía mensajes.
 
-## 3.1 Sincronización de citas — Mis citas ↔ Panel TFG ↔ PostgreSQL
+<details>
+<summary>Activar el bot de Telegram</summary>
 
-Esta es la pieza que unifica lo que ve el **paciente** en `reservar.html` y lo que muestra el **panel de pruebas** del TFG.
-
-### Qué problema había
-
-| Vista | Antes (confuso) | Ahora |
-|-------|-----------------|--------|
-| **Mis citas programadas** | Lista en `localStorage` del navegador | Caché local **rellenada desde el API** |
-| **Panel TFG** | Solo `GET /api/citas/agenda/reservas` (BD) | Igual (BD) |
-| **Reserva sin login** | A veces solo `localStorage` | Siempre persiste en BD + sincroniza lista |
-
-Consecuencias antiguas: citas que aparecían en «Mis citas» pero no en el panel; cancelaciones de invitado solo en el navegador; reservas legacy con id `CITA-XXXX` que nunca existieron en el servidor.
-
-### Fuente de verdad
-
-```
-                    ┌─────────────────────┐
-                    │   PostgreSQL        │
-                    │   (tabla citas)     │
-                    └──────────┬──────────┘
-                               │
-         ┌─────────────────────┼─────────────────────┐
-         │                     │                     │
-         ▼                     ▼                     ▼
- GET /citas/mias      GET /por-email?email=   GET /agenda/reservas
- (JWT paciente)       (invitado TFG)          (panel TFG)
-         │                     │                     │
-         ▼                     ▼                     ▼
-   syncMisCitas()         syncMisCitas()      panel-pruebas.js
-         │                     │
-         └──────────┬──────────┘
-                    ▼
-         localStorage citas_dr_agramonte_v3
-         (solo caché UI en reservar.html)
-```
-
-**Regla:** lo que cuenta para el tribunal y el panel es lo que está en **BD**. `localStorage` solo refleja esa lista tras cada sincronización.
-
-### Función `syncMisCitas()` (`frontend/js/pages/reserva.js`)
-
-| Situación | Petición | Efecto en «Mis citas» |
-|-----------|----------|------------------------|
-| Usuario con **JWT** | `GET /api/citas/mias` | Sustituye la caché local por citas del servidor |
-| **Invitado** con email en formulario o `localStorage` | `GET /api/citas/por-email?email=...` | Igual: solo citas de ese email en BD |
-| Sin email válido | No llama al API | Elimina entradas locales con id `CITA-...` (legacy) |
-
-**Cuándo se ejecuta:**
-
-- Al cargar `reservar.html` (tras cargar médicos).  
-- Tras **confirmar** una reserva (paciente o invitado).  
-- Tras **cancelar** (si la cita tiene id numérico del servidor).  
-- Al **escribir el email** (debounce 600 ms).  
-- Tras **login/logout** (`auth-changed`).
-
-### Flujos de reserva y cancelación
-
-#### Paciente autenticado
-
-1. `POST /api/citas` con JWT.  
-2. `syncMisCitas()` → `GET /citas/mias`.  
-3. `notificarCitaCreada()` → el panel abierto se refresca.
-
-#### Invitado (sin sesión)
-
-1. `POST /api/citas/reserva-publica` (nombre, email, teléfono, médico, fecha/hora; contraseña opcional).  
-2. Backend: crea o reutiliza usuario `PACIENTE` (`cuenta_invitada=true` hasta que fije contraseña).  
-3. Si el email ya tiene cuenta **con contraseña** → HTTP **409** («Inicia sesión»).  
-4. `syncMisCitas()` con el email del formulario.  
-5. Cancelar: `DELETE /api/citas/publica/{id}?email=...` (mismo email que la cita).
-
-#### Panel TFG (`panel-pruebas.html`)
-
-- Carga: `GET /api/citas/agenda/reservas?medicoId=1`.  
-- Refresco automático al reservar en otra pestaña (`BroadcastChannel` + clave `dr-agramonte-cita-creada`).  
-- Botón **Actualizar tabla** y al volver a la pestaña (`visibilitychange`).
-
-### Cómo comprobar que está sincronizado (checklist)
-
-1. `docker compose up -d --build` y esperar backend **healthy**.  
-2. Abrir http://localhost/reservar.html (recarga forzada **Ctrl+Shift+R** si hubo service worker antiguo).  
-3. Reservar **sin iniciar sesión** con un email de prueba (p. ej. `prueba.sync@example.com`).  
-4. Abrir **Mis citas programadas** → debe aparecer la cita.  
-5. Abrir http://localhost/panel-pruebas.html → misma fila en la tabla (o pulsar **Actualizar tabla**).  
-6. Cancelar desde «Mis citas» → la fila del panel pasa a **Cancelada** (o desaparece del filtro de activas).  
-7. (Opcional) API directo:  
-   `http://localhost:8080/api/citas/agenda/reservas?medicoId=1`  
-   `http://localhost:8080/api/citas/por-email?email=prueba.sync@example.com`
-
-### Endpoints relacionados con el control de sincronización
-
-| Método | Ruta | Quién | Panel | Mis citas |
-|--------|------|-------|-------|-----------|
-| POST | `/api/citas` | Paciente JWT | Sí | Sí (vía `mias`) |
-| POST | `/api/citas/reserva-publica` | Invitado | Sí | Sí (vía `por-email`) |
-| GET | `/api/citas/mias` | Paciente JWT | — | Sí |
-| GET | `/api/citas/por-email` | Invitado (email) | — | Sí |
-| DELETE | `/api/citas/{id}` | Paciente JWT | Sí | Sí |
-| DELETE | `/api/citas/publica/{id}?email=` | Invitado | Sí | Sí |
-| GET | `/api/citas/agenda/reservas` | Médico/Admin JWT | Sí | — |
-
-### Limitaciones (decirlas en la defensa)
-
-- **`por-email` y cancelación pública** son aceptables en un **prototipo TFG**; en producción harían falta enlace firmado, OTP o login obligatorio.  
-- «Mis citas» en otro navegador u otro PC solo se ven si usas el **mismo email** (el API filtra por email) o inicias sesión.  
-- El panel lista **todas** las reservas del médico; ya exige rol `MEDICO`/`ADMIN`, pero sigue siendo una vista de demo, no el panel clínico final.
-
-**Más detalle operativo:** [docs/SINCRONIZACION-CITAS.md](docs/SINCRONIZACION-CITAS.md)
-
----
-
-## 4. Estructura del repositorio
-
-```
-DR-AGRAMONTE-PROYECTO/
-├── README.md                 ← Este archivo (historia + uso)
-├── .env.example              ← Plantilla de secretos
-├── docker-compose.yml        ← Postgres + backend + frontend
-├── frontend/                 ← Sitio estático + nginx.conf
-├── postman/                  ← Colección + entorno Local-Docker (ver postman/README.md)
-├── backend/                  ← API Spring Boot
-│   └── src/main/resources/db/migration/
-│       ├── postgresql/       ← Flyway Postgres
-│       └── mysql/            ← Flyway MySQL
-└── docs/                     ← Memoria LaTeX y diagramas
-    ├── README.md             ← Índice documentación académica
-    └── Memoria-TFG-Dr-Agramonte.tex
-```
-
----
-
-## 5. Requisitos e instalación
-
-| Herramienta | ¿Necesaria? |
-|-------------|-------------|
-| **Docker Desktop** | Sí (recomendado para demo) |
-| JDK 21 + Maven 3.9+ | Solo si compilas backend sin Docker |
-| Node.js | No (frontend estático) |
-
-### Arranque rápido (recomendado)
-
-```powershell
-cd DR-AGRAMONTE-PROYECTO
-copy .env.example .env
-# Editar JWT_SECRET y opcionalmente Twilio
-
-docker compose up -d --build
-docker compose ps
-```
-
-- Web: http://localhost  
-- API directa: http://localhost:8080  
-- En la misma Wi‑Fi (móvil): `http://<IP-de-tu-PC>` (puerto 80)
-
-### Compilar backend sin Docker
-
-```powershell
-cd backend
-mvn -DskipTests compile
-mvn spring-boot:run
-```
-
-### Perfil MySQL (opcional)
-
-```powershell
-docker compose --profile mysql up -d --build
-# API en http://localhost:8081
-```
-
----
-
-## 6. Configuración (.env)
-
-Copia `.env.example` → `.env`:
-
-| Variable | Descripción |
-|----------|-------------|
-| `JWT_SECRET` | Secreto JWT (mín. 32 caracteres) |
-| `TWILIO_ENABLED` | `true` para enviar SMS/WhatsApp |
-| `TWILIO_ACCOUNT_SID` / `TWILIO_AUTH_TOKEN` | Credenciales Twilio |
-| `TWILIO_FROM` / `TWILIO_NOTIFY_TO` | Remitente y tu móvil |
-| `TWILIO_CHANNEL` | `whatsapp` o `sms` |
-| `TWILIO_NOTIFY_PATIENTS` | Avisos al paciente |
-| `TWILIO_REMINDER_HOURS` | Horas antes del recordatorio (24) |
-| `TELEGRAM_ENABLED` | `true` para enviar avisos por Telegram |
-| `TELEGRAM_BOT_TOKEN` | Token del bot (@BotFather) |
-| `TELEGRAM_BOT_USERNAME` | Usuario del bot sin `@`, para el enlace de vinculación |
-| `TELEGRAM_WEBHOOK_SECRET` | Secreto que valida las llamadas al webhook |
-| `MAIL_*` / `CONTACT_INBOX` | Email formulario contacto (opcional) |
-
-Si `TWILIO_ENABLED=false`, las citas funcionan igual; solo no se envían mensajes. Lo mismo con `TELEGRAM_ENABLED`.
-
-### Canal Telegram
-
-Los avisos al paciente (confirmación, cancelación y recordatorio) salen por Twilio y por Telegram; cada canal es independiente y el que esté apagado simplemente no envía.
-
-1. Crear el bot con **@BotFather** y guardar el token en `TELEGRAM_BOT_TOKEN`.  
+1. Crear el bot con **@BotFather** y guardar el token en `TELEGRAM_BOT_TOKEN`.
 2. Registrar el webhook con el mismo secreto que lleve `TELEGRAM_WEBHOOK_SECRET`:
 
    ```bash
@@ -391,145 +173,97 @@ Los avisos al paciente (confirmación, cancelación y recordatorio) salen por Tw
      -d "secret_token=<TELEGRAM_WEBHOOK_SECRET>"
    ```
 
-3. El paciente, con sesión iniciada, pulsa **Recibir avisos por Telegram** en «Mis citas programadas» (`reservar.html`). El backend emite un token de un solo uso, válido 15 minutos, y el enlace `https://t.me/<bot>?start=<token>`.  
-4. Al abrirlo, Telegram envía `/start <token>` al webhook, que asocia el `chat_id` al usuario. Desde ahí, el botón pasa a **Dejar de recibir avisos** (`DELETE /api/telegram/vinculacion`).
+3. El paciente, con sesión iniciada, pulsa **Recibir avisos por Telegram** en «Mis citas
+   programadas». El backend emite el token y el enlace `https://t.me/<bot>?start=<token>`.
+4. Al abrirlo, Telegram envía `/start <token>` al webhook, que asocia el `chat_id` a la
+   cuenta. Desde ahí el botón pasa a **Dejar de recibir avisos**.
 
-El token se emite siempre para el usuario del JWT, nunca a partir de un email recibido por parámetro: de otro modo cualquiera podría desviar a su chat los avisos de otro paciente.
-
-### Usuario médico de prueba (migración V3)
-
-| Campo | Valor |
-|-------|--------|
-| Email | `dr.agramonte@example.com` |
-| Contraseña | `Medico123!` |
-| Rol | `MEDICO` |
-
-Coincide con el email del médico seed (`medicos.id = 1`). La migración V3 también **regenera huecos en `horarios`** unos 90 días hacia adelante (lun–vie, sin pausa 14:00–15:00). En bases ya desplegadas, al arrancar el API Flyway aplica V3 automáticamente.
+</details>
 
 ---
 
-## 7. Demo y defensa (resumen)
+## Estructura del repositorio
 
-> **Guion de defensa completo (discurso cronometrado minuto a minuto para 15 min + banco de preguntas):** ver **[docs/DEFENSA-ENSAYO.md](docs/DEFENSA-ENSAYO.md)**. Esta sección es solo el resumen del flujo de demo.
-
-### Flujo a mostrar (5–7 min)
-
-1. `docker compose up -d --build`  
-2. Abrir http://localhost  
-3. **Opción A — Invitado:** `reservar.html` sin login → centro → **Junio** (o mes con huecos) → hora → datos + email → bloque «Cuenta (opcional)» → confirmar.  
-4. **Opción B — Paciente:** registro/login → misma reserva con JWT.  
-5. Desplegar **Mis citas programadas** → debe coincidir con el servidor.  
-6. Footer → **Pruebas TFG** (`panel-pruebas.html`): misma reserva en la tabla (se refresca sola o con **Actualizar tabla**).  
-7. Cancelar desde «Mis citas» → comprobar estado en el panel.  
-8. (Opcional) Login médico V3: `dr.agramonte@example.com` / `Medico123!` → pestaña «Vista médico».  
-9. (Opcional) Postman: carpeta `postman/` → **Reserva pública** → **Historial reservas prueba**.  
-
-### Si falla el backend
-
-- Sin API **no** se confirma la reserva (modal de éxito solo tras respuesta 201).  
-- Recuperación: `docker compose down` → `docker compose up -d --build`  
-- Plan B: capturas o vídeo del flujo; explicar arquitectura (sección 3.1)  
-
-### Preguntas frecuentes del tribunal (respuesta corta)
-
-| Pregunta | Respuesta |
-|----------|-----------|
-| ¿Doble reserva misma hora? | `SELECT FOR UPDATE`; la segunda recibe HTTP 409 |
-| ¿Por qué Spring Boot? | Seguridad, JPA, validación, ecosistema maduro |
-| ¿Por qué Docker? | Entorno reproducible para demo y tribunal |
-| ¿RGPD? | Privacidad, consentimiento, minimización de datos, JWT |
-| ¿Mis citas y el panel? | Misma BD; `syncMisCitas()` + panel con `agenda/reservas` (sección 3.1) |
-| ¿Qué no está hecho? | Historial clínico API, tests E2E automatizados, app nativa |
-
-**Detalle ampliado:** secciones 8 y 9 de este README (antes en archivos sueltos).
-
----
-
-## 8. Guía de demo con contingencia
-
-### Niveles
-
-- **A — Completo:** Docker + reserva (invitado o login) + mis citas = panel + cancelar  
-- **B — API caído:** explicar capas y logs; no hay reserva persistente sin backend  
-- **C — Último recurso:** diagrama sección 3.1 + capturas  
-
-### Protocolo si el backend no responde (60 s)
-
-```powershell
-docker compose down
-docker compose up -d --build
-docker compose logs backend --tail 50
+```
+.
+├── backend/          API Spring Boot (controller · service · repository · DTOs)
+│   └── src/main/resources/db/migration/   Flyway V1–V10 (postgresql/ y mysql/)
+├── frontend/         Sitio estático, PWA y nginx.conf
+├── postman/          Colección de la API
+├── docs/             Memoria del proyecto, diagramas y guías
+└── docker-compose.yml
 ```
 
-Mientras arranca: explicar capas (nginx → Spring → PostgreSQL).
+<details>
+<summary>Mapa del frontend</summary>
 
-### Mensaje para el tribunal
+| Página | Función |
+|--------|---------|
+| `index.html` | Inicio, hero y resumen de servicios |
+| `servicios.html` | Catálogo, con enlace directo a la reserva de cada servicio |
+| `reservar.html` | Flujo de cita: centro, calendario, hora, datos y «Mis citas» |
+| `estadisticas.html` | Cuadro de mando (rol `MEDICO`/`ADMIN`) |
+| `contacto.html` · `sobre-mi.html` · `testimonios.html` | Contenido informativo |
+| `privacidad.html` | Política de privacidad (RGPD) |
+| `offline.html` | Página que sirve la PWA cuando no hay conexión |
+| `panel-pruebas.html` | Panel de reservas y vista del médico |
 
-> La continuidad importa en sanidad. Si un componente falla, el flujo crítico no debe bloquear al paciente; por eso hay degradación controlada y entorno Docker reproducible.
+| Módulo JavaScript | Rol |
+|-------------------|-----|
+| `js/modules/api-client.js` | Cliente REST y gestión del JWT |
+| `js/modules/api-config.js` | URL base de la API |
+| `js/modules/auth-ui.js` | Login y registro desde el menú |
+| `js/pages/reserva.js` | Reserva, `syncMisCitas()`, «Mis citas» y vinculación con Telegram |
+| `js/pages/estadisticas.js` | Gráficos del cuadro de mando (Chart.js vendorizado) |
+| `js/pages/panel-pruebas.js` | Tabla de reservas y refresco entre pestañas |
+| `js/pages/dr-agramonte.js` | Navegación, tema, accesibilidad y registro de la PWA |
+| `service-worker.js` | Caché y modo sin conexión |
 
----
+</details>
 
-## 9. Preguntas probables del tribunal (extracto)
+## Documentación
 
-**Funcional:** flujo end-to-end; reserva invitado en BD; `syncMisCitas`; panel alineado; disponibilidad real; export ICS.
+| Documento | Contenido |
+|-----------|-----------|
+| [docs/EVOLUCION.md](docs/EVOLUCION.md) | Cómo creció el proyecto, fase a fase |
+| [docs/BASE-DE-DATOS.md](docs/BASE-DE-DATOS.md) | Esquema, diagrama relacional, integridad y concurrencia |
+| [docs/SINCRONIZACION-CITAS.md](docs/SINCRONIZACION-CITAS.md) | Una sola fuente de verdad entre las tres vistas de citas |
+| [docs/Memoria-TFG-Dr-Agramonte.pdf](docs/Memoria-TFG-Dr-Agramonte.pdf) | Memoria completa del proyecto (LaTeX) |
+| [docs/DOCKER-TROUBLESHOOTING.md](docs/DOCKER-TROUBLESHOOTING.md) | Arranque, 502 y healthchecks |
+| [docs/README.md](docs/README.md) | Índice del resto de documentación |
 
-**Arquitectura:** capas controller / service / repository; DTOs; JWT stateless; nginx proxy `/api`.
+## Hacia dónde va
 
-**Seguridad:** BCrypt; CORS configurado; rutas por rol; no commitear `.env`.
-
-**Notificaciones:** Twilio (SMS/WhatsApp) y Telegram, ambos opcionales; médico + paciente; recordatorio 24 h con `@Scheduled`. Si un canal falla o está apagado, el otro sigue enviando.
-
-**Pruebas / calidad:** suite de **47 tests en 3 niveles** — unitarios (`CitaServiceTest`, `TelegramVinculacionServiceTest`, `JwtProviderTest`, `DatabaseUrlEnvironmentPostProcessorTest`), seguridad/RBAC (`CitaControllerWebMvcTest`, `TelegramVinculacionControllerWebMvcTest`, `TelegramWebhookControllerWebMvcTest`) e integración end-to-end con **Testcontainers + PostgreSQL real** (`ReservaPublicaIntegrationTest`) — cubriendo las ramas críticas (409 doble reserva, 403 por rol, JWT, cancelación, secreto del webhook). Cobertura **no medida con JaCoCo** todavía y E2E (Playwright) como línea futura.
-
-**Limitaciones honestas:** `panel-pruebas.html` muestra reservas reales y agenda médico básica; historial clínico completo es evolución futura; sin MongoDB/Redis.
-
----
-
-## 10. Pendiente y hacia dónde vamos
-
-### Corto plazo (cierre TFG)
-
-- [ ] Capturas reales en anexo de memoria PDF  
-- [ ] Pruebas manuales documentadas (tabla de casos)  
-- [ ] Ensayo defensa oral 15 min (guion: `docs/DEFENSA-ENSAYO.md`)  
-- [ ] Probar Twilio sandbox antes del tribunal  
-
-### Mejora futura (post-TFG)
-
-- [ ] API de historial clínico + panel médico real  
-- [x] Tests JUnit (unitarios) + Testcontainers (integración) — suite en `backend/src/test`  
-- [x] Capa REST + seguridad por rol con `@WebMvcTest` (`CitaControllerWebMvcTest`)  
-- [ ] Ampliar cobertura (resto de controllers y servicios)  
-- [ ] Tests E2E (Playwright)  
-- [ ] Refresh token JWT  
-- [ ] Despliegue cloud (HTTPS, dominio)  
-- [ ] Pasarela de pago / teleconsulta integrada  
-
----
-
-## 11. Documentación en el repositorio
-
-| Qué necesitas | Dónde está |
-|---------------|------------|
-| **Historia + técnico + arranque** | Este `README.md` |
-| **Sincronización Mis citas ↔ Panel** | Sección 3.1 aquí + `docs/SINCRONIZACION-CITAS.md` |
-| **Postman (colección API)** | `postman/README.md` |
-| **Docker / 502 al arrancar** | `docs/DOCKER-TROUBLESHOOTING.md` |
-| **Memoria PDF (LaTeX)** | `docs/Memoria-TFG-Dr-Agramonte.tex` |
-| **Base de datos (esquema, diagrama, Q&A defensa)** | `docs/BASE-DE-DATOS.md` |
-| **Compilar memoria** | `docs/INSTRUCCIONES-MEMORIA-LATEX.md` |
-| **Integraciones (Twilio, sin secretos)** | `frontend/js/modules/API.md` |
-| **Guion de defensa (15 min cronometrado + preguntas)** | `docs/DEFENSA-ENSAYO.md` |
-| **Guion del PowerPoint (diapositivas)** | `docs/Defensa-TFG-PowerPoint-Guion.md` |
-| **Ficha esencial de la defensa (pitch + números)** | `docs/PRESENTACION-DEFENSA.md` |
-| **Demo contingencia** | Sección 8 aquí (antes `GUIA-DEMO-CONTINGENCIA.md`) |
-| **Preguntas tribunal** | Sección 9 aquí (antes `PREGUNTAS-TRIBUNAL-DEMO.md`) |
-
-Los antiguos `GUIA-DEMO-CONTINGENCIA.md` y `PREGUNTAS-TRIBUNAL-DEMO.md` eran solo punteros al README; se retiraron del repositorio (quedan en la carpeta local `_a-eliminar/`). **La versión consolidada y actualizada es este README** y `docs/DEFENSA-ENSAYO.md`.
+- [ ] Pasarela de pago en línea (la cobertura y la preferencia ya se capturan)
+- [ ] Panel clínico multi-centro con historial
+- [ ] Refresh token
+- [ ] Cobertura medida con JaCoCo y pruebas E2E
+- [ ] Confirmar o cancelar la cita desde el propio aviso
 
 ---
 
-## Licencia y autoría
+## Sobre mí
 
-Proyecto académico — **Mar Agramonte**, CESUR, DAM 2024–2025.  
-Código y documentación para evaluación del módulo de proyecto (TFG).
+Soy **Mar Agramonte**, desarrolladora recién graduada en el Ciclo Superior de **Desarrollo de
+Aplicaciones Multiplataforma**.
+
+Vengo de administración y he hecho la transición a desarrollo construyendo proyectos reales,
+no solo ejercicios de clase. Este es uno: nació como mi proyecto de fin de ciclo y sigue
+creciendo porque hay una consulta de verdad detrás. Ahora mismo estoy desarrollando además
+una web para un negocio real.
+
+Trabajo con **Java, JavaScript, HTML y CSS**. Sé consumir y probar APIs e integrar servicios
+externos en una aplicación: aquí están Twilio, la Bot API de Telegram y el despliegue en
+Railway con dominio propio y HTTPS.
+
+Uso herramientas de IA como apoyo activo —para aprender más rápido, depurar y desatascarme—
+igual que cualquier desarrolladora junior hoy. Las decisiones técnicas de este repositorio,
+y el saber explicarlas, son mías.
+
+Busco mi **primera oportunidad como desarrolladora junior**, en Mallorca o en remoto, en un
+equipo donde seguir creciendo y aportar desde el primer día.
+
+---
+
+Proyecto propio de **Mar Agramonte**. Desarrollado como Trabajo de Fin de Ciclo (DAM, CESUR)
+y en evolución desde entonces.
