@@ -32,7 +32,7 @@
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\small\color{tealdark}Mar Agramonte --- Proyecto DAM}
+\fancyhead[L]{\small\color{tealdark}Mar Agramonte --- Dr. Agramonte}
 \fancyhead[R]{\small\thepage}
 \renewcommand{\headrulewidth}{0.4pt}
 
@@ -80,7 +80,7 @@
   \pagestyle{empty}
   \centering
   \vspace*{1.5cm}
-  {\Large\bfseries\color{tealdark} TRABAJO DE FIN DE CICLO\\[0.8em]}
+  {\Large\bfseries\color{tealdark} MEMORIA TÉCNICA DEL PROYECTO\\[0.8em]}
   \vspace{0.8cm}
   {\Huge\bfseries\color{teal} DR. AGRAMONTE\\[0.4em]}
   {\Large\bfseries\color{teallight} Plataforma web de gestión de citas médicas\\[1.5em]}
@@ -91,10 +91,7 @@
   \vfill
   \begin{tabular}{rl}
     \textbf{Autora:} & Mar Agramonte Campos \\
-    \textbf{Centro:} & CESUR \\
-    \textbf{Ciclo:} & Desarrollo de Aplicaciones Multiplataforma \\
-    \textbf{Tutores:} & Pascual Barrer -- Jaume Rossinrol \\
-    \textbf{Curso:} & 2025--2026 \\
+    \textbf{En línea:} & \url{https://www.dragramonte.com} \\
   \end{tabular}
 \end{titlepage}
 
@@ -173,13 +170,31 @@ En España, si trabajas en un hospital grande tienes sistemas de cita online; si
 
 Existe un espacio entre ambas opciones donde caben muchos profesionales que necesitan una herramienta especializada, accesible y bajo su control. \textbf{Dr. Agramonte se diseña pensando precisamente en ese espacio.}
 
+\section{El sector: construir software para una consulta médica}
+
+El ámbito del proyecto es el sanitario privado y, dentro de él, un problema muy concreto: la gestión de agenda, la relación paciente--médico y la comunicación entre ambos.
+
+Construir software para una consulta médica exige un perfil mixto: por un lado, trabajo de oficina propio del desarrollo de software (análisis, programación, pruebas, documentación); por otro, la necesidad de entender la realidad de un entorno clínico, donde los datos que se manejan son sensibles, los usuarios tienen edades y niveles digitales muy distintos, y un error no es un simple \emph{bug}, sino una persona afectada. Comprender ese sector —sus tiempos, sus prioridades y sus límites legales— es tan parte del trabajo como escribir el código, y de hecho condiciona casi todas las decisiones técnicas que aparecen más adelante.
+
+\section{Tipos de solución y dónde encaja el proyecto}
+
+Desde el punto de vista del desarrollo, una herramienta de gestión de citas puede abordarse de tres formas, cada una con sus compromisos:
+
+\begin{itemize}
+  \item \textbf{SaaS} (software como servicio): el proveedor aloja la aplicación y el cliente paga una suscripción (Doctoralia, Top Doctors). Cómodo y siempre actualizado, pero con costes recurrentes, comisiones y los datos en manos de un tercero.
+  \item \textbf{A medida} (\emph{open source} / propietario): la aplicación se desarrolla y se despliega en la infraestructura del propio profesional. Da control total, sin comisiones y permite personalizar, a cambio de requerir conocimiento técnico para mantenerla.
+  \item \textbf{Herramientas genéricas} (agendas o CRM no sanitarios): baratas, pero ajenas a las particularidades de la sanidad (historial clínico, normativa de conservación, roles).
+\end{itemize}
+
+\textbf{Dr. Agramonte} se sitúa en el modelo \emph{a medida}: una solución propia, sin comisiones, con los datos bajo control del consultorio y pensada para ser desplegable y mantenible por un perfil técnico.
+
 \section{Viabilidad económica (estimación)}
 
 Como desarrolladora, una decisión técnica no se sostiene solo por ser elegante: tiene que tener sentido también en coste. Por eso conviene una estimación, con cifras aproximadas y a modo ilustrativo, de lo que aporta la herramienta frente a su coste.
 
 \textbf{Ahorro.} Si la reserva, confirmación y cancelación autónomas evitan en torno a \textbf{4 horas semanales} de gestión telefónica, y se valora la hora de consulta privada en unos 50\,€, el ahorro ronda los 200\,€ semanales, del orden de \textbf{10.000\,€ al año} en tiempo recuperado por el profesional.
 
-\textbf{Coste.} El desarrollo es un coste \emph{único} (este propio TFG), y la operación es deliberadamente barata gracias a las decisiones de arquitectura: un frontend estático sin dependencias, un único backend Java y una base de datos relacional caben de sobra en una VPS modesta (del orden de 10\,€/mes). No hay comisiones por cita ni cuotas de plataforma de terceros.
+\textbf{Coste.} El desarrollo es un coste \emph{único} ya asumido, y la operación es deliberadamente barata gracias a las decisiones de arquitectura: un frontend estático sin dependencias, un único backend Java y una base de datos relacional caben de sobra en una VPS modesta (del orden de 10\,€/mes). No hay comisiones por cita ni cuotas de plataforma de terceros.
 
 \textbf{Conclusión.} Con estas cifras —que habría que afinar en un caso real— la inversión se amortiza en pocos meses. Más allá del número, la idea de fondo es que las decisiones de desarrollo (sin frameworks innecesarios, contenedores ligeros, una sola base de datos relacional) no solo simplifican el código: también hacen el sistema \textbf{sostenible} para una consulta pequeña.
 
@@ -205,13 +220,13 @@ Esto significa que no basta con que la aplicación funcione: tiene que funcionar
 \chapter{Objetivos}
 % ============================================================================
 
-Los objetivos del proyecto se formularon con un criterio que ha guiado toda la memoria: que cada meta fuera \textbf{concreta, verificable y realmente alcanzable} dentro del alcance de un TFG. No se persigue prometer un producto enorme a medias, sino entregar un sistema más pequeño pero completo, coherente y demostrable.
+Los objetivos se formularon con un criterio que ha guiado todo el proyecto: que cada meta fuera \textbf{concreta, verificable y realmente alcanzable} con los recursos disponibles. No se persigue prometer un producto enorme a medias, sino entregar un sistema más pequeño pero completo, coherente y demostrable.
 
 \section{Objetivo general}
 
 Desarrollar una aplicación web de gestión de citas médicas que permita al paciente reservar y cancelar de forma autónoma, reduciendo la dependencia del teléfono y devolviendo al profesional el control de su tiempo, sobre un backend seguro y un despliegue reproducible.
 
-\section{Objetivos específicos (alineados con la implementación)}
+\section{Objetivos específicos}
 
 Cada objetivo específico se corresponde con código real del repositorio y, cuando aplica, con una prueba que lo respalda. Esa trazabilidad entre objetivo, implementación y prueba es deliberada: evita el riesgo de prometer en la memoria lo que no existe en el sistema.
 
@@ -222,8 +237,8 @@ Cada objetivo específico se corresponde con código real del repositorio y, cua
   \item Construir frontend responsive, PWA, modo oscuro y flujo de reserva accesible (\texttt{reserva.js}, \texttt{api-client.js}).
   \item Enviar notificaciones al médico y al paciente por \textbf{Twilio} (SMS/WhatsApp) y por un \textbf{bot de Telegram}, con recordatorio programado 24\,h antes (\texttt{CitaReminderScheduler}).
   \item Desplegar con \textbf{Docker Compose} (nginx + backend + base de datos).
-  \item Validar la calidad con pruebas automatizadas y análisis de vulnerabilidades, y preparar la defensa con una demo reproducible.
-  \item Ofrecer un \textbf{cuadro de mando de gestión} (módulo SGE) con analítica agregada —carga por médico, demanda por especialidad, reparto por centro y tasa de cancelación— restringido a los roles \texttt{MEDICO}/\texttt{ADMIN}.
+  \item Validar la calidad con pruebas automatizadas y análisis de vulnerabilidades, sobre un entorno reproducible.
+  \item Ofrecer un \textbf{cuadro de mando de gestión} con analítica agregada —carga por médico, demanda por especialidad, reparto por centro y tasa de cancelación— restringido a los roles \texttt{MEDICO}/\texttt{ADMIN}.
 \end{enumerate}
 
 Estos ocho objetivos se retoman en el capítulo de conclusiones para comprobar, uno a uno, su grado de cumplimiento.
@@ -232,69 +247,7 @@ Estos ocho objetivos se retoman en el capítulo de conclusiones para comprobar, 
 \chapter{Desarrollo}
 % ============================================================================
 
-% ----------------------------------------------------------------------------
-\section{Contextualización del sector}
-% ----------------------------------------------------------------------------
-
-\subsection{Descripción del sector profesional}
-
-El ciclo de Desarrollo de Aplicaciones Multiplataforma (DAM) aporta competencias en desarrollo multiplataforma, bases de datos, programación de servicios, diseño de interfaces y despliegue. Este proyecto las aplica a un ámbito muy concreto: el sanitario privado, y dentro de él, a la gestión de agenda, la relación paciente--médico y la comunicación entre ambos.
-
-El puesto de referencia para este TFG es el de \emph{desarrollador/a de aplicaciones} que da soporte a un consultorio de medicina interna. Es un perfil mixto: por un lado, trabajo de oficina propio del desarrollo de software (análisis, programación, pruebas, documentación); por otro, la necesidad de entender la realidad de un entorno clínico, donde los datos que se manejan son sensibles, los usuarios tienen edades y niveles digitales muy distintos, y un error no es un simple \emph{bug}, sino una persona afectada. Comprender ese sector —sus tiempos, sus prioridades y sus límites legales— es tan parte del trabajo como escribir el código, y de hecho condiciona casi todas las decisiones técnicas que aparecen más adelante en esta memoria.
-
-\subsection{Tipos de solución y dónde encaja el proyecto}
-
-Desde el punto de vista del desarrollo, una herramienta de gestión de citas puede abordarse de tres formas, cada una con sus compromisos:
-
-\begin{itemize}
-  \item \textbf{SaaS} (software como servicio): el proveedor aloja la aplicación y el cliente paga una suscripción (Doctoralia, Top Doctors). Cómodo y siempre actualizado, pero con costes recurrentes, comisiones y los datos en manos de un tercero.
-  \item \textbf{A medida} (\emph{open source} / propietario): la aplicación se desarrolla y se despliega en la infraestructura del propio profesional. Da control total, sin comisiones y permite personalizar, a cambio de requerir conocimiento técnico para mantenerla.
-  \item \textbf{Herramientas genéricas} (agendas o CRM no sanitarios): baratas, pero ajenas a las particularidades de la sanidad (historial clínico, normativa de conservación, roles).
-\end{itemize}
-
-\textbf{Dr. Agramonte} se sitúa en el modelo \emph{a medida}: una solución propia, sin comisiones, con los datos bajo control del consultorio y pensada para ser desplegable y mantenible por un perfil técnico.
-
-\subsection{Competencias del desarrollador DAM aplicadas}
-
-El proyecto no nace de un módulo concreto, sino de la integración de las competencias del ciclo, que es precisamente lo que se espera de un perfil de \emph{desarrollo}:
-
-\begin{itemize}
-  \item \textbf{Acceso a datos:} modelo relacional, JPA y transacciones (las tablas y el bloqueo de la reserva).
-  \item \textbf{Programación de servicios y procesos:} la API REST, la seguridad y la tarea programada de recordatorios.
-  \item \textbf{Desarrollo de interfaces:} el frontend accesible y la PWA.
-  \item \textbf{Sistemas y despliegue:} contenedores Docker, nginx y perfiles de configuración.
-  \item \textbf{Empresa e iniciativa emprendedora:} el análisis del hueco de mercado y la viabilidad económica.
-\end{itemize}
-
-Las salidas naturales de este perfil —desarrollo \emph{backend}, \emph{full-stack} o iniciación a \emph{DevOps}— se ven reflejadas en las distintas capas que ha sido necesario construir para este sistema.
-
-\subsection{Riesgos laborales}
-
-\begin{itemize}
-  \item \textbf{Ergonómicos:} posturas prolongadas ante pantalla, fatiga visual y movimientos repetitivos al teclear, tanto en el puesto de desarrollo como en la consulta.
-  \item \textbf{Psicosociales:} estrés por interrupciones y carga administrativa; la digitalización de citas reduce esa presión.
-  \item \textbf{Seguridad de la información:} el tratamiento de datos de salud (categoría especial RGPD) implica riesgo de fuga o acceso indebido.
-  \item \textbf{Medioambientales:} consumo energético de equipos y servidores; gestión responsable de residuos electrónicos (RAEE).
-\end{itemize}
-
-\subsection{Medidas preventivas}
-
-\begin{itemize}
-  \item \textbf{Ergonomía:} silla regulable, pantalla a la altura de los ojos, regla 20-20-20 para la vista y pausas activas periódicas.
-  \item \textbf{Organización:} la propia herramienta reduce el riesgo psicosocial al eliminar llamadas e interrupciones de agenda.
-  \item \textbf{Protección de datos:} cifrado en tránsito (HTTPS), contraseñas con \texttt{BCrypt}, secretos en variables de entorno, control de accesos por rol y copias de seguridad de la base de datos.
-  \item \textbf{Sostenibilidad:} despliegue en contenedores ligeros y apagado de servicios no usados.
-\end{itemize}
-
-\subsection{Equipos de protección y buenas prácticas (EPIs)}
-
-En un puesto de desarrollo software los EPIs físicos son limitados, por lo que la prevención se apoya en \textbf{equipamiento ergonómico} (reposamuñecas, filtro de luz azul, iluminación adecuada) y, sobre todo, en \textbf{buenas prácticas de seguridad} como ``EPI digital'': no commitear credenciales, principio de mínimo privilegio, actualización de dependencias y revisión de vulnerabilidades.
-
-% ----------------------------------------------------------------------------
-\section{Desarrollo principal}
-% ----------------------------------------------------------------------------
-
-\subsection{Del boceto inicial a la implementación}
+\section{Del boceto inicial a la implementación}
 
 Antes de escribir una sola línea de código dibujé cómo debía sentirse la plataforma. El boceto inicial (figura~\ref{fig:boceto}) fijó las decisiones de fondo que luego se mantuvieron: un flujo de reserva guiado paso a paso, una estética sobria propia de un consultorio y una navegación pensada para que una persona mayor o poco habituada a la tecnología no se pierda. Ese boceto no fue un trámite: marcó la diferencia entre construir ``una web de citas'' y construir \emph{esta} web de citas, con su identidad y su tono.
 
@@ -305,21 +258,21 @@ Antes de escribir una sola línea de código dibujé cómo debía sentirse la pl
   \label{fig:boceto}
 \end{figure}
 
-Comparando el boceto con el resultado final se aprecia que las ideas centrales sobrevivieron al desarrollo (reserva por pasos, selección de centro, identidad visual del consultorio), mientras que otras se ajustaron a lo que el alcance de un TFG permite construir con garantías. Documentar esa evolución es parte del valor del proyecto: enseña no solo qué se hizo, sino por qué se decidió así.
+Comparando el boceto con el resultado final se aprecia que las ideas centrales sobrevivieron al desarrollo (reserva por pasos, selección de centro, identidad visual del consultorio), mientras que otras se ajustaron a lo que era posible construir con garantías en el tiempo disponible. Documentar esa evolución es parte del valor del proyecto: enseña no solo qué se hizo, sino por qué se decidió así.
 
-\subsection{Metodología de desarrollo}
+\section{Metodología de desarrollo}
 
 El proyecto no se construyó de una vez, sino de forma \textbf{iterativa e incremental}: primero una web estática que validaba la idea y la navegación, después el backend y la base de datos, luego la integración real entre frontend y API, y por último las notificaciones, la robustez para la demo y la documentación. Cada iteración partía de algo que ya funcionaba y le añadía una capa, lo que permitió detectar pronto los problemas reales —como la incoherencia entre las citas del navegador y las de la base de datos— en lugar de descubrirlos al final.
 
 Todo el código se gestionó con \textbf{control de versiones Git}, lo que aportó un historial de cambios, la posibilidad de volver atrás ante un error y una separación clara entre lo que es código fuente y lo que son secretos o configuración local (estos últimos excluidos del repositorio mediante \texttt{.gitignore}). Se trabajó además con la distinción entre \textbf{entornos}: una configuración para desarrollo y otra preparada para producción, seleccionables por perfiles, de modo que la misma base de código se comporta de forma adecuada en cada contexto sin tocar el código. Esta forma de trabajar es, en sí misma, una de las competencias que el ciclo busca consolidar.
 
-\subsection{Arquitectura general}
+\section{Arquitectura general}
 
 La solución sigue una arquitectura en capas desplegada con contenedores, de forma que cada pieza tiene una responsabilidad clara y puede sustituirse o escalarse sin arrastrar a las demás. El navegador consume el frontend (HTML, CSS y JavaScript) servido por \textbf{nginx}; las peticiones a \texttt{/api} se redirigen mediante proxy inverso al backend Java, lo que evita problemas de CORS en producción y permite presentar todo bajo un mismo origen. El backend de \textbf{Spring Boot} concentra la lógica de negocio, la seguridad y el acceso a datos sobre \textbf{PostgreSQL}, y delega en \textbf{Twilio} (servicio externo invocado desde \texttt{TwilioMessageService}) el envío de SMS y mensajes de WhatsApp. Esta separación en capas (presentación, API, persistencia y servicios externos) es la que sostiene el resto de decisiones técnicas de la memoria.
 
 \input{tikz-diagrama-arquitectura}
 
-\subsection{Organización del backend en capas y DTOs}
+\section{Organización del backend en capas y DTOs}
 
 Dentro del backend, el código sigue el patrón clásico de \textbf{tres capas} de Spring, con responsabilidades bien separadas:
 
@@ -329,9 +282,9 @@ Dentro del backend, el código sigue el patrón clásico de \textbf{tres capas} 
   \item \textbf{Repositorios} (\texttt{repository}): acceden a la base de datos mediante Spring Data JPA, incluida la consulta con bloqueo pesimista para la reserva.
 \end{itemize}
 
-Una decisión importante fue \textbf{no exponer nunca las entidades JPA directamente} en la API. Las respuestas usan objetos de transferencia de datos (\emph{DTO}) como \texttt{CitaResponse} o \texttt{ReservaPublicaResponse}, y las peticiones se modelan con clases como \texttt{CrearCitaRequest} o \texttt{ReservaPublicaRequest}. Esto tiene tres ventajas: evita filtrar al exterior campos internos o sensibles, desacopla el modelo de base de datos del contrato público de la API (se puede cambiar la entidad sin romper a los clientes) y permite validar la entrada de forma declarativa con anotaciones. Es una práctica que el tribunal reconoce de inmediato como código profesional, no de juguete.
+Una decisión importante fue \textbf{no exponer nunca las entidades JPA directamente} en la API. Las respuestas usan objetos de transferencia de datos (\emph{DTO}) como \texttt{CitaResponse} o \texttt{ReservaPublicaResponse}, y las peticiones se modelan con clases como \texttt{CrearCitaRequest} o \texttt{ReservaPublicaRequest}. Esto tiene tres ventajas: evita filtrar al exterior campos internos o sensibles, desacopla el modelo de base de datos del contrato público de la API (se puede cambiar la entidad sin romper a los clientes) y permite validar la entrada de forma declarativa con anotaciones. Es una práctica que distingue de inmediato el código profesional del código de juguete.
 
-\subsection{Stack tecnológico}
+\section{Stack tecnológico}
 
 \begin{table}[H]
 \centering
@@ -354,20 +307,20 @@ Analítica & Chart.js 4 (vendorizado) & Cuadro de mando de gestión \\
 \end{tabular}
 \end{table}
 
-\subsection{Justificación de las tecnologías}
+\section{Justificación de las tecnologías}
 
 Cada pieza del stack se eligió por una razón concreta, no por moda:
 
 \begin{itemize}
   \item \textbf{Java + Spring Boot.} El tipado fuerte de Java detecta en tiempo de compilación errores que en un lenguaje dinámico aparecerían en producción, algo especialmente valioso cuando se manejan datos de salud. Spring Boot aporta, además, un ecosistema maduro: Spring Security como estándar de facto para autenticación y autorización, Spring Data JPA para el acceso a datos y transacciones ACID que garantizan que una reserva se complete entera o no se complete en absoluto.
   \item \textbf{PostgreSQL.} Para datos críticos (usuarios, médicos, horarios y citas) hace falta integridad referencial real, transacciones fiables y bloqueo a nivel de fila. PostgreSQL ofrece las tres cosas y permite implementar el control de concurrencia con \texttt{SELECT \ldots FOR UPDATE}, núcleo de la garantía de ``no doble reserva''.
-  \item \textbf{Flyway.} Versiona el esquema en migraciones numeradas (V1 a V10), de modo que cualquier entorno —el de desarrollo, el del tribunal o uno futuro en producción— se reconstruye exactamente igual al arrancar.
+  \item \textbf{Flyway.} Versiona el esquema en migraciones numeradas (V1 a V10), de modo que cualquier entorno —el de desarrollo, el de otra persona del equipo o el de producción— se reconstruye exactamente igual al arrancar.
   \item \textbf{Twilio.} En lugar de montar infraestructura propia de mensajería, se delega el envío de SMS y WhatsApp en un proveedor consolidado, invocado directamente desde el backend Java.
   \item \textbf{Telegram (Bot API).} Se incorporó como segundo canal de aviso por una razón práctica: es gratuito y no exige que el paciente se dé de alta previamente en un \emph{sandbox}, como sí ocurre con la cuenta de prueba de Twilio. Se integra por HTTP con \texttt{RestClient}, sin SDK adicional, de modo que no añade ninguna dependencia al proyecto.
   \item \textbf{Docker Compose.} Levanta todo el sistema con un único comando, eliminando el clásico ``en mi máquina funciona''.
 \end{itemize}
 
-\subsection{Modelo de datos}
+\section{Modelo de datos}
 
 \input{tikz-diagrama-er}
 
@@ -382,9 +335,9 @@ El modelo relacional gira en torno a cuatro entidades centrales —\texttt{usuar
   \item \texttt{centros}: los centros o consultas donde se atiende (\texttt{codigo} único, nombre, dirección, ciudad). Cada \texttt{cita} referencia opcionalmente su centro mediante \texttt{centro\_id}.
 \end{itemize}
 
-La evolución del esquema queda reflejada en las migraciones Flyway: la \texttt{V2\_\_cita\_recordatorio} añade el campo \texttt{recordatorio\_enviado} para evitar duplicar avisos Twilio, la \texttt{V3} extiende los horarios y crea el usuario médico de prueba, la \texttt{V4} introduce \texttt{cuenta\_invitada} para la reserva sin registro previo, la \texttt{V5} crea la tabla \texttt{centros} (con sus datos iniciales) y añade \texttt{centro\_id} a \texttt{citas}, la \texttt{V6} añade \texttt{centro\_id} a \texttt{horarios} (repartiendo la agenda por centro), la \texttt{V7} actualiza los centros a sus ubicaciones reales en Palma de Mallorca, la \texttt{V8} incorpora a la cita la cobertura y la preferencia de pago, la \texttt{V9} abre el canal de Telegram (\texttt{telegram\_chat\_id} y \texttt{telegram\_link\_token}, ambos con índice único) y la \texttt{V10} añade la caducidad de ese token de vinculación. Versionar el esquema de esta forma garantiza que la base de datos del tribunal se construya exactamente igual que la de desarrollo.
+La evolución del esquema queda reflejada en las migraciones Flyway: la \texttt{V2\_\_cita\_recordatorio} añade el campo \texttt{recordatorio\_enviado} para evitar duplicar avisos Twilio, la \texttt{V3} extiende los horarios y crea el usuario médico de prueba, la \texttt{V4} introduce \texttt{cuenta\_invitada} para la reserva sin registro previo, la \texttt{V5} crea la tabla \texttt{centros} (con sus datos iniciales) y añade \texttt{centro\_id} a \texttt{citas}, la \texttt{V6} añade \texttt{centro\_id} a \texttt{horarios} (repartiendo la agenda por centro), la \texttt{V7} actualiza los centros a sus ubicaciones reales en Palma de Mallorca, la \texttt{V8} incorpora a la cita la cobertura y la preferencia de pago, la \texttt{V9} abre el canal de Telegram (\texttt{telegram\_chat\_id} y \texttt{telegram\_link\_token}, ambos con índice único) y la \texttt{V10} añade la caducidad de ese token de vinculación. Versionar el esquema de esta forma garantiza que la base de datos se construya exactamente igual en cualquier máquina.
 
-\subsection{Persistencia relacional frente a NoSQL}
+\section{Persistencia relacional frente a NoSQL}
 
 La elección de la base de datos no fue automática: se valoró expresamente un enfoque \textbf{NoSQL documental} (MongoDB) frente al \textbf{relacional} (PostgreSQL) antes de decidir. Ambos paradigmas son válidos, pero resuelven problemas distintos, y conviene justificar por qué uno encaja mejor en este caso.
 
@@ -394,19 +347,19 @@ En este proyecto los datos son intrínsecamente relacionales —un \texttt{usuar
 
 Esto no descarta NoSQL: simplemente lo reserva para donde sí encaja. El \textbf{historial clínico} es el candidato natural a un almacén documental, porque cada especialidad registra campos distintos (no hay un esquema único razonable) y los datos se añaden más que se modifican; lo mismo aplicaría a un \emph{registro de auditoría} de accesos. La evolución coherente del sistema sería, por tanto, una \textbf{persistencia políglota}: PostgreSQL para el núcleo de citas (consistencia) y MongoDB para el historial clínico (flexibilidad), una línea ya recogida entre los trabajos futuros. La decisión, en resumen, no fue ``relacional porque sí'', sino elegir la herramienta adecuada para cada tipo de dato.
 
-\subsection{Frontend y paleta visual}
+\section{Frontend y paleta visual}
 
 Los colores del documento y de los diagramas coinciden con \texttt{dr-agramonte.css}: teal principal, fondos \texttt{off-white}, tarjetas blancas y variante oscura (\texttt{data-theme="dark"}, fondo \#0F172A).
 
 \input{tikz-diagrama-frontend}
 
-\subsection{Autenticación JWT}
+\section{Autenticación JWT}
 
 La autenticación se resuelve con \textbf{JSON Web Tokens} en modo \emph{stateless}: el servidor no guarda sesiones en base de datos, sino que confía en un token firmado que el cliente presenta en cada petición. \texttt{AuthController} expone \texttt{POST /api/auth/login} y \texttt{POST /api/auth/registro}; al autenticarse correctamente, \texttt{JwtProvider} genera un token firmado con clave secreta (algoritmo HMAC-SHA) que incluye el identificador del usuario y una fecha de expiración. A partir de ahí, el token viaja en la cabecera \texttt{Authorization: Bearer} y \texttt{JwtAuthFilter} lo valida en cada petición protegida antes de que esta llegue al controlador.
 
 Elegí este modelo por tres motivos concretos. Primero, \textbf{rendimiento}: al no consultar sesiones en BD, cada validación es una comprobación de firma en memoria. Segundo, \textbf{escalabilidad horizontal}: varios contenedores del backend pueden validar el mismo token sin compartir estado entre ellos. Tercero, \textbf{simplicidad de integración}: cualquier cliente (la web actual o, en el futuro, una app móvil) consume la API igual. La contrapartida honesta es que un token \emph{stateless} no se puede revocar antes de que caduque; por eso la duración es corta y la introducción de un \emph{refresh token} queda recogida como mejora futura. Las contraseñas nunca se almacenan en claro: se cifran con \texttt{BCryptPasswordEncoder} con factor de coste 12, de modo que incluso ante una fuga de la base de datos los hashes resultan costosísimos de revertir.
 
-\subsection{Reserva y concurrencia}
+\section{Reserva y concurrencia}
 
 El problema más interesante de toda la aplicación es aparentemente trivial: ¿qué pasa si dos pacientes intentan reservar la misma franja en el mismo instante? Sin control, ambos verían el hueco como libre, ambos confirmarían y el médico acabaría con dos personas citadas a la misma hora. Esto no es una hipótesis de laboratorio: en una agenda real ocurre justo en las franjas más demandadas. La solución no puede ser ``cruzar los dedos'', tiene que ser determinista.
 
@@ -422,7 +375,7 @@ Tras validar, se crea la \texttt{Cita} y se marca el horario como no disponible.
 
 \input{tikz-diagrama-reserva}
 
-\subsection{Reserva como invitado}
+\section{Reserva como invitado}
 
 No todos los pacientes quieren —o saben— crearse una cuenta antes de pedir cita, y obligar a registrarse es una de las principales causas de abandono en cualquier formulario. Por eso la plataforma ofrece \textbf{dos vías de reserva que persisten en la misma tabla \texttt{citas}}:
 
@@ -433,11 +386,11 @@ No todos los pacientes quieren —o saben— crearse una cuenta antes de pedir c
 
 En la reserva de invitado, el backend crea o reutiliza una cuenta de paciente marcada como \texttt{cuenta\_invitada} (introducida en la migración Flyway V4); la contraseña es opcional, de modo que el invitado puede ``ascender'' más adelante a cuenta completa sin perder su historial de citas. Si el email ya pertenece a una cuenta con contraseña, el sistema responde con \textbf{HTTP 409} invitando a iniciar sesión, evitando que un tercero reserve en nombre de un usuario registrado. El invitado consulta y cancela sus citas mediante su email (\texttt{GET /api/citas/por-email} y \texttt{DELETE /api/citas/publica/\{id\}}).
 
-Es importante presentarlo con honestidad: este mecanismo es \textbf{adecuado para un prototipo de TFG}, pero en producción la consulta y cancelación por email deberían reforzarse con un enlace firmado, un código de un solo uso (OTP) o login obligatorio, para impedir que alguien acceda a las citas de otra persona conociendo solo su dirección de correo. Reconocer esa limitación forma parte del rigor del proyecto.
+Es importante presentarlo con honestidad: este mecanismo es \textbf{adecuado para un prototipo}, pero en producción la consulta y cancelación por email deberían reforzarse con un enlace firmado, un código de un solo uso (OTP) o login obligatorio, para impedir que alguien acceda a las citas de otra persona conociendo solo su dirección de correo. Reconocer esa limitación forma parte del rigor del proyecto.
 
 \paragraph{Cobertura y preferencia de pago.} A raíz del \emph{feedback} de los primeros usuarios de prueba —que echaban en falta saber el precio y los seguros aceptados antes de confirmar— el formulario de reserva captura también la \textbf{cobertura}: consulta privada, con su precio visible (80 euros), o seguro médico, con la aseguradora y el número de tarjeta sanitaria. En el caso privado se recoge además la \textbf{preferencia de pago} (en consulta u online). Estos datos se persisten en la cita mediante la migración Flyway \textbf{V8} (\texttt{cobertura}, \texttt{aseguradora}, \texttt{numero\_tarjeta\_sanitaria}, \texttt{preferencia\_pago}) y se devuelven al profesional al gestionar la agenda. El \emph{cobro} en sí no se procesa todavía: la pasarela de pago en línea se documenta como línea futura.
 
-\subsection{API principal}
+\section{API principal}
 
 \begin{table}[H]
 \centering
@@ -464,13 +417,13 @@ POST & /api/contact & Formulario de contacto \\
 \caption{Endpoints principales}
 \end{table}
 
-\subsection{Manejo centralizado de errores}
+\section{Manejo centralizado de errores}
 
 Una API es tan buena como sus errores: si cada fallo se devuelve de una forma distinta, el frontend se vuelve frágil y difícil de mantener. Para evitarlo, el backend usa un \texttt{GlobalExceptionHandler} que captura las excepciones de forma centralizada y las traduce a respuestas JSON consistentes, con su código HTTP adecuado. Así, una franja ya ocupada devuelve siempre \textbf{409 Conflict}, una acción sin permiso \textbf{403 Forbidden} y un recurso inexistente \textbf{404 Not Found}, todos con el mismo formato (marca de tiempo, estado, mensaje y ruta).
 
 La ventaja es doble. Por un lado, el frontend puede confiar en una estructura de error predecible y mostrar mensajes claros al usuario (por ejemplo, ``esa hora acaba de ocuparse, elige otra'' ante un 409). Por otro, se evita filtrar trazas internas o detalles de implementación al exterior, lo que también es una cuestión de seguridad. Centralizar el manejo de errores en un único punto, en lugar de repetir bloques \texttt{try-catch} por todos los controladores, mantiene el código limpio y coherente.
 
-\subsection{Notificaciones: Twilio y Telegram}
+\section{Notificaciones: Twilio y Telegram}
 
 Las notificaciones son la otra mitad de la promesa del proyecto: si la web evita llamadas, tiene que avisar de forma fiable de lo que ocurre con cada cita. El envío se realiza \textbf{directamente desde el backend Java} mediante el SDK de Twilio, sin un servicio intermedio de colas. Es una arquitectura más simple y perfectamente adecuada al volumen de una consulta; un sistema de mensajería asíncrona con reintentos desacoplados sería justificable a mayor escala y se contempla como evolución futura. \texttt{CitaNotificationService} envía:
 \begin{itemize}
@@ -494,7 +447,7 @@ Hay dos decisiones de seguridad que conviene subrayar. La primera: el token \tex
 
 Ambos canales son \textbf{independientes y opcionales}: se activan por variables de entorno (\texttt{TELEGRAM\_ENABLED}, \texttt{TELEGRAM\_BOT\_TOKEN}, \texttt{TELEGRAM\_BOT\_USERNAME}, \texttt{TELEGRAM\_WEBHOOK\_SECRET}) y ninguno de los dos puede tumbar una reserva: los servicios de mensajería nunca propagan la excepción hacia el flujo de citas, solo registran el fallo y devuelven \texttt{false}. Si un canal está caído o apagado, el otro sigue avisando. El paciente puede además retirar el canal en cualquier momento (\texttt{DELETE /api/telegram/vinculacion}), lo que borra su \texttt{chat\_id}: una forma concreta de aplicar el derecho de supresión del RGPD.
 
-\subsection{Implementación del frontend}
+\section{Implementación del frontend}
 
 El frontend se construyó con HTML5, CSS3 y JavaScript nativo, sin frameworks como React o Vue. No fue la primera idea: al principio valoré usar React o incluso Python en el cliente, en parte por mi formación y por el \emph{feedback} de profesionales del sector (OmniAccess). Sin embargo, tras un análisis de necesidades reales del proyecto, decidí prescindir de esa maquinaria. Fue una decisión consciente de ingeniería: la aplicación no maneja un estado global tan complejo como para justificarla, y evitarla reduce dependencias, acelera la carga inicial y permite que cualquier persona lea y modifique el código sin aprender antes una librería ni arrastrar un \texttt{node\_modules} de cientos de megas. El JavaScript se organiza en módulos reutilizables (\texttt{api-client.js} para las llamadas REST con JWT, y la lógica de reserva en \texttt{reserva.js}), lo que evita duplicar código entre páginas. Saber \emph{cuándo no} añadir una tecnología es, para un perfil de desarrollo, tan importante como saber usarla.
 
@@ -523,7 +476,7 @@ Todas las relaciones con \texttt{centro} son \emph{nullable} a propósito: las c
 
 \paragraph{Validación de datos.} La entrada del usuario se valida en dos niveles, porque ninguno de los dos basta por sí solo. En el \textbf{frontend} se comprueban formato de email, teléfono español y campos obligatorios antes de enviar, dando un aviso inmediato y evitando viajes innecesarios al servidor; esto mejora la experiencia, pero no es una garantía de seguridad porque puede manipularse. Por eso la validación se repite en el \textbf{backend} con las anotaciones de \emph{Bean Validation} sobre los DTO de entrada: el servidor nunca confía en que el cliente haya validado bien. Esta doble barrera —comodidad en el cliente, seguridad en el servidor— es un principio básico de cualquier aplicación web seria.
 
-\subsection{Accesibilidad y usabilidad (WCAG)}
+\section{Accesibilidad y usabilidad (WCAG)}
 
 En una aplicación de salud, la accesibilidad no es un extra: una parte importante de los pacientes son personas mayores o con dificultades visuales o motrices, y si no pueden usar la herramienta, esta sencillamente no cumple su función. Por eso la interfaz se diseñó tomando como referencia las \textbf{Pautas de Accesibilidad para el Contenido Web (WCAG 2.1)} en su nivel \textbf{AA}, organizadas en torno a sus cuatro principios: perceptible, operable, comprensible y robusto.
 
@@ -555,13 +508,13 @@ Mensajes de error (rojo) & 4{,}8:1 & \checkmark \\
 
 \paragraph{Limitación honesta.} La accesibilidad se ha trabajado por diseño y se ha verificado el contraste de forma manual, pero no se ha pasado todavía una auditoría automática completa (por ejemplo, \emph{Lighthouse} o \emph{axe}) ni se ha probado con usuarios reales de lector de pantalla. Documentar esa auditoría y realizar pruebas con usuarios es la evolución natural de este apartado, ya recogida entre las líneas futuras de calidad.
 
-\subsection{Sincronización de citas: una sola fuente de verdad}
+\section{Sincronización de citas: una sola fuente de verdad}
 
 Uno de los problemas más instructivos del desarrollo no fue de algoritmos, sino de \emph{coherencia de datos} entre vistas. Al principio, la lista ``Mis citas programadas'' que veía el paciente vivía solo en el \texttt{localStorage} del navegador, mientras que el panel de pruebas del médico leía de la base de datos. El resultado eran incoherencias desconcertantes: citas que aparecían para el paciente pero no en el panel, cancelaciones que solo existían en un navegador, e incluso reservas antiguas con identificadores locales que nunca habían llegado al servidor.
 
-La solución fue establecer una \textbf{única fuente de verdad}: PostgreSQL. La función \texttt{syncMisCitas()} de \texttt{reserva.js} sustituye la caché local por lo que realmente hay en el servidor, consultando \texttt{GET /api/citas/mias} para el paciente autenticado o \texttt{GET /api/citas/por-email} para el invitado. Esta sincronización se dispara en los momentos clave: al cargar la página de reserva, tras confirmar o cancelar una cita, al escribir el email (con \emph{debounce}) y tras iniciar o cerrar sesión. Así, lo que ve el paciente y lo que ve el panel siempre coinciden, porque ambos derivan del mismo origen. La regla de diseño es sencilla y se defiende bien ante el tribunal: \emph{el navegador nunca es la verdad; solo refleja la base de datos tras cada sincronización.}
+La solución fue establecer una \textbf{única fuente de verdad}: PostgreSQL. La función \texttt{syncMisCitas()} de \texttt{reserva.js} sustituye la caché local por lo que realmente hay en el servidor, consultando \texttt{GET /api/citas/mias} para el paciente autenticado o \texttt{GET /api/citas/por-email} para el invitado. Esta sincronización se dispara en los momentos clave: al cargar la página de reserva, tras confirmar o cancelar una cita, al escribir el email (con \emph{debounce}) y tras iniciar o cerrar sesión. Así, lo que ve el paciente y lo que ve el panel siempre coinciden, porque ambos derivan del mismo origen. La regla de diseño es sencilla: \emph{el navegador nunca es la verdad; solo refleja la base de datos tras cada sincronización.}
 
-\subsection{Cuadro de mando de gestión (analítica)}
+\section{Cuadro de mando de gestión (analítica)}
 
 Una consulta médica no es solo una agenda: es una pequeña empresa que genera datos cada día. Esos datos, si se quedan dispersos en filas de una tabla, no le dicen nada al profesional; pero agregados y representados visualmente revelan información útil para tomar decisiones: qué especialidad se demanda más, cómo se reparte la carga de trabajo, qué centro concentra más actividad o cuántas citas se cancelan. Con esa idea —entender la clínica como un negocio que se puede medir y optimizar— se incorporó un \textbf{cuadro de mando de gestión}, accesible solo para el personal interno.
 
@@ -578,11 +531,11 @@ El cuadro de mando presenta primero cuatro indicadores resumen (KPIs) y, debajo,
   \item \textbf{Evolución temporal} (línea): el volumen de citas mes a mes, para detectar tendencias.
 \end{itemize}
 
-En el frontend, los gráficos se dibujan con \textbf{Chart.js}, una librería ligera que se incorporó \emph{vendorizada} en el propio repositorio (\texttt{js/vendor/}) en lugar de cargarse desde una CDN externa. La decisión es deliberada: el sistema no depende de una conexión a internet ajena para funcionar —coherente con la filosofía PWA y \emph{offline first} del proyecto— y la demo ante el tribunal es reproducible aunque no haya red. La página respeta el modo claro/oscuro recalculando los colores al cambiar de tema, y \textbf{degrada con elegancia}: si quien la abre no ha iniciado sesión como personal autorizado, en lugar de un error muestra un aviso claro invitando a identificarse.
+En el frontend, los gráficos se dibujan con \textbf{Chart.js}, una librería ligera que se incorporó \emph{vendorizada} en el propio repositorio (\texttt{js/vendor/}) en lugar de cargarse desde una CDN externa. La decisión es deliberada: el sistema no depende de una conexión a internet ajena para funcionar —coherente con la filosofía PWA y \emph{offline first} del proyecto— y la aplicación se puede mostrar aunque no haya red. La página respeta el modo claro/oscuro recalculando los colores al cambiar de tema, y \textbf{degrada con elegancia}: si quien la abre no ha iniciado sesión como personal autorizado, en lugar de un error muestra un aviso claro invitando a identificarse.
 
 El acceso está restringido en \texttt{SecurityConfig} a los roles \texttt{MEDICO} y \texttt{ADMIN}: las analíticas de negocio son una herramienta interna y no deben ser visibles para un paciente ni para un usuario anónimo. Esta restricción se verificó en vivo —una petición sin token recibe \textbf{403 Forbidden}, mientras que con el token de un médico el endpoint devuelve los datos agregados—, lo que conecta este módulo directamente con la política de autorización por rol descrita más adelante. En conjunto, el cuadro de mando demuestra la competencia de \emph{sistemas de gestión empresarial}: convertir los datos operativos del día a día en información de gestión accionable.
 
-\subsection{Seguridad y RGPD}
+\section{Seguridad y RGPD}
 
 La seguridad no se añadió al final, se diseñó desde el principio, porque manejar datos de salud obliga a ello. El acceso está gobernado por roles (\texttt{PACIENTE}, \texttt{MEDICO}, \texttt{ADMIN}) declarados en \texttt{SecurityConfig}: cada ruta exige el rol mínimo necesario, de modo que un paciente no puede asomarse a la agenda del médico ni un usuario anónimo crear citas en nombre de otro. Sobre esa base se aplican las medidas concretas de protección de datos:
 
@@ -595,7 +548,7 @@ La seguridad no se añadió al final, se diseñó desde el principio, porque man
   \item \textbf{Análisis de vulnerabilidades:} \texttt{OWASP dependency-check} configurado en \texttt{pom.xml}, que hace fallar el build con CVSS\,$\geq$\,7.
 \end{itemize}
 
-\subsection{Despliegue}
+\section{Despliegue}
 
 Uno de los objetivos era que el sistema completo se pudiera levantar sin instalar nada manualmente, ni siquiera por alguien sin experiencia previa. Por eso todo el despliegue se reduce a un único comando, que construye las imágenes y arranca los contenedores en el orden correcto:
 
@@ -603,11 +556,11 @@ Uno de los objetivos era que el sistema completo se pudiera levantar sin instala
 docker compose up -d --build
 \end{lstlisting}
 
-Esto levanta tres servicios coordinados: \texttt{postgres} (la base de datos), \texttt{backend} en el puerto 8080 (la API Spring Boot) y \texttt{frontend} en el puerto 80 (nginx sirviendo la web y haciendo de proxy de \texttt{/api}). El \texttt{docker-compose} define dependencias y comprobaciones de salud, de modo que el backend no se da por listo hasta que la base de datos responde. El artefacto del backend es un \textbf{JAR de Spring Boot con servidor embebido} (generado por \texttt{spring-boot-maven-plugin}), el esquema de la base de datos se versiona con Flyway —que aplica las migraciones pendientes en el primer arranque— y la configuración se separa por perfiles (\texttt{application-postgres.yml} y \texttt{application-mysql.yml}), existiendo además un perfil opcional de MySQL con \texttt{--profile mysql}. La ventaja práctica es enorme de cara a la defensa: el entorno del tribunal será idéntico al de desarrollo, eliminando el clásico ``en mi máquina funciona''.
+Esto levanta tres servicios coordinados: \texttt{postgres} (la base de datos), \texttt{backend} en el puerto 8080 (la API Spring Boot) y \texttt{frontend} en el puerto 80 (nginx sirviendo la web y haciendo de proxy de \texttt{/api}). El \texttt{docker-compose} define dependencias y comprobaciones de salud, de modo que el backend no se da por listo hasta que la base de datos responde. El artefacto del backend es un \textbf{JAR de Spring Boot con servidor embebido} (generado por \texttt{spring-boot-maven-plugin}), el esquema de la base de datos se versiona con Flyway —que aplica las migraciones pendientes en el primer arranque— y la configuración se separa por perfiles (\texttt{application-postgres.yml} y \texttt{application-mysql.yml}), existiendo además un perfil opcional de MySQL con \texttt{--profile mysql}. La ventaja práctica es enorme: cualquier entorno queda idéntico al de desarrollo, eliminando el clásico ``en mi máquina funciona''.
 
-\paragraph{Dominio e identidad de marca.} De cara al salto a producción se ha registrado el dominio \textbf{\texttt{dragramonte.com}}, una marca personal corta, profesional y fácil de dictar por teléfono (frente a alternativas más largas que se descartaron). La aplicación ya está preparada para ese dominio: los pies de página, la página de contacto, las etiquetas \texttt{Open Graph} y la política de CORS del backend apuntan a \texttt{dragramonte.com}, y el correo de contacto utiliza la propia marca (\texttt{contacto@dragramonte.com}). El despliegue, además, ya está \textbf{en producción}: la aplicación se ejecuta en la nube sobre \textbf{Railway}, empaquetada con un \texttt{Dockerfile} \emph{multi-stage} en el que el backend Spring Boot sirve a la vez la API y el frontend en un \textbf{único servicio} —junto a una base de datos PostgreSQL gestionada—, y es \textbf{accesible públicamente con HTTPS} (certificado Let's Encrypt) en \url{https://www.dragramonte.com}. Llegar a un dominio propio, con certificado válido y la aplicación abierta a cualquier navegador, es una madurez poco frecuente en un TFG; la migración de identidad de marca ya estaba hecha en el código y ahora se acompaña del despliegue real.
+\paragraph{Dominio e identidad de marca.} De cara al salto a producción se ha registrado el dominio \textbf{\texttt{dragramonte.com}}, una marca personal corta, profesional y fácil de dictar por teléfono (frente a alternativas más largas que se descartaron). La aplicación ya está preparada para ese dominio: los pies de página, la página de contacto, las etiquetas \texttt{Open Graph} y la política de CORS del backend apuntan a \texttt{dragramonte.com}, y el correo de contacto utiliza la propia marca (\texttt{contacto@dragramonte.com}). El despliegue, además, ya está \textbf{en producción}: la aplicación se ejecuta en la nube sobre \textbf{Railway}, empaquetada con un \texttt{Dockerfile} \emph{multi-stage} en el que el backend Spring Boot sirve a la vez la API y el frontend en un \textbf{único servicio} —junto a una base de datos PostgreSQL gestionada—, y es \textbf{accesible públicamente con HTTPS} (certificado Let's Encrypt) en \url{https://www.dragramonte.com}. Llegar a un dominio propio, con certificado válido y la aplicación abierta a cualquier navegador, es una madurez poco habitual en un proyecto de este tamaño; la migración de identidad de marca ya estaba hecha en el código y ahora se acompaña del despliegue real.
 
-\subsection{Sostenibilidad y eficiencia (green computing)}
+\section{Sostenibilidad y eficiencia (green computing)}
 
 La sostenibilidad de este proyecto no es una etiqueta añadida al final, sino una consecuencia directa de las decisiones de diseño. Un software es sostenible cuando consume los recursos justos —energía, ancho de banda, hardware y, en última instancia, dinero— para hacer su trabajo, y cuando además \emph{sustituye} procesos físicos más costosos. Dr.\ Agramonte actúa en los dos frentes: reduce el gasto material de la consulta y se ha construido para gastar poco al ejecutarse.
 
@@ -628,7 +581,7 @@ La sostenibilidad de este proyecto no es una etiqueta añadida al final, sino un
 
 \paragraph{Limitación honesta.} No se ha realizado una medición formal de la huella de carbono ni del consumo energético real (con herramientas como auditorías de \emph{Lighthouse} o medidores de consumo del contenedor); las afirmaciones anteriores son cualitativas y se apoyan en las decisiones de arquitectura, no en métricas instrumentadas. Cuantificar ese ahorro —por ejemplo, comparar el consumo del frontend frente a una versión con framework— es una línea de mejora natural y coherente con el resto del proyecto.
 
-\subsection{Planificación temporal}
+\section{Planificación temporal}
 
 El desarrollo se organizó en fases encadenadas a lo largo de cuatro meses, partiendo del análisis y el diseño de datos antes de escribir el grueso del backend, y dejando la redacción de la memoria como una tarea transversal que acompañó a todo el proyecto. El diagrama de Gantt de la figura siguiente resume esa planificación por hitos; en la práctica algunas fases se solaparon (por ejemplo, las pruebas se fueron escribiendo a la vez que avanzaban backend y frontend), algo habitual y deseable en un desarrollo iterativo.
 
@@ -655,7 +608,7 @@ El desarrollo se organizó en fases encadenadas a lo largo de cuatro meses, part
 \captionof{figure}{Diagrama de Gantt por hitos (M1--M4).}
 \end{center}
 
-\subsection{Pruebas y validación}
+\section{Pruebas y validación}
 
 La estrategia de pruebas se centró en los \textbf{caminos críticos}, aquellos en los que un fallo tendría consecuencias reales: la no duplicación de reservas, el respeto de los permisos por rol y la validez del token de autenticación. La filosofía no fue ``probarlo todo'' de forma superficial, sino probar bien lo que importa, combinando tres niveles —unitario, de seguridad e integración— para cubrir el comportamiento desde distintos ángulos. El proyecto incorpora una batería de \textbf{47 pruebas automatizadas}, ejecutable con \texttt{mvn test} desde \texttt{backend/}:
 
@@ -691,7 +644,7 @@ Token de vinculación caducado & \texttt{TelegramVinculacionServiceTest} & Unita
 \end{tabular}
 \end{table}
 
-\paragraph{Requisito de las pruebas de integración.} Las cinco pruebas de \texttt{ReservaPublicaIntegrationTest} levantan un PostgreSQL real mediante Testcontainers y, por tanto, necesitan un motor Docker en marcha. Cuando no lo hay, la propia suite las marca como \emph{saltadas} en lugar de fallar, de modo que \texttt{mvn test} sigue siendo verde en una máquina sin Docker; para la demostración ante el tribunal conviene arrancarlo y ejecutar las 47 completas.
+\paragraph{Requisito de las pruebas de integración.} Las cinco pruebas de \texttt{ReservaPublicaIntegrationTest} levantan un PostgreSQL real mediante Testcontainers y, por tanto, necesitan un motor Docker en marcha. Cuando no lo hay, la propia suite las marca como \emph{saltadas} en lugar de fallar, de modo que \texttt{mvn test} sigue siendo verde en una máquina sin Docker; para una verificación completa conviene arrancarlo y ejecutar las 47.
 
 \paragraph{Mejoras futuras de calidad.} Informe de cobertura formal con \textbf{JaCoCo} ($\geq$\,80\,\% medido), pruebas E2E (Playwright/Cypress), auditoría \textbf{Lighthouse} documentada y escenario de alta disponibilidad (réplicas/failover), hoy contemplado como diseño y no ejecutado en esta infraestructura.
 
@@ -714,7 +667,7 @@ Se ha entregado una aplicación funcional y desplegable que responde al problema
   \item \emph{Cuadro de mando de gestión (SGE).} \textbf{Cumplido:} endpoint \texttt{/api/estadisticas} con agregaciones \texttt{GROUP BY}, restringido por rol y representado con Chart.js (carga por médico, demanda por especialidad, reparto por centro y estado, evolución temporal y tasa de cancelación).
 \end{enumerate}
 
-\textbf{Limitaciones honestas:} la cobertura no está medida con JaCoCo (se valida cualitativamente por ramas críticas), el panel médico no expone API de historial, no hay refresh token ni escenario de réplicas/failover. Son líneas de evolución natural del TFG, no carencias del alcance entregado.
+\textbf{Limitaciones honestas:} la cobertura no está medida con JaCoCo (se valida cualitativamente por ramas críticas), el panel médico no expone API de historial, no hay refresh token ni escenario de réplicas/failover. Son líneas de evolución natural del producto, no carencias de lo entregado.
 
 \textbf{Líneas de trabajo futuras.} El proyecto está pensado para seguir creciendo más allá de la entrega. Las evoluciones más coherentes con lo ya construido son:
 
@@ -729,9 +682,9 @@ Se ha entregado una aplicación funcional y desplegable que responde al problema
   \item \textbf{Historial clínico:} API y panel clínico reales, con almacenamiento documental flexible por especialidad (p.\ ej.\ MongoDB), avanzando hacia una persistencia políglota.
 \end{itemize}
 
-\textbf{Aprendizajes:} el proyecto ha consolidado competencias de los módulos de DAM (acceso a datos, programación de servicios, interfaces, sistemas de gestión empresarial y empresa e iniciativa emprendedora) en un caso real, integrando seguridad, concurrencia y despliegue.
+\textbf{Aprendizajes:} lo que más ha enseñado este proyecto no es ninguna tecnología concreta, sino el criterio para decidir entre varias. Cuándo un bloqueo pesimista compensa frente a uno optimista, por qué un aviso debe salir después del \emph{commit} y no durante, cuándo \emph{no} añadir un framework. También que un sistema pequeño y verificable vale más que uno ambicioso a medias: cada afirmación de este documento se sostiene sobre código que se puede ejecutar.
 
-\textbf{Reflexión:} la coherencia entre memoria, código y demo oral es tan importante como la funcionalidad; este documento describe la versión real del sistema, no una versión idealizada.
+\textbf{Reflexión:} la coherencia entre lo que un documento afirma y lo que el código hace es tan importante como la propia funcionalidad. Este documento describe la versión real del sistema, no una versión idealizada.
 
 % ============================================================================
 \chapter*{Agradecimientos}
@@ -791,35 +744,19 @@ Doctoralia. (s.f.). \textit{Plataforma para profesionales}. Recuperado en junio 
 \end{thebibliography}
 
 % ============================================================================
-\chapter*{Anexos}
-\addcontentsline{toc}{chapter}{Anexos}
+\chapter*{Anexo}
+\addcontentsline{toc}{chapter}{Anexo}
 % ============================================================================
 
-\section*{Anexo A. Checklist de cumplimiento (rúbricas del módulo)}
-
-\input{checklist-rubricas}
-
-\section*{Anexo B. Manual de usuario (resumen)}
+\section*{Manual de usuario (resumen)}
 
 \begin{enumerate}
-  \item \textbf{Registro / acceso:} desde \texttt{login.html}, crear cuenta (rol PACIENTE) o iniciar sesión. El sistema devuelve un token JWT que el navegador guarda para las peticiones protegidas.
+  \item \textbf{Registro / acceso (opcional):} desde el propio menú de navegación, crear cuenta (rol \texttt{PACIENTE}) o iniciar sesión. El sistema devuelve un token JWT que el navegador guarda para las peticiones protegidas. También se puede reservar sin registrarse.
   \item \textbf{Elegir servicio (opcional):} en \texttt{servicios.html}, pulsar un servicio abre la reserva con el tipo de consulta preseleccionado (\texttt{reservar.html?servicio=...}).
   \item \textbf{Reservar:} en \texttt{reservar.html} seguir los pasos centro $\rightarrow$ calendario $\rightarrow$ hora $\rightarrow$ datos $\rightarrow$ confirmación, aceptando la política de privacidad.
-  \item \textbf{Mis citas:} consultar las citas propias y su estado; el paciente recibe confirmación (y recordatorio $\sim$24\,h antes) por Twilio si tiene teléfono.
+  \item \textbf{Mis citas:} consultar las citas propias y su estado. El paciente recibe la confirmación y el recordatorio ($\sim$24\,h antes) por SMS o WhatsApp si tiene teléfono, y por Telegram si ha vinculado el bot desde esa misma pantalla.
   \item \textbf{Cancelar:} desde ``Mis citas'', cancelar libera la franja y notifica al médico.
   \item \textbf{Tema claro/oscuro:} el botón luna/sol alterna el modo y se recuerda la preferencia.
 \end{enumerate}
-
-\section*{Anexo C. Capturas de pantalla}
-
-Incluir aquí las capturas de la demo (inicio, servicios, flujo de reserva, mis citas y modo oscuro). Cada captura debe ir numerada y con su leyenda. Ejemplo de inclusión:
-
-\begin{verbatim}
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.8\textwidth]{capturas/reserva-paso1.png}
-  \caption{Primer paso del flujo de reserva: selección de centro.}
-\end{figure}
-\end{verbatim}
 
 \end{document}

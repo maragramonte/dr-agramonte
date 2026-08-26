@@ -228,7 +228,7 @@ Con los canales desactivados la aplicación funciona igual; simplemente no enví
 | [docs/EVOLUCION.md](docs/EVOLUCION.md) | Cómo creció el proyecto, fase a fase |
 | [docs/BASE-DE-DATOS.md](docs/BASE-DE-DATOS.md) | Esquema, diagrama relacional, integridad y concurrencia |
 | [docs/SINCRONIZACION-CITAS.md](docs/SINCRONIZACION-CITAS.md) | Una sola fuente de verdad entre las tres vistas de citas |
-| [docs/Memoria-TFG-Dr-Agramonte.pdf](docs/Memoria-TFG-Dr-Agramonte.pdf) | Memoria completa del proyecto (LaTeX) |
+| [docs/Memoria-Dr-Agramonte.pdf](docs/Memoria-Dr-Agramonte.pdf) | Memoria completa del proyecto (LaTeX) |
 | [docs/DOCKER-TROUBLESHOOTING.md](docs/DOCKER-TROUBLESHOOTING.md) | Arranque, 502 y healthchecks |
 | [docs/README.md](docs/README.md) | Índice del resto de documentación |
 

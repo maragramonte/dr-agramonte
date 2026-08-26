@@ -19,9 +19,7 @@ proyecto, los diagramas y las guías de detalle.
 
 | Archivo | Contenido |
 |---------|-----------|
-| [Memoria-TFG-Dr-Agramonte.tex](Memoria-TFG-Dr-Agramonte.tex) | Memoria completa, alineada con el código real |
-| [INSTRUCCIONES-MEMORIA-LATEX.md](INSTRUCCIONES-MEMORIA-LATEX.md) | Requisitos de formato y cómo compilar |
-| [checklist-rubricas.tex](checklist-rubricas.tex) | Checklist de cumplimiento (anexo A) |
+| [Memoria-Dr-Agramonte.tex](Memoria-Dr-Agramonte.tex) | Memoria completa, alineada con el código real |
 | `tikz-*.tex` | Diagramas vectoriales: arquitectura, modelo E-R, flujo de reserva, capas del frontend y paleta |
 | [diagrama-er.svg](diagrama-er.svg) · [diagrama-er.png](diagrama-er.png) | Modelo entidad-relación exportado, para presentaciones |
 
@@ -40,20 +38,24 @@ proyecto, los diagramas y las guías de detalle.
 
 ```powershell
 cd docs
-pdflatex Memoria-TFG-Dr-Agramonte.tex
-pdflatex Memoria-TFG-Dr-Agramonte.tex
+pdflatex Memoria-Dr-Agramonte.tex
+pdflatex Memoria-Dr-Agramonte.tex
 ```
 
 Dos pasadas: la primera genera el índice y las referencias, la segunda las coloca.
-Salida: `Memoria-TFG-Dr-Agramonte.pdf`. Requiere MiKTeX o TeX Live; también funciona
+Salida: `Memoria-Dr-Agramonte.pdf`. Requiere MiKTeX o TeX Live; también funciona
 subiendo la carpeta `docs/` a [Overleaf](https://www.overleaf.com/).
+
+**Formato:** el preámbulo fija Helvetica a 12 pt (sustituto métrico de Arial; para Arial
+real haría falta XeLaTeX), interlineado 1,15, márgenes de 3 cm y texto justificado. Las
+figuras y tablas van numeradas y con leyenda, integradas en el texto.
 
 ---
 
 ## Coherencia memoria ↔ código
 
 La memoria describe **solo lo implementado**. Lo que no está construido va en «líneas
-futuras», nunca en el cuerpo. Es la regla que mantiene el documento defendible.
+futuras», nunca en el cuerpo. Es la regla que mantiene el documento fiable.
 
 Si cambias el flujo de reservas, el panel o el esquema, actualiza en el mismo momento:
 

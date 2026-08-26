@@ -65,7 +65,7 @@ Para el estado actual del sistema, ver el [README principal](../README.md).
 
 ## Fase 6 — Documentación académica
 
-- Memoria LaTeX alineada con el código real: `docs/Memoria-TFG-Dr-Agramonte.tex`  
+- Memoria LaTeX alineada con el código real: `docs/Memoria-Dr-Agramonte.tex`  
 - Diagramas TikZ con la misma paleta teal del CSS  
 - Checklist de rúbricas del módulo de proyecto  
 
