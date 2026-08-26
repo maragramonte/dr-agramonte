@@ -41,7 +41,7 @@ Anexos (checklist, manual, capturas) & $\checkmark$ & --- & Faltan insertar capt
 Demo: login $\rightarrow$ reservar $\rightarrow$ cancelar & $\square$ & $\square$ & \texttt{docker compose up} \\
 Demo servicio preseleccionado + modo oscuro & $\square$ & $\square$ & \\
 Plan B (capturas / vídeo) & $\square$ & $\square$ & \\
-Twilio en sandbox (opcional) & $\square$ & $\square$ & \\
+Avisos por Twilio / Telegram (opcional) & $\square$ & $\square$ & \\
 \midrule
 
 \multicolumn{4}{l}{\textbf{\color{tealdark}D. Implementación verificada en repo}} \\
@@ -50,8 +50,9 @@ PostgreSQL + Flyway + Spring Boot + JWT & $\checkmark$ & $\checkmark$ & \\
 \texttt{SELECT FOR UPDATE} + citas & $\checkmark$ & $\checkmark$ & \\
 Frontend PWA + reserva + servicios URL & $\checkmark$ & $\checkmark$ & \\
 Twilio Java (médico, paciente, recordatorio) & $\checkmark$ & $\square$ & Requiere \texttt{.env} \\
+Bot de Telegram (vinculación + webhook) & $\checkmark$ & $\checkmark$ & Requiere \texttt{.env} \\
 Panel médico API historial & $\square$ & $\square$ & Solo demo estática \\
-Tests automatizados JUnit + Testcontainers & $\checkmark$ & $\checkmark$ & E2E (Playwright) pendiente \\
+47 tests JUnit + Testcontainers & $\checkmark$ & $\checkmark$ & E2E (Playwright) pendiente \\
 OWASP dependency-check (CVSS$\geq$7) & $\checkmark$ & $\square$ & \texttt{pom.xml} \\
 \bottomrule
 \end{longtable}

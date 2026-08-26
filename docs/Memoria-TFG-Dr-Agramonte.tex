@@ -109,7 +109,7 @@
 \chapter*{Resumen}
 \addcontentsline{toc}{chapter}{Resumen}
 
-\textbf{Dr. Agramonte} es una aplicación web para que pacientes reserven, consulten y cancelen citas médicas sin depender del teléfono del profesional. El sistema integra un frontend estático (HTML, CSS y JavaScript), una API REST con \textbf{Spring Boot 3.5.3}, base de datos \textbf{PostgreSQL}, autenticación \textbf{JWT}, control de concurrencia con \textbf{bloqueo pesimista}, notificaciones \textbf{Twilio} (SMS/WhatsApp) y despliegue reproducible con \textbf{Docker Compose}. La aplicación está además \textbf{desplegada en la nube y es accesible públicamente con HTTPS} en \url{https://www.dragramonte.com}.
+\textbf{Dr. Agramonte} es una aplicación web para que pacientes reserven, consulten y cancelen citas médicas sin depender del teléfono del profesional. El sistema integra un frontend estático (HTML, CSS y JavaScript), una API REST con \textbf{Spring Boot 3.5.3}, base de datos \textbf{PostgreSQL}, autenticación \textbf{JWT}, control de concurrencia con \textbf{bloqueo pesimista}, notificaciones por dos canales independientes —\textbf{Twilio} (SMS/WhatsApp) y un \textbf{bot de Telegram}— y despliegue reproducible con \textbf{Docker Compose}. La aplicación está además \textbf{desplegada en la nube y es accesible públicamente con HTTPS} en \url{https://www.dragramonte.com}.
 
 El proyecto nace de una observación directa del sector sanitario: buena parte de las llamadas que recibe un médico fuera de su horario no son urgencias clínicas, sino gestión de agenda. Digitalizar esa parte administrativa devuelve tiempo al profesional sin sustituir el trato humano donde de verdad hace falta. Sobre esa idea se construye una herramienta pensada para consultas pequeñas y médicos autónomos, que mantienen la titularidad de sus datos en lugar de depender de plataformas de terceros.
 
@@ -118,14 +118,14 @@ La interfaz replica la identidad visual del consultorio: paleta \textbf{teal} (\
 La calidad se respalda con una batería de \textbf{pruebas automatizadas} (unitarias, de seguridad y de integración con Testcontainers) y con análisis de vulnerabilidades \textbf{OWASP dependency-check}. La principal conclusión es que la coherencia entre memoria, código y demostración es tan determinante como la propia funcionalidad: este documento describe la versión \emph{real} del sistema a junio de 2026, distinguiendo lo entregado de lo planificado como evolución.
 
 \vspace{0.5em}
-\noindent\textbf{Palabras clave:} citas médicas, aplicación web, Spring Boot, API REST, PostgreSQL, JWT, concurrencia, Twilio, Docker, despliegue en la nube, HTTPS, PWA, accesibilidad.
+\noindent\textbf{Palabras clave:} citas médicas, aplicación web, Spring Boot, API REST, PostgreSQL, JWT, concurrencia, Twilio, Telegram, Docker, despliegue en la nube, HTTPS, PWA, accesibilidad.
 
 % ============================================================================
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
 % ============================================================================
 
-\textbf{Dr. Agramonte} is a web application that lets patients book, review and cancel medical appointments without depending on the practitioner's phone line. The system integrates a static frontend (HTML, CSS and JavaScript), a REST API built with \textbf{Spring Boot 3.5.3}, a \textbf{PostgreSQL} database, \textbf{JWT} authentication, concurrency control through \textbf{pessimistic locking}, \textbf{Twilio} notifications (SMS/WhatsApp) and reproducible deployment with \textbf{Docker Compose}. The application is also \textbf{deployed to the cloud and publicly accessible over HTTPS} at \url{https://www.dragramonte.com}.
+\textbf{Dr. Agramonte} is a web application that lets patients book, review and cancel medical appointments without depending on the practitioner's phone line. The system integrates a static frontend (HTML, CSS and JavaScript), a REST API built with \textbf{Spring Boot 3.5.3}, a \textbf{PostgreSQL} database, \textbf{JWT} authentication, concurrency control through \textbf{pessimistic locking}, notifications over two independent channels —\textbf{Twilio} (SMS/WhatsApp) and a \textbf{Telegram bot}— and reproducible deployment with \textbf{Docker Compose}. The application is also \textbf{deployed to the cloud and publicly accessible over HTTPS} at \url{https://www.dragramonte.com}.
 
 The project stems from direct observation of the healthcare sector: many of the calls a doctor receives outside working hours are not clinical emergencies but scheduling tasks. Digitising that administrative layer gives time back to the professional without replacing human contact where it is truly needed. On this premise, the tool is designed for small practices and self-employed doctors, who retain ownership of their data instead of relying on third-party platforms.
 
@@ -221,7 +221,7 @@ Cada objetivo específico se corresponde con código real del repositorio y, cua
   \item Implementar API REST con \textbf{Spring Boot}, autenticación \textbf{JWT} y roles \texttt{PACIENTE}, \texttt{MEDICO} y \texttt{ADMIN} en \texttt{SecurityConfig}.
   \item Garantizar integridad de reservas con \texttt{SELECT FOR UPDATE} sobre horarios disponibles.
   \item Construir frontend responsive, PWA, modo oscuro y flujo de reserva accesible (\texttt{reserva.js}, \texttt{api-client.js}).
-  \item Enviar notificaciones al médico y al paciente vía \textbf{Twilio}, con recordatorio programado 24\,h antes (\texttt{CitaReminderScheduler}).
+  \item Enviar notificaciones al médico y al paciente por \textbf{Twilio} (SMS/WhatsApp) y por un \textbf{bot de Telegram}, con recordatorio programado 24\,h antes (\texttt{CitaReminderScheduler}).
   \item Desplegar con \textbf{Docker Compose} (nginx + backend + base de datos).
   \item Validar la calidad con pruebas automatizadas y análisis de vulnerabilidades, y preparar la defensa con una demo reproducible.
   \item Ofrecer un \textbf{cuadro de mando de gestión} (módulo SGE) con analítica agregada —carga por médico, demanda por especialidad, reparto por centro y tasa de cancelación— restringido a los roles \texttt{MEDICO}/\texttt{ADMIN}.
@@ -362,8 +362,9 @@ Cada pieza del stack se eligió por una razón concreta, no por moda:
 \begin{itemize}
   \item \textbf{Java + Spring Boot.} El tipado fuerte de Java detecta en tiempo de compilación errores que en un lenguaje dinámico aparecerían en producción, algo especialmente valioso cuando se manejan datos de salud. Spring Boot aporta, además, un ecosistema maduro: Spring Security como estándar de facto para autenticación y autorización, Spring Data JPA para el acceso a datos y transacciones ACID que garantizan que una reserva se complete entera o no se complete en absoluto.
   \item \textbf{PostgreSQL.} Para datos críticos (usuarios, médicos, horarios y citas) hace falta integridad referencial real, transacciones fiables y bloqueo a nivel de fila. PostgreSQL ofrece las tres cosas y permite implementar el control de concurrencia con \texttt{SELECT \ldots FOR UPDATE}, núcleo de la garantía de ``no doble reserva''.
-  \item \textbf{Flyway.} Versiona el esquema en migraciones numeradas (V1 a V8), de modo que cualquier entorno —el de desarrollo, el del tribunal o uno futuro en producción— se reconstruye exactamente igual al arrancar.
+  \item \textbf{Flyway.} Versiona el esquema en migraciones numeradas (V1 a V10), de modo que cualquier entorno —el de desarrollo, el del tribunal o uno futuro en producción— se reconstruye exactamente igual al arrancar.
   \item \textbf{Twilio.} En lugar de montar infraestructura propia de mensajería, se delega el envío de SMS y WhatsApp en un proveedor consolidado, invocado directamente desde el backend Java.
+  \item \textbf{Telegram (Bot API).} Se incorporó como segundo canal de aviso por una razón práctica: es gratuito y no exige que el paciente se dé de alta previamente en un \emph{sandbox}, como sí ocurre con la cuenta de prueba de Twilio. Se integra por HTTP con \texttt{RestClient}, sin SDK adicional, de modo que no añade ninguna dependencia al proyecto.
   \item \textbf{Docker Compose.} Levanta todo el sistema con un único comando, eliminando el clásico ``en mi máquina funciona''.
 \end{itemize}
 
@@ -374,7 +375,7 @@ Cada pieza del stack se eligió por una razón concreta, no por moda:
 El modelo relacional gira en torno a cuatro entidades centrales —\texttt{usuarios}, \texttt{medicos}, \texttt{horarios} y \texttt{citas}— más \texttt{notificaciones} para el registro de avisos. Un \texttt{usuario} (paciente) puede tener muchas \texttt{citas}; un \texttt{medico} tiene muchos \texttt{horarios} y muchas \texttt{citas}; cada \texttt{cita} enlaza un usuario con un médico en una fecha y hora concretas. Cada tabla cumple un papel preciso:
 
 \begin{itemize}
-  \item \texttt{usuarios}: identidad y credenciales (email único, contraseña cifrada, nombre, teléfono, rol). El campo \texttt{rol} discrimina entre \texttt{PACIENTE}, \texttt{MEDICO} y \texttt{ADMIN}, y \texttt{cuenta\_invitada} marca las cuentas creadas en una reserva sin registro.
+  \item \texttt{usuarios}: identidad y credenciales (email único, contraseña cifrada, nombre, teléfono, rol). El campo \texttt{rol} discrimina entre \texttt{PACIENTE}, \texttt{MEDICO} y \texttt{ADMIN}, y \texttt{cuenta\_invitada} marca las cuentas creadas en una reserva sin registro. Desde la V9 guarda además el chat de Telegram vinculado (\texttt{telegram\_chat\_id}) y el token de un solo uso con el que se realiza esa vinculación.
   \item \texttt{medicos}: datos profesionales (nombre, especialidad, email de contacto del facultativo).
   \item \texttt{horarios}: la disponibilidad real, como franjas con \texttt{inicio}, \texttt{fin}, un indicador \texttt{disponible} y el centro donde se atiende (\texttt{centro\_id}, V6). Un índice único sobre \texttt{(medico\_id, inicio)} impide crear dos franjas idénticas para el mismo médico.
   \item \texttt{citas}: las reservas, que vinculan \texttt{usuario\_id} y \texttt{medico\_id} con \texttt{fecha\_hora}, \texttt{motivo} y \texttt{estado}. La cancelación no borra la fila: cambia su \texttt{estado} (mediante el enumerado \texttt{EstadoCita}), preservando la trazabilidad.
@@ -382,7 +383,7 @@ El modelo relacional gira en torno a cuatro entidades centrales —\texttt{usuar
   \item \texttt{centros}: los centros o consultas donde se atiende (\texttt{codigo} único, nombre, dirección, ciudad). Cada \texttt{cita} referencia opcionalmente su centro mediante \texttt{centro\_id}.
 \end{itemize}
 
-La evolución del esquema queda reflejada en las migraciones Flyway: la \texttt{V2\_\_cita\_recordatorio} añade el campo \texttt{recordatorio\_enviado} para evitar duplicar avisos Twilio, la \texttt{V3} extiende los horarios y crea el usuario médico de prueba, la \texttt{V4} introduce \texttt{cuenta\_invitada} para la reserva sin registro previo, la \texttt{V5} crea la tabla \texttt{centros} (con sus datos iniciales) y añade \texttt{centro\_id} a \texttt{citas}, y la \texttt{V6} añade \texttt{centro\_id} a \texttt{horarios} (repartiendo la agenda por centro). Versionar el esquema de esta forma garantiza que la base de datos del tribunal se construya exactamente igual que la de desarrollo.
+La evolución del esquema queda reflejada en las migraciones Flyway: la \texttt{V2\_\_cita\_recordatorio} añade el campo \texttt{recordatorio\_enviado} para evitar duplicar avisos Twilio, la \texttt{V3} extiende los horarios y crea el usuario médico de prueba, la \texttt{V4} introduce \texttt{cuenta\_invitada} para la reserva sin registro previo, la \texttt{V5} crea la tabla \texttt{centros} (con sus datos iniciales) y añade \texttt{centro\_id} a \texttt{citas}, la \texttt{V6} añade \texttt{centro\_id} a \texttt{horarios} (repartiendo la agenda por centro), la \texttt{V7} actualiza los centros a sus ubicaciones reales en Palma de Mallorca, la \texttt{V8} incorpora a la cita la cobertura y la preferencia de pago, la \texttt{V9} abre el canal de Telegram (\texttt{telegram\_chat\_id} y \texttt{telegram\_link\_token}, ambos con índice único) y la \texttt{V10} añade la caducidad de ese token de vinculación. Versionar el esquema de esta forma garantiza que la base de datos del tribunal se construya exactamente igual que la de desarrollo.
 
 \subsection{Persistencia relacional frente a NoSQL}
 
@@ -456,6 +457,8 @@ GET & /api/citas/mias & Citas del paciente (JWT) \\
 GET & /api/citas/por-email & Citas del invitado por email \\
 DELETE & /api/citas/\{id\} & Cancelación (paciente autenticado) \\
 GET & /api/estadisticas & Cuadro de mando de gestión (rol MEDICO/ADMIN) \\
+GET, POST, DELETE & /api/telegram/vinculacion & Estado, alta y baja del canal Telegram (JWT) \\
+POST & /api/telegram/webhook & Lo invoca Telegram; se autentica con un secreto compartido \\
 POST & /api/contact & Formulario de contacto \\
 \bottomrule
 \end{tabular}
@@ -468,16 +471,29 @@ Una API es tan buena como sus errores: si cada fallo se devuelve de una forma di
 
 La ventaja es doble. Por un lado, el frontend puede confiar en una estructura de error predecible y mostrar mensajes claros al usuario (por ejemplo, ``esa hora acaba de ocuparse, elige otra'' ante un 409). Por otro, se evita filtrar trazas internas o detalles de implementación al exterior, lo que también es una cuestión de seguridad. Centralizar el manejo de errores en un único punto, en lugar de repetir bloques \texttt{try-catch} por todos los controladores, mantiene el código limpio y coherente.
 
-\subsection{Notificaciones Twilio}
+\subsection{Notificaciones: Twilio y Telegram}
 
 Las notificaciones son la otra mitad de la promesa del proyecto: si la web evita llamadas, tiene que avisar de forma fiable de lo que ocurre con cada cita. El envío se realiza \textbf{directamente desde el backend Java} mediante el SDK de Twilio, sin un servicio intermedio de colas. Es una arquitectura más simple y perfectamente adecuada al volumen de una consulta; un sistema de mensajería asíncrona con reintentos desacoplados sería justificable a mayor escala y se contempla como evolución futura. \texttt{CitaNotificationService} envía:
 \begin{itemize}
   \item Aviso al médico (\texttt{TWILIO\_NOTIFY\_TO}) en alta y cancelación.
-  \item Confirmación y cancelación al paciente si tiene teléfono.
+  \item Confirmación y cancelación al paciente, por cada canal que tenga disponible.
   \item Recordatorio $\sim$24\,h antes vía \texttt{@Scheduled} (ventana 23--25\,h).
 \end{itemize}
 
 Variables: \texttt{TWILIO\_ENABLED}, \texttt{TWILIO\_ACCOUNT\_SID}, \texttt{TWILIO\_AUTH\_TOKEN}, \texttt{TWILIO\_FROM}, \texttt{TWILIO\_CHANNEL} (whatsapp o sms).
+
+\paragraph{El segundo canal: un bot de Telegram.} La cuenta de prueba de Twilio impone una limitación incómoda para un producto real: el paciente debe darse de alta en el \emph{sandbox} antes de poder recibir nada, y los mensajes salientes tienen coste. Por eso se añadió un \textbf{segundo canal independiente} sobre la \emph{Bot API} de Telegram, que es gratuita y no exige alta previa. La integración es deliberadamente ligera —una llamada HTTP con \texttt{RestClient} a \texttt{sendMessage}, sin SDK ni dependencias nuevas— y vive en \texttt{TelegramMessageService}, gemelo de \texttt{TwilioMessageService}.
+
+El punto interesante no es el envío, sino \textbf{cómo se averigua a qué chat escribir}. Telegram no permite iniciar una conversación con alguien: es el usuario quien tiene que escribir primero al bot. El flujo implementado resuelve ese problema con un enlace profundo y un token de un solo uso:
+\begin{enumerate}
+  \item El paciente, con su sesión iniciada, pulsa \emph{Recibir avisos por Telegram}. El backend (\texttt{TelegramVinculacionService}) genera un token de 32 bytes con \texttt{SecureRandom}, lo guarda en su fila de \texttt{usuarios} con una caducidad de 15 minutos y devuelve el enlace \texttt{https://t.me/<bot>?start=<token>}.
+  \item Al abrirlo, Telegram envía al bot el mensaje \texttt{/start <token>}, que llega al backend a través del \emph{webhook} \texttt{POST /api/telegram/webhook}.
+  \item El controlador busca al dueño de ese token, comprueba que no haya caducado, asocia el \texttt{chat\_id} a su cuenta y \textbf{consume el token} (lo pone a \texttt{NULL}). A partir de ese momento, ese paciente recibe por Telegram los mismos avisos que por SMS.
+\end{enumerate}
+
+Hay dos decisiones de seguridad que conviene subrayar. La primera: el token \textbf{se emite siempre para el usuario del JWT}, nunca para un correo recibido por parámetro; de lo contrario cualquiera podría solicitar el token de otra persona y desviar a su propio chat los avisos de las citas ajenas. La segunda: como la ruta del \emph{webhook} es pública —Telegram no puede presentar un JWT—, se autentica con el secreto compartido que se registra en \texttt{setWebhook} y que Telegram devuelve en la cabecera \texttt{X-Telegram-Bot-Api-Secret-Token}, comparado en tiempo constante. Superada esa verificación, el \emph{webhook} responde siempre \texttt{200 OK} aunque el contenido no sirva, porque un error haría que Telegram reintentase el mismo mensaje indefinidamente.
+
+Ambos canales son \textbf{independientes y opcionales}: se activan por variables de entorno (\texttt{TELEGRAM\_ENABLED}, \texttt{TELEGRAM\_BOT\_TOKEN}, \texttt{TELEGRAM\_BOT\_USERNAME}, \texttt{TELEGRAM\_WEBHOOK\_SECRET}) y ninguno de los dos puede tumbar una reserva: los servicios de mensajería nunca propagan la excepción hacia el flujo de citas, solo registran el fallo y devuelven \texttt{false}. Si un canal está caído o apagado, el otro sigue avisando. El paciente puede además retirar el canal en cualquier momento (\texttt{DELETE /api/telegram/vinculacion}), lo que borra su \texttt{chat\_id}: una forma concreta de aplicar el derecho de supresión del RGPD.
 
 \subsection{Implementación del frontend}
 
@@ -492,7 +508,7 @@ El frontend se construyó con HTML5, CSS3 y JavaScript nativo, sin frameworks co
 
 \paragraph{Aplicación web progresiva (PWA).} La web es instalable en el móvil como si fuera una app, sin pasar por una tienda de aplicaciones. Esto se logra con tres piezas: un \texttt{manifest.json} que define nombre, iconos y color de tema; un \emph{service worker} que cachea los recursos críticos para que la navegación siga funcionando aunque la conexión falle, mostrando una página \texttt{offline.html} cuando no hay red; y el requisito de servir bajo HTTPS en producción. Para un paciente, la diferencia práctica es poder tener ``Dr. Agramonte'' como un icono más en su pantalla de inicio, reforzando justamente la idea de un canal propio y cercano al consultorio.
 
-\paragraph{Selección de centro (multi-ubicación).} El flujo de reserva permite elegir entre dos centros antes de fijar la hora: \emph{Clínica Salamanca} (Madrid) y \emph{Consulta Palma de Mallorca}, cada uno con sus propios días de atención. Esto refleja una realidad habitual: un mismo profesional atiende en más de una ubicación. El centro \textbf{se persiste en la base de datos}: existe una entidad \texttt{Centro} (tabla \texttt{centros}, creada en la migración Flyway V5) con un \texttt{codigo} estable —\texttt{madrid}, \texttt{palma}— que coincide con el identificador que ya empleaba el frontend, de modo que no hubo que reescribir la web. El backend expone el listado mediante \texttt{GET /api/centros}.
+\paragraph{Selección de centro (multi-ubicación).} El flujo de reserva permite elegir entre dos centros antes de fijar la hora: \emph{Consulta General Riera} y \emph{Consulta Avenidas}, ambos en Palma de Mallorca y cada uno con sus propios días de atención. Esto refleja una realidad habitual: un mismo profesional atiende en más de una ubicación. El centro \textbf{se persiste en la base de datos}: existe una entidad \texttt{Centro} (tabla \texttt{centros}, creada en la migración Flyway V5) con un \texttt{codigo} estable —\texttt{madrid}, \texttt{palma}— que coincide con el identificador que ya empleaba el frontend, de modo que no hubo que reescribir la web. El backend expone el listado mediante \texttt{GET /api/centros}.
 
 \paragraph{Agenda del médico por centro.} La multi-ubicación se llevó hasta el final: cada \texttt{horario} pertenece a un centro (columna \texttt{centro\_id}, migración V6; la V7 actualizó los centros a sus ubicaciones reales en Palma de Mallorca), repartiendo la agenda del médico por día de la semana —la consulta de General Riera los lunes, martes y jueves; la de Avenidas los miércoles, viernes y sábados— de forma que cada día el profesional está en un único sitio. A partir de ahí, todo encaja de manera coherente:
 \begin{itemize}
@@ -575,7 +591,8 @@ La seguridad no se añadió al final, se diseñó desde el principio, porque man
   \item Contraseñas con \texttt{BCryptPasswordEncoder(12)}.
   \item CORS configurado para orígenes de desarrollo y producción.
   \item Política de privacidad en \texttt{privacidad.html} y checkbox de aceptación en el formulario de reserva.
-  \item Secretos (\texttt{JWT\_SECRET}, Twilio) en \texttt{.env}, no en el repositorio.
+  \item Secretos (\texttt{JWT\_SECRET}, Twilio, token del bot de Telegram) en \texttt{.env}, no en el repositorio.
+  \item \textbf{Webhook público autenticado:} la ruta que invoca Telegram no puede presentar un JWT, así que se valida con el secreto compartido que se registra en \texttt{setWebhook} y que Telegram reenvía en cada llamada; la comparación se hace en \textbf{tiempo constante} (\texttt{MessageDigest.isEqual}) para no filtrar información por el tiempo de respuesta.
   \item \textbf{Análisis de vulnerabilidades:} \texttt{OWASP dependency-check} configurado en \texttt{pom.xml}, que hace fallar el build con CVSS\,$\geq$\,7.
 \end{itemize}
 
@@ -641,11 +658,11 @@ El desarrollo se organizó en fases encadenadas a lo largo de cuatro meses, part
 
 \subsection{Pruebas y validación}
 
-La estrategia de pruebas se centró en los \textbf{caminos críticos}, aquellos en los que un fallo tendría consecuencias reales: la no duplicación de reservas, el respeto de los permisos por rol y la validez del token de autenticación. La filosofía no fue ``probarlo todo'' de forma superficial, sino probar bien lo que importa, combinando tres niveles —unitario, de seguridad e integración— para cubrir el comportamiento desde distintos ángulos. El proyecto incorpora una batería de pruebas automatizadas, ejecutable con \texttt{mvn test} desde \texttt{backend/}:
+La estrategia de pruebas se centró en los \textbf{caminos críticos}, aquellos en los que un fallo tendría consecuencias reales: la no duplicación de reservas, el respeto de los permisos por rol y la validez del token de autenticación. La filosofía no fue ``probarlo todo'' de forma superficial, sino probar bien lo que importa, combinando tres niveles —unitario, de seguridad e integración— para cubrir el comportamiento desde distintos ángulos. El proyecto incorpora una batería de \textbf{47 pruebas automatizadas}, ejecutable con \texttt{mvn test} desde \texttt{backend/}:
 
 \begin{itemize}
-  \item \textbf{Unitarias (caja blanca):} \texttt{CitaServiceTest} (reserva sobre franja libre confirma y bloquea el horario; franja ocupada $\rightarrow$ 409 sin persistir; cancelación por no propietario $\rightarrow$ 403; re-cancelación $\rightarrow$ 409). \texttt{JwtProviderTest} (generación, validación y expiración del token firmado).
-  \item \textbf{Seguridad / RBAC (caja negra, WebMvc):} \texttt{CitaControllerWebMvcTest} importa la \texttt{SecurityConfig} real: rol MEDICO sobre rutas de paciente $\rightarrow$ 403; acceso anónimo bloqueado; rol PACIENTE $\rightarrow$ 201.
+  \item \textbf{Unitarias (caja blanca):} \texttt{CitaServiceTest} (reserva sobre franja libre confirma y bloquea el horario; franja ocupada $\rightarrow$ 409 sin persistir; cancelación por no propietario $\rightarrow$ 403; re-cancelación $\rightarrow$ 409). \texttt{JwtProviderTest} (generación, validación y expiración del token firmado). \texttt{TelegramVinculacionServiceTest} (el token de vinculación se emite con caducidad, dos llamadas seguidas no repiten token, uno caducado no cuenta como vinculación pendiente, la desvinculación es idempotente y con el canal apagado la petición responde 503).
+  \item \textbf{Seguridad / RBAC (caja negra, WebMvc):} \texttt{CitaControllerWebMvcTest} importa la \texttt{SecurityConfig} real: rol MEDICO sobre rutas de paciente $\rightarrow$ 403; acceso anónimo bloqueado; rol PACIENTE $\rightarrow$ 201. \texttt{TelegramVinculacionControllerWebMvcTest} comprueba que las tres operaciones del canal exigen sesión y que siempre actúan sobre el usuario del \emph{principal}, nunca sobre uno indicado por parámetro. \texttt{TelegramWebhookControllerWebMvcTest} cubre la ruta pública del \emph{webhook}: sin la cabecera del secreto o con un secreto que no coincide $\rightarrow$ 401 sin tocar la base de datos; con el secreto correcto, \texttt{/start <token>} vincula el chat; y un token caducado no vincula.
   \item \textbf{Integración end-to-end (Testcontainers + PostgreSQL real):} \texttt{ReservaPublicaIntegrationTest}: \emph{(a)} \textbf{concurrencia real}: dos transacciones simultáneas, en hilos distintos sincronizados con una \texttt{CyclicBarrier}, compiten por la misma franja; exactamente una confirma (201) y la otra recibe 409, demostrando el bloqueo pesimista sobre PostgreSQL —algo que un H2 en memoria no reproduce y que un \emph{mock} no prueba—; \emph{(b)} segunda reserva secuencial sobre la franja ya ocupada $\rightarrow$ 409; \emph{(c)} reserva pública persistida y consultable por email; \emph{(d)} agenda por centro: el hueco se filtra por ubicación y la cita hereda el centro del horario.
   \item \textbf{Análisis de vulnerabilidades:} \texttt{OWASP dependency-check} (\texttt{mvn org.owasp:dependency-check-maven:check}).
   \item \textbf{Manuales:} compilación Maven, arranque Docker Compose y health check; flujo registro/login $\rightarrow$ reservar $\rightarrow$ mis citas $\rightarrow$ cancelar; parámetro \texttt{?servicio=}; validación de formularios (email, teléfono español).
@@ -666,9 +683,16 @@ JWT firmado válido & \texttt{JwtProviderTest} & Unitaria & \checkmark \\
 \rowcolor{rowgray}
 Solo el dueño cancela & \texttt{CitaServiceTest} & Unitaria & 403 \checkmark \\
 No re-cancelar & \texttt{CitaServiceTest} & Unitaria & 409 \checkmark \\
+\rowcolor{rowgray}
+Webhook público sin secreto válido & \texttt{TelegramWebhookControllerWebMvcTest} & Seguridad & 401 \checkmark \\
+\rowcolor{rowgray}
+Canal Telegram solo del propio usuario & \texttt{TelegramVinculacionControllerWebMvcTest} & Seguridad & 401/204 \checkmark \\
+Token de vinculación caducado & \texttt{TelegramVinculacionServiceTest} & Unitaria & \checkmark \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\paragraph{Requisito de las pruebas de integración.} Las cinco pruebas de \texttt{ReservaPublicaIntegrationTest} levantan un PostgreSQL real mediante Testcontainers y, por tanto, necesitan un motor Docker en marcha. Cuando no lo hay, la propia suite las marca como \emph{saltadas} en lugar de fallar, de modo que \texttt{mvn test} sigue siendo verde en una máquina sin Docker; para la demostración ante el tribunal conviene arrancarlo y ejecutar las 47 completas.
 
 \paragraph{Mejoras futuras de calidad.} Informe de cobertura formal con \textbf{JaCoCo} ($\geq$\,80\,\% medido), pruebas E2E (Playwright/Cypress), auditoría \textbf{Lighthouse} documentada y escenario de alta disponibilidad (réplicas/failover), hoy contemplado como diseño y no ejecutado en esta infraestructura.
 
@@ -676,16 +700,16 @@ No re-cancelar & \texttt{CitaServiceTest} & Unitaria & 409 \checkmark \\
 \chapter{Conclusiones}
 % ============================================================================
 
-Se ha entregado una aplicación funcional y desplegable que responde al problema de gestión de citas, con arquitectura clara, código mantenible y \textbf{pruebas automatizadas} que cubren los caminos críticos (409 por doble reserva, 403 por rol, JWT firmado, cancelación). Los objetivos técnicos del repositorio se cumplen en PostgreSQL, Spring Boot, frontend PWA y Twilio integrado en Java.
+Se ha entregado una aplicación funcional y desplegable que responde al problema de gestión de citas, con arquitectura clara, código mantenible y \textbf{pruebas automatizadas} que cubren los caminos críticos (409 por doble reserva, 403 por rol, JWT firmado, cancelación). Los objetivos técnicos del repositorio se cumplen en PostgreSQL, Spring Boot, frontend PWA y los dos canales de aviso (Twilio y Telegram) integrados en Java.
 
 \textbf{Cumplimiento de los objetivos.} Retomando los ocho objetivos específicos planteados al inicio, el balance es el siguiente:
 
 \begin{enumerate}
-  \item \emph{Modelo de datos en PostgreSQL con Flyway.} \textbf{Cumplido:} seis tablas, migraciones V1--V8 y perfiles \texttt{postgres}/\texttt{mysql}.
+  \item \emph{Modelo de datos en PostgreSQL con Flyway.} \textbf{Cumplido:} seis tablas, migraciones V1--V10 y perfiles \texttt{postgres}/\texttt{mysql}.
   \item \emph{API REST con Spring Boot, JWT y roles.} \textbf{Cumplido:} controladores por recurso, autenticación JWT y autorización por rol en \texttt{SecurityConfig}.
   \item \emph{Integridad de reservas con \texttt{SELECT FOR UPDATE}.} \textbf{Cumplido y verificado:} la prueba de integración confirma que, ante dos transacciones simultáneas en hilos distintos sobre la misma franja, exactamente una reserva prospera (201) y la otra recibe 409.
   \item \emph{Frontend responsive, PWA y reserva accesible.} \textbf{Cumplido:} reserva por pasos, modo oscuro, selección de centro y service worker.
-  \item \emph{Notificaciones por Twilio con recordatorio programado.} \textbf{Cumplido:} avisos a médico y paciente y recordatorio a $\sim$24\,h vía \texttt{@Scheduled}.
+  \item \emph{Notificaciones con recordatorio programado.} \textbf{Cumplido y ampliado:} avisos a médico y paciente y recordatorio a $\sim$24\,h vía \texttt{@Scheduled}, por \textbf{dos canales independientes} —Twilio (SMS/WhatsApp) y un bot de Telegram con vinculación por token de un solo uso—, de forma que la caída o desactivación de uno no deja al paciente sin aviso.
   \item \emph{Despliegue reproducible con Docker Compose.} \textbf{Cumplido:} un único comando levanta base de datos, backend y frontend; y, más allá del objetivo, la aplicación está \textbf{desplegada en la nube} (Railway) y es pública con HTTPS en \url{https://www.dragramonte.com}.
   \item \emph{Validación de la calidad.} \textbf{Cumplido parcialmente:} pruebas unitarias, de seguridad e integración más \texttt{OWASP dependency-check}; queda pendiente medir la cobertura con JaCoCo y añadir pruebas E2E.
   \item \emph{Cuadro de mando de gestión (SGE).} \textbf{Cumplido:} endpoint \texttt{/api/estadisticas} con agregaciones \texttt{GROUP BY}, restringido por rol y representado con Chart.js (carga por médico, demanda por especialidad, reparto por centro y estado, evolución temporal y tasa de cancelación).
@@ -752,6 +776,9 @@ Docker, Inc. (s.f.). \textit{Docker Compose documentation}. Recuperado en junio 
 
 \bibitem{twilio}
 Twilio. (s.f.). \textit{Messaging API documentation}. Recuperado en junio de 2026, de \url{https://www.twilio.com/docs/messaging}
+
+\bibitem{telegram}
+Telegram. (s.f.). \textit{Telegram Bot API}. Recuperado en agosto de 2026, de \url{https://core.telegram.org/bots/api}
 
 \bibitem{flyway}
 Redgate. (s.f.). \textit{Flyway documentation}. Recuperado en junio de 2026, de \url{https://documentation.red-gate.com/fd}

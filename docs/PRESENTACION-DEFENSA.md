@@ -8,7 +8,7 @@
 Aplicación web **completa, segura y desplegada en producción** para que los pacientes de un médico internista real reserven, consulten y cancelen citas sin depender del teléfono — desarrollada de extremo a extremo y accesible en **https://www.dragramonte.com**.
 
 ## Pitch de 60 segundos (memorízalo)
-> «Muchas de las llamadas que recibe un médico fuera de su horario no son urgencias clínicas, sino **gestión de agenda**. Mi TFG digitaliza esa parte: un sistema de reserva de citas para un internista real en Palma de Mallorca. Tiene un **backend Spring Boot con PostgreSQL**, autenticación **JWT con roles**, y resuelve la **doble reserva** con bloqueo pesimista probado bajo concurrencia. Incluye un **cuadro de mando** de gestión, es **PWA y accesible**, y —lo más importante— **está desplegado y público con HTTPS** en un dominio propio. Toda la memoria describe lo que el código hace de verdad; lo que no está hecho lo presento como línea futura.»
+> «Muchas de las llamadas que recibe un médico fuera de su horario no son urgencias clínicas, sino **gestión de agenda**. Mi TFG digitaliza esa parte: un sistema de reserva de citas para un internista real en Palma de Mallorca. Tiene un **backend Spring Boot con PostgreSQL**, autenticación **JWT con roles**, y resuelve la **doble reserva** con bloqueo pesimista probado bajo concurrencia. Avisa al paciente por **dos canales independientes** (SMS/WhatsApp con Twilio y un **bot de Telegram**). Incluye un **cuadro de mando** de gestión, es **PWA y accesible**, y —lo más importante— **está desplegado y público con HTTPS** en un dominio propio. Toda la memoria describe lo que el código hace de verdad; lo que no está hecho lo presento como línea futura.»
 
 ---
 
@@ -18,9 +18,10 @@ Aplicación web **completa, segura y desplegada en producción** para que los pa
 | Stack | Java 21 · Spring Boot 3.5.3 · PostgreSQL 15 · JS vanilla (sin framework) |
 | Seguridad | JWT (1 token) + roles PACIENTE/MEDICO/ADMIN · BCrypt factor **12** |
 | Concurrencia | `SELECT … FOR UPDATE` + índice `UNIQUE(medico_id, inicio)` → 2.ª reserva = **409** |
-| Base de datos | **6 tablas** (3FN) · migraciones **Flyway V1–V8** · `ddl-auto: validate` |
-| Pruebas | **25 en verde** (unitarias + WebMvc + integración con **Testcontainers**) |
+| Base de datos | **6 tablas** (3FN) · migraciones **Flyway V1–V10** · `ddl-auto: validate` |
+| Pruebas | **47 en verde** (unitarias + WebMvc + integración con **Testcontainers**) |
 | Calidad | **OWASP dependency-check** (`failBuildOnCVSS=7`) |
+| Notificaciones | **2 canales** desacoplados: Twilio (SMS/WhatsApp) y **Telegram** (bot con webhook) · recordatorio 24 h |
 | Cuadro de mando | 4 KPIs + 5 gráficos · agregación **`GROUP BY` en BD** · Chart.js vendorizado · gated por rol |
 | Frontend | PWA (service worker, offline) · responsive · modo oscuro · **WCAG 2.1 AA** · SEO |
 | Despliegue | **Docker Compose** (local) + **Railway** (nube) · **HTTPS** Let's Encrypt · www.dragramonte.com |
@@ -37,15 +38,16 @@ Aplicación web **completa, segura y desplegada en producción** para que los pa
 1. **Problema** — la agenda telefónica satura al médico; coste oculto de tiempo.
 2. **Propuesta + 8 objetivos** — cada uno con código y, donde aplica, prueba.
 3. **Arquitectura** — frontend ⇄ API REST (Spring) ⇄ PostgreSQL; en la nube un único servicio sirve API + web.
-4. **Modelo de datos** — 6 tablas, Flyway V1–V8 (enseña el diagrama ER).
+4. **Modelo de datos** — 6 tablas, Flyway V1–V10 (enseña el diagrama ER).
 5. **Seguridad + concurrencia** ⭐ — JWT/roles/BCrypt y el `SELECT FOR UPDATE` (tu joya técnica).
 6. **Flujo de reserva** — invitado o con cuenta; centro → fecha → hora; cobertura (privada 80 € / seguro).
 7. **Cuadro de mando** — analítica con `GROUP BY`, gated por rol.
-8. **Frontend** — PWA, accesible, responsive, SEO.
-9. **Despliegue real** ⭐ — Railway + HTTPS + dominio propio.
-10. **Calidad** — 25 tests en verde + OWASP (lleva la captura del verde).
-11. **Demo en vivo** — reserva → panel/médico → dashboard.
-12. **Limitaciones + líneas futuras** y **cierre**.
+8. **Notificaciones** — Twilio y Telegram; vinculación del bot con token de un solo uso que caduca.
+9. **Frontend** — PWA, accesible, responsive, SEO.
+10. **Despliegue real** ⭐ — Railway + HTTPS + dominio propio.
+11. **Calidad** — 47 tests en verde + OWASP (lleva la captura del verde).
+12. **Demo en vivo** — reserva → panel/médico → dashboard.
+13. **Limitaciones + líneas futuras** y **cierre**.
 
 ## Cómo decir las limitaciones (sin que resten)
 Preséntalas como **decisiones de alcance**, no como olvidos:

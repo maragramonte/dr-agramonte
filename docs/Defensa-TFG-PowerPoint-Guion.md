@@ -71,7 +71,7 @@
 
 **En pantalla:**
 - Entidades en español: `usuarios`, `medicos`, `horarios`, `citas`, `notificaciones`, `centros`
-- Migraciones **Flyway versionadas (V1–V8)**, perfiles `postgres` / `mysql`
+- Migraciones **Flyway versionadas (V1–V10)**, perfiles `postgres` / `mysql`
 - Multi-centro: la cita **hereda** el centro de su horario
 - Esquema validado en arranque (`ddl-auto: validate`)
 
@@ -124,7 +124,21 @@
 
 ---
 
-## Diapositiva 9 — Frontend: PWA, accesible y responsive
+## Diapositiva 9 — Notificaciones: dos canales independientes
+
+**En pantalla:**
+- Avisos de **confirmación, cancelación y recordatorio 24 h** al paciente, y alta de cita al médico
+- **Twilio** (SMS/WhatsApp) y **Telegram** (bot con webhook): canales **independientes**, se activan por `.env`
+- Vinculación del bot: token de **un solo uso**, válido **15 min**, emitido solo para el usuario del JWT
+- El envío se aplaza al **commit** de la transacción: si la reserva se revierte, nunca se avisa
+
+**Visual:** captura del chat de Telegram con el aviso de cita + el botón «Recibir avisos por Telegram» en `reservar.html`.
+
+**Notas:** el detalle fino es que un canal caído **no bloquea** al otro ni tumba la reserva (`TelegramMessageService`/`TwilioMessageService` nunca propagan excepción, solo registran el fallo). El recordatorio de 24 h lo lanza un `@Scheduled` cada 15 min, y `recordatorio_enviado` evita duplicarlo. Sé honesta si en la demo los canales están apagados: es una variable de entorno, no código que falte.
+
+---
+
+## Diapositiva 10 — Frontend: PWA, accesible y responsive
 
 **En pantalla:**
 - **PWA** con service worker (cacheo + modo offline)
@@ -138,7 +152,7 @@
 
 ---
 
-## Diapositiva 10 — Despliegue real en producción ⭐
+## Diapositiva 11 — Despliegue real en producción ⭐
 
 **En pantalla:**
 - **En vivo y público:** https://www.dragramonte.com
@@ -152,21 +166,22 @@
 
 ---
 
-## Diapositiva 11 — Calidad y verificación
+## Diapositiva 12 — Calidad y verificación
 
 **En pantalla:**
-- **25 pruebas** automatizadas (unitarias, WebMvc e integración) — verificadas en verde
+- **47 pruebas** automatizadas en **3 niveles** — verificadas en verde
+- **Unitarias** (servicios, JWT, configuración) · **WebMvc** (seguridad y roles de la API) · **integración end-to-end**
 - **Testcontainers** (PostgreSQL real en contenedor) para la prueba de integración
 - **OWASP Dependency-Check** (análisis de vulnerabilidades de dependencias)
 - Migraciones probadas: la suite de integración levanta la BD y corre Flyway
 
 **Visual:** captura de la terminal con `BUILD SUCCESS` / `Tests run: ... Failures: 0`.
 
-**Notas:** ejecuta `mvn test` antes de la defensa y lleva la captura del verde. Si te preguntan por cobertura, sé honesta: pruebas centradas en el núcleo crítico (auth, reserva, concurrencia, API).
+**Notas:** ejecuta `mvn test` antes de la defensa y lleva la captura del verde. Si te preguntan por cobertura, sé honesta: **no está medida con JaCoCo**; las pruebas se centran en el núcleo crítico (auth, reserva, concurrencia, roles y el secreto del webhook de Telegram). Aviso práctico: si Docker Desktop no está arrancado, las 5 de integración salen **saltadas** en vez de en verde — arráncalo antes de hacer la captura.
 
 ---
 
-## Diapositiva 12 — Demo en vivo (qué se enseña)
+## Diapositiva 13 — Demo en vivo (qué se enseña)
 
 **En pantalla (índice de la demo):**
 1. Reserva de cita como paciente (centro de Mallorca → fecha → hora)
@@ -180,7 +195,7 @@
 
 ---
 
-## Diapositiva 13 — Decisiones de ingeniería (por qué)
+## Diapositiva 14 — Decisiones de ingeniería (por qué)
 
 **En pantalla:**
 - **Relacional frente a NoSQL**: núcleo transaccional ACID + datos interrelacionados → PostgreSQL (NoSQL queda como línea futura para historial/auditoría)
@@ -194,39 +209,40 @@
 
 ---
 
-## Diapositiva 14 — Limitaciones y líneas futuras
+## Diapositiva 15 — Limitaciones y líneas futuras
 
 **En pantalla:**
-- Notificaciones por SMS/WhatsApp (**Twilio**) y asistente IA: **aplazados** (líneas futuras, no implementados en producción)
+- **Asistente IA**: aplazado (línea futura, no implementado)
+- Notificaciones **Twilio y Telegram: implementadas**, pero dependen de credenciales externas; en la beta pueden ir apagadas por `.env` (Twilio en modo sandbox exige que el destinatario se dé de alta)
 - Persistencia políglota (NoSQL para historial clínico)
 - Auditoría formal de accesibilidad (Lighthouse/axe) y de huella energética
 - **Cobro online** (Stripe, captura manual: "si no acude, no se cobra") — la cobertura, el precio y la preferencia de pago **ya se muestran y se registran**; falta solo la pasarela
 
 **Visual:** roadmap sencillo (hecho ✓ / futuro ○).
 
-**Notas:** presenta las limitaciones con seguridad: son decisiones de alcance, no olvidos. Nunca afirmes que Twilio/IA están funcionando si no lo están en la demo.
+**Notas:** presenta las limitaciones con seguridad: son decisiones de alcance, no olvidos. Distingue bien «no implementado» (IA) de «implementado pero desactivado en la demo» (Twilio/Telegram): lo segundo se enseña con el código y el log, no se afirma sin más.
 
 ---
 
-## Diapositiva 15 — Objetivos cumplidos
+## Diapositiva 16 — Objetivos cumplidos
 
 **En pantalla (checklist 8/8):**
 1. ✅ Modelo + PostgreSQL + Flyway (perfiles postgres/mysql)
 2. ✅ API REST + JWT + roles
 3. ✅ Integridad con `SELECT FOR UPDATE`
 4. ✅ Frontend responsive, PWA, accesible
-5. ◐ Notificaciones (email sí; Twilio como línea futura)
+5. ✅ Notificaciones (email + Twilio SMS/WhatsApp + bot de Telegram, activables por `.env`)
 6. ✅ Despliegue reproducible (Docker; + nube real en Railway)
 7. ✅ Pruebas + análisis de vulnerabilidades + demo reproducible
 8. ✅ Cuadro de mando de gestión (SGE)
 
 **Visual:** los 8 objetivos con su check.
 
-**Notas:** sé honesta con el nº5 (email implementado; Twilio aplazado). El resto, cumplidos y demostrables.
+**Notas:** el nº5 se cerró en agosto de 2026 al añadir el canal de Telegram: los tres canales están implementados y probados; lo que varía es si están **activados** en el entorno de la demo. El resto, cumplidos y demostrables.
 
 ---
 
-## Diapositiva 16 — Cierre
+## Diapositiva 17 — Cierre
 
 **En pantalla:**
 - Un sistema **completo, seguro y en producción** para un caso real
@@ -246,7 +262,8 @@
 
 ### Prioridad alta — coherencia memoria ↔ código ↔ demo (la regla de oro)
 - ✅ **Resuelto (junio 2026):** la memoria LaTeX se alineó con el código — los centros pasan a **Palma de Mallorca (General Riera y Avenidas)** y el recuento de migraciones a **V1–V7**; PDF recompilado sin errores.
-- ✅ **Suite de tests verificada:** **25/25 en verde** (`mvn test`, incluida la de integración con Testcontainers). Lleva la captura del verde a la diapositiva 11.
+- ✅ **Resuelto (agosto 2026):** segunda pasada de alineación tras el canal de Telegram — memoria, guion y referencia de BD actualizados a **Flyway V1–V10** y a **47 pruebas**; PDF recompilado.
+- ✅ **Suite de tests verificada:** **47 en verde** (`mvn test`; las 5 de integración con Testcontainers requieren Docker arrancado). Lleva la captura del verde a la diapositiva 12.
 
 ### Prioridad media — credibilidad del producto
 4. **Datos reales del doctor:** siguen como *placeholder* el **colegiado N.º 12345** y los **teléfonos**. En una web de salud real conviene sustituirlos por los reales (o neutralizarlos) antes de enseñarla. *(Necesito que me pases los datos.)*
@@ -263,6 +280,6 @@
 - **Poco texto por diapositiva** (máx. 4-5 viñetas cortas). El detalle va en lo que dices, no en la pantalla.
 - **Capturas reales** de la app (las tuyas, en vivo) — más creíbles que iconos genéricos.
 - **Una idea por diapositiva.** Si una diapositiva tiene dos ideas, divídela.
-- **Diapositiva 10 (despliegue en vivo) y la demo** son tu sello: dales protagonismo.
+- **Diapositiva 11 (despliegue en vivo) y la demo** son tu sello: dales protagonismo.
 - Lleva el PDF de la memoria abierto en el **diagrama de arquitectura** por si el tribunal lo pide.
 - Numera las diapositivas y ten una de **respaldo** con el diagrama E-R y otra con el de arquitectura para preguntas.

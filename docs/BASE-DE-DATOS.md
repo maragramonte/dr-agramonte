@@ -1,6 +1,6 @@
 # Base de datos — referencia para la defensa
 
-> **TFG DAM · Dr. Agramonte · junio 2026.** Esquema real reconstruido de las migraciones **Flyway V1–V8** (`backend/src/main/resources/db/migration/postgresql/`). **PostgreSQL 15.** Hibernate arranca con `ddl-auto: validate`, así que el esquema de esta referencia coincide exactamente con las entidades JPA.
+> **TFG DAM · Dr. Agramonte · junio 2026.** Esquema real reconstruido de las migraciones **Flyway V1–V10** (`backend/src/main/resources/db/migration/postgresql/`). **PostgreSQL 15.** Hibernate arranca con `ddl-auto: validate`, así que el esquema de esta referencia coincide exactamente con las entidades JPA.
 
 ## Resumen en una frase
 6 tablas en **3ª forma normal**, claves `BIGSERIAL`, integridad referencial con **claves foráneas** (unas en `CASCADE`, otras en `SET NULL` según convenga conservar o no el dato), un **índice único** que —junto al bloqueo pesimista— evita las dobles reservas, e **índices** sobre las consultas más frecuentes.
@@ -28,6 +28,9 @@ erDiagram
         varchar  rol "PACIENTE|MEDICO|ADMIN"
         boolean  enabled
         boolean  cuenta_invitada "V4"
+        varchar  telegram_chat_id UK "V9 (null)"
+        varchar  telegram_link_token UK "V9 (null)"
+        timestamp telegram_link_token_expira_en "V10 (null)"
         timestamp created_at
         timestamp updated_at
     }
@@ -72,7 +75,7 @@ erDiagram
         bigint   cita_id FK "→ citas (null)"
         varchar  mensaje
         boolean  leida
-        varchar  canal "EMAIL|SMS|VOICE"
+        varchar  canal "EMAIL|SMS|VOICE|TELEGRAM"
         varchar  estado_entrega
         varchar  respuesta_paciente
         timestamp fecha_creacion
@@ -97,6 +100,9 @@ erDiagram
 | `rol` | VARCHAR(50) | NOT NULL, default `PACIENTE` — enum `Rol` |
 | `enabled` | BOOLEAN | NOT NULL, default TRUE |
 | `cuenta_invitada` | BOOLEAN | NOT NULL, default FALSE — **V4** (reserva sin registro) |
+| `telegram_chat_id` | VARCHAR(64) | **V9** — nullable, **UNIQUE**; chat vinculado al que se envían los avisos |
+| `telegram_link_token` | VARCHAR(64) | **V9** — nullable, **UNIQUE**; token de un solo uso para vincular el chat |
+| `telegram_link_token_expira_en` | TIMESTAMP | **V10** — nullable; caducidad del token (15 min) |
 | `created_at`, `updated_at` | TIMESTAMP | auditoría básica |
 
 ### `medicos` — catálogo de especialistas
@@ -146,7 +152,7 @@ erDiagram
 
 > La cita **hereda el centro de su horario** (no se elige aparte): al reservar, `centro_id` se toma del horario bloqueado.
 
-### `notificaciones` — avisos (Twilio / email)
+### `notificaciones` — avisos (Twilio / Telegram / email)
 | Columna | Tipo | Restricción |
 |---|---|---|
 | `id` | BIGSERIAL | **PK** |
@@ -154,7 +160,7 @@ erDiagram
 | `cita_id` | BIGINT | FK → citas, nullable, `ON DELETE SET NULL` |
 | `mensaje` | VARCHAR(255) | |
 | `leida` | BOOLEAN | NOT NULL, default FALSE |
-| `canal` | VARCHAR(50) | enum `CanalNotificacion`: EMAIL / SMS / VOICE |
+| `canal` | VARCHAR(50) | enum `CanalNotificacion`: EMAIL / SMS / VOICE / **TELEGRAM** |
 | `estado_entrega`, `respuesta_paciente` | VARCHAR(255) | seguimiento del envío y respuesta |
 | `fecha_creacion`, `fecha_respuesta` | TIMESTAMP | |
 
@@ -196,13 +202,15 @@ Está **probado**: `ReservaPublicaIntegrationTest` lanza dos hilos en paralelo c
 | `idx_citas_usuario_fecha` | citas | «mis citas» del paciente |
 | `idx_citas_centro` | citas | citas por centro |
 | `idx_citas_recordatorio` (estado, recordatorio_enviado, fecha_hora) | citas | barrido del recordatorio 24 h |
+| `uk_usuarios_telegram_chat_id` (UNIQUE) | usuarios | un chat de Telegram pertenece como mucho a un paciente — **V9** |
+| `uk_usuarios_telegram_link_token` (UNIQUE) | usuarios | el token de vinculación es irrepetible — **V9** |
 
 ---
 
 ## Decisiones de diseño (resumen para responder rápido)
 - **Claves `BIGSERIAL`/`BIGINT`:** autoincremento nativo de PostgreSQL; margen de crecimiento frente a `INT`.
 - **Enums como `VARCHAR` + `@Enumerated(STRING)`:** dominios pequeños y estables (estado, rol, canal); legibles en la BD y sin una tabla-catálogo que sería sobre-ingeniería.
-- **Columnas nuevas siempre `nullable`** (centro_id V5/V6, recordatorio V2, cobertura V8): no rompen las filas existentes al migrar (compatibilidad hacia atrás).
+- **Columnas nuevas siempre `nullable`** (centro_id V5/V6, recordatorio V2, cobertura V8, Telegram V9/V10): no rompen las filas existentes al migrar (compatibilidad hacia atrás).
 - **Flyway forward-only:** cada cambio es una migración numerada; el esquema se reconstruye idéntico en cualquier entorno. No hay *undo* automático (edición community): se corrige con una nueva V.
 - **Normalización 3FN:** sin datos repetidos; cada hecho vive en un único sitio y se referencia por FK.
 
@@ -218,3 +226,6 @@ Está **probado**: `ReservaPublicaIntegrationTest` lanza dos hilos en paralelo c
 - **¿Guardas datos sensibles (tarjeta sanitaria)?** → Sí, desde V8, para que el profesional gestione la cobertura; en un despliegue real convendría cifrarlo/minimizarlo (RGPD: dato de salud) — recogido como mejora.
 - **¿Por qué no una tabla de «pagos»?** → De momento solo se **captura** la cobertura/preferencia en la propia cita; no hay cobro. Cuando se integre la pasarela (Stripe, línea futura) tendría sentido una tabla `pagos` con su ciclo de estados.
 - **¿Migraciones reversibles?** → Forward-only con Flyway; cada cambio es una nueva versión. Reproducible y trazable, que es lo que importa para la defensa.
+- **¿Por qué el chat de Telegram se guarda en `usuarios` y no en una tabla aparte?** → Es una relación **1:1** (un paciente, un chat) y siempre se consulta junto al usuario al enviar el aviso. Una tabla `usuario_telegram` añadiría un `JOIN` en cada notificación sin ganar nada; si algún día un paciente pudiera vincular varios canales, entonces sí tocaría normalizarlo.
+- **¿Cómo evitas que alguien secuestre los avisos de otro paciente?** → El token de vinculación (V9) es de **un solo uso**, se genera con `SecureRandom` (32 bytes en Base64 URL-safe), **caduca a los 15 minutos** (V10) y solo se emite para el usuario del JWT en sesión, nunca para un email pasado por parámetro. Al consumirse se pone a `NULL`, y el índice `UNIQUE` sobre `telegram_chat_id` impide que un mismo chat quede asociado a dos cuentas.
+- **¿Y si el paciente quiere dejar de recibir avisos?** → `DELETE /api/telegram/vinculacion` pone a `NULL` el chat y el token. Es idempotente y funciona aunque el canal esté desactivado, precisamente para que siempre se puedan retirar esos datos (RGPD, derecho de supresión).
