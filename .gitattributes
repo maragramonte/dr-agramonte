@@ -1,0 +1,6 @@
+# Los scripts y ficheros de configuración se ejecutan en el VPS (Linux): siempre
+# LF, aunque se editen en Windows, o el shell falla con "bad interpreter".
+*.sh text eol=lf
+Caddyfile text eol=lf
+Dockerfile text eol=lf
+*.yml text eol=lf

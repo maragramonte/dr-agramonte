@@ -1,0 +1,108 @@
+# Despliegue en un VPS propio. Agnóstico de proveedor: funciona igual en
+# cualquier servidor con Docker (Hetzner, IONOS, DigitalOcean, OVH, Contabo...).
+#
+# Diferencias con el docker-compose.yml de desarrollo:
+#   - Caddy delante: HTTPS automático (Let's Encrypt) y redirección apex -> www.
+#   - Un solo contenedor de aplicación (Dockerfile de la raíz): Spring Boot sirve
+#     API + frontend juntos, sin nginx aparte y sin CORS entre web y API.
+#   - Postgres NO publica puerto al host: solo es accesible desde la red interna.
+#   - Contraseñas y secretos obligatorios: el arranque falla si faltan.
+#
+# Uso:  docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
+# Guía: docs/DESPLIEGUE-VPS.md
+
+name: dr-agramonte-prod
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    container_name: agramonte_caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp" # HTTP/3
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data # certificados: NO borrar este volumen
+      - caddy_config:/config
+    environment:
+      DOMAIN_WWW: ${DOMAIN_WWW:?falta DOMAIN_WWW en .env.prod}
+      DOMAIN_APEX: ${DOMAIN_APEX:?falta DOMAIN_APEX en .env.prod}
+      ACME_EMAIL: ${ACME_EMAIL:?falta ACME_EMAIL en .env.prod}
+    depends_on:
+      app:
+        condition: service_healthy
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile # imagen combinada: frontend dentro del backend
+    image: dr-agramonte:prod
+    container_name: agramonte_app
+    restart: unless-stopped
+    expose:
+      - "8080" # visible solo para Caddy, no publicado en la IP del servidor
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      APP_PROFILE: postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-dr_agramonte}
+      DB_USER: ${POSTGRES_USER:-agramonte}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:?falta POSTGRES_PASSWORD en .env.prod}
+      JWT_SECRET: ${JWT_SECRET:?falta JWT_SECRET en .env.prod}
+      # Detrás del proxy: Spring lee X-Forwarded-* de Caddy y entiende que la
+      # petición original venía por HTTPS.
+      SERVER_FORWARD_HEADERS_STRATEGY: framework
+      # La RAM del contenedor la fija mem_limit; la JVM toma el 75% (ver Dockerfile).
+      MAIL_HOST: ${MAIL_HOST:-}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:-}
+      CONTACT_INBOX: ${CONTACT_INBOX:-}
+      TWILIO_ENABLED: ${TWILIO_ENABLED:-false}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_FROM: ${TWILIO_FROM:-}
+      TWILIO_NOTIFY_TO: ${TWILIO_NOTIFY_TO:-}
+      TWILIO_CHANNEL: ${TWILIO_CHANNEL:-whatsapp}
+      TWILIO_NOTIFY_PATIENTS: ${TWILIO_NOTIFY_PATIENTS:-true}
+      TWILIO_REMINDER_HOURS: ${TWILIO_REMINDER_HOURS:-24}
+      TELEGRAM_ENABLED: ${TELEGRAM_ENABLED:-false}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_BOT_USERNAME: ${TELEGRAM_BOT_USERNAME:-}
+      TELEGRAM_WEBHOOK_SECRET: ${TELEGRAM_WEBHOOK_SECRET:-}
+    healthcheck:
+      # La imagen JRE no trae curl; /dev/tcp de bash basta para saber si Tomcat escucha.
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/127.0.0.1/8080'"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 60s
+    mem_limit: 1g # en un VPS de 2 GB, bajar a 768m
+
+  postgres:
+    image: postgres:15
+    container_name: agramonte_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-dr_agramonte}
+      POSTGRES_USER: ${POSTGRES_USER:-agramonte}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?falta POSTGRES_PASSWORD en .env.prod}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups # destino de los volcados de scripts/backup-db.sh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-agramonte} -d ${POSTGRES_DB:-dr_agramonte}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    mem_limit: 512m
+
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:

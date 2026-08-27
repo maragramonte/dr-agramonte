@@ -96,6 +96,9 @@ docker compose up -d --build
 
 Usuario médico de prueba (lo crea la migración V3): `dr.agramonte@example.com` / `Medico123!`
 
+Para **producción** (servidor propio con dominio y HTTPS) hay un compose aparte,
+`docker-compose.prod.yml`: ver [docs/DESPLIEGUE-VPS.md](docs/DESPLIEGUE-VPS.md).
+
 <details>
 <summary>Backend sin Docker · perfil MySQL</summary>
 
@@ -229,6 +232,7 @@ Con los canales desactivados la aplicación funciona igual; simplemente no enví
 | [docs/BASE-DE-DATOS.md](docs/BASE-DE-DATOS.md) | Esquema, diagrama relacional, integridad y concurrencia |
 | [docs/SINCRONIZACION-CITAS.md](docs/SINCRONIZACION-CITAS.md) | Una sola fuente de verdad entre las tres vistas de citas |
 | [docs/Memoria-Dr-Agramonte.pdf](docs/Memoria-Dr-Agramonte.pdf) | Memoria completa del proyecto (LaTeX) |
+| [docs/DESPLIEGUE-VPS.md](docs/DESPLIEGUE-VPS.md) | Puesta en producción en un VPS propio: HTTPS, dominio, copias y actualizaciones |
 | [docs/DOCKER-TROUBLESHOOTING.md](docs/DOCKER-TROUBLESHOOTING.md) | Arranque, 502 y healthchecks |
 | [docs/README.md](docs/README.md) | Índice del resto de documentación |
 

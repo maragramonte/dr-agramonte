@@ -1,0 +1,41 @@
+# Proxy inverso y HTTPS para el despliegue en VPS (docker-compose.prod.yml).
+#
+# Caddy pide y renueva solo el certificado de Let's Encrypt: no hay que instalar
+# certbot ni tocar cron. Basta con que los DNS del dominio apunten a la IP del
+# servidor y que los puertos 80 y 443 estén abiertos.
+#
+# Los dominios y el correo salen de .env.prod (DOMAIN_WWW, DOMAIN_APEX, ACME_EMAIL).
+
+{
+	# Correo de aviso de Let's Encrypt (caducidad, incidencias del certificado).
+	email {$ACME_EMAIL}
+}
+
+# El apex redirige al www con un 301 permanente. Esto es lo que en Railway había
+# que resolver desde el panel de IONOS (y lo que rompía el registro de www):
+# aquí es una línea y no toca el DNS.
+{$DOMAIN_APEX} {
+	redir https://{$DOMAIN_WWW}{uri} permanent
+}
+
+{$DOMAIN_WWW} {
+	encode zstd gzip
+
+	header {
+		# HSTS: el navegador recuerda que este dominio es solo HTTPS.
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		# No anunciamos el servidor que hay detrás.
+		-Server
+	}
+
+	# Un solo destino: Spring Boot sirve la API y el frontend juntos (Dockerfile
+	# de la raíz), así que no hay CORS entre web y API.
+	reverse_proxy app:8080 {
+		# Spring necesita saber que el cliente llegó por HTTPS para construir
+		# bien las URLs (ver SERVER_FORWARD_HEADERS_STRATEGY en el compose).
+		header_up X-Forwarded-Proto {scheme}
+	}
+}

@@ -23,6 +23,7 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+!.env.prod.example
 # Scripts locales con credenciales (no subir al repo)
 *.local.ps1
 # Volcados de base de datos

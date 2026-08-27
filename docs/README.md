@@ -14,6 +14,7 @@ proyecto, los diagramas y las guías de detalle.
 | [BASE-DE-DATOS.md](BASE-DE-DATOS.md) | Esquema tabla a tabla, diagrama relacional, integridad referencial, concurrencia y preguntas frecuentes |
 | [SINCRONIZACION-CITAS.md](SINCRONIZACION-CITAS.md) | Una sola fuente de verdad entre «Mis citas», el panel y la base de datos |
 | [DOCKER-TROUBLESHOOTING.md](DOCKER-TROUBLESHOOTING.md) | Arranque de Docker, errores 502 y healthchecks |
+| [DESPLIEGUE-VPS.md](DESPLIEGUE-VPS.md) | Puesta en producción en un VPS propio: Caddy y HTTPS, DNS del dominio, copias de seguridad y actualizaciones |
 
 ## Memoria (LaTeX)
 
