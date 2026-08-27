@@ -9,7 +9,7 @@ La app no depende de ningún servicio propietario: si el proveedor falla, copias
 repositorio y el último volcado de la base de datos a otro servidor y en media
 hora estás en marcha otra vez.
 
-**Coste orientativo:** 4-6 EUR/mes por el VPS, fijos, más el dominio que ya tienes.
+**Coste orientativo:** 6-7 EUR/mes por el VPS, fijos, más el dominio que ya tienes.
 
 ---
 
@@ -58,6 +58,46 @@ trabajar en local con nginx + backend + Postgres por separado.
 - La **IP pública** del servidor y acceso SSH.
 - El dominio `dragramonte.com` con acceso al **editor de zona DNS** (IONOS).
 - El repositorio en GitHub (`maragramonte/dr-agramonte`), ya lo tienes.
+
+### El servidor elegido
+
+Todo lo que sigue funciona en cualquier proveedor, pero para no dejarlo en
+abstracto, este es el que usa el proyecto:
+
+| | |
+|---|---|
+| **Proveedor** | Hetzner Cloud |
+| **Plan** | **CX23** — 2 vCPU (x86), 4 GB RAM, 40 GB NVMe, 20 TB de tráfico |
+| **Ubicación** | Falkenstein o Núremberg (Alemania, UE) |
+| **Sistema** | Ubuntu 24.04 LTS |
+| **Precio** | ~5,49 €/mes + 0,50 € de la IPv4, IVA aparte (agosto 2026) |
+| **Extra recomendado** | Copias automáticas del proveedor: +20 % (~1,10 €/mes) |
+| **IP pública** | _(anotar aquí al contratar)_ |
+
+**Por qué 4 GB y no 2.** `scripts/deploy.sh` compila Maven **en el propio
+servidor**. El build se come cerca de 1 GB y coincide con la JVM anterior aún
+en marcha, Postgres y Caddy. Con 2 GB el despliegue puede morir por falta de
+memoria justo mientras actualizas. Con 4 GB sobra y el `mem_limit: 1g` del
+compose se queda como está.
+
+**Las copias automáticas del proveedor no sustituyen a `backup-db.sh`, lo
+complementan:** son instantáneas del disco entero, para cuando lo que pierdes
+es la máquina y no solo los datos.
+
+**Al contratar:**
+
+- Sube tu **clave SSH en el propio formulario de creación**, no después: el
+  servidor nace sin acceso por contraseña.
+- **Ubicación en la UE**, no negociable: aquí se tratan datos de salud.
+- **Firma el contrato de encargado del tratamiento** (DPA) desde el panel del
+  proveedor. Los datos de salud son categoría especial del RGPD y sin ese
+  contrato con quien aloja el servidor el cumplimiento cojea.
+- Hetzner pide a veces **verificación de identidad** en el alta y tarda unas
+  horas en activar la cuenta.
+
+**Si algún día cambias de proveedor:** solo hay que rehacer los apartados 2, 3 y
+6 en la máquina nueva, restaurar el último volcado y cambiar la IP de los dos
+registros `A`. Nada del código ni de la configuración depende de Hetzner.
 
 > **Antes de nada, rescata los datos de Railway si aún existen.** Si el servicio
 > de Postgres sigue vivo en el proyecto `pacific-healing`, saca un volcado antes
