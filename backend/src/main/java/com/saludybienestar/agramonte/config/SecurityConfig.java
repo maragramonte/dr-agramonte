@@ -105,7 +105,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // Combinación de tus orígenes de desarrollo y producción anteriores
+        // Desarrollo (docker compose: web en :80, API en :8080) y dominio del VPS. En producción
+        // el frontend lo sirve la propia app, mismo origen, y CORS apenas entra en juego.
         config.setAllowedOrigins(Arrays.asList(
                 "http://localhost",
                 "http://localhost:80",
@@ -117,8 +118,7 @@ public class SecurityConfig {
                 "http://127.0.0.1:5500",
                 "http://127.0.0.1:3456",
                 "https://www.dragramonte.com",
-                "https://dragramonte.com",
-                "https://dr-agramonte-production.up.railway.app"
+                "https://dragramonte.com"
         ));
 
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));

@@ -27,7 +27,8 @@ server:
     include-binding-errors: always
     include-exception: false
     include-stacktrace: never
-  # En la nube (Railway) el puerto lo asigna la plataforma con $PORT; en local cae a 8080
+  # El puerto lo fija el contenedor: 8080, detrás de Caddy (docker-compose.prod.yml).
+  # PORT queda por si se despliega en un PaaS que lo imponga; en local cae a 8080.
   port: ${PORT:8080}
 
 app:
