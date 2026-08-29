@@ -28,7 +28,6 @@
 
         // ---- Footer (compartido) ----
         'footer.especialista': 'Especialista en Medicina Interna',
-        'footer.colegiado': 'Col·legiat núm. 12345',
         'footer.ubicacion': 'Palma, Illes Balears',
         'footer.contacto': 'Contacte',
         'footer.horario': 'Horari',
