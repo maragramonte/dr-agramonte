@@ -62,6 +62,6 @@ class DatabaseUrlEnvironmentPostProcessorTest {
 
         processor.postProcessEnvironment(env, null);
 
-        assertThat(env.getPropertySources().contains("railwayDatabaseUrl")).isFalse();
+        assertThat(env.getPropertySources().contains("datasourceFromDatabaseUrl")).isFalse();
     }
 }
