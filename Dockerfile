@@ -1,9 +1,14 @@
-# Imagen combinada para despliegue en la nube (Railway).
-# A diferencia de docker-compose (nginx + backend + Postgres por separado),
-# aquí Spring Boot sirve la API y el frontend juntos en un solo servicio.
-# Esto evita CORS, simplifica el despliegue y gasta menos crédito.
+# Imagen combinada de producción: Spring Boot sirve la API y el frontend juntos
+# en un solo contenedor. La usa docker-compose.prod.yml en el VPS, con Caddy
+# delante para el HTTPS (ver docs/DESPLIEGUE-VPS.md).
+#
+# A diferencia del docker-compose.yml de desarrollo (nginx + backend + Postgres
+# por separado), aquí no hay CORS entre la web y la API: salen del mismo origen.
 # El despliegue local con docker-compose sigue usando backend/Dockerfile.
-# Lee la conexión de la BD desde DATABASE_URL (ver DatabaseUrlEnvironmentPostProcessor).
+#
+# La conexión a la base de datos llega por SPRING_DATASOURCE_URL. Si en su lugar
+# existe DATABASE_URL (plataformas tipo Railway o Heroku), la adapta
+# DatabaseUrlEnvironmentPostProcessor; que no esté solo deja un aviso en el log.
 
 FROM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /workspace
@@ -17,7 +22,8 @@ FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 COPY --from=build /workspace/target/*.jar app.jar
 EXPOSE 8080
-# En Railway (plan de prueba) la RAM es muy justa. Limitamos el heap de la JVM
-# a un % de la memoria del contenedor para evitar que el SO mate el proceso (OOM, exit 137).
+# La RAM del contenedor la fija mem_limit en docker-compose.prod.yml (1 GB).
+# Limitamos el heap de la JVM a un % de esa memoria para que el sistema no mate
+# el proceso por falta de memoria (OOM, exit 137).
 ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0"
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
