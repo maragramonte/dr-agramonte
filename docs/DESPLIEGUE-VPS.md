@@ -99,11 +99,11 @@ es la máquina y no solo los datos.
 6 en la máquina nueva, restaurar el último volcado y cambiar la IP de los dos
 registros `A`. Nada del código ni de la configuración depende de Hetzner.
 
-> **Antes de nada, rescata los datos de Railway si aún existen.** Si el servicio
-> de Postgres sigue vivo en el proyecto `pacific-healing`, saca un volcado antes
-> de borrar nada, usando la `DATABASE_PUBLIC_URL` que da el panel:
+> **Si vienes de otro alojamiento, rescata los datos antes de apagarlo.** Mientras
+> su Postgres siga vivo, saca un volcado usando la URL de conexión pública que dé
+> su panel:
 >
-> `pg_dump "postgresql://usuario:clave@host:puerto/railway" > backups/desde-railway.sql`
+> `pg_dump "postgresql://usuario:clave@host:puerto/basededatos" > backups/desde-el-anterior.sql`
 >
 > Si ya no está, no pasa nada: Flyway recrea el esquema vacío en el primer arranque.
 
@@ -203,8 +203,7 @@ el volumen de datos ya existe, el contenedor no podrá abrirlo.
 
 ## 5. Apuntar el dominio
 
-Aquí está la ganancia frente a Railway: con una IP fija los DNS son dos registros
-`A` y se acabó. **Nada de CNAME y nada del asistente de "Redirección" de IONOS**,
+Con una IP fija, los DNS son dos registros `A` y se acabó. **Nada de CNAME y nada del asistente de "Redirección" de IONOS**,
 que es justo lo que sobrescribía el registro `www` una y otra vez.
 
 En IONOS, en *Dominios* -> `dragramonte.com` -> **Editar zona DNS**:
@@ -213,7 +212,7 @@ En IONOS, en *Dominios* -> `dragramonte.com` -> **Editar zona DNS**:
    DNS normal, no "Redirección". Mientras haya un reenvío, IONOS reescribirá los
    registros por su cuenta.
 2. Borra los registros `A`, `AAAA` y `CNAME` que existan para `@` y para `www`
-   (incluido el `CNAME www` que apuntaba a `up.railway.app`, que ya no sirve).
+   (incluido cualquier `CNAME` de `www` que apuntara al alojamiento anterior).
 3. Crea estos dos:
 
    | Tipo | Host | Valor | TTL |
@@ -242,8 +241,8 @@ Las dos tienen que devolver la IP del servidor y nada más.
 certificado en el primer arranque y Let's Encrypt necesita que el dominio ya
 apunte al servidor. Si falla, hay un límite de 5 intentos por hora.
 
-Por último, en Railway: quita el dominio personalizado del servicio (Settings ->
-Networking) para que no queden dos sitios reclamando el mismo nombre.
+Por último, si vienes de otro alojamiento, quita allí el dominio personalizado
+para que no queden dos sitios reclamando el mismo nombre.
 
 ---
 
@@ -267,7 +266,7 @@ Señales de que ha ido bien:
 - `caddy`: `certificate obtained successfully`
 
 > El log de `app` puede mostrar un aviso de que no encuentra `DATABASE_URL`. Es
-> **esperado**: esa variable era de Railway; aquí la conexión llega por
+> **esperado**: esa variable es cosa de los PaaS; aquí la conexión llega por
 > `SPRING_DATASOURCE_URL` y el aviso no afecta a nada.
 
 Para no repetir `--env-file ... -f ...` en cada comando, deja un alias:
@@ -396,7 +395,7 @@ dc exec caddy caddy validate --config /etc/caddy/Caddyfile
 
 ## 12. Qué no cubre esto
 
-Lo que en Railway venía dado y aquí es tuyo:
+Lo que un alojamiento gestionado te daba hecho y aquí es tuyo:
 
 - **Las copias de seguridad las haces tú** (apartado 8). Es el punto que más duele
   si se olvida.
