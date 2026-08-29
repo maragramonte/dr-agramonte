@@ -31,6 +31,9 @@ Este proyecto digitaliza esa parte concreta, sin tocar lo que sí requiere trato
 
 ## Arquitectura
 
+**En local** (`docker-compose.yml`) — tres contenedores: nginx sirve el frontend y hace de
+proxy hacia la API.
+
 ```
 [Navegador]  →  [nginx]  →  HTML/CSS/JS + proxy /api
                               ↓
@@ -39,10 +42,18 @@ Este proyecto digitaliza esa parte concreta, sin tocar lo que sí requiere trato
                    [Twilio]   [Telegram]
 ```
 
-En local son tres contenedores (nginx, backend, base de datos). En el VPS también son
-tres, pero distintos: Caddy termina el HTTPS por delante de un único contenedor donde Spring
-Boot sirve la API y el frontend juntos —sin nginx aparte y sin CORS entre ambos— y PostgreSQL,
-que no publica ningún puerto fuera de la red interna.
+**En producción** (`docker-compose.prod.yml`, VPS con Docker) — también tres, pero distintos:
+Caddy termina el HTTPS por delante de un único contenedor donde Spring Boot sirve la API y el
+frontend juntos, sin nginx aparte y sin CORS entre ambos. PostgreSQL no publica ningún puerto
+fuera de la red interna: solo se llega a él desde el contenedor de la aplicación.
+
+```
+[Navegador]  →  [Caddy]  →  HTTPS con Let's Encrypt, apex → www
+                              ↓
+                     [Spring Boot]  →  [PostgreSQL]
+                              ↓
+                   [Twilio]   [Telegram]
+```
 
 ---
 
