@@ -1316,6 +1316,40 @@ a {
     animation: fadeInUp 0.7s ease-out 0.2s both;
 }
 
+/* Los dos botones del hero nacían del mismo degradado --teal que el fondo de la
+   sección, así que la pastilla era invisible y el texto blanco se quedaba en 2.5:1.
+   El principal pasa a blanco sólido (9.5:1) y el secundario a un relleno oscuro
+   translúcido (5.7:1): ambos legibles y con la jerarquía intacta. */
+.hero-actions .btn--primary {
+    background: #fff;
+    color: var(--teal-dark);
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.18);
+}
+
+.hero-actions .btn--primary:hover,
+.hero-actions .btn--primary:focus-visible {
+    background: #fff;
+    color: var(--teal-dark);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.28);
+}
+
+/* El botón secundario es --teal sobre borde --teal, y el hero es un degradado de ese
+   mismo --teal: 2.2:1, invisible en la práctica. Aquí va en blanco sobre un relleno
+   oscuro translúcido (~5.7:1) que lo hace legible sin quitarle protagonismo al
+   botón principal de reserva. */
+.hero-actions .btn--secondary {
+    background: rgba(19, 78, 72, 0.65); /* --teal-dark translúcido, fijo en ambos temas */
+    border-color: rgba(255, 255, 255, 0.9);
+    color: #fff;
+}
+
+.hero-actions .btn--secondary:hover,
+.hero-actions .btn--secondary:focus-visible {
+    background: rgba(19, 78, 72, 0.88);
+    border-color: #fff;
+    color: #fff;
+}
+
 .hero-features {
     margin: var(--space-4) 0;
     display: grid;
