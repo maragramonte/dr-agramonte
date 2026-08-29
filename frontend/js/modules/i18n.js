@@ -49,7 +49,6 @@
         'home.feature.3': 'Seguiment continu i comunicació accessible',
         'home.feature.4': 'Consulta presencial i telemedicina disponible',
         'btn.solicitar': 'Demanar cita',
-        'btn.llamar': 'Trucar ara',
         'btn.reservar': 'Demanar cita',
         'home.serv.title': 'Serveis Mèdics Especialitzats',
         'home.serv.subtitle': 'Atenció integral amb diagnòstic precís i tractament personalitzat.',
