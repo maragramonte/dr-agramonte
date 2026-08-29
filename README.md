@@ -29,6 +29,11 @@ Este proyecto digitaliza esa parte concreta, sin tocar lo que sí requiere trato
   reparto por centro y tasa de cancelación.
 - **PWA instalable**, accesible (WCAG 2.1 AA), con modo oscuro y modo sin conexión.
 
+![Pantalla de reserva: centro de consulta, calendario de agosto con el día seleccionado y los huecos libres de mañana y tarde](frontend/pictures/reserva-calendario.png)
+
+*La reserva, paso a paso: centro, fecha y hora. Los huecos salen de la agenda real del médico,
+calculados en el servidor para el centro y el día elegidos.*
+
 ## Arquitectura
 
 **En local** (`docker-compose.yml`) — tres contenedores: nginx sirve el frontend y hace de
