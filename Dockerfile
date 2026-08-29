@@ -7,7 +7,7 @@
 # El despliegue local con docker-compose sigue usando backend/Dockerfile.
 #
 # La conexión a la base de datos llega por SPRING_DATASOURCE_URL. Si en su lugar
-# existe DATABASE_URL (plataformas tipo Railway o Heroku), la adapta
+# existe DATABASE_URL (el formato URI de un solo campo que usan los PaaS), la adapta
 # DatabaseUrlEnvironmentPostProcessor; que no esté solo deja un aviso en el log.
 
 FROM maven:3.9.9-eclipse-temurin-21 AS build

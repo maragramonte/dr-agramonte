@@ -58,10 +58,10 @@
 **En pantalla:**
 - Frontend PWA (HTML/CSS/JS vanilla) ⇄ API REST (Spring Boot) ⇄ PostgreSQL
 - Java 21 · Spring Boot 3.5.3 · Spring Security (JWT) · Flyway · Hibernate/JPA
-- Local: Docker Compose (nginx + backend + BD) · Nube: Railway (1 servicio web + Postgres)
+- Local: Docker Compose (nginx + backend + BD) · Producción: VPS con Docker (Caddy + 1 contenedor de app + Postgres)
 - Sin framework de frontend (decisión consciente: ligereza)
 
-**Visual:** diagrama de arquitectura de la memoria (frontend ⇄ API ⇄ BD + Docker/Railway).
+**Visual:** diagrama de arquitectura de la memoria (frontend ⇄ API ⇄ BD + Docker/VPS).
 
 **Notas:** explica que en la nube el backend **sirve también el frontend** (un solo servicio, evita CORS y ahorra recursos), mientras que en local se mantiene la separación con nginx. Decisión de ingeniería, no improvisación.
 
@@ -156,8 +156,8 @@
 
 **En pantalla:**
 - **En vivo y público:** https://www.dragramonte.com
-- **Railway**: imagen Docker multi-stage (Maven build → JRE), 1 servicio web + Postgres
-- **HTTPS** con certificado Let's Encrypt + dominio propio (Ionos → Railway)
+- **VPS con Docker**: imagen multi-stage (Maven build → JRE), Caddy delante + 1 contenedor de app + Postgres
+- **HTTPS** con certificado Let's Encrypt automático, renovado por Caddy + dominio propio (Ionos → IP del VPS)
 - El backend sirve API y frontend juntos (un solo servicio)
 
 **Visual:** captura del navegador con el **candado verde** y la URL `www.dragramonte.com`.
@@ -232,7 +232,7 @@
 3. ✅ Integridad con `SELECT FOR UPDATE`
 4. ✅ Frontend responsive, PWA, accesible
 5. ✅ Notificaciones (email + Twilio SMS/WhatsApp + bot de Telegram, activables por `.env`)
-6. ✅ Despliegue reproducible (Docker; + nube real en Railway)
+6. ✅ Despliegue reproducible (Docker; + servidor real con HTTPS y dominio propio)
 7. ✅ Pruebas + análisis de vulnerabilidades + demo reproducible
 8. ✅ Cuadro de mando de gestión (SGE)
 
@@ -267,10 +267,10 @@
 
 ### Prioridad media — credibilidad del producto
 4. **Datos reales del doctor:** siguen como *placeholder* el **colegiado N.º 12345** y los **teléfonos**. En una web de salud real conviene sustituirlos por los reales (o neutralizarlos) antes de enseñarla. *(Necesito que me pases los datos.)*
-5. **Dominio canónico = `www`** (decisión, no pendiente): la web vive en `https://www.dragramonte.com` (CNAME → Railway, cert válido). El apex `dragramonte.com` sin `www` no redirige: el reenvío de Ionos sobrescribía el registro de `www` y tiraba la web, así que se optó por dejar solo `www` (todo el contenido ya canonicaliza ahí). Redirección apex→www "bien hecha" = línea futura (p. ej. apex como 2º dominio en Railway).
+5. **Dominio canónico = `www`** (decisión, no pendiente): la web vive en `https://www.dragramonte.com`. El apex `dragramonte.com` no redirigía porque el reenvío de Ionos sobrescribía el registro de `www` y tiraba la web, así que se optó por dejar solo `www`. Con el VPS ya está resuelto: Caddy responde también al apex y lo manda al `www` con un 301, sin tocar el DNS (ver `Caddyfile`).
 
 ### Prioridad baja — limpieza (no afecta a la demo)
-6. **Infra Railway:** queda un **TCP Proxy sobrante** en el servicio web y un **servicio MySQL sin usar** en el proyecto; se pueden eliminar desde el panel para dejarlo limpio.
+6. ✅ **Resuelto (agosto 2026):** la infraestructura sobrante de Railway (un TCP Proxy sin uso y un servicio MySQL abandonado) desapareció al llevar el despliegue a un VPS propio con Docker.
 
 ---
 

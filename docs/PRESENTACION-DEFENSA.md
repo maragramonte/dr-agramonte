@@ -24,7 +24,7 @@ Aplicación web **completa, segura y desplegada en producción** para que los pa
 | Notificaciones | **2 canales** desacoplados: Twilio (SMS/WhatsApp) y **Telegram** (bot con webhook) · recordatorio 24 h |
 | Cuadro de mando | 4 KPIs + 5 gráficos · agregación **`GROUP BY` en BD** · Chart.js vendorizado · gated por rol |
 | Frontend | PWA (service worker, offline) · responsive · modo oscuro · **WCAG 2.1 AA** · SEO |
-| Despliegue | **Docker Compose** (local) + **Railway** (nube) · **HTTPS** Let's Encrypt · www.dragramonte.com |
+| Despliegue | **Docker Compose** (local) + **VPS propio con Docker** (producción) · **Caddy** con HTTPS Let's Encrypt · www.dragramonte.com |
 
 ## 4 ideas fuerza (tus diferenciadores)
 1. **Está en producción de verdad** (dominio propio + HTTPS válido). Pocos TFG llegan aquí.
@@ -44,7 +44,7 @@ Aplicación web **completa, segura y desplegada en producción** para que los pa
 7. **Cuadro de mando** — analítica con `GROUP BY`, gated por rol.
 8. **Notificaciones** — Twilio y Telegram; vinculación del bot con token de un solo uso que caduca.
 9. **Frontend** — PWA, accesible, responsive, SEO.
-10. **Despliegue real** ⭐ — Railway + HTTPS + dominio propio.
+10. **Despliegue real** ⭐ — VPS propio con Docker + HTTPS + dominio propio.
 11. **Calidad** — 47 tests en verde + OWASP (lleva la captura del verde).
 12. **Demo en vivo** — reserva → panel/médico → dashboard.
 13. **Limitaciones + líneas futuras** y **cierre**.
@@ -52,7 +52,7 @@ Aplicación web **completa, segura y desplegada en producción** para que los pa
 ## Cómo decir las limitaciones (sin que resten)
 Preséntalas como **decisiones de alcance**, no como olvidos:
 - Cobertura **no medida con JaCoCo** → la valido por ramas críticas; medirla es mejora pendiente. *(No digas «≥80 %».)*
-- **Sin failover/réplicas**; la beta corre en la **capa de prueba** de Railway (no es un SLA de producción).
+- **Sin failover/réplicas**: un único servidor con una sola instancia de cada servicio (no es un SLA de producción).
 - **Reserva por email** = nivel prototipo; en producción la reforzaría con enlace firmado/OTP.
 - **Sin refresh token** (token único) — línea futura.
 - **Cobro online** (Stripe) → la cobertura/precio ya se capturan; falta la pasarela.
