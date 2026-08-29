@@ -5,7 +5,9 @@ Los pacientes reservan, consultan y cancelan sus citas por su cuenta, sin depend
 
 **En producción:** [www.dragramonte.com](https://www.dragramonte.com)
 
-`Java 21` · `Spring Boot 3.5` · `PostgreSQL 15` · `JavaScript` · `Docker` · `Railway`
+`Java 21` · `Spring Boot 3.5` · `PostgreSQL 15` · `JavaScript` · `Docker` · `Caddy`
+
+![Portada de la web: reserva de cita con el Dr. Agramonte, especialista en Medicina Interna en Palma de Mallorca](frontend/pictures/Imagenwebapp.png)
 
 ---
 
@@ -37,8 +39,10 @@ Este proyecto digitaliza esa parte concreta, sin tocar lo que sí requiere trato
                    [Twilio]   [Telegram]
 ```
 
-En local son tres contenedores (nginx, backend, base de datos). En la nube, un único
-servicio de Railway sirve la API y el frontend juntos: evita CORS y consume menos recursos.
+En local son tres contenedores (nginx, backend, base de datos). En el VPS también son
+tres, pero distintos: Caddy termina el HTTPS por delante de un único contenedor donde Spring
+Boot sirve la API y el frontend juntos —sin nginx aparte y sin CORS entre ambos— y PostgreSQL,
+que no publica ningún puerto fuera de la red interna.
 
 ---
 
@@ -258,7 +262,7 @@ una web para un negocio real.
 
 Trabajo con **Java, JavaScript, HTML y CSS**. Sé consumir y probar APIs e integrar servicios
 externos en una aplicación: aquí están Twilio, la Bot API de Telegram y el despliegue en
-Railway con dominio propio y HTTPS.
+un VPS propio con Docker, dominio propio y HTTPS automático con Caddy.
 
 Uso herramientas de IA como apoyo activo —para aprender más rápido, depurar y desatascarme—
 igual que cualquier desarrolladora junior hoy. Las decisiones técnicas de este repositorio,
