@@ -684,7 +684,10 @@ a {
     opacity: 0.93;
     font-size: clamp(0.92rem, 2vw, 1.05rem);
     line-height: 1.65;
-    color: var(--silver-light);
+    /* Blanco, no --silver-light: esa variable pasa a gris oscuro (#52525B) en
+       tema oscuro, y la banda es teal en los dos temas, asi que el subtitulo se
+       quedaba en 1.7:1. Sobre el teal, el blanco al 92% da de sobra. */
+    color: rgba(255, 255, 255, 0.92);
 }
 
 .page-hero a {
@@ -2371,18 +2374,22 @@ a {
    ============================================================ */
 
 /* Cabeceras de seccion: pegadas al margen izquierdo y con el filete debajo
-   del titulo movido a la izquierda, como el antetitulo del hero. */
-.home .section-header {
+   del titulo movido a la izquierda, como el antetitulo del hero. Sin .home
+   delante: las paginas interiores comparten estas clases y siguen el mismo eje. */
+.section-header,
+.section__header {
     text-align: left;
     margin-bottom: var(--space-5);
 }
 
-.home .section-title::after {
+.section-title::after,
+.section__title::after {
     left: 0;
     transform: none;
 }
 
-.home .section-subtitle {
+.section-subtitle,
+.section__subtitle {
     margin-left: 0;
     margin-right: 0;
     max-width: 34rem;
@@ -2457,5 +2464,91 @@ a {
 
     .home .grid--cta > :nth-child(2) {
         margin-left: var(--space-5);
+    }
+}
+
+
+/* ============================================================
+   PAGINAS INTERIORES — el mismo eje que la portada.
+
+   La banda de titulo deja de centrarse y las rejillas se escalonan igual que
+   en index. Se usan las clases propias de cada pagina, asi que no hace falta
+   marcar el <body>: solo la portada necesita .home, porque alli habia que
+   distinguir componentes que comparte con estas paginas.
+   ============================================================ */
+
+/* La banda superior: titulo al margen, texto sin centrar y el mismo filete
+   corto que llevan los titulos de seccion. */
+.page-hero .container {
+    text-align: left;
+}
+
+.page-hero h1 {
+    position: relative;
+    padding-bottom: var(--space-2);
+}
+
+.page-hero h1::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 60px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.75);
+    border-radius: 2px;
+}
+
+.page-hero p {
+    margin: 0;
+    max-width: 38rem;
+}
+
+@media (min-width: 900px) {
+    /* Servicios: mismos anchos desiguales y mismo escalonado que la portada. */
+    .servicios-grid {
+        grid-template-columns: 1.15fr 1fr 0.9fr;
+        align-items: start;
+    }
+
+    .servicios-grid > :nth-child(2) {
+        margin-top: var(--space-4);
+    }
+
+    .servicios-grid > :nth-child(3) {
+        margin-top: calc(var(--space-4) * 2);
+    }
+
+    /* Testimonios: van en una sola columna, asi que escalonarlos en vertical
+       solo parecia un hueco mal puesto. Se sangran los pares por la izquierda:
+       la lectura baja en zigzag y ninguna tarjeta empieza donde la anterior. */
+    .grid--testimonials > :nth-child(even) {
+        margin-left: 8%;
+    }
+
+    /* La banda de cifras, en dientes de sierra. */
+    .stats-band > :nth-child(even) {
+        margin-top: var(--space-4);
+    }
+
+    /* Sobre el doctor y contacto ya eran asimetricas; se acentua la diferencia
+       y la columna secundaria arranca mas abajo. */
+    .sobre-mi-layout {
+        grid-template-columns: 0.85fr 1.35fr;
+    }
+
+    .contacto-container {
+        grid-template-columns: 1.35fr 0.95fr;
+        align-items: start;
+    }
+
+    .formulario-contacto {
+        margin-top: var(--space-5);
+    }
+
+    /* Privacidad: el indice se queda estrecho a un lado en vez de ocupar todo
+       el ancho por encima del texto. */
+    .toc-grid {
+        grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
     }
 }
