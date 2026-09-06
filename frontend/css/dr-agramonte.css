@@ -161,9 +161,11 @@ a {
 
 /* ========== 3. ANIMACIONES – con temática médica sutil ========== */
 @keyframes fadeInUp {
+    /* 30px, que es el valor que venia ganando: pages-extra.css la redefinia
+       identica salvo esta distancia y se cargaba despues. Ahora vive aqui sola. */
     from {
         opacity: 0;
-        transform: translateY(24px);
+        transform: translateY(30px);
     }
     to {
         opacity: 1;
@@ -1620,12 +1622,6 @@ a {
     padding: var(--space-4) var(--space-3);
 }
 
-.reserva-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-4);
-}
-
 @media (min-width: 1024px) {
     .reserva-grid {
         grid-template-columns: 1.2fr 0.8fr;
@@ -1688,23 +1684,6 @@ a {
     transition: var(--transition);
 }
 
-.step.active .step-num {
-    background: var(--teal);
-    color: white;
-    border-color: var(--teal);
-}
-
-.step.active {
-    color: var(--teal);
-    font-weight: 600;
-}
-
-.step.done .step-num {
-    background: var(--teal-light);
-    border-color: var(--teal-light);
-    color: white;
-}
-
 /* Calendario – diseño limpio */
 .calendar {
     width: 100%;
@@ -1734,37 +1713,6 @@ a {
 
 .calendar-nav:hover {
     background: var(--teal-pale);
-}
-
-.cal-weekdays {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    text-align: center;
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: var(--muted);
-    margin-bottom: 0.5rem;
-}
-
-.cal-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
-}
-
-.cal-day {
-    aspect-ratio: 1;
-    border-radius: var(--radius);
-    border: 1px solid transparent;
-    background: transparent;
-    cursor: pointer;
-    font-size: 0.8rem;
-    transition: var(--transition-fast);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
 }
 
 .cal-day:hover:not(:disabled) {
@@ -1825,28 +1773,6 @@ a {
 .slots h4 {
     font-size: 0.9rem;
     margin-bottom: var(--space-2);
-}
-
-.slots-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-    gap: var(--space-1);
-}
-
-.slot {
-    padding: 0.45rem;
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    background: var(--card);
-    font-size: 0.8rem;
-    cursor: pointer;
-    text-align: center;
-    transition: var(--transition-fast);
-}
-
-.slot:hover:not(:disabled) {
-    background: var(--teal-pale);
-    border-color: var(--teal);
 }
 
 .slot.selected {
@@ -1984,13 +1910,6 @@ a {
     font-size: 1.3rem;
     color: var(--teal);
     margin-bottom: var(--space-2);
-}
-
-.rights-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: var(--space-2);
-    margin: var(--space-3) 0;
 }
 
 /* ========== 14. OFFLINE PAGE ========== */
