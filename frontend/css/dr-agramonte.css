@@ -598,6 +598,13 @@ a {
 }
 
 /* Selector de idioma (ES / CA) en la cabecera */
+/* El selector de idioma es un item mas del menu: en escritorio queda tras el
+   boton de reservar y en movil, al final del desplegable. Un poco de aire para
+   que no se pegue al CTA. */
+.nav-item--lang {
+    margin-left: 0.5rem;
+}
+
 .lang-switch {
     display: inline-flex;
     align-items: center;
@@ -1062,12 +1069,6 @@ a {
    para liberar espacio horizontal en la barra. */
 @media (max-width: 600px) {
     .logo-text p {
-        display: none;
-    }
-
-    /* En móvil el selector de idioma se oculta para que la barra respire
-       (la i18n se gestiona desde index; se recupera al ampliar pantalla). */
-    .lang-switch {
         display: none;
     }
 }

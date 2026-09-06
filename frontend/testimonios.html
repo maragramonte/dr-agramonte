@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="css/dr-agramonte.css">
     <link rel="stylesheet" href="css/pages-extra.css">
     <script src="js/modules/theme-init.js"></script>
+    <script src="js/modules/i18n.js"></script>
 </head>
 <body>
 <header class="main-header" role="banner">
@@ -30,18 +31,19 @@
                     <div class="logo-icon" aria-hidden="true"><i class="fas fa-user-md"></i></div>
                     <div class="logo-text">
                         <h1 class="logo-title">Dr. Agramonte</h1>
-                        <p class="logo-subtitle">Especialista en Medicina Interna</p>
+                        <p class="logo-subtitle" data-i18n="logo.subtitle">Especialista en Medicina Interna</p>
                     </div>
                 </a>
             </div>
             <nav class="main-nav" aria-label="Navegación principal">
                 <ul class="nav-menu" id="nav-menu">
-                    <li class="nav-item"><a href="index.html" class="nav-link">Inicio</a></li>
-                    <li class="nav-item"><a href="sobre-mi.html" class="nav-link">Sobre el Dr.</a></li>
-                    <li class="nav-item"><a href="servicios.html" class="nav-link">Servicios</a></li>
-                    <li class="nav-item"><a href="contacto.html" class="nav-link">Contacto</a></li>
-                    <li class="nav-item"><a href="testimonios.html" class="nav-link">Testimonios</a></li>
-                    <li class="nav-item"><a href="reservar.html" class="nav-cta"><i class="fas fa-calendar-plus" aria-hidden="true"></i><span class="nav-cta-text">Reservar cita</span></a></li>
+                    <li class="nav-item"><a href="index.html" class="nav-link" data-i18n="nav.inicio">Inicio</a></li>
+                    <li class="nav-item"><a href="sobre-mi.html" class="nav-link" data-i18n="nav.sobre">Sobre el Dr.</a></li>
+                    <li class="nav-item"><a href="servicios.html" class="nav-link" data-i18n="nav.servicios">Servicios</a></li>
+                    <li class="nav-item"><a href="contacto.html" class="nav-link" data-i18n="nav.contacto">Contacto</a></li>
+                    <li class="nav-item"><a href="testimonios.html" class="nav-link" data-i18n="nav.testimonios">Testimonios</a></li>
+                    <li class="nav-item"><a href="reservar.html" class="nav-cta"><i class="fas fa-calendar-plus" aria-hidden="true"></i><span class="nav-cta-text" data-i18n="nav.reservar">Reservar cita</span></a></li>
+                    <li class="nav-item nav-item--lang"><div class="lang-switch" role="group" aria-label="Idioma"><button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" aria-pressed="true">ES</button><button type="button" class="lang-btn" data-lang-btn="ca" aria-pressed="false">CA</button></div></li>
                 </ul>
             </nav>
             <div class="header-actions">
@@ -91,12 +93,12 @@
 
 <footer class="footer">
     <div class="footer-content">
-        <div class="footer-section"><h3>Dr. Agramonte</h3><p>Especialista en Medicina Interna</p><p>Palma de Mallorca, Islas Baleares</p></div>
-        <div class="footer-section"><h3>Contacto</h3><a href="mailto:contacto@dragramonte.com"><i class="fas fa-envelope"></i> contacto@dragramonte.com</a><p><i class="fas fa-map-marker-alt"></i> Palma de Mallorca</p></div>
-        <div class="footer-section"><h3>Horario</h3><p><strong>Lunes a Viernes</strong><br>9:00 - 14:00<br>16:00 - 19:00</p><p><strong>Sábados</strong><br>9:00 - 13:00 (con cita)</p></div>
-        <div class="footer-section"><h3>Enlaces</h3><a href="sobre-mi.html"><i class="fas fa-user-md"></i> El Dr. Agramonte</a><a href="servicios.html"><i class="fas fa-stethoscope"></i> Servicios</a><a href="testimonios.html"><i class="fas fa-star"></i> Testimonios</a><a href="contacto.html"><i class="fas fa-envelope"></i> Contacto</a><a href="reservar.html"><i class="fas fa-calendar-plus"></i> Reservar cita</a><a href="privacidad.html"><i class="fas fa-shield-alt"></i> Política de Privacidad</a><a href="offline.html"><i class="fas fa-wifi-slash"></i> Modo Offline</a><a href="panel-pruebas.html"><i class="fas fa-flask"></i> Pruebas TFG (reservas / médico)</a><a href="estadisticas.html"><i class="fas fa-chart-line"></i> Cuadro de mando</a></div>
+        <div class="footer-section"><h3>Dr. Agramonte</h3><p data-i18n="footer.especialista">Especialista en Medicina Interna</p><p data-i18n="footer.ubicacion">Palma de Mallorca, Islas Baleares</p></div>
+        <div class="footer-section"><h3 data-i18n="footer.contacto">Contacto</h3><a href="mailto:contacto@dragramonte.com"><i class="fas fa-envelope"></i> contacto@dragramonte.com</a><p><i class="fas fa-map-marker-alt"></i> Palma de Mallorca</p></div>
+        <div class="footer-section"><h3 data-i18n="footer.horario">Horario</h3><p><strong data-i18n="footer.lunVie">Lunes a Viernes</strong><br>9:00 - 14:00<br>16:00 - 19:00</p><p><strong data-i18n="footer.sabado">Sábados</strong><br><span data-i18n="footer.sabadoHoras">9:00 - 13:00 (con cita)</span></p></div>
+        <div class="footer-section"><h3 data-i18n="footer.enlaces">Enlaces</h3><a href="sobre-mi.html"><i class="fas fa-user-md"></i> El Dr. Agramonte</a><a href="servicios.html"><i class="fas fa-stethoscope"></i> <span data-i18n="nav.servicios">Servicios</span></a><a href="testimonios.html"><i class="fas fa-star"></i> <span data-i18n="nav.testimonios">Testimonios</span></a><a href="contacto.html"><i class="fas fa-envelope"></i> <span data-i18n="nav.contacto">Contacto</span></a><a href="reservar.html"><i class="fas fa-calendar-plus"></i> <span data-i18n="nav.reservar">Reservar cita</span></a><a href="privacidad.html"><i class="fas fa-shield-alt"></i> <span data-i18n="footer.privacidad">Política de Privacidad</span></a><a href="offline.html"><i class="fas fa-plug-circle-xmark"></i> <span data-i18n="footer.offline">Modo Offline</span></a><a href="panel-pruebas.html"><i class="fas fa-flask"></i> <span data-i18n="footer.pruebas">Pruebas TFG (reservas / médico)</span></a><a href="estadisticas.html"><i class="fas fa-chart-line"></i> <span data-i18n="footer.cuadro">Cuadro de mando</span></a></div>
     </div>
-    <div class="footer-bottom"><p>© 2026 Dr. Juan Manuel Agramonte. <a href="privacidad.html">Política de Privacidad</a></p></div>
+    <div class="footer-bottom"><p><span data-i18n="footer.copyright">© 2026 Dr. Juan Manuel Agramonte.</span> <a href="privacidad.html" data-i18n="footer.privacidad">Política de Privacidad</a></p></div>
 </footer>
 
 <script src="js/modules/api-config.js"></script>
