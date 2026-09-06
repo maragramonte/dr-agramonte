@@ -1999,7 +1999,11 @@ a {
     align-items: center;
     justify-content: center;
     padding: var(--space-4);
-    background: linear-gradient(135deg, #e8f3f3 0%, #d4eaea 100%);
+    /* Con variables, no con hex: antes eran dos verdes claros literales y la
+       pagina se quedaba con el fondo claro al activar el tema oscuro, con la
+       cabecera y la tarjeta ya en oscuro. --teal-pale es translucido, asi que
+       tine el fondo del tema en lugar de sustituirlo. */
+    background: linear-gradient(135deg, var(--bg) 0%, var(--teal-pale) 100%);
 }
 
 .offline-card {

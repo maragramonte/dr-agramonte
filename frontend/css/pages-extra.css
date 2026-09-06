@@ -153,10 +153,10 @@
         .offline-card{background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:24px;padding:3rem 2rem;max-width:550px;width:100%;box-shadow:0 20px 40px rgba(0,0,0,0.1);animation:fadeInUp 0.6s ease-out;}
         @keyframes fadeInUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
         .offline-icon{font-size:5rem;color:#14b8a6;margin-bottom:1.5rem;animation:pulse 2s infinite;}@keyframes pulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.1);opacity:0.8;}}
-        .offline-title{font-family:'DM Serif Display',serif;font-size:2rem;color:#0F766E;margin-bottom:1rem;}
+        .offline-title{font-family:'DM Serif Display',serif;font-size:2rem;color:var(--heading);margin-bottom:1rem;}
         .offline-text{font-size:1rem;color:#4B5563;max-width:400px;margin:0 auto 2rem auto;line-height:1.6;}
         .offline-features{background:#F9FAFB;padding:1.5rem;border-radius:16px;margin-bottom:2rem;text-align:left;border:1px solid #E5E7EB;}
-        .offline-features h3{color:#0F766E;margin-bottom:1rem;font-size:1.1rem;display:flex;align-items:center;gap:0.5rem;}
+        .offline-features h3{color:var(--heading);margin-bottom:1rem;font-size:1.1rem;display:flex;align-items:center;gap:0.5rem;}
         .offline-features ul{list-style:none;padding:0;} .offline-features li{padding:0.6rem 0;display:flex;align-items:center;gap:0.75rem;color:#374151;font-size:0.9rem;border-bottom:1px solid #E5E7EB;}
         .offline-features li:last-child{border-bottom:none;} .offline-features i{color:#14b8a6;width:20px;}
         .btn-group{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem;}
@@ -180,7 +180,7 @@ body.offline-page {
 [data-theme="dark"] body.offline-page {
     background: linear-gradient(135deg, #0f172a 0%, #134e48 100%);
 }
-.offline-title { font-family: var(--font-display); color: var(--teal-dark); }
+.offline-title { font-family: var(--font-display); color: var(--heading); }
 .offline-icon { color: var(--teal-light); }
 .offline-features h3 { color: var(--teal); }
 .offline-features i { color: var(--teal-light); }
