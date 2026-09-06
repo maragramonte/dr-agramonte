@@ -1591,6 +1591,27 @@ a {
     box-shadow: var(--shadow);
 }
 
+.btn-enviar:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Ruedecita que contacto.js inserta en el boton mientras envia el formulario
+   (toggleButton). La utilidad .loading-spinner no vale aqui: sus colores estan
+   pensados para fondo claro y este boton es de color. El giro se detiene solo
+   con prefers-reduced-motion, por la regla global de accesibilidad. */
+.btn-enviar .spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: var(--white);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
 /* ========== 12. RESERVAS PRO – sistema tipo Calendly ========== */
 .reserva-wrapper {
     max-width: var(--maxw);
