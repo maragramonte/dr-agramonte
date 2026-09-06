@@ -93,12 +93,23 @@ const formatIsoTime = (d) => {
 const isExtraHour = (h) => CFG.extraHoras.includes(h);
 const hasConnectedFlowReady = () => !!state.medicoId && !!state.centroId && !!state.dateISO && !!state.hour;
 
+// Un unico temporizador para todos los avisos: antes cada llamada programaba el
+// suyo sobre el mismo div, asi que el de un aviso viejo podia ocultar al recien
+// mostrado (se veia al validar el formulario varias veces seguidas).
+let toastTimer = null;
+
 function showToast(msg, type = 'info') {
     const el = $('toast');
+    if (!el) return;
     const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
-    el.innerHTML = `<i class="fas ${icons[type]}"></i> ${msg}`;
+    // El texto puede venir del servidor (err.message), asi que se inserta como
+    // texto y no como HTML: replaceChildren() lo convierte en un nodo de texto.
+    const icono = document.createElement('i');
+    icono.className = `fas ${icons[type]}`;
+    el.replaceChildren(icono, msg);
     el.className = `toast ${type} show`;
-    setTimeout(() => el.classList.remove('show'), 3500);
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 3500);
 }
 
 function updateConnectionBanner() {
