@@ -291,3 +291,12 @@ equipo donde seguir creciendo y aportar desde el primer día.
 
 Proyecto propio de **Mar Agramonte**. Desarrollado como Trabajo de Fin de Ciclo (DAM, CESUR)
 y en evolución desde entonces.
+
+## Licencia
+
+© 2026 Mar Agramonte. Todos los derechos reservados.
+
+Software propietario: el código puede leerse y citarse, pero no reutilizarse ni
+adaptarse sin permiso escrito. Las condiciones completas están en [LICENSE](LICENSE),
+y las licencias de los componentes de terceros que incorpora, en
+[THIRD-PARTY.md](THIRD-PARTY.md). Para una licencia de uso, escríbeme.

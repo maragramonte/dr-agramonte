@@ -1,0 +1,85 @@
+Copyright (c) 2026 Mar Agramonte. Todos los derechos reservados.
+All rights reserved.
+
+SOFTWARE PROPIETARIO — LICENCIA DE USO NO CONCEDIDA
+
+
+1. Objeto
+
+   Esta licencia cubre el proyecto «Dr. Agramonte»: el código fuente del backend
+   y del frontend, el esquema y las migraciones de la base de datos, el diseño y
+   la hoja de estilos, los textos, la documentación (incluida la memoria) y las
+   imágenes propias que forman parte de este repositorio. En adelante, «la Obra».
+
+   La Obra es propiedad de su autora, que conserva íntegramente los derechos de
+   explotación reconocidos por el Real Decreto Legislativo 1/1996 (Ley de
+   Propiedad Intelectual) y por los tratados internacionales aplicables.
+
+
+2. Ausencia de licencia
+
+   NO se concede ninguna licencia, expresa ni implícita, sobre la Obra. Que el
+   código esté visible —en un repositorio público, en una demostración o en el
+   navegador de quien visita la web— no autoriza a usarlo.
+
+   En particular, queda prohibido sin autorización previa y por escrito de la
+   autora:
+
+   a) copiar, reproducir o almacenar la Obra o cualquier parte suya, salvo la
+      copia técnica que el navegador hace al visitar la web publicada;
+   b) usarla, total o parcialmente, en otro proyecto, propio o ajeno, tenga o no
+      ánimo de lucro;
+   c) modificarla, traducirla o crear obras derivadas;
+   d) distribuirla, publicarla, venderla, alquilarla, cederla o sublicenciarla;
+   e) explotarla como servicio para terceros;
+   f) retirar u ocultar los avisos de autoría y de copyright.
+
+
+3. Lo que sí está permitido
+
+   Si este repositorio es público, cualquiera puede leer el código y la
+   documentación para estudiarlos o para evaluar el trabajo de la autora, y
+   citarlos indicando la fuente. Eso es todo: leer y citar, no reutilizar.
+
+
+4. Licencias comerciales
+
+   La autora sí licencia la Obra a quien lo solicite, en las condiciones que se
+   acuerden en cada caso (implantación en otra consulta, adaptación a otra
+   especialidad, cesión de código). Para pedir una licencia:
+
+       [completar con el correo de contacto]
+
+
+5. Componentes de terceros
+
+   La Obra incorpora bibliotecas, iconos y tipografías de terceros, cada uno con
+   su propia licencia, que esta no altera ni sustituye. Están enumerados en
+   THIRD-PARTY.md, junto a los ficheros de licencia que acompañan a cada uno.
+
+
+6. Datos personales y derechos de imagen
+
+   El nombre, la trayectoria profesional, la fotografía y los textos biográficos
+   del Dr. Juan Manuel Agramonte, así como cualquier dato de pacientes, no forman
+   parte de la Obra a efectos de esta licencia: pertenecen a sus titulares y
+   están protegidos además por la normativa de protección de datos y por sus
+   derechos de imagen y honor. Usarlos requiere el consentimiento de quien
+   corresponda, con independencia de lo que aquí se autorice o se prohíba.
+
+
+7. Ausencia de garantía
+
+   La Obra se ofrece «tal cual», sin garantía de ningún tipo, expresa o
+   implícita, incluidas las de comerciabilidad, adecuación a un fin concreto y
+   ausencia de infracción. La autora no responde de ningún daño, directo o
+   indirecto, derivado del uso de la Obra o de la imposibilidad de usarla.
+
+   Esta cláusula no limita la responsabilidad que la ley imponga de forma
+   imperativa, ni afecta a las condiciones que se pacten en una licencia
+   comercial firmada al amparo del apartado 4.
+
+
+8. Legislación aplicable
+
+   Esta licencia se rige por la legislación española.
