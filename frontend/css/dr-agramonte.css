@@ -449,12 +449,31 @@ a {
 /* Contacto – mapa, FAQ */
 .mapa-ubicacion {
     margin-top: var(--space-5);
+    margin-bottom: var(--space-5);
 }
-.mapa-contenedor iframe {
-    width: 100%;
-    height: 350px;
+/* Antes aquí había un iframe de Google Maps. Se cambió por un enlace: el mapa
+   embebido cargaba scripts y cookies de Google en cada visita a la página, y era
+   el unico tercero que quedaba en la web (ver la CSP del Caddyfile). */
+.mapa-contenedor {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    background: var(--teal-pale);
+    border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    border: 0;
+    padding: var(--space-3);
+}
+.mapa-contenedor > i {
+    font-size: 1.75rem;
+    color: var(--teal);
+}
+.mapa-contenedor p {
+    margin: 0;
+    flex: 1 1 12rem;
+}
+.mapa-contenedor .btn {
+    white-space: nowrap;
 }
 .faq-grid {
     display: grid;

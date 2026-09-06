@@ -56,5 +56,5 @@ configuración.
 - **Twilio** — avisos por WhatsApp/SMS (`TWILIO_ENABLED`).
 - **Telegram Bot API** — avisos por Telegram (`TELEGRAM_ENABLED`).
 - **Let's Encrypt** — certificado TLS, gestionado por Caddy.
-- **Google Maps** — mapa embebido en `contacto.html`; es el único tercero que
-  carga el navegador al visitar la web.
+- **Google Maps** — solo como enlace «Cómo llegar» en `contacto.html`. No se
+  embebe: visitar la web no carga nada de Google.

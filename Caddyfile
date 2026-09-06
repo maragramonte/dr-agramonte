@@ -32,11 +32,11 @@
 		# cabecera lo convierte en una regla que impone el navegador, de modo que
 		# un tercero colado por descuido deja de cargar en vez de pasar inadvertido.
 		#
-		# style-src permite 'unsafe-inline' porque quedan atributos style= en el
-		# HTML (sobre todo en reservar.html); frame-src abre la unica excepcion que
-		# queda, el mapa de Google embebido en contacto.html. Sustituyendo ese
-		# iframe por un enlace, la politica pasa a ser default-src 'self' a secas.
-		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; frame-src https://maps.google.com https://www.google.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'"
+		# La unica concesion es 'unsafe-inline' en style-src, porque quedan
+		# atributos style= en el HTML (sobre todo en reservar.html). Ningun origen
+		# externo esta permitido: la web ya no embebe el mapa de Google, solo enlaza
+		# a el, y un enlace no carga nada hasta que alguien lo pulsa.
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; frame-src 'none'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'"
 		# No anunciamos el servidor que hay detrás.
 		-Server
 	}
