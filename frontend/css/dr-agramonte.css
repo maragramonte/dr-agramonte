@@ -2358,3 +2358,104 @@ a {
         padding: 0;
     }
 }
+
+
+/* ============================================================
+   PORTADA — el mismo eje asimetrico del hero en el resto de la pagina.
+
+   Todo va bajo .home (la clase del <body> de index.html) porque
+   .section-header, .section-title y .section-subtitle los comparten otras
+   paginas, que siguen centradas. Las clases propias de la portada
+   (.grid--services, .sobre-mi-*, .cta-*) tambien se escriben asi para que
+   quede claro de un vistazo que este bloque solo afecta a la portada.
+   ============================================================ */
+
+/* Cabeceras de seccion: pegadas al margen izquierdo y con el filete debajo
+   del titulo movido a la izquierda, como el antetitulo del hero. */
+.home .section-header {
+    text-align: left;
+    margin-bottom: var(--space-5);
+}
+
+.home .section-title::after {
+    left: 0;
+    transform: none;
+}
+
+.home .section-subtitle {
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 34rem;
+}
+
+/* Servicios: tres columnas de anchos distintos y escalonadas en vertical, de
+   modo que ninguna tarjeta empieza a la misma altura que su vecina. */
+@media (min-width: 900px) {
+    .home .grid--services {
+        grid-template-columns: 1.15fr 1fr 0.9fr;
+        align-items: start;
+    }
+
+    .home .grid--services > :nth-child(2) {
+        margin-top: var(--space-4);
+    }
+
+    .home .grid--services > :nth-child(3) {
+        margin-top: calc(var(--space-4) * 2);
+    }
+
+    /* El enlace de "ver todos" cae al lado contrario del titulo. */
+    .home .section-footer {
+        text-align: right;
+    }
+}
+
+/* Sobre el doctor: manda la columna de texto y las cifras bajan un escalon;
+   dentro de las cifras, las de la derecha bajan otro. */
+@media (min-width: 900px) {
+    .home .sobre-mi-resumen .sobre-mi-content {
+        grid-template-columns: 1.45fr 0.85fr;
+        align-items: start;
+    }
+
+    .home .sobre-mi-stats {
+        margin-top: var(--space-5);
+        align-content: start;
+    }
+
+    .home .sobre-mi-stats > :nth-child(even) {
+        margin-top: var(--space-4);
+    }
+}
+
+/* Llamada final: el titular a un lado, las dos opciones al otro y desplazadas
+   entre si. Ademas deshace el display:flex que le cae encima de la segunda
+   regla .cta-section del fichero (ver L2324), pensada para otro componente. */
+.home .cta-section {
+    display: block;
+    margin-top: 0;
+    padding: var(--space-5) 0;
+    border-top: 0;
+}
+
+.home .cta-content {
+    text-align: left;
+}
+
+@media (min-width: 900px) {
+    .home .cta-content {
+        display: grid;
+        grid-template-columns: 0.95fr 1.05fr;
+        gap: var(--space-5);
+        align-items: center;
+    }
+
+    .home .grid--cta {
+        margin-top: 0;
+        grid-template-columns: 1fr;
+    }
+
+    .home .grid--cta > :nth-child(2) {
+        margin-left: var(--space-5);
+    }
+}
