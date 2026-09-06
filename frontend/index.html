@@ -10,9 +10,7 @@
     <link rel="apple-touch-icon" href="icons/app-icon.svg">
     <meta name="theme-color" content="#0F766E">
     <link rel="canonical" href="https://www.dragramonte.com/">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-          integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
-          crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="css/dr-agramonte.css">
     <link rel="stylesheet" href="css/pages-extra.css">
     <script src="js/modules/theme-init.js"></script>
@@ -195,13 +193,6 @@
 <script src="js/modules/api-config.js"></script>
 <script src="js/modules/auth-ui.js" defer></script>
 <script src="js/pages/dr-agramonte.js" defer></script>
-<script>
-    // Precarga de la imagen del hero (LCP). El menú móvil lo gestiona dr-agramonte.js
-    // para todas las páginas; no se duplica aquí.
-    (function() {
-        const preloadLinks = [{ href: 'pictures/hero-doctor.svg', as: 'image' }];
-        preloadLinks.forEach(link => { const preload = document.createElement('link'); preload.rel = 'preload'; preload.href = link.href; preload.as = link.as; document.head.appendChild(preload); });
-    })();
-</script>
+<script src="js/pages/index-preload.js"></script>
 </body>
 </html>

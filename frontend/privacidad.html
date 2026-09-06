@@ -18,7 +18,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Dr. Agramonte">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="css/dr-agramonte.css">
     <link rel="stylesheet" href="css/pages-extra.css">
     <script src="js/modules/theme-init.js"></script>
@@ -87,15 +87,7 @@
     <div class="footer-bottom"><p>© 2026 Dr. Juan Manuel Agramonte. <a href="privacidad.html">Política de privacidad</a></p></div>
 </footer>
 
-<script>
-    (function() {
-        const links = document.querySelectorAll('.toc-link');
-        const cards = document.querySelectorAll('.privacy-card');
-        function showCard(id) { cards.forEach(c => c.classList.remove('active')); const active = document.getElementById(id); if(active) active.classList.add('active'); links.forEach(l => { if(l.dataset.target === id) l.classList.add('active'); else l.classList.remove('active'); }); }
-        links.forEach(l => l.addEventListener('click', (e) => { e.preventDefault(); showCard(l.dataset.target); document.getElementById(l.dataset.target)?.scrollIntoView({ behavior: 'smooth' }); }));
-        if(cards.length) showCard('responsable');
-    })();
-</script>
+<script src="js/pages/privacidad.js"></script>
 <script src="js/pages/dr-agramonte.js" defer></script>
 </body>
 </html>

@@ -1,0 +1,8 @@
+// Reintento de reconexion de la pagina sin conexion: vuelve al inicio en cuanto
+// hay red. Extraido del HTML para la Content-Security-Policy (ver Caddyfile).
+let reloadAttempts=0; const maxAttempts=30;
+const reconnectInterval=setInterval(()=>{ if(navigator.onLine){ clearInterval(reconnectInterval); showNotification('¡Conexión restablecida! Redirigiendo...','success'); setTimeout(()=>{ window.location.href='index.html'; },2000); } else { reloadAttempts++; if(reloadAttempts>=maxAttempts) clearInterval(reconnectInterval); } },10000);
+function showNotification(message,type='info'){ const notification=document.createElement('div'); const bgColor=type==='success'?'#10B981':'#F59E0B'; notification.innerHTML=`<div style="position:fixed;top:20px;right:20px;background:${bgColor};color:white;padding:1rem 1.5rem;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.2);z-index:10000;display:flex;align-items:center;gap:0.75rem;font-family:'DM Sans',sans-serif;animation:slideIn 0.3s ease-out;"><i class="fas ${type==='success'?'fa-check-circle':'fa-info-circle'}"></i><span>${message}</span></div>`; document.body.appendChild(notification); setTimeout(()=>notification.remove(),3000); }
+window.addEventListener('online',()=>{ showNotification('¡Conexión restablecida! Redirigiendo al inicio...','success'); setTimeout(()=>{ window.location.href='index.html'; },2000); });
+window.addEventListener('offline',()=>{ showNotification('Se ha perdido la conexión a Internet','info'); });
+if('serviceWorker' in navigator && navigator.serviceWorker.controller) console.log('Service Worker activo - modo offline disponible');

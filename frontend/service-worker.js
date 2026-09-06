@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dr-agramonte-v25';
+const CACHE_NAME = 'dr-agramonte-v26';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -26,8 +26,25 @@ const urlsToCache = [
     '/js/pages/contacto.js',
     '/js/pages/panel-pruebas.js',
     '/js/pages/estadisticas.js',
+    // Extraidos del HTML para poder aplicar la CSP; sin ellos la pagina sin
+    // conexion se quedaria sin menu ni reintento de reconexion.
+    '/js/pages/index-preload.js',
+    '/js/pages/privacidad.js',
+    '/js/pages/offline-menu.js',
+    '/js/pages/offline-reconexion.js',
     '/js/vendor/chart.umd.min.js',
-    '/icons/app-icon.svg'
+    '/icons/app-icon.svg',
+    // Iconos y tipografias autoalojadas (antes venian de cdnjs y de Google Fonts).
+    // Se precargan solo los ficheros que hacen falta para leer la web en espanol:
+    // el subconjunto latin de cada familia y los iconos solidos, que son el 99 %
+    // de los que se usan. Los de marca (fab) y el subconjunto latin-ext se piden
+    // a la red cuando toca, porque aparecen en pantallas que ya necesitan conexion.
+    '/vendor/fontawesome/css/all.min.css',
+    '/vendor/fontawesome/webfonts/fa-solid-900.woff2',
+    '/vendor/fonts/dm-fonts.css',
+    '/vendor/fonts/dm-sans-normal-latin.woff2',
+    '/vendor/fonts/dm-sans-italic-latin.woff2',
+    '/vendor/fonts/dm-serif-display-normal-latin.woff2'
 ];
 
 self.addEventListener('install', (event) => {
