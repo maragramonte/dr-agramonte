@@ -42,6 +42,12 @@
         'footer.copyright': '© 2026 Dr. Juan Manuel Agramonte.',
 
         // ---- Inicio ----
+        'home.eyebrow': 'Medicina Interna',
+        'home.fact.anios': "35 anys d'experiència",
+        'home.fact.lugar': 'Palma de Mallorca',
+        'home.fact.modalidad': 'Presencial i telemedicina',
+        'home.card.title': 'Demani cita sense trucar',
+        'home.card.note': "Centre, dia i hora sobre l'agenda real del doctor.",
         'home.hero.title': 'Atenció Mèdica Integral en Medicina Interna',
         'home.hero.subtitle': 'El Dr. Agramonte té cura de la seva salut amb professionalitat, proximitat i seguiment personalitzat a Mallorca.',
         'home.feature.1': 'Especialista certificat amb més de 35 anys d\'experiència',
