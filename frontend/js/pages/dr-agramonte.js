@@ -27,7 +27,6 @@ const CONFIG = Object.freeze({
 
     urls: {
         telemedicina: 'https://meet.jit.si/DrAgramonte',
-        whatsapp:     'https://wa.me/34615483443',
         doctoralia:   'https://www.doctoralia.es/juan-manuel-agramonte-bucho'
     },
 
