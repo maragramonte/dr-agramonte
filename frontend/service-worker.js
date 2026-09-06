@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dr-agramonte-v28';
+const CACHE_NAME = 'dr-agramonte-v29';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -49,7 +49,21 @@ const urlsToCache = [
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
+        caches.open(CACHE_NAME).then((cache) =>
+            // Una entrada por llamada en vez de cache.addAll(lista): addAll es
+            // todo o nada, asi que un solo recurso que falle (un 404 tras
+            // renombrar un fichero, una entrada repetida) aborta la precarga
+            // entera y la web se queda sin modo sin conexion sin avisar. Asi
+            // cada fallo queda en el log y el resto de la cache se completa.
+            Promise.allSettled(
+                urlsToCache.map((url) =>
+                    cache.add(url).catch((error) => {
+                        console.warn('[SW] no se pudo precargar', url, error.name);
+                        throw error;
+                    })
+                )
+            )
+        )
     );
     self.skipWaiting();
 });
