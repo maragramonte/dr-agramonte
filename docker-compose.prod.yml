@@ -52,6 +52,10 @@ services:
       DB_USER: ${POSTGRES_USER:-agramonte}
       DB_PASSWORD: ${POSTGRES_PASSWORD:?falta POSTGRES_PASSWORD en .env.prod}
       JWT_SECRET: ${JWT_SECRET:?falta JWT_SECRET en .env.prod}
+      # Credenciales reales del médico: sin ellas quedaría activa la cuenta de
+      # demostración de la migración V3, cuya contraseña está en el repositorio.
+      MEDICO_EMAIL: ${MEDICO_EMAIL:?falta MEDICO_EMAIL en .env.prod}
+      MEDICO_PASSWORD: ${MEDICO_PASSWORD:?falta MEDICO_PASSWORD en .env.prod}
       # Detrás del proxy: Spring lee X-Forwarded-* de Caddy y entiende que la
       # petición original venía por HTTPS.
       SERVER_FORWARD_HEADERS_STRATEGY: framework

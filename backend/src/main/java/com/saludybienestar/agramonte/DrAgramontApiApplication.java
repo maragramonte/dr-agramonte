@@ -1,5 +1,6 @@
 package com.saludybienestar.agramonte;
 
+import com.saludybienestar.agramonte.config.MedicoCuentaProperties;
 import com.saludybienestar.agramonte.config.TelegramProperties;
 import com.saludybienestar.agramonte.config.TwilioProperties;
 import org.springframework.boot.SpringApplication;
@@ -10,7 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 // La auditoría JPA se habilita en JpaAuditingConfig (separada para no romper @WebMvcTest).
 @SpringBootApplication
 @EnableScheduling
-@EnableConfigurationProperties({TwilioProperties.class, TelegramProperties.class})
+@EnableConfigurationProperties({TwilioProperties.class, TelegramProperties.class, MedicoCuentaProperties.class})
 public class DrAgramontApiApplication {
     public static void main(String[] args) {
         SpringApplication.run(DrAgramontApiApplication.class, args);

@@ -32,6 +32,13 @@ server:
   port: ${PORT:8080}
 
 app:
+  # Cuenta del médico. Vacías = se queda la de demostración que siembra la
+  # migración V3 (dr.agramonte@example.com / Medico123!), válida solo en local:
+  # su contraseña está escrita en el .sql. En el servidor son obligatorias
+  # (docker-compose.prod.yml no arranca sin MEDICO_PASSWORD).
+  medico:
+    email: ${MEDICO_EMAIL:}
+    password: ${MEDICO_PASSWORD:}
   contact:
     inbox: ${CONTACT_INBOX:}
   twilio:
