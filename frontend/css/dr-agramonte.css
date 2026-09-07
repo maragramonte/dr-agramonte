@@ -1196,11 +1196,9 @@ a {
 
 /* ---------- Pantallas grandes: que el contenido crezca con la pantalla ---------- */
 
-/* Con --maxw en 1200px la fila entraba por 4px, sin margen para un nombre largo
-   al iniciar sesión o para las etiquetas en catalán. Ensanchar la rejilla aquí
-   da holgura y de paso es parte del problema de fondo: el contenido se quedaba
-   estrecho en cuanto la pantalla crecía. */
-@media (min-width: 1200px) {
+/* Donde aparecen los destinos, la rejilla se ensancha para que la fila respire
+   y de paso el contenido deje de quedarse estrecho en cuanto crece la pantalla. */
+@media (min-width: 1250px) {
     :root {
         --maxw: 1320px;
     }
@@ -1306,24 +1304,14 @@ a {
     }
 }
 
-/* El subtítulo del logo solo aparece donde hay sitio de verdad. Medido: entre
-   1200 y 1600px la fila completa —logo, tres destinos, «Iniciar sesión», el CTA
-   y las utilidades— no deja hueco para él, y era el subtítulo el que empujaba
-   al título a truncarse. Por debajo de 1200 los destinos están en el panel y
-   vuelve a caber. */
-@media (min-width: 1200px) and (max-width: 1599px) {
-    .logo-text p {
-        display: none;
-    }
-}
-
 /* ---------- Pantallas pequeñas ---------- */
 
-/* Los destinos de la barra solo salen cuando caben. Medido: la fila completa
-   necesita ~1150px de contenido, así que por debajo de 1200px de ventana se van
-   al panel, que de todos modos los lleva todos. Antes salían a 992px y a 1024
-   la barra desbordaba con scroll horizontal. */
-@media (max-width: 1199px) {
+/* Los destinos de la barra solo salen cuando caben, con el subtítulo del logo
+   puesto. Medido: la fila completa pide ~1117px y la ventana deja (ancho − 96)
+   de contenido, así que hacen falta unos 1213px; el umbral queda en 1250 para
+   tener margen con las etiquetas en catalán y con un nombre largo al iniciar
+   sesión. Antes salían a 992px y a 1024 la barra desbordaba con scroll. */
+@media (max-width: 1249px) {
     .main-nav {
         display: none;
     }
