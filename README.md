@@ -155,7 +155,12 @@ quedó sin ejecutar. Un segundo job construye la imagen de producción y comprue
 frontend viaja dentro del jar.
 
 También hay análisis de vulnerabilidades de dependencias con **OWASP dependency-check**,
-configurado para hacer fallar el build con CVSS ≥ 7.
+configurado para hacer fallar el build con CVSS ≥ 7. Corre aparte del CI, todos los lunes
+([`.github/workflows/seguridad.yml`](.github/workflows/seguridad.yml)), porque lo que cambia
+no es el código sino la lista de CVE publicados; también puede lanzarse a mano desde Actions.
+Necesita el secreto `NVD_API_KEY` ([clave gratuita de la
+NVD](https://nvd.nist.gov/developers/request-an-api-key)): sin ella la descarga pasa de
+minutos a horas.
 
 ---
 

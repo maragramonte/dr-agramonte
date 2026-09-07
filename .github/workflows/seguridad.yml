@@ -1,0 +1,92 @@
+# Análisis semanal de vulnerabilidades de las dependencias del backend con OWASP
+# dependency-check. Va aparte del CI (.github/workflows/ci.yml) a propósito: el
+# análisis tarda minutos, depende de un servicio externo (la NVD) y no debe
+# bloquear cada push. Aquí importa el paso del tiempo, no el commit: una
+# dependencia que hoy está limpia puede tener un CVE publicado la semana que viene.
+#
+# El umbral de fallo (CVSS >= 7) está en backend/pom.xml, en la configuración del
+# plugin, para que `mvn org.owasp:dependency-check-maven:check` se comporte igual
+# aquí que en local.
+name: Seguridad (OWASP)
+
+on:
+  schedule:
+    # Lunes a las 05:00 UTC (06:00 o 07:00 en Baleares según el horario de verano).
+    - cron: '0 5 * * 1'
+  # Permite lanzarlo a mano desde la pestaña Actions, p. ej. tras tocar el pom.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-check:
+    name: OWASP dependency-check
+    runs-on: ubuntu-latest
+    # La primera ejecución descarga el histórico entero de la NVD y es la lenta;
+    # las siguientes solo traen el incremento. El tope evita que un cuelgue del
+    # servicio se coma los minutos de Actions.
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      # Sin clave de la NVD el plugin queda limitado a una petición cada ~6 s y la
+      # descarga pasa de minutos a horas. Se pide gratis en
+      # https://nvd.nist.gov/developers/request-an-api-key y se guarda como secreto
+      # del repositorio con el nombre NVD_API_KEY.
+      - name: Comprobar que hay clave de la NVD
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        run: |
+          if [ -z "$NVD_API_KEY" ]; then
+            echo "::error::Falta el secreto NVD_API_KEY. Pídelo en https://nvd.nist.gov/developers/request-an-api-key y añádelo en Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+      - name: Preparar JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      # La base de datos de la NVD (H2, cientos de MB) se reaprovecha entre semanas:
+      # la clave lleva el run_id para que nunca acierte de pleno y siempre se guarde
+      # una copia actualizada, mientras restore-keys recupera la más reciente.
+      - name: Reutilizar la base de datos de la NVD
+        uses: actions/cache@v4
+        with:
+          path: ~/.dependency-check-data
+          key: nvd-${{ github.run_id }}
+          restore-keys: nvd-
+
+      # La clave viaja por variable de entorno, no por -DnvdApiKey=: el propio
+      # plugin advierte de que el parámetro directo puede acabar en los logs de
+      # depuración de Maven (GHSA-qqhq-8r2c-c3f5).
+      #
+      # El analizador de OSS Index queda desactivado: sin cuenta de Sonatype
+      # responde 429 de forma intermitente y ensuciaría el resultado con fallos
+      # que no son vulnerabilidades. La NVD sola ya cubre los CVE.
+      - name: Analizar las dependencias
+        working-directory: backend
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        run: |
+          mvn -B org.owasp:dependency-check-maven:check \
+            -DnvdApiKeyEnvironmentVariable=NVD_API_KEY \
+            -DdataDirectory="$HOME/.dependency-check-data" \
+            -DossindexAnalyzerEnabled=false \
+            -Dformats=HTML,JSON
+
+      # Se sube siempre: el caso que más interesa leer es justo aquel en el que el
+      # paso anterior ha fallado por encontrar un CVE con CVSS >= 7.
+      - name: Guardar el informe
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: |
+            backend/target/dependency-check-report.html
+            backend/target/dependency-check-report.json
+          retention-days: 30
+          if-no-files-found: warn
