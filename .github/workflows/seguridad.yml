@@ -31,19 +31,35 @@ jobs:
       - uses: actions/checkout@v4
 
       # Sin clave de la NVD el plugin queda limitado a una petición cada ~6 s y la
-      # descarga pasa de minutos a horas. Se pide gratis en
+      # descarga pasa de minutos a horas, así que no se intenta siquiera: el resto
+      # de pasos se saltan y el run queda en verde. No es un fallo, es que todavía
+      # no hay con qué analizar. Se pide gratis en
       # https://nvd.nist.gov/developers/request-an-api-key y se guarda como secreto
       # del repositorio con el nombre NVD_API_KEY.
-      - name: Comprobar que hay clave de la NVD
+      #
+      # Queda constancia en el resumen del run para que un verde no se confunda con
+      # un análisis limpio: aquí «verde» solo significa que no se ha analizado nada.
+      - name: Comprobar si hay clave de la NVD
+        id: clave
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: |
           if [ -z "$NVD_API_KEY" ]; then
-            echo "::error::Falta el secreto NVD_API_KEY. Pídelo en https://nvd.nist.gov/developers/request-an-api-key y añádelo en Settings > Secrets and variables > Actions."
-            exit 1
+            echo "hay_clave=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Sin secreto NVD_API_KEY: se omite el análisis. Pide la clave en https://nvd.nist.gov/developers/request-an-api-key y añádela en Settings > Secrets and variables > Actions."
+            {
+              echo "### Análisis omitido"
+              echo
+              echo "Falta el secreto \`NVD_API_KEY\`, así que **no se han analizado las dependencias**."
+              echo "La clave es gratuita: [pedirla a la NVD](https://nvd.nist.gov/developers/request-an-api-key)"
+              echo "y guardarla en *Settings → Secrets and variables → Actions*."
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "hay_clave=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Preparar JDK 21
+        if: steps.clave.outputs.hay_clave == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -54,6 +70,7 @@ jobs:
       # la clave lleva el run_id para que nunca acierte de pleno y siempre se guarde
       # una copia actualizada, mientras restore-keys recupera la más reciente.
       - name: Reutilizar la base de datos de la NVD
+        if: steps.clave.outputs.hay_clave == 'true'
         uses: actions/cache@v4
         with:
           path: ~/.dependency-check-data
@@ -68,6 +85,7 @@ jobs:
       # responde 429 de forma intermitente y ensuciaría el resultado con fallos
       # que no son vulnerabilidades. La NVD sola ya cubre los CVE.
       - name: Analizar las dependencias
+        if: steps.clave.outputs.hay_clave == 'true'
         working-directory: backend
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
@@ -81,7 +99,7 @@ jobs:
       # Se sube siempre: el caso que más interesa leer es justo aquel en el que el
       # paso anterior ha fallado por encontrar un CVE con CVSS >= 7.
       - name: Guardar el informe
-        if: always()
+        if: always() && steps.clave.outputs.hay_clave == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: dependency-check-report

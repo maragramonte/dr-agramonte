@@ -159,8 +159,9 @@ configurado para hacer fallar el build con CVSS ≥ 7. Corre aparte del CI, todo
 ([`.github/workflows/seguridad.yml`](.github/workflows/seguridad.yml)), porque lo que cambia
 no es el código sino la lista de CVE publicados; también puede lanzarse a mano desde Actions.
 Necesita el secreto `NVD_API_KEY` ([clave gratuita de la
-NVD](https://nvd.nist.gov/developers/request-an-api-key)): sin ella la descarga pasa de
-minutos a horas.
+NVD](https://nvd.nist.gov/developers/request-an-api-key)), porque sin ella la descarga pasa
+de minutos a horas; mientras no esté configurado, el workflow se salta el análisis y lo deja
+dicho en el resumen del run en vez de fallar.
 
 ---
 
