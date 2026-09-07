@@ -600,13 +600,6 @@ a {
 }
 
 /* Selector de idioma (ES / CA) en la cabecera */
-/* El selector de idioma es un item mas del menu: en escritorio queda tras el
-   boton de reservar y en movil, al final del desplegable. Un poco de aire para
-   que no se pegue al CTA. */
-.nav-item--lang {
-    margin-left: 0.5rem;
-}
-
 .lang-switch {
     display: inline-flex;
     align-items: center;
@@ -766,7 +759,19 @@ a {
     margin-top: auto;
 }
 
-/* ========== 6. HEADER Y NAVEGACIÓN (sticky + hamburguesa) ========== */
+/* ========== 6. HEADER Y NAVEGACIÓN (sticky + menú completo) ==========
+
+   La barra deja arriba solo lo esencial —logo, tres destinos, el CTA y las
+   utilidades— y el mapa completo del sitio vive en el panel .mega-menu, que
+   abre el botón «Menú» a cualquier ancho. Antes la barra enseñaba cinco
+   destinos de los nueve que tiene el sitio; los otros cuatro solo estaban en
+   el pie.
+
+   Los tamaños ahora crecen con la pantalla. Hasta 1200px manda el bloque base
+   y por encima hay escalones en min-width, porque antes todos los @media de la
+   cabecera eran max-width: solo sabía encogerse, así que en un monitor grande
+   o en un televisor quedaba una cinta diminuta rodeada de vacío.
+*/
 .main-header {
     background: var(--card);
     backdrop-filter: blur(10px);
@@ -792,9 +797,18 @@ a {
     display: flex;
     align-items: center;
     gap: var(--space-2);
+    /* La marca no cede ancho en escritorio. Sin esto el logo era el único
+       elemento encogible de la fila y .main-nav, que crece, lo aplastaba: a
+       1366px el título salía como «Dr. Agram…» y el subtítulo en dos líneas.
+       Por debajo de 992px sí se le deja ceder (ver más abajo), porque allí la
+       barra de destinos está oculta y el logo es lo único que puede dar. */
+    flex-shrink: 0;
 }
 
 .logo-icon {
+    /* Insignia de tamaño fijo: sin esto el flex la aplastaba (31,7px en vez de
+       los 34 que le tocan) al pelear por el sitio en pantallas de 320px. */
+    flex-shrink: 0;
     width: 48px;
     height: 48px;
     background: linear-gradient(135deg, var(--teal) 0%, var(--teal-light) 100%);
@@ -814,11 +828,13 @@ a {
 
 .logo-text h1 {
     font-family: var(--font-display);
-    font-size: 1.25rem;
+    font-size: clamp(1rem, 3.4vw, 1.25rem);
     color: var(--heading);
     font-weight: 500;
     line-height: 1.2;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .logo-text p {
@@ -826,7 +842,8 @@ a {
     color: var(--text-light);
 }
 
-/* Zona central: navegación. Crece para centrarse entre logo y utilidades. */
+/* Zona central: los destinos principales. Crece para centrarse entre el logo
+   y las utilidades. */
 .main-nav {
     flex: 1 1 auto;
     display: flex;
@@ -875,15 +892,22 @@ a {
     border-radius: 1px;
 }
 
-/* Zona derecha: utilidades (idioma/tema) + CTA, separadas del menú por un divisor */
+/* Zona derecha: CTA + utilidades (idioma, tema y el botón del menú), separadas
+   entre sí por un divisor fino. */
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.6rem;
     flex-shrink: 0;
 }
 
-.header-actions::before {
+.header-utils {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.header-utils::before {
     content: '';
     width: 1px;
     height: 26px;
@@ -891,7 +915,9 @@ a {
     margin-right: 0.15rem;
 }
 
-/* CTA "Reservar cita": acción principal como botón sólido, no como enlace */
+/* CTA "Reservar cita": acción principal como botón sólido, no como enlace.
+   Vive en la barra a todos los anchos (antes se escondía dentro del
+   desplegable en móvil, donde nadie lo veía). */
 .nav-cta {
     display: inline-flex;
     align-items: center;
@@ -952,20 +978,47 @@ a {
     color: #fff;
 }
 
-/* Hamburguesa para móvil */
+/* Botón «Menú»: abre el panel con el mapa completo. A diferencia de la antigua
+   hamburguesa, está visible a cualquier ancho, no solo en móvil. */
 .nav-toggle {
-    display: none;
-    background: none;
-    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    height: 42px;
+    padding: 0 0.95rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    background: var(--card);
+    color: var(--heading);
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
     cursor: pointer;
-    padding: 0.5rem;
+    transition: var(--transition-fast);
 }
 
+.nav-toggle:hover,
+.nav-toggle:focus-visible {
+    color: var(--teal);
+    border-color: var(--teal-light);
+    background: rgba(15, 118, 110, 0.06);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
+}
+
+.nav-toggle[aria-expanded="true"] {
+    color: var(--teal);
+    border-color: var(--teal);
+    background: rgba(15, 118, 110, 0.08);
+}
+
+/* Las tres barras heredan el color del botón (currentColor), así que siguen
+   sus estados de hover y abierto sin repetir reglas. */
 .nav-toggle-icon {
     display: block;
-    width: 24px;
+    width: 18px;
     height: 2px;
-    background: var(--teal);
+    background: currentColor;
     position: relative;
     transition: var(--transition-fast);
 }
@@ -974,18 +1027,18 @@ a {
 .nav-toggle-icon::after {
     content: '';
     position: absolute;
-    width: 24px;
+    width: 18px;
     height: 2px;
-    background: var(--teal);
+    background: currentColor;
     transition: var(--transition-fast);
 }
 
 .nav-toggle-icon::before {
-    top: -8px;
+    top: -6px;
 }
 
 .nav-toggle-icon::after {
-    bottom: -8px;
+    bottom: -6px;
 }
 
 .nav-toggle[aria-expanded="true"] .nav-toggle-icon {
@@ -1002,20 +1055,281 @@ a {
     bottom: 0;
 }
 
-@media (max-width: 992px) {
+/* ---------- Panel con el mapa completo ---------- */
+
+/* Se superpone al contenido en lugar de empujarlo: si estuviera en el flujo,
+   abrirlo movería la página entera hacia abajo. El max-height deja que haga
+   scroll él solo cuando no cabe (móvil en horizontal, sobre todo). */
+.mega-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    max-height: calc(100vh - 100%);
+    overflow-y: auto;
+    animation: slideDown 0.25s ease-out;
+}
+
+.mega-menu[hidden] {
+    display: none;
+}
+
+.mega-menu__inner {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: var(--space-3);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: var(--space-3);
+}
+
+.mega-menu__title {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 0.65rem;
+    padding-left: 0.7rem;
+}
+
+.mega-menu__list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.mega-link {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 0.6rem 0.7rem;
+    border-radius: var(--radius);
+    color: var(--heading);
+    transition: var(--transition-fast);
+}
+
+.mega-link:hover,
+.mega-link:focus-visible {
+    background: rgba(15, 118, 110, 0.06);
+    color: var(--teal);
+    outline: none;
+}
+
+.mega-link.active {
+    background: rgba(15, 118, 110, 0.09);
+    color: var(--teal);
+}
+
+.mega-link > i {
+    flex-shrink: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-top: 0.05rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    background: rgba(15, 118, 110, 0.08);
+    color: var(--teal);
+    font-size: 0.85rem;
+}
+
+/* La reserva es la acción que importa: su icono va en sólido, como el CTA. */
+.mega-link--destacado > i {
+    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-light) 100%);
+    color: #fff;
+}
+
+.mega-link__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.mega-link__label {
+    font-size: 0.92rem;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.mega-link__hint {
+    font-size: 0.76rem;
+    color: var(--text-light);
+    line-height: 1.3;
+}
+
+.mega-menu__pie {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0.85rem var(--space-3);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+
+.mega-menu__legal {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.82rem;
+    color: var(--text-light);
+    transition: var(--transition-fast);
+}
+
+.mega-menu__legal:hover {
+    color: var(--teal);
+}
+
+/* Copia del selector de idioma: solo aparece cuando no cabe en la barra. */
+.lang-switch--menu {
+    display: none;
+}
+
+/* ---------- Pantallas grandes: que el contenido crezca con la pantalla ---------- */
+
+/* Con --maxw en 1200px la fila entraba por 4px, sin margen para un nombre largo
+   al iniciar sesión o para las etiquetas en catalán. Ensanchar la rejilla aquí
+   da holgura y de paso es parte del problema de fondo: el contenido se quedaba
+   estrecho en cuanto la pantalla crecía. */
+@media (min-width: 1200px) {
+    :root {
+        --maxw: 1320px;
+    }
+}
+
+@media (min-width: 1400px) {
+    .header-content {
+        padding: 1.35rem var(--space-3);
+    }
+
+    .nav-menu {
+        gap: 0.5rem;
+    }
+
+    .nav-link {
+        font-size: 0.95rem;
+        padding: 0.65rem 1.15rem;
+    }
+
+    .logo-text h1 {
+        font-size: 1.35rem;
+    }
+
+    .logo-text p {
+        font-size: 0.75rem;
+    }
+
+    .nav-cta {
+        font-size: 0.92rem;
+        padding: 0.62rem 1.35rem;
+    }
+}
+
+/* Monitores grandes y televisores. Aquí se ensancha la rejilla del sitio
+   entero, no solo la cabecera: el problema no era la barra en sí, era que
+   1200px en una pantalla de 2K dejan el contenido en una columna estrecha con
+   vacío a los lados, y una cabecera más ancha que el contenido quedaría
+   desalineada. Para volver atrás basta con quitar la redefinición de --maxw
+   de este bloque y del siguiente. */
+@media (min-width: 1600px) {
+    :root {
+        --maxw: 1440px;
+    }
+
+    .header-content {
+        padding: 1.6rem var(--space-4);
+        gap: var(--space-4);
+    }
+
+    .logo-icon {
+        width: 56px;
+        height: 56px;
+        font-size: 1.5rem;
+    }
+
+    .logo-text h1 {
+        font-size: 1.5rem;
+    }
+
+    .logo-text p {
+        font-size: 0.82rem;
+    }
+
+    .nav-link {
+        font-size: 1rem;
+        padding: 0.7rem 1.3rem;
+    }
+
+    .nav-cta {
+        font-size: 1rem;
+        padding: 0.7rem 1.6rem;
+    }
+
+    .theme-toggle {
+        width: 46px;
+        height: 46px;
+        font-size: 1.15rem;
+    }
+
     .nav-toggle {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+        height: 46px;
+        font-size: 0.92rem;
+        padding: 0 1.15rem;
     }
 
-    /* El menú deja de crecer; las utilidades se pegan a la derecha */
+    .mega-menu__inner {
+        padding: var(--space-4);
+        gap: var(--space-4);
+    }
+
+    .mega-link__label {
+        font-size: 1rem;
+    }
+
+    .mega-link__hint {
+        font-size: 0.82rem;
+    }
+}
+
+@media (min-width: 2000px) {
+    :root {
+        --maxw: 1560px;
+    }
+}
+
+/* El subtítulo del logo solo aparece donde hay sitio de verdad. Medido: entre
+   1200 y 1600px la fila completa —logo, tres destinos, «Iniciar sesión», el CTA
+   y las utilidades— no deja hueco para él, y era el subtítulo el que empujaba
+   al título a truncarse. Por debajo de 1200 los destinos están en el panel y
+   vuelve a caber. */
+@media (min-width: 1200px) and (max-width: 1599px) {
+    .logo-text p {
+        display: none;
+    }
+}
+
+/* ---------- Pantallas pequeñas ---------- */
+
+/* Los destinos de la barra solo salen cuando caben. Medido: la fila completa
+   necesita ~1150px de contenido, así que por debajo de 1200px de ventana se van
+   al panel, que de todos modos los lleva todos. Antes salían a 992px y a 1024
+   la barra desbordaba con scroll horizontal. */
+@media (max-width: 1199px) {
     .main-nav {
-        flex: 0 0 auto;
+        display: none;
     }
+}
 
-    /* Gap y padding más ajustados en móvil para que quepan
-       logo + utilidades + hamburguesa sin que nada se salga. */
+@media (max-width: 992px) {
     .header-content {
         gap: 0.5rem;
         padding-left: 0.75rem;
@@ -1025,64 +1339,79 @@ a {
     .logo-section,
     .logo-link {
         gap: 0.5rem;
+        /* Aquí sí cede: es lo único encogible de la barra y sin esto el botón
+           «Menú» se salía por la derecha en pantallas de 320px. */
+        flex-shrink: 1;
+        min-width: 0;
+    }
+
+    .logo-text {
+        min-width: 0;
     }
 
     .header-actions {
         margin-left: auto;
+        gap: 0.4rem;
+    }
+
+    .header-utils {
         gap: 0.35rem;
     }
 
-    .header-actions::before {
+    .header-utils::before {
         display: none;
     }
 
-    .nav-menu {
-        display: none;
-        position: fixed;
-        top: 80px;
-        left: 0;
-        right: 0;
-        flex-direction: column;
-        gap: 0.25rem;
-        background: var(--card);
-        padding: var(--space-3);
-        box-shadow: var(--shadow-lg);
-        border-bottom: 1px solid var(--border);
-        z-index: 99;
-    }
-
-    .nav-menu.nav-menu--open {
-        display: flex;
-        animation: slideDown 0.3s ease-out;
-    }
-
-    .nav-link {
-        padding: 0.8rem 1rem;
-        width: 100%;
-        justify-content: center;
-    }
-
-    /* Centrar todos los ítems del desplegable, incluido el CTA Reservar
-       (el ítem flex es el <li>, no el <a> interior). */
-    .nav-menu .nav-item {
-        display: flex;
-        justify-content: center;
+    .mega-menu__inner {
+        grid-template-columns: 1fr;
+        gap: var(--space-2);
+        padding: var(--space-2);
     }
 }
 
-/* En pantallas estrechas el subtítulo del logo (el texto más ancho) se oculta
-   para liberar espacio horizontal en la barra. */
+/* Aquí ya no caben ni el subtítulo del logo ni las etiquetas de los botones:
+   el CTA y el menú se quedan en icono, y el idioma se va al pie del panel. */
 @media (max-width: 600px) {
     .logo-text p {
         display: none;
     }
+
+    .nav-cta-text,
+    .nav-toggle-text {
+        display: none;
+    }
+
+    .nav-cta {
+        padding: 0.55rem 0.85rem;
+    }
+
+    .nav-toggle {
+        padding: 0 0.8rem;
+    }
+
+    .header-utils .lang-switch {
+        display: none;
+    }
+
+    .lang-switch--menu {
+        display: inline-flex;
+    }
 }
 
-/* Móviles muy estrechos: encoge logo e iconos para que nada se recorte. */
-@media (max-width: 380px) {
+/* Móviles estrechos: encoge logo e iconos para que nada se recorte. Antes este
+   bloque entraba a 380px y en un móvil de 390 la barra ya se desbordaba. */
+@media (max-width: 480px) {
     .header-content {
         padding-left: 0.6rem;
         padding-right: 0.6rem;
+    }
+
+    .header-actions {
+        gap: 0.3rem;
+    }
+
+    .nav-cta {
+        padding: 0.55rem 0.7rem;
     }
 
     .logo-icon {
@@ -1098,6 +1427,32 @@ a {
     .theme-toggle {
         width: 38px;
         height: 38px;
+    }
+
+    .nav-toggle {
+        height: 38px;
+    }
+}
+
+/* Los más estrechos que se ven hoy (320px, iPhone SE de primera hornada): con
+   los tamaños del tramo de 480 el nombre aún salía como «Dr. Agram…». */
+@media (max-width: 360px) {
+    .header-content {
+        gap: 0.4rem;
+    }
+
+    .logo-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
+    }
+
+    .logo-text h1 {
+        font-size: 0.88rem;
+    }
+
+    .nav-toggle {
+        padding: 0 0.6rem;
     }
 }
 
@@ -2338,6 +2693,7 @@ a {
     .main-header,
     .footer,
     .nav-toggle,
+    .mega-menu,
     .hero-actions,
     .btn,
     .btn-enviar {

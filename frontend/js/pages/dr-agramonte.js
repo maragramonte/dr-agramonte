@@ -183,28 +183,39 @@ const Utils = {
 
 /* ══════════════════════════════════════════════
    3. NAVEGACIÓN
-   - Toggle del menú móvil (un solo listener)
-   - Marca automáticamente el enlace de la página actual
+   - Abre y cierra el panel «Menú» con el mapa completo del sitio
+   - Marca automáticamente el enlace de la página actual, tanto en la barra
+     como dentro del panel
 ══════════════════════════════════════════════ */
 class Navegacion {
 
     init() {
         this._toggle = document.querySelector('.nav-toggle');
-        this._menu   = document.querySelector('.nav-menu');
-        this._abierto = false;
-
-        if (!this._toggle || !this._menu) return;
+        this._panel  = document.getElementById('mega-menu');
 
         this._marcarPaginaActual();
+
+        // El panel es HTML estático: si el botón no estuviera, los enlaces
+        // seguirían ahí y accesibles, solo que sin poder plegarse.
+        if (!this._toggle || !this._panel) return;
+
+        // En offline.html este script convive con offline-menu.js, que hace lo
+        // mismo por si aquí no hay caché. Dos listeners sobre el mismo botón se
+        // anulaban (uno abría y el otro volvía a cerrar), así que el primero que
+        // llega marca el botón y el segundo se aparta.
+        if (this._toggle.dataset.menuBound) return;
+        this._toggle.dataset.menuBound = '1';
+
         this._bindEventos();
     }
 
+    /* Marca la página actual en los dos sitios donde aparece un enlace a ella:
+       los destinos de la barra (.nav-link) y las entradas del panel (.mega-link). */
     _marcarPaginaActual() {
         const pagina = location.pathname.split('/').pop() || 'index.html';
-        this._menu.querySelectorAll('.nav-link').forEach(a => {
-            const esActual = a.getAttribute('href') === pagina ||
-                (pagina === '' && a.getAttribute('href') === 'index.html');
-            if (esActual) {
+        document.querySelectorAll('.nav-link, .mega-link, .mega-menu__legal').forEach(a => {
+            const destino = a.getAttribute('href');
+            if (destino === pagina || (pagina === '' && destino === 'index.html')) {
                 a.classList.add('active');
                 a.setAttribute('aria-current', 'page');
             }
@@ -212,27 +223,36 @@ class Navegacion {
     }
 
     _bindEventos() {
-        // Abrir/cerrar con el botón hamburguesa
         this._toggle.addEventListener('click', () => this._alternar());
 
-        // Cerrar al pulsar un enlace del menú
-        this._menu.querySelectorAll('a').forEach(a =>
+        // Cerrar al elegir un destino del panel
+        this._panel.querySelectorAll('a').forEach(a =>
             a.addEventListener('click', () => this._cerrar())
         );
 
-        // Cerrar con Escape
+        // Cerrar con Escape, devolviendo el foco al botón para no perder el sitio
         document.addEventListener('keydown', e => {
-            if (e.key === 'Escape' && this._abierto) this._cerrar();
+            if (e.key === 'Escape' && this._abierto) {
+                this._cerrar();
+                this._toggle.focus();
+            }
         });
 
         // Cerrar al hacer clic fuera
         document.addEventListener('click', e => {
             if (this._abierto &&
                 !this._toggle.contains(e.target) &&
-                !this._menu.contains(e.target)) {
+                !this._panel.contains(e.target)) {
                 this._cerrar();
             }
         });
+    }
+
+    // El estado no se guarda en una bandera propia: se lee del propio panel.
+    // En offline.html conviven este script y offline-menu.js sobre el mismo
+    // boton, y dos banderas independientes acabarian discrepando.
+    get _abierto() {
+        return !this._panel.hidden;
     }
 
     _alternar() {
@@ -240,15 +260,15 @@ class Navegacion {
     }
 
     _abrir() {
-        this._abierto = true;
-        this._menu.classList.add('nav-menu--open');
+        this._panel.hidden = false;
         this._toggle.setAttribute('aria-expanded', 'true');
+        this._toggle.setAttribute('aria-label', 'Cerrar el menú');
     }
 
     _cerrar() {
-        this._abierto = false;
-        this._menu.classList.remove('nav-menu--open');
+        this._panel.hidden = true;
         this._toggle.setAttribute('aria-expanded', 'false');
+        this._toggle.setAttribute('aria-label', 'Abrir el menú');
     }
 }
 

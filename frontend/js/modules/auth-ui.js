@@ -46,19 +46,34 @@ class AuthUI {
             li.innerHTML = '<button type="button" class="nav-link nav-link--auth" data-auth-trigger>Iniciar sesión</button>';
             menu.appendChild(li);
         });
+
+        // El mismo acceso dentro del panel «Menú». La barra de destinos se oculta
+        // por debajo de 992px, así que sin esta copia no habría forma de entrar
+        // desde un móvil.
+        document.querySelectorAll('[data-auth-slot]').forEach((lista) => {
+            if (lista.querySelector('[data-auth-trigger]')) return;
+            const li = document.createElement('li');
+            li.innerHTML =
+                '<button type="button" class="mega-link mega-link--auth" data-auth-trigger>' +
+                '<i class="fas fa-right-to-bracket" aria-hidden="true"></i>' +
+                '<span class="mega-link__text">' +
+                '<span class="mega-link__label" data-auth-label>Iniciar sesión</span>' +
+                '<span class="mega-link__hint">Consulte y cancele sus citas</span>' +
+                '</span></button>';
+            lista.appendChild(li);
+        });
     }
 
     #updateNavState() {
         const authed = this.isAuthenticated();
         const nombre = localStorage.getItem('nombre') || 'Mi cuenta';
+        const texto = authed ? nombre.split(' ')[0] : 'Iniciar sesión';
         document.querySelectorAll('[data-auth-trigger]').forEach((btn) => {
-            if (authed) {
-                btn.textContent = nombre.split(' ')[0];
-                btn.setAttribute('aria-label', 'Cerrar sesión');
-            } else {
-                btn.textContent = 'Iniciar sesión';
-                btn.setAttribute('aria-label', 'Iniciar sesión');
-            }
+            // El disparador del panel lleva icono y descripción dentro, así que
+            // el texto va en su etiqueta; el de la barra es el botón entero.
+            const destino = btn.querySelector('[data-auth-label]') || btn;
+            destino.textContent = texto;
+            btn.setAttribute('aria-label', authed ? 'Cerrar sesión' : 'Iniciar sesión');
         });
     }
 
@@ -382,6 +397,14 @@ class AuthUI {
                     font: inherit;
                     color: inherit;
                     padding: 0.5rem 1rem;
+                }
+                .mega-link--auth {
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    font: inherit;
+                    width: 100%;
+                    text-align: left;
                 }
                 .auth-modal__footer {
                     margin: 1rem 0 0;

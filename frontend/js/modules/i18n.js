@@ -26,6 +26,22 @@
         'nav.reservar': 'Demanar cita',
         'logo.subtitle': 'Especialista en Medicina Interna',
 
+        // ---- Panel «Menú» (mapa completo del sitio) ----
+        'nav.menu': 'Menú',
+        'menu.consulta': 'La consulta',
+        'menu.citas': 'Cites',
+        'menu.herramientas': 'Eines',
+        'menu.panel': 'Panell de proves',
+        'menu.inicio.hint': 'Portada i resum',
+        'menu.sobre.hint': 'Trajectòria i formació',
+        'menu.servicios.hint': "Què s'atén a la consulta",
+        'menu.testimonios.hint': 'Opinions de pacients',
+        'menu.reservar.hint': 'Triï centre, dia i hora',
+        'menu.contacto.hint': 'Formulari i ubicació',
+        'menu.cuadro.hint': "Estadístiques de l'agenda",
+        'menu.panel.hint': 'Accés de pacient i metge',
+        'menu.offline.hint': 'El web sense connexió',
+
         // ---- Footer (compartido) ----
         'footer.especialista': 'Especialista en Medicina Interna',
         'footer.ubicacion': 'Palma, Illes Balears',
