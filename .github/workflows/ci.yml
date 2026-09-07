@@ -1,0 +1,89 @@
+# Integración continua: en cada push y cada pull request a main se compilan y se
+# ejecutan las pruebas del backend, y se comprueba que la imagen de producción
+# sigue construyéndose.
+#
+# A diferencia de una máquina de desarrollo con Docker Desktop parado, el runner
+# de GitHub trae Docker, así que aquí SÍ se ejecutan las pruebas de integración
+# con Testcontainers (@Testcontainers(disabledWithoutDocker = true) las salta en
+# local cuando no hay Docker, pero en CI no deben saltarse nunca).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Solo lectura del repositorio: el workflow no publica nada.
+permissions:
+  contents: read
+
+# Si se empujan varios commits seguidos, cancela los runs anteriores de la misma rama.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (JDK 21 + Testcontainers)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Preparar JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      # verify = compilar + pruebas + empaquetar el jar ejecutable, que es lo que
+      # acaba desplegándose. Un fallo al empaquetar también debe romper el build.
+      - name: Compilar y pasar las pruebas
+        working-directory: backend
+        run: mvn -B verify
+
+      # Las pruebas de integración se saltan solas si el runner no tuviera Docker;
+      # eso dejaría el build en verde ocultando que no se han ejecutado.
+      - name: Comprobar que no se ha saltado ninguna prueba
+        working-directory: backend
+        run: |
+          if ! ls target/surefire-reports/*.xml > /dev/null 2>&1; then
+            echo "::error::Surefire no ha dejado ningún informe: las pruebas no se han ejecutado."
+            exit 1
+          fi
+          saltadas=$(grep -ho 'skipped="[0-9]*"' target/surefire-reports/*.xml \
+            | grep -o '[0-9]*' | awk '{s+=$1} END {print s+0}')
+          echo "Pruebas saltadas: $saltadas"
+          if [ "$saltadas" -ne 0 ]; then
+            echo "::error::Se han saltado $saltadas pruebas; en CI deben ejecutarse todas."
+            exit 1
+          fi
+
+      - name: Guardar los informes de Surefire si algo falla
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: backend/target/surefire-reports/
+          retention-days: 7
+
+  imagen:
+    name: Imagen de producción
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # El Dockerfile de la raíz es el que usa el VPS (docker-compose.prod.yml):
+      # empaqueta el frontend como recursos estáticos dentro del jar del backend.
+      - name: Construir la imagen combinada
+        run: docker build -t dr-agramonte:ci .
+
+      # Si el COPY del frontend se rompiera, la imagen seguiría construyéndose
+      # pero arrancaría sin web. Se comprueba que los estáticos están en el jar.
+      - name: Comprobar que el frontend viaja dentro del jar
+        run: |
+          docker create --name comprobacion dr-agramonte:ci
+          docker cp comprobacion:/app/app.jar app.jar
+          docker rm comprobacion
+          unzip -l app.jar | grep -q 'BOOT-INF/classes/static/index.html'

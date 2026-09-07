@@ -7,6 +7,8 @@ Los pacientes reservan, consultan y cancelan sus citas por su cuenta, sin depend
 
 `Java 21` · `Spring Boot 3.5` · `PostgreSQL 15` · `JavaScript` · `Docker` · `Caddy`
 
+[![CI](https://github.com/maragramonte/dr-agramonte/actions/workflows/ci.yml/badge.svg)](https://github.com/maragramonte/dr-agramonte/actions/workflows/ci.yml)
+
 ![Portada de la web: reserva de cita con el Dr. Agramonte, especialista en Medicina Interna en Palma de Mallorca](frontend/pictures/Imagenwebapp.png)
 
 ---
@@ -145,6 +147,12 @@ PostgreSQL levantado con Testcontainers. Cubren las ramas críticas: 409 por dob
 
 Las 5 de integración necesitan Docker en marcha; si no lo hay se marcan como saltadas en
 lugar de fallar. La cobertura todavía no está medida con JaCoCo.
+
+En cada push y cada pull request a `main` las ejecuta GitHub Actions
+([`.github/workflows/ci.yml`](.github/workflows/ci.yml)). El runner sí tiene Docker, así que
+allí no se salta ninguna: el workflow revisa los informes de Surefire y falla si alguna
+quedó sin ejecutar. Un segundo job construye la imagen de producción y comprueba que el
+frontend viaja dentro del jar.
 
 También hay análisis de vulnerabilidades de dependencias con **OWASP dependency-check**,
 configurado para hacer fallar el build con CVSS ≥ 7.
