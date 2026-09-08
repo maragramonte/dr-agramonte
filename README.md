@@ -29,6 +29,7 @@ Este proyecto digitaliza esa parte concreta, sin tocar lo que sí requiere trato
 - **Avisos automáticos** de confirmación, cancelación y recordatorio 24 h antes.
 - **Cuadro de mando** para el profesional: carga por médico, demanda por especialidad,
   reparto por centro y tasa de cancelación.
+- **Bilingüe** castellano/catalán, con la preferencia guardada en el navegador.
 - **PWA instalable**, accesible (WCAG 2.1 AA), con modo oscuro y modo sin conexión.
 
 ![Pantalla de reserva: centro de consulta, calendario de agosto con el día seleccionado y los huecos libres de mañana y tarde](frontend/pictures/reserva-calendario.png)
@@ -140,12 +141,12 @@ docker compose --profile mysql up -d --build
 cd backend && mvn test
 ```
 
-**47 pruebas en tres niveles**: unitarias de servicio, de seguridad y roles sobre la capa
+**48 pruebas en tres niveles**: unitarias de servicio, de seguridad y roles sobre la capa
 REST (`@WebMvcTest` con la `SecurityConfig` real) y de integración end-to-end contra un
 PostgreSQL levantado con Testcontainers. Cubren las ramas críticas: 409 por doble reserva,
 403 por rol, validez del JWT, cancelación y el secreto del webhook.
 
-Las 5 de integración necesitan Docker en marcha; si no lo hay se marcan como saltadas en
+Las 6 de integración necesitan Docker en marcha; si no lo hay se marcan como saltadas en
 lugar de fallar. La cobertura todavía no está medida con JaCoCo.
 
 En cada push y cada pull request a `main` las ejecuta GitHub Actions
@@ -153,6 +154,15 @@ En cada push y cada pull request a `main` las ejecuta GitHub Actions
 allí no se salta ninguna: el workflow revisa los informes de Surefire y falla si alguna
 quedó sin ejecutar. Un segundo job construye la imagen de producción y comprueba que el
 frontend viaja dentro del jar.
+
+El frontend no tiene pruebas automatizadas, pero tampoco se revisa a ojo. La maquetación se
+mide con Chrome headless sobre iframes del ancho real —fijar el tamaño de la ventana no sirve
+por debajo de 500 px, porque Chrome impone un mínimo y luego recorta el PNG, lo que simula
+desbordes que no existen—: las diez páginas por una veintena de anchos de 320 a 2560, sin
+scroll horizontal ni textos truncados. Y el contraste se audita aplicando la fórmula de
+luminancia de la WCAG a los colores calculados de cada texto sobre su fondo real, en los dos
+temas; así apareció que en modo oscuro el formulario de reserva escribía en gris casi negro
+sobre gris casi negro.
 
 También hay análisis de vulnerabilidades de dependencias con **OWASP dependency-check**,
 configurado para hacer fallar el build con CVSS ≥ 7. Corre aparte del CI, todos los lunes
@@ -250,10 +260,13 @@ Con los canales desactivados la aplicación funciona igual; simplemente no enví
 | `js/modules/api-client.js` | Cliente REST y gestión del JWT |
 | `js/modules/api-config.js` | URL base de la API |
 | `js/modules/auth-ui.js` | Login y registro desde el menú |
+| `js/modules/i18n.js` | Traducción al catalán por `data-i18n`, sin dependencias |
+| `js/modules/theme-init.js` | Fija el tema antes de pintar, para que no parpadee |
 | `js/pages/reserva.js` | Reserva, `syncMisCitas()`, «Mis citas» y vinculación con Telegram |
 | `js/pages/estadisticas.js` | Gráficos del cuadro de mando (Chart.js vendorizado) |
 | `js/pages/panel-pruebas.js` | Tabla de reservas y refresco entre pestañas |
 | `js/pages/dr-agramonte.js` | Navegación, tema, accesibilidad y registro de la PWA |
+| `js/pages/offline-menu.js` | El panel «Menú» en la página sin conexión, cuando el anterior no está en caché |
 | `service-worker.js` | Caché y modo sin conexión |
 
 </details>
