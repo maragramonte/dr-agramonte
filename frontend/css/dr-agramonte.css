@@ -149,6 +149,12 @@ main {
     width: 100%;
 }
 
+/* El atributo hidden lo pone el UA con display:none, que pierde ante cualquier
+   regla de autor con display (p. ej. .servicio-banner). Se blinda aquí. */
+[hidden] {
+    display: none !important;
+}
+
 /* Imágenes responsivas por defecto */
 img {
     max-width: 100%;

@@ -68,7 +68,11 @@ class AuthUI {
         const authed = this.isAuthenticated();
         const nombre = localStorage.getItem('nombre') || 'Mi cuenta';
         const texto = authed ? nombre.split(' ')[0] : 'Iniciar sesión';
-        document.querySelectorAll('[data-auth-trigger]').forEach((btn) => {
+        // Solo los accesos de navegación cambian de texto. Hay más disparadores
+        // sueltos —los enlaces «inicia sesión» / «crea una cuenta» del formulario
+        // de reserva—, y reescribirlos todos dejaba la frase con «Iniciar sesión»
+        // dos veces y se llevaba por delante el icono del botón del cuadro de mando.
+        document.querySelectorAll('.nav-link--auth, .mega-link--auth').forEach((btn) => {
             // El disparador del panel lleva icono y descripción dentro, así que
             // el texto va en su etiqueta; el de la barra es el botón entero.
             const destino = btn.querySelector('[data-auth-label]') || btn;
