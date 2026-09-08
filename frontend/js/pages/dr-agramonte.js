@@ -596,7 +596,7 @@ class Accesibilidad {
         link.textContent = 'Ir al contenido principal';
         link.style.cssText = `
             position:absolute; top:-40px; left:0;
-            background:var(--teal); color:#fff;
+            background:var(--teal-fill); color:#fff;
             padding:8px 16px; z-index:9999;
             border-radius:0 0 8px 0; transition:top .2s;
             text-decoration:none; font-weight:600;

@@ -28,6 +28,15 @@
     --teal: #0F766E;
     --teal-dark: #134E48;
     --teal-light: #14B8A6;
+
+    /* Relleno de marca para lo que lleva texto o iconos blancos encima. No se
+       redefine en oscuro: --teal sí lo hace (allí es color de texto sobre
+       superficies oscuras y tiene que aclararse), y al compartir token, cada
+       botón y cada chip caían a 2,49:1 en cuanto se cambiaba de tema.
+       #0F766E da 5,49:1 con blanco y #0F8478 se queda en 4,57:1, así que el
+       degradado sigue siendo un degradado y pasa AA por los dos extremos. */
+    --teal-fill: #0F766E;
+    --teal-fill-light: #0F8478;
     --teal-glow: rgba(15, 118, 110, 0.2);
     --teal-pale: rgba(15, 118, 110, 0.08);
 
@@ -645,7 +654,7 @@ a {
 }
 .lang-btn:hover { color: var(--teal); }
 .lang-btn--active {
-    background: var(--teal);
+    background: var(--teal-fill);
     color: #fff;
 }
 
@@ -653,7 +662,7 @@ a {
 .page-hero {
     position: relative;
     overflow: hidden;
-    background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal) 42%, var(--teal-light) 100%);
+    background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal-fill) 42%, var(--teal-light) 100%);
     color: var(--white);
     padding: clamp(2.25rem, 7vw, 3.75rem) 0;
     margin-bottom: var(--space-4);
@@ -833,7 +842,7 @@ a {
     flex-shrink: 0;
     width: 48px;
     height: 48px;
-    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-light) 100%);
+    background: linear-gradient(135deg, var(--teal-fill) 0%, var(--teal-fill-light) 100%);
     border-radius: var(--radius);
     display: flex;
     align-items: center;
@@ -950,7 +959,7 @@ a {
     gap: 0.45rem;
     padding: 0.55rem 1.15rem;
     border-radius: var(--radius-full);
-    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-light) 100%);
+    background: linear-gradient(135deg, var(--teal-fill) 0%, var(--teal-fill-light) 100%);
     color: #fff;
     font-weight: 600;
     font-size: 0.88rem;
@@ -1168,7 +1177,7 @@ a {
 
 /* La reserva es la acción que importa: su icono va en sólido, como el CTA. */
 .mega-link--destacado > i {
-    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-light) 100%);
+    background: linear-gradient(135deg, var(--teal-fill) 0%, var(--teal-fill-light) 100%);
     color: #fff;
 }
 
@@ -1486,7 +1495,7 @@ a {
 }
 
 .btn--primary {
-    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-light) 100%);
+    background: linear-gradient(135deg, var(--teal-fill) 0%, var(--teal-fill-light) 100%);
     color: white;
     box-shadow: var(--shadow-sm);
 }
@@ -1545,7 +1554,7 @@ a {
 
 /* Botón de reserva unificado en todo el sitio */
 .btn--reserva {
-    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-light) 100%);
+    background: linear-gradient(135deg, var(--teal-fill) 0%, var(--teal-fill-light) 100%);
     color: #fff;
     box-shadow: var(--shadow-sm);
     text-decoration: none;
@@ -1558,7 +1567,7 @@ a {
 }
 
 .nav-link--reserva {
-    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-light) 100%) !important;
+    background: linear-gradient(135deg, var(--teal-fill) 0%, var(--teal-fill-light) 100%) !important;
     color: #fff !important;
     font-weight: 600;
     box-shadow: var(--shadow-sm);
@@ -1643,7 +1652,7 @@ a {
    derecha para que el fondo negro de la foto se funda con la seccion en vez de
    recortarse contra ella. */
 .hero-section {
-    background: linear-gradient(105deg, var(--teal-dark) 0%, var(--teal) 38%, #123240 72%, #0e1f2a 100%);
+    background: linear-gradient(105deg, var(--teal-dark) 0%, var(--teal-fill) 38%, #123240 72%, #0e1f2a 100%);
     color: white;
     position: relative;
     overflow: hidden;
@@ -1785,7 +1794,7 @@ a {
 }
 
 .hero-card .btn--primary {
-    background: var(--teal);
+    background: var(--teal-fill);
     color: #fff;
     box-shadow: 0 4px 14px rgba(15, 23, 42, 0.18);
 }
@@ -2018,7 +2027,7 @@ a {
 .btn-enviar {
     width: 100%;
     padding: var(--space-3);
-    background: linear-gradient(135deg, var(--teal), var(--teal-light));
+    background: linear-gradient(135deg, var(--teal-fill), var(--teal-fill-light));
     color: white;
     border: none;
     border-radius: var(--radius-full);
@@ -2163,7 +2172,7 @@ a {
 }
 
 .cal-day.selected {
-    background: var(--teal);
+    background: var(--teal-fill);
     color: white;
     transform: scale(1.05);
 }
@@ -2218,9 +2227,9 @@ a {
 }
 
 .slot.selected {
-    background: var(--teal);
+    background: var(--teal-fill);
     color: white;
-    border-color: var(--teal);
+    border-color: var(--teal-fill);
     animation: pulseMedical 0.6s ease;
 }
 
@@ -2297,7 +2306,7 @@ a {
     margin-top: var(--space-3);
     padding: 0.85rem;
     border-radius: var(--radius-full);
-    background: linear-gradient(135deg, var(--teal), var(--teal-light));
+    background: linear-gradient(135deg, var(--teal-fill), var(--teal-fill-light));
     color: white;
     font-weight: 600;
     border: none;
@@ -2312,7 +2321,7 @@ a {
 
 /* ========== 13. POLÍTICA DE PRIVACIDAD ========== */
 .privacy-hero {
-    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-light) 100%);
+    background: linear-gradient(135deg, var(--teal-fill) 0%, var(--teal-fill-light) 100%);
     color: white;
     padding: 3rem var(--space-3) 4rem;
     text-align: center;
@@ -2683,7 +2692,7 @@ a {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--teal), var(--teal-light));
+    background: linear-gradient(135deg, var(--teal-fill), var(--teal-fill-light));
     transform: translateY(-50%);
 }
 
