@@ -140,9 +140,13 @@ body {
     transition: background-color 0.3s, color 0.3s;
 }
 
-/* El main empuja el footer hacia abajo */
+/* El main empuja el footer hacia abajo. El width: 100% no es decorativo: body es
+   un flex en columna, y sin un ancho definido Chrome estira el ítem hasta su
+   min-content, así que una tabla ancha (panel de pruebas) desbordaba la página
+   entera y anulaba el overflow-x de su propio contenedor. */
 main {
     flex: 1;
+    width: 100%;
 }
 
 /* Imágenes responsivas por defecto */
@@ -376,7 +380,7 @@ a {
 }
 .grid--cta {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
     gap: var(--space-4);
     margin-top: var(--space-4);
 }
@@ -429,7 +433,7 @@ a {
 }
 .proceso-pasos {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
     gap: var(--space-3);
     margin-top: var(--space-4);
 }
@@ -737,16 +741,16 @@ a {
 }
 
 .grid--2 {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
 }
 
 .grid--3 {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
 }
 
 /* Rejilla de servicios (index): mosaico responsivo de tarjetas iguales */
 .grid--services {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
 }
 
 /* Tarjeta de servicio: misma altura y botón anclado abajo para una
@@ -1082,7 +1086,7 @@ a {
     margin: 0 auto;
     padding: var(--space-3);
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
     gap: var(--space-3);
 }
 
@@ -1705,7 +1709,7 @@ a {
 .hero-features {
     margin: var(--space-3) 0 var(--space-4);
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
     gap: var(--space-2) var(--space-3);
     animation: fadeInUp 0.7s ease-out 0.2s both;
 }
@@ -1831,7 +1835,7 @@ a {
 /* ========== 10. TESTIMONIOS – glassmorphismo elegante ========== */
 .testimonios-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
     gap: var(--space-4);
 }
 
@@ -1909,7 +1913,10 @@ a {
 /* ========== 11. CONTACTO Y FORMULARIOS ========== */
 .contacto-container {
     display: grid;
-    grid-template-columns: 1fr;
+    /* minmax(0, 1fr) y no 1fr: el mínimo automático de la pista es el min-content
+       de .info-contacto, que con las filas de icono + texto no baja de 310px y
+       desbordaba a 320. */
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-5);
 }
 
@@ -2362,7 +2369,7 @@ a {
     max-width: var(--maxw);
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
     gap: var(--space-5);
     margin-bottom: var(--space-4);
 }
