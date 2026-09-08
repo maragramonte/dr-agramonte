@@ -903,12 +903,16 @@ a {
 }
 
 /* Zona derecha: CTA + utilidades (idioma, tema y el botón del menú), separadas
-   entre sí por un divisor fino. */
+   entre sí por un divisor fino. El margen automático va aquí y no solo en el
+   bloque de móvil: por encima de 1250 lo absorbe .main-nav, que crece y ya
+   empuja la zona a la derecha, pero entre 993 y 1249 la nav está oculta y sin
+   este margen la fila se quedaba apelmazada a la izquierda. */
 .header-actions {
     display: flex;
     align-items: center;
     gap: 0.6rem;
     flex-shrink: 0;
+    margin-left: auto;
 }
 
 .header-utils {
@@ -1348,7 +1352,6 @@ a {
     }
 
     .header-actions {
-        margin-left: auto;
         gap: 0.4rem;
     }
 
