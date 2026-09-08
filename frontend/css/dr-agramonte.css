@@ -104,7 +104,19 @@
     --text: #F1F5F9;
     --text-light: #CBD5E1;
     --muted: #94A3B8;
+    /* La escala de grises se invierte entera. Los componentes la usan para las dos
+       cosas —superficies (--gray-50/100/200) y texto (--gray-500/700/900)—, así que
+       dejarla con los valores claros mientras --card y --text sí cambiaban partía el
+       tema por la mitad: el formulario de reserva escribía en #1F2937 sobre #1E293B y
+       la cabecera de la tabla del panel salía blanca sobre blanca. */
+    --gray-50: #1E293B;
+    --gray-100: #273449;
+    --gray-200: #334155;
+    --gray-300: #475569;
     --gray-400: #9CA3AF; /* en oscuro vuelve al tono claro: 7:1 sobre fondo oscuro */
+    --gray-500: #94A3B8;
+    --gray-700: #CBD5E1;
+    --gray-900: #F1F5F9;
     --teal: #14B8A6;
     --teal-dark: #0F766E;
     --heading: var(--teal-light); /* títulos legibles sobre superficies oscuras (~6.5:1) */
