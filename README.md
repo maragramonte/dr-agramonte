@@ -3,7 +3,9 @@
 Plataforma de gestión de citas médicas para la consulta de un internista real en Palma de Mallorca.
 Los pacientes reservan, consultan y cancelan sus citas por su cuenta, sin depender del teléfono.
 
-**En producción:** [www.dragramonte.com](https://www.dragramonte.com)
+**Dominio propio:** `dragramonte.com`, ahora mismo entre alojamientos — el anterior se
+retiró y el despliegue en servidor propio está listo y probado, a la espera de levantar la
+máquina (ver [docs/DESPLIEGUE-VPS.md](docs/DESPLIEGUE-VPS.md)).
 
 `Java 21` · `Spring Boot 3.5` · `PostgreSQL 15` · `JavaScript` · `Docker` · `Caddy`
 
@@ -62,6 +64,11 @@ fuera de la red interna: solo se llega a él desde el contenedor de la aplicaci�
                               ↓
                    [Twilio]   [Telegram]
 ```
+
+Caddy añade además las cabeceras de seguridad: HSTS, `nosniff`, `X-Frame-Options`,
+`Referrer-Policy` y una **Content-Security-Policy sin `'unsafe-inline'` en los scripts**, que
+se puede aplicar porque nada del sitio carga de un CDN — tipografías, iconos y Chart.js están
+autoalojados. Un tercero colado por descuido deja de cargar en vez de pasar inadvertido.
 
 ---
 
@@ -141,12 +148,12 @@ docker compose --profile mysql up -d --build
 cd backend && mvn test
 ```
 
-**48 pruebas en tres niveles**: unitarias de servicio, de seguridad y roles sobre la capa
+**47 pruebas en tres niveles**: unitarias de servicio, de seguridad y roles sobre la capa
 REST (`@WebMvcTest` con la `SecurityConfig` real) y de integración end-to-end contra un
 PostgreSQL levantado con Testcontainers. Cubren las ramas críticas: 409 por doble reserva,
 403 por rol, validez del JWT, cancelación y el secreto del webhook.
 
-Las 6 de integración necesitan Docker en marcha; si no lo hay se marcan como saltadas en
+Las 5 de integración necesitan Docker en marcha; si no lo hay se marcan como saltadas en
 lugar de fallar. La cobertura todavía no está medida con JaCoCo.
 
 En cada push y cada pull request a `main` las ejecuta GitHub Actions
@@ -266,8 +273,18 @@ Con los canales desactivados la aplicación funciona igual; simplemente no enví
 | `js/pages/estadisticas.js` | Gráficos del cuadro de mando (Chart.js vendorizado) |
 | `js/pages/panel-pruebas.js` | Tabla de reservas y refresco entre pestañas |
 | `js/pages/dr-agramonte.js` | Navegación, tema, accesibilidad y registro de la PWA |
+| `js/pages/contacto.js` | Formulario de contacto: validación en tiempo real |
+| `js/pages/servicios.js` | Catálogo de servicios y enlace a la reserva de cada uno |
+| `js/pages/index-preload.js` | Precarga de la imagen del hero (LCP) |
+| `js/pages/privacidad.js` | Índice navegable de la política de privacidad |
 | `js/pages/offline-menu.js` | El panel «Menú» en la página sin conexión, cuando el anterior no está en caché |
+| `js/pages/offline-reconexion.js` | Reintento y vuelta al inicio al recuperar la conexión |
 | `service-worker.js` | Caché y modo sin conexión |
+
+Los cuatro últimos —`index-preload`, `privacidad`, `offline-menu` y `offline-reconexion`—
+existen por un motivo concreto: **son JavaScript que antes estaba dentro del HTML** y se sacó
+a ficheros propios para poder servir una Content-Security-Policy sin `'unsafe-inline'` en los
+scripts.
 
 </details>
 
