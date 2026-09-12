@@ -130,6 +130,23 @@ rsync --archive --chown=mar:mar ~/.ssh /home/mar    # copia tu clave SSH
 
 Sal y vuelve a entrar como el usuario nuevo: `ssh mar@LA_IP_DEL_SERVIDOR`.
 
+**Comprueba que entras con la clave antes de seguir.** El paso siguiente cierra la
+puerta de las contraseñas, y si la clave no funciona te quedas fuera del servidor.
+
+Con la clave ya probada, desactiva el acceso por contraseña: un servidor con datos
+de salud y una IP pública recibe intentos de fuerza bruta desde el primer día.
+
+```bash
+sudo sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
+sudo sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
+sudo systemctl restart ssh
+```
+
+En Ubuntu 24.04 puede haber ficheros en `/etc/ssh/sshd_config.d/` que manden sobre
+lo anterior; compruébalo con `sudo sshd -T | grep -E 'passwordauthentication|permitrootlogin'`,
+que enseña la configuración efectiva. **Deja la sesión actual abierta** mientras
+verificas desde otra terminal que sigues entrando.
+
 ### 2.2 Cortafuegos
 
 Solo tres puertos abiertos: SSH y los dos de web.
@@ -143,6 +160,13 @@ sudo ufw --force enable
 sudo ufw status
 ```
 
+> **Ojo con `ufw` y Docker:** Docker escribe sus propias reglas de `iptables` y los
+> puertos que publica un contenedor quedan accesibles aunque `ufw` diga lo
+> contrario. Aquí no es un problema **porque solo Caddy publica puertos** (80 y
+> 443): la aplicación usa `expose` y Postgres no publica nada, así que ninguno de
+> los dos asoma a Internet. Si algún día añades un `ports:` a otro servicio,
+> recuerda que `ufw` no te va a proteger de él.
+
 ### 2.3 Instalar Docker
 
 ```bash
@@ -152,6 +176,23 @@ sudo usermod -aG docker $USER
 
 Cierra la sesión SSH y vuelve a entrar para que el grupo `docker` tenga efecto.
 Comprueba con `docker run --rm hello-world`.
+
+**Limita el tamaño de los logs.** Por omisión Docker guarda la salida de cada
+contenedor en un fichero JSON que crece sin tope: en un disco de 40 GB, meses de
+logs de Spring acaban llenándolo y tumbando la web por algo tan tonto como eso.
+
+```bash
+sudo tee /etc/docker/daemon.json > /dev/null <<'JSON'
+{
+  "log-driver": "json-file",
+  "log-opts": { "max-size": "10m", "max-file": "3" }
+}
+JSON
+sudo systemctl restart docker
+```
+
+Son 30 MB de log como mucho por contenedor. El límite se aplica a los contenedores
+que se creen a partir de ahora, así que hazlo **antes** del primer arranque.
 
 ### 2.4 Actualizaciones de seguridad automáticas
 
@@ -293,9 +334,13 @@ Esperado: `200` con certificado válido, `{"status":"UP"}`, y `301` hacia
 En el navegador: candado cerrado, la web carga, y una reserva de prueba en
 `/reservar.html` se guarda sin errores 403 (eso confirma que el CORS está bien).
 
-Entra también al panel del médico y **cambia la contraseña de inmediato**:
-`dr.agramonte@example.com` / `Medico123!` son las credenciales que crea la
-migración V3 y están publicadas en el README.
+Entra al panel del médico con el `MEDICO_EMAIL` y el `MEDICO_PASSWORD` que
+pusiste en `.env.prod`. **No uses las credenciales de demostración**
+(`dr.agramonte@example.com` / `Medico123!`, publicadas en el README y en la
+migración V3): al arrancar, `MedicoCuentaInicializador` reescribe esa cuenta con
+las tuyas, de modo que en producción ya no sirven. Si por lo que sea entrases con
+ellas, es que `MEDICO_PASSWORD` no llegó al contenedor — revísalo antes de abrir
+la web a nadie.
 
 ---
 

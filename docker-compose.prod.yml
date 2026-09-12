@@ -96,8 +96,11 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-agramonte}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?falta POSTGRES_PASSWORD en .env.prod}
     volumes:
+      # Solo el volumen de datos. NO se monta ./backups: scripts/backup-db.sh
+      # canaliza la salida de pg_dump en el anfitrion, no escribe dentro del
+      # contenedor, y el montaje hacia una carpeta que aun no existe hacia que
+      # Docker la creara como root, dejando las copias sin permiso de escritura.
       - postgres_data:/var/lib/postgresql/data
-      - ./backups:/backups # destino de los volcados de scripts/backup-db.sh
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-agramonte} -d ${POSTGRES_DB:-dr_agramonte}"]
       interval: 5s
