@@ -328,8 +328,18 @@ curl -I http://dragramonte.com/
 curl -I http://www.dragramonte.com/
 ```
 
-Esperado: `200` con certificado válido, `{"status":"UP"}`, y `301` hacia
-`https://www.dragramonte.com/` en los dos últimos.
+Esperado, y conviene saberlo antes para no pensar que algo falla: los dos
+primeros dan `200` con certificado válido y `{"status":"UP"}`. Los redirectos son
+**dos saltos distintos y con códigos distintos**:
+
+| Petición | Código | Destino |
+|---|---|---|
+| `http://www.dragramonte.com/` | `308` | `https://www.dragramonte.com/` |
+| `http://dragramonte.com/` | `308` | `https://dragramonte.com/` |
+| `https://dragramonte.com/` | `301` | `https://www.dragramonte.com/` |
+
+El `308` es el salto a HTTPS, que Caddy añade solo; el `301` es el del apex al www,
+el que pone el `Caddyfile`. Quien teclee el dominio pelado pasa por los dos.
 
 En el navegador: candado cerrado, la web carga, y una reserva de prueba en
 `/reservar.html` se guarda sin errores 403 (eso confirma que el CORS está bien).
