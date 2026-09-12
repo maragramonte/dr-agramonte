@@ -6,3 +6,8 @@ function showNotification(message,type='info'){ const notification=document.crea
 window.addEventListener('online',()=>{ showNotification('¡Conexión restablecida! Redirigiendo al inicio...','success'); setTimeout(()=>{ window.location.href='index.html'; },2000); });
 window.addEventListener('offline',()=>{ showNotification('Se ha perdido la conexión a Internet','info'); });
 if('serviceWorker' in navigator && navigator.serviceWorker.controller) console.log('Service Worker activo - modo offline disponible');
+
+// Reintento manual. El manejador vive aqui y no en un onclick= del HTML porque
+// la Content-Security-Policy de produccion (ver Caddyfile) no permite
+// script-src-attr: un onclick inline se queda sin ejecutar y el boton no hace nada.
+document.getElementById('btn-reintentar')?.addEventListener('click', () => { window.location.reload(); });
