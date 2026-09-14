@@ -24,15 +24,6 @@ proyecto, los diagramas y las guías de detalle.
 | `tikz-*.tex` | Diagramas vectoriales: arquitectura, modelo E-R, flujo de reserva, capas del frontend y paleta |
 | [diagrama-er.svg](diagrama-er.svg) · [diagrama-er.png](diagrama-er.png) | Modelo entidad-relación exportado, para presentaciones |
 
-## Defensa del proyecto
-
-| Documento | Contenido |
-|-----------|-----------|
-| [PRESENTACION-DEFENSA.md](PRESENTACION-DEFENSA.md) | Ficha esencial: pitch de 60 s, números clave e ideas fuerza |
-| [DEFENSA-ENSAYO.md](DEFENSA-ENSAYO.md) | Guion hablado cronometrado (15 min) y banco de preguntas |
-| [Defensa-TFG-PowerPoint-Guion.md](Defensa-TFG-PowerPoint-Guion.md) | Contenido diapositiva a diapositiva |
-| [GUIA-DEMO.md](GUIA-DEMO.md) | Flujo de la demo en vivo y qué hacer si algo se cae |
-
 ---
 
 ## Compilar la memoria
