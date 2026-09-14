@@ -11,7 +11,7 @@ máquina (ver [docs/DESPLIEGUE-VPS.md](docs/DESPLIEGUE-VPS.md)).
 
 [![CI](https://github.com/maragramonte/dr-agramonte/actions/workflows/ci.yml/badge.svg)](https://github.com/maragramonte/dr-agramonte/actions/workflows/ci.yml)
 
-![Portada de la web: reserva de cita con el Dr. Agramonte, especialista en Medicina Interna en Palma de Mallorca](frontend/pictures/Imagenwebapp.png)
+![Portada de la web: fotografía del Dr. Agramonte a sangre junto al titular «Atención Médica Integral en Medicina Interna», con sus años de experiencia, la ubicación en Palma de Mallorca y el acceso directo a solicitar cita](frontend/pictures/Imagenwebapp.png)
 
 ---
 
@@ -34,7 +34,7 @@ Este proyecto digitaliza esa parte concreta, sin tocar lo que sí requiere trato
 - **Bilingüe** castellano/catalán, con la preferencia guardada en el navegador.
 - **PWA instalable**, accesible (WCAG 2.1 AA), con modo oscuro y modo sin conexión.
 
-![Pantalla de reserva: centro de consulta, calendario de agosto con el día seleccionado y los huecos libres de mañana y tarde](frontend/pictures/reserva-calendario.png)
+![Pantalla de reserva: los dos centros de consulta, el calendario del mes con el día elegido, los huecos libres de mañana y tarde, y a la derecha el formulario con modalidad, cobertura y forma de pago](frontend/pictures/reserva-calendario.png)
 
 *La reserva, paso a paso: centro, fecha y hora. Los huecos salen de la agenda real del médico,
 calculados en el servidor para el centro y el día elegidos.*
