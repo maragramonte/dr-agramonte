@@ -127,7 +127,11 @@ docker compose up -d --build
 Usuario médico de prueba (lo crea la migración V3): `dr.agramonte@example.com` / `Medico123!`
 
 Para **producción** (servidor propio con dominio y HTTPS) hay un compose aparte,
-`docker-compose.prod.yml`: ver [docs/DESPLIEGUE-VPS.md](docs/DESPLIEGUE-VPS.md).
+`docker-compose.prod.yml`, con su propia plantilla de variables
+([`.env.prod.example`](.env.prod.example)). Las actualizaciones posteriores van por
+`scripts/deploy.sh`: hace copia de seguridad antes de tocar nada —por si una migración de
+Flyway sale mal—, reconstruye la imagen, levanta los servicios y consulta el `health` al
+final. Guía completa en [docs/DESPLIEGUE-VPS.md](docs/DESPLIEGUE-VPS.md).
 
 <details>
 <summary>Backend sin Docker · perfil MySQL</summary>
@@ -204,16 +208,24 @@ Colección de Postman lista para importar en [`postman/`](postman/README.md).
 ## Configuración
 
 Todo lo sensible vive en `.env` (plantilla en [`.env.example`](.env.example)), nunca en el
-repositorio.
+repositorio. El servidor usa un fichero propio, `.env.prod`
+([`.env.prod.example`](.env.prod.example)), que además fija el dominio y el correo del
+certificado.
 
 | Variable | Para qué |
 |----------|----------|
 | `JWT_SECRET` | Firma de los tokens (mínimo 32 caracteres) |
+| `MEDICO_EMAIL`, `MEDICO_PASSWORD` | Cuenta real del médico; **obligatorias en producción** |
 | `TWILIO_*` | Credenciales, canal (`whatsapp`/`sms`) y horas del recordatorio |
 | `TELEGRAM_*` | Token del bot, usuario del bot y secreto del webhook |
 | `MAIL_*`, `CONTACT_INBOX` | Correo del formulario de contacto |
 
 Con los canales desactivados la aplicación funciona igual; simplemente no envía mensajes.
+
+La cuenta de médico es el caso aparte: la migración V3 siembra una de demostración cuya
+contraseña está escrita en el propio repositorio, así que es pública. Al arrancar, la
+aplicación la reescribe con `MEDICO_EMAIL` y `MEDICO_PASSWORD`; si faltan, el compose de
+producción **no levanta**. En local se dejan sin definir y vale la de demostración.
 
 <details>
 <summary>Activar el bot de Telegram</summary>
@@ -244,8 +256,11 @@ Con los canales desactivados la aplicación funciona igual; simplemente no enví
 │   └── src/main/resources/db/migration/   Flyway V1–V10 (postgresql/ y mysql/)
 ├── frontend/         Sitio estático, PWA y nginx.conf
 ├── postman/          Colección de la API
+├── scripts/          deploy.sh y backup-db.sh — despliegue y copias en el VPS
 ├── docs/             Memoria del proyecto, diagramas y guías
-└── docker-compose.yml
+├── Caddyfile         HTTPS, apex → www y cabeceras de seguridad
+├── docker-compose.yml        Local:  nginx · Spring Boot · PostgreSQL
+└── docker-compose.prod.yml   VPS:    Caddy · Spring Boot (API y web) · PostgreSQL
 ```
 
 <details>
