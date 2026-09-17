@@ -26,7 +26,13 @@ jobs:
     # La primera ejecución descarga el histórico entero de la NVD y es la lenta;
     # las siguientes solo traen el incremento. El tope evita que un cuelgue del
     # servicio se coma los minutos de Actions.
-    timeout-minutes: 60
+    #
+    # Eran 60 minutos y no bastaban: el run del 14/09/2026 murió cancelado justo
+    # ahí, a mitad de la primera descarga. Y un job cancelado no guarda la caché,
+    # así que la semana siguiente volvía a empezar de cero y a morir en el mismo
+    # sitio. Se sube el tope y, sobre todo, la caché se guarda pase lo que pase
+    # (ver el paso «Guardar la base de datos de la NVD»).
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
 
@@ -69,9 +75,16 @@ jobs:
       # La base de datos de la NVD (H2, cientos de MB) se reaprovecha entre semanas:
       # la clave lleva el run_id para que nunca acierte de pleno y siempre se guarde
       # una copia actualizada, mientras restore-keys recupera la más reciente.
+      #
+      # Va partido en restore + save a propósito. Con `actions/cache` entero, el
+      # guardado ocurre en un post-step que NO se ejecuta si el job se cancela por
+      # timeout, que es justo lo que pasaba: la descarga a medias se tiraba a la
+      # basura cada lunes. Separado, el guardado es un paso normal con `always()`
+      # y conserva lo descargado aunque el análisis se quede a medias, de modo que
+      # el run siguiente arranca desde ahí en vez de desde cero.
       - name: Reutilizar la base de datos de la NVD
         if: steps.clave.outputs.hay_clave == 'true'
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: ~/.dependency-check-data
           key: nvd-${{ github.run_id }}
@@ -95,6 +108,17 @@ jobs:
             -DdataDirectory="$HOME/.dependency-check-data" \
             -DossindexAnalyzerEnabled=false \
             -Dformats=HTML,JSON
+
+      # Se guarda incluso si el análisis ha fallado o se ha quedado sin tiempo: lo
+      # que se conserva es el trabajo de descarga, no el resultado. Mientras la
+      # base no esté completa, cada lunes avanza un trozo y el run siguiente
+      # continúa; cuando ya lo esté, esto pasa a costar segundos.
+      - name: Guardar la base de datos de la NVD
+        if: always() && steps.clave.outputs.hay_clave == 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.dependency-check-data
+          key: nvd-${{ github.run_id }}
 
       # Se sube siempre: el caso que más interesa leer es justo aquel en el que el
       # paso anterior ha fallado por encontrar un CVE con CVSS >= 7.
