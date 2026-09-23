@@ -1,0 +1,44 @@
+# Publica la demo (frontend real + API simulada en el navegador) en GitHub Pages.
+# Requisito único: Settings → Pages → Source: "GitHub Actions".
+name: Demo en GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - 'demo/**'
+      - 'scripts/build-demo.sh'
+      - '.github/workflows/demo.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  # Sin cancelar: un despliegue a medias deja la demo en un estado raro.
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generar dist-demo/
+        run: ./scripts/build-demo.sh
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist-demo
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

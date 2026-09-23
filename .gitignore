@@ -43,3 +43,6 @@ desktop.ini
 
 # Copia local de docs retirados del repo (datos personales / notas internas)
 /_private/
+
+# Build de la demo (scripts/build-demo.sh)
+dist-demo/

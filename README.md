@@ -7,6 +7,11 @@ Los pacientes reservan, consultan y cancelan sus citas por su cuenta, sin depend
 retiró y el despliegue en servidor propio está listo y probado, a la espera de levantar la
 máquina (ver [docs/DESPLIEGUE-VPS.md](docs/DESPLIEGUE-VPS.md)).
 
+**▶ [Probar la demo](https://maragramonte.github.io/dr-agramonte/)** — el frontend real con
+una API simulada en el navegador y datos ficticios. Se puede reservar, cancelar, vincular
+Telegram y entrar como médico para ver el cuadro de mando. No hay servidor detrás ni se envía ningún aviso
+([cómo funciona](#demo-en-línea)).
+
 `Java 21` · `Spring Boot 3.5` · `PostgreSQL 15` · `JavaScript` · `Docker` · `Caddy`
 
 [![CI](https://github.com/maragramonte/dr-agramonte/actions/workflows/ci.yml/badge.svg)](https://github.com/maragramonte/dr-agramonte/actions/workflows/ci.yml)
@@ -146,6 +151,35 @@ docker compose --profile mysql up -d --build
 
 </details>
 
+### Demo en línea
+
+La [demo pública](https://maragramonte.github.io/dr-agramonte/) no es una maqueta aparte:
+son las mismas páginas y el mismo `api-client.js` de `frontend/`. Lo único que cambia es
+[`demo/demo-api.js`](demo/demo-api.js), que intercepta `fetch('/api/...')` y responde con los
+mismos contratos JSON que los DTOs del backend. Reproduce sus reglas: la agenda por centro
+de V6, el 409 por hueco ocupado y el 401/403 por rol. Los datos ficticios viven en el
+`localStorage` del visitante y se regeneran cada día.
+
+Telegram también funciona, contra un chat simulado en la propia página en vez del bot real.
+La vinculación usa un token de un solo uso con 15 minutos de validez. Al pulsar «Iniciar»
+pasa lo mismo que con `/start <token>` en el webhook. A partir de ahí llegan la
+confirmación, la cancelación y el recordatorio, con los textos exactos de
+`CitaNotificationService`.
+
+```bash
+./scripts/build-demo.sh                      # genera dist-demo/
+python3 -m http.server -d dist-demo 8000     # http://localhost:8000
+```
+
+El script copia `frontend/` e inyecta la API simulada. También quita el service worker, que
+precachea rutas absolutas y en Pages el sitio vive bajo `/dr-agramonte/`. Además marca
+todas las páginas `noindex` para no competir con el dominio real. `frontend/` no se toca,
+así que la imagen de producción nunca lleva el modo demo. Cada push a `main` que afecte al
+frontend la publica con [`.github/workflows/demo.yml`](.github/workflows/demo.yml).
+
+Lo que la demo no puede enseñar es la concurrencia real. El bloqueo pesimista solo existe
+contra PostgreSQL, y para eso están las pruebas de integración.
+
 ## Pruebas
 
 ```bash
@@ -255,8 +289,9 @@ producción **no levanta**. En local se dejan sin definir y vale la de demostrac
 ├── backend/          API Spring Boot (controller · service · repository · DTOs)
 │   └── src/main/resources/db/migration/   Flyway V1–V10 (postgresql/ y mysql/)
 ├── frontend/         Sitio estático, PWA y nginx.conf
+├── demo/             API simulada para la demo en GitHub Pages
 ├── postman/          Colección de la API
-├── scripts/          deploy.sh y backup-db.sh — despliegue y copias en el VPS
+├── scripts/          deploy.sh, backup-db.sh y build-demo.sh
 ├── docs/             Memoria del proyecto, diagramas y guías
 ├── Caddyfile         HTTPS, apex → www y cabeceras de seguridad
 ├── docker-compose.yml        Local:  nginx · Spring Boot · PostgreSQL
