@@ -158,13 +158,24 @@ son las mismas páginas y el mismo `api-client.js` de `frontend/`. Lo único que
 [`demo/demo-api.js`](demo/demo-api.js), que intercepta `fetch('/api/...')` y responde con los
 mismos contratos JSON que los DTOs del backend. Reproduce sus reglas: la agenda por centro
 de V6, el 409 por hueco ocupado y el 401/403 por rol. Los datos ficticios viven en el
-`localStorage` del visitante y se regeneran cada día.
+`localStorage` del visitante y se regeneran cada día. La franja amarilla de abajo, con los
+accesos directos «Entrar como médico» y «Entrar como paciente», es lo único que la demo
+añade a la interfaz real.
+
+![Reserva en la demo: los dos centros con sus días de consulta (Lun / Mar / Jue y Mie / Vie / Sab), el calendario de septiembre con los únicos días hábiles seleccionables, los dieciséis huecos libres de mañana y tarde, y a la derecha el formulario con modalidad, cobertura y forma de pago](docs/demo-reserva.png)
 
 Telegram también funciona, contra un chat simulado en la propia página en vez del bot real.
 La vinculación usa un token de un solo uso con 15 minutos de validez. Al pulsar «Iniciar»
 pasa lo mismo que con `/start <token>` en el webhook. A partir de ahí llegan la
 confirmación, la cancelación y el recordatorio, con los textos exactos de
 `CitaNotificationService`.
+
+![Chat de Telegram simulado sobre la página de reserva: el mensaje /start con el token de un solo uso, la respuesta del bot confirmando la vinculación y el aviso de cita confirmada con fecha, médico, motivo y dirección, más un botón para simular el recordatorio de 24 horas](docs/demo-telegram.png)
+
+Entrando como médico se llega al cuadro de mando, que en la demo agrega las citas ficticias
+igual que el backend agrega las reales con `GROUP BY`:
+
+![Cuadro de mando de la demo: los cuatro indicadores (230 citas totales, 53 activas, 152 completadas y 10,9 % de tasa de cancelación) sobre tres gráficos de barras horizontales con la carga por médico, la demanda por especialidad y el reparto de citas entre los dos centros](docs/demo-cuadro-mando.png)
 
 ```bash
 ./scripts/build-demo.sh                      # genera dist-demo/
