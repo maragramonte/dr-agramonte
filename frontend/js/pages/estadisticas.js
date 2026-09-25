@@ -60,6 +60,23 @@ function pintarKpis(data) {
     $('kpiTasa').textContent = `${data.tasaCancelacion}%`;
 }
 
+/**
+ * Chart.js no parte las etiquetas del eje: si no caben en el ancho reservado las
+ * recorta por la izquierda, y «Dr. Juan Manuel Agramonte» salía como «r. Juan
+ * Manuel Agramonte». Devolver un array pinta una línea por elemento.
+ */
+function partirEtiqueta(texto, max = 16) {
+    const lineas = [];
+    let actual = '';
+    String(texto).split(' ').forEach((palabra) => {
+        if (!actual) actual = palabra;
+        else if (`${actual} ${palabra}`.length <= max) actual += ` ${palabra}`;
+        else { lineas.push(actual); actual = palabra; }
+    });
+    if (actual) lineas.push(actual);
+    return lineas.length > 1 ? lineas : lineas[0];
+}
+
 function barH(canvasId, items, label) {
     const ctx = $(canvasId);
     if (!ctx) return;
@@ -80,7 +97,15 @@ function barH(canvasId, items, label) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
-            scales: { x: { beginAtZero: true, ticks: { precision: 0 } } }
+            scales: {
+                x: { beginAtZero: true, ticks: { precision: 0 } },
+                y: {
+                    ticks: {
+                        // Función normal, no flecha: Chart.js expone la escala en «this».
+                        callback(value) { return partirEtiqueta(this.getLabelForValue(value)); }
+                    }
+                }
+            }
         }
     });
     charts.push(chart);
