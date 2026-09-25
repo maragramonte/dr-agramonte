@@ -26,11 +26,23 @@ printf 'User-agent: *\nDisallow: /\n' > "$OUT/robots.txt"
 sed -i -e 's#"start_url": *"/"#"start_url": "./"#' -e 's#"/icons/#"icons/#g' "$OUT/manifest.json"
 
 # El panel del médico habla de "reservas reales en el servidor": en la demo no lo son.
+# La última sustitución es la del <meta description>, que no se ve en pantalla pero
+# acompaña a la página si alguien comparte el enlace.
 sed -i \
     -e 's#<strong>todas las reservas reales</strong> guardadas en el servidor#<strong>todas las reservas de la demo</strong> (ficticias, guardadas en tu navegador)#' \
     -e 's#Cada fila es una cita creada en base de datos (pruebas de integración, demos del tribunal, reservas de pacientes registrados)\.#Cada fila es una cita ficticia de la demo, más las que reserves tú desde reservar.html.#' \
+    -e 's#reservas reales y vista del acceso médico#reservas ficticias de demo y vista del acceso médico#' \
     "$OUT/panel-pruebas.html"
-grep -q 'reservas de la demo' "$OUT/panel-pruebas.html" || { echo "✗ no se pudo adaptar el texto de panel-pruebas.html" >&2; exit 1; }
+for marca in 'reservas de la demo' 'cita ficticia de la demo' 'reservas ficticias de demo'; do
+    grep -q "$marca" "$OUT/panel-pruebas.html" ||
+        { echo "✗ no se pudo adaptar el texto de panel-pruebas.html: falta «$marca»" >&2; exit 1; }
+done
+# Con «set -e», esta comprobación tiene que ir en un if: un grep sin coincidencias
+# devuelve 1, y en una lista «&&» eso abortaría el script justo cuando todo va bien.
+if grep -q 'reservas reales' "$OUT/panel-pruebas.html"; then
+    echo "✗ queda texto de «reservas reales» en panel-pruebas.html" >&2
+    exit 1
+fi
 
 # Inyectar la API simulada justo después de i18n.js (en <head>, antes que
 # cualquier script que llame a fetch) y un noindex en cada página.
