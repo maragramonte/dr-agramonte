@@ -19,7 +19,10 @@ public class TwilioProperties {
     /** whatsapp | sms */
     private String channel = "whatsapp";
 
-    /** Enviar confirmación/cancelación/recordatorio al paciente si tiene teléfono. */
+    /**
+     * Enviar confirmación/cancelación/recordatorio al paciente por SMS/WhatsApp si tiene teléfono.
+     * Solo afecta a este canal: los avisos por Telegram se siguen enviando aunque esté a false.
+     */
     private boolean notifyPatients = true;
 
     /** Horas antes de la cita para el recordatorio (por defecto 24). */
