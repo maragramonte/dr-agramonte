@@ -11,6 +11,12 @@ hora estás en marcha otra vez.
 
 **Coste orientativo:** 6-7 EUR/mes por el VPS, fijos, más el dominio que ya tienes.
 
+> **¿Solo quieres ver cómo funciona?** La [demo pública](https://maragramonte.github.io/dr-agramonte/)
+> enseña la aplicación entera sin montar nada: son las mismas páginas, con una API
+> simulada en el navegador y datos ficticios. No sustituye a esta guía —no hay servidor,
+> ni base de datos, ni avisos de verdad—, pero sirve para enseñar el proyecto sin gastar
+> un euro. Cómo está hecha, en el [README principal](../README.md#demo-en-línea).
+
 ---
 
 ## 0. Qué vas a montar
