@@ -54,8 +54,10 @@ const SERVICIOS_RESERVA = {
 
 const CENTROS = [
     // El 'id' es el código interno que se envía al backend (coincide con centros.codigo en BD); se mantiene aunque el nombre visible cambie.
-    { id: 'madrid', nombre: 'Consulta General Riera', direccion: 'Carrer del General Riera', ciudad: 'Palma de Mallorca', icono: 'fa-clinic-medical', diasSemana: [1, 2, 3, 4, 5], diasHint: 'Lun - Vie' },
-    { id: 'palma', nombre: 'Consulta Avenidas', direccion: 'Zona de las Avenidas', ciudad: 'Palma de Mallorca', icono: 'fa-clinic-medical', diasSemana: [1, 3, 5, 6], diasHint: 'Lun / Mie / Vie / Sab' }
+    // 'diasSemana' tiene que cuadrar con el reparto de horarios de V6__horarios_por_centro.sql: si no, el calendario
+    // deja elegir un día para el que el backend no tiene ningún hueco.
+    { id: 'madrid', nombre: 'Consulta General Riera', direccion: 'Carrer del General Riera', ciudad: 'Palma de Mallorca', icono: 'fa-clinic-medical', diasSemana: [1, 2, 4], diasHint: 'Lun / Mar / Jue' },
+    { id: 'palma', nombre: 'Consulta Avenidas', direccion: 'Zona de las Avenidas', ciudad: 'Palma de Mallorca', icono: 'fa-clinic-medical', diasSemana: [3, 5, 6], diasHint: 'Mie / Vie / Sab' }
 ];
 
 const state = {
@@ -310,11 +312,16 @@ function mapBackendCitaToFrontend(cita) {
         cancelada: 'cancelada',
         completada: 'completada'
     };
+    // El centro de la cita lo manda la API. Lo de 'state' es solo el centro que el usuario tiene
+    // seleccionado ahora mismo, y sirve de reserva para las citas antiguas que no tienen centro.
+    const centro = CENTROS.find(c => c.id === cita.centroCodigo);
     return {
         id: String(cita.id),
-        centroId: state.centroId || 'madrid',
-        centroNombre: state.centroNombre || 'Consulta General Riera',
-        centroDireccion: state.centroDireccion || 'Carrer del General Riera, Palma de Mallorca',
+        centroId: cita.centroCodigo || state.centroId || 'madrid',
+        centroNombre: cita.centroNombre || centro?.nombre || state.centroNombre || 'Consulta General Riera',
+        centroDireccion: centro
+            ? `${centro.direccion}, ${centro.ciudad}`
+            : (state.centroDireccion || 'Carrer del General Riera, Palma de Mallorca'),
         fecha: formatIsoDate(dt),
         hora: formatIsoTime(dt),
         paciente: { nombre: localStorage.getItem('nombre') || 'Paciente', telefono: '', email: localStorage.getItem('email') || '' },

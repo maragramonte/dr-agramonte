@@ -23,23 +23,16 @@ public class CitaNotificationService {
 
     public void notifyNuevaCita(Cita cita) {
         sendToMedico(buildNuevaCitaMedicoMessage(cita));
-        if (twilio.isNotifyPatients()) {
-            sendToPaciente(cita, buildConfirmacionPacienteMessage(cita));
-        }
+        sendToPaciente(cita, buildConfirmacionPacienteMessage(cita));
     }
 
     public void notifyCancelacion(Cita cita) {
         sendToMedico(buildCancelacionMedicoMessage(cita));
-        if (twilio.isNotifyPatients()) {
-            sendToPaciente(cita, buildCancelacionPacienteMessage(cita));
-        }
+        sendToPaciente(cita, buildCancelacionPacienteMessage(cita));
     }
 
     /** @return true si se envió al paciente */
     public boolean sendRecordatorio24h(Cita cita) {
-        if (!twilio.isNotifyPatients()) {
-            return false;
-        }
         return sendToPaciente(cita, buildRecordatorioPacienteMessage(cita));
     }
 
@@ -50,19 +43,29 @@ public class CitaNotificationService {
     /**
      * Avisa al paciente por todos los canales que tenga vinculados (Telegram y
      * SMS/WhatsApp). Un canal caído o sin configurar no impide el envío por el otro.
+     * <p>
+     * {@code twilio.notifyPatients} apaga solo el canal de Twilio: es la configuración de
+     * Twilio y no debe llevarse por delante los avisos de Telegram.
      *
      * @return true si al menos un canal aceptó el mensaje
      */
     private boolean sendToPaciente(Cita cita, String body) {
         boolean enviadoTelegram = sendTelegramToPaciente(cita, body);
+        boolean enviadoTwilio = sendTwilioToPaciente(cita, body);
+        return enviadoTwilio || enviadoTelegram;
+    }
 
+    private boolean sendTwilioToPaciente(Cita cita, String body) {
+        if (!twilio.isNotifyPatients()) {
+            log.debug("Avisos de Twilio al paciente desactivados (cita {})", cita.getId());
+            return false;
+        }
         String phone = resolveTelefonoPaciente(cita.getUsuario());
         if (phone == null) {
             log.info("Paciente sin teléfono (cita {}), no se envía SMS/WhatsApp", cita.getId());
-            return enviadoTelegram;
+            return false;
         }
-        boolean enviadoTwilio = twilioMessageService.send(phone, body);
-        return enviadoTwilio || enviadoTelegram;
+        return twilioMessageService.send(phone, body);
     }
 
     private boolean sendTelegramToPaciente(Cita cita, String body) {
