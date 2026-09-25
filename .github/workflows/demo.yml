@@ -1,9 +1,20 @@
 # Publica la demo (frontend real + API simulada en el navegador) en GitHub Pages.
 # Requisito único: Settings → Pages → Source: "GitHub Actions".
+#
+# En los pull request solo se construye: así un fallo de build-demo.sh se ve antes
+# de mergear, y no al desplegar. Publicar, solo desde main.
 name: Demo en GitHub Pages
 
 on:
+  # Las dos listas de paths van repetidas a propósito: Actions no admite anclas YAML.
   push:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - 'demo/**'
+      - 'scripts/build-demo.sh'
+      - '.github/workflows/demo.yml'
+  pull_request:
     branches: [main]
     paths:
       - 'frontend/**'
@@ -18,9 +29,10 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
-  # Sin cancelar: un despliegue a medias deja la demo en un estado raro.
-  cancel-in-progress: false
+  # Los despliegues comparten cola; las builds de PR van aparte para no bloquearla.
+  group: pages-${{ github.event_name == 'pull_request' && github.head_ref || 'deploy' }}
+  # Un despliegue a medias deja la demo en un estado raro; una build de PR no.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
@@ -35,6 +47,7 @@ jobs:
 
   deploy:
     needs: build
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
