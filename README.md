@@ -44,7 +44,7 @@ Este proyecto digitaliza esa parte concreta, sin tocar lo que sí requiere trato
 - **Bilingüe** castellano/catalán, con la preferencia guardada en el navegador.
 - **PWA instalable**, accesible (WCAG 2.1 AA), con modo oscuro y modo sin conexión.
 
-![Pantalla de reserva: los dos centros de consulta, el calendario del mes con el día elegido, los huecos libres de mañana y tarde, y a la derecha el formulario con modalidad y cobertura](docs/capturas/04-reserva-huecos.png)
+![Pantalla de reserva: los dos centros de consulta, el calendario del mes con el día elegido, los huecos libres de mañana y tarde, y a la derecha el formulario con especialista, tipo de consulta y cobertura](docs/capturas/04-reserva-huecos.png)
 
 *La reserva, paso a paso: centro, fecha y hora. Los huecos salen de la agenda real del médico,
 calculados en el servidor para el centro y el día elegidos.*

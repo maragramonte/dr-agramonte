@@ -22,7 +22,7 @@ la tarjeta inferior, sin obligarle a bajar ni a buscar un teléfono.
 
 ## 2. Servicios
 
-![Catálogo de servicios en tarjetas escalonadas: consulta general, control de enfermedades crónicas, chequeos preventivos, telemedicina, interpretación de analíticas y asesoramiento en estilo de vida, con el proceso de atención en cuatro pasos debajo](capturas/02-servicios.png)
+![Catálogo de servicios en tarjetas escalonadas: consulta general, control de enfermedades crónicas, chequeos preventivos, interpretación de analíticas y asesoramiento en estilo de vida, con el proceso de atención en cuatro pasos debajo](capturas/02-servicios.png)
 
 Cada tarjeta lleva a la reserva con el servicio ya elegido (`reservar.html?servicio=…`), de
 modo que el paciente no tiene que volver a decidir lo que ya decidió aquí.
@@ -38,7 +38,7 @@ datos desde la migración V6 (ver [BASE-DE-DATOS.md](BASE-DE-DATOS.md)).
 
 ## 4. Reservar: huecos y formulario, a la vez
 
-![Pantalla completa de reserva: a la izquierda el centro, el calendario con el día 8 seleccionado y los dieciséis huecos de mañana y tarde; a la derecha el formulario con modalidad y cobertura](capturas/04-reserva-huecos.png)
+![Pantalla completa de reserva: a la izquierda el centro, el calendario con el día 8 seleccionado y los dieciséis huecos de mañana y tarde; a la derecha el formulario con especialista, tipo de consulta y cobertura](capturas/04-reserva-huecos.png)
 
 Los huecos libres salen de la agenda del médico para ese centro y ese día. En producción los
 calcula el servidor (`GET /api/disponibilidad`), no el navegador: es lo que impide que dos
@@ -47,10 +47,10 @@ intermedios ni recargas.
 
 ## 5. Los datos de la cita
 
-![Formulario completo: especialista Dr. Juan Manuel Agramonte – Medicina Interna, modalidad presencial, primera visita, cobertura de consulta privada con el importe de 80 €, los datos personales rellenos y el motivo de consulta](capturas/05-reserva-formulario.png)
+![Formulario completo: especialista Dr. Juan Manuel Agramonte – Medicina Interna, primera visita, cobertura de consulta privada con el importe de 80 €, los datos personales rellenos y el motivo de consulta](capturas/05-reserva-formulario.png)
 
-Modalidad, tipo de consulta y cobertura. Si el paciente elige seguro médico, el formulario
-pide la aseguradora; si elige privada, enseña el importe y cuándo se abona. La cuenta es
+Tipo de consulta y cobertura. Si el paciente elige seguro médico, el formulario pide la
+aseguradora; si elige privada, enseña el importe y cuándo se abona. La cuenta es
 opcional: se puede reservar sin registrarse y poner contraseña después.
 
 ## 6. Mis citas

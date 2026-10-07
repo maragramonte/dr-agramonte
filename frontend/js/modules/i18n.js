@@ -31,7 +31,6 @@
         'menu.consulta': 'La consulta',
         'menu.citas': 'Cites',
         'menu.herramientas': 'Eines',
-        'menu.panel': 'Panell de proves',
         'menu.inicio.hint': 'Portada i resum',
         'menu.sobre.hint': 'Trajectòria i formació',
         'menu.servicios.hint': "Què s'atén a la consulta",
@@ -39,7 +38,6 @@
         'menu.reservar.hint': 'Triï centre, dia i hora',
         'menu.contacto.hint': 'Formulari i ubicació',
         'menu.cuadro.hint': "Estadístiques de l'agenda",
-        'menu.panel.hint': 'Accés de pacient i metge',
         'menu.offline.hint': 'El web sense connexió',
 
         // ---- Footer (compartido) ----
@@ -53,7 +51,6 @@
         'footer.enlaces': 'Enllaços',
         'footer.privacidad': 'Política de Privacitat',
         'footer.offline': 'Mode Fora de línia',
-        'footer.pruebas': 'Proves TFG (reserves / metge)',
         'footer.cuadro': 'Quadre de comandament',
         'footer.copyright': '© 2026 Dr. Juan Manuel Agramonte.',
 
@@ -61,7 +58,6 @@
         'home.eyebrow': 'Medicina Interna',
         'home.fact.anios': "35 anys d'experiència",
         'home.fact.lugar': 'Palma de Mallorca',
-        'home.fact.modalidad': 'Presencial i telemedicina',
         'home.card.title': 'Demani cita sense trucar',
         'home.card.note': "Centre, dia i hora sobre l'agenda real del doctor.",
         'home.hero.title': 'Atenció Mèdica Integral en Medicina Interna',
@@ -69,7 +65,6 @@
         'home.feature.1': 'Especialista certificat amb més de 35 anys d\'experiència',
         'home.feature.2': 'Diagnòstic precís i tractament personalitzat',
         'home.feature.3': 'Seguiment continu i comunicació accessible',
-        'home.feature.4': 'Consulta presencial i telemedicina disponible',
         'btn.solicitar': 'Demanar cita',
         'btn.reservar': 'Demanar cita',
         'home.serv.title': 'Serveis Mèdics Especialitzats',
