@@ -1,0 +1,18 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Encuadre de móvil</title>
+<!-- Chrome no abre ventanas más estrechas de ~500 px: se le piden 390 y da 504,
+     luego recorta el PNG y simula desbordes que no existen. La página va dentro
+     de un iframe del ancho real, que sí respeta la medida. -->
+<style>
+    html, body { margin: 0; padding: 0; background: #f8fafc; }
+    iframe { width: 390px; height: 1700px; border: 0; display: block; }
+</style>
+<iframe id="marco" src="__cap-reservar.html?cap=reserva-huecos"></iframe>
+<script>
+    var q = new URLSearchParams(location.search);
+    var marco = document.getElementById('marco');
+    if (q.get('src')) marco.src = q.get('src');
+    if (q.get('alto')) marco.style.height = q.get('alto') + 'px';
+    if (q.get('ancho')) marco.style.width = q.get('ancho') + 'px';
+</script>

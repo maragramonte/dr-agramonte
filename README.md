@@ -12,11 +12,16 @@ una API simulada en el navegador y datos ficticios. Se puede reservar, cancelar,
 Telegram y entrar como médico para ver el cuadro de mando. No hay servidor detrás ni se envía ningún aviso
 ([cómo funciona](#demo-en-línea)).
 
+**🖼 [Verla sin probar nada](docs/CAPTURAS.md)** — las doce pantallas en imágenes, con lo que
+hay detrás de cada una: la portada, la reserva paso a paso, los avisos de Telegram, el cuadro
+de mando del médico, el móvil, el modo oscuro y el catalán. Y si prefieres leer el proyecto
+entero, la [memoria completa](docs/Memoria-Dr-Agramonte.pdf) (PDF).
+
 `Java 21` · `Spring Boot 3.5` · `PostgreSQL 15` · `JavaScript` · `Docker` · `Caddy`
 
 [![CI](https://github.com/maragramonte/dr-agramonte/actions/workflows/ci.yml/badge.svg)](https://github.com/maragramonte/dr-agramonte/actions/workflows/ci.yml)
 
-![Portada de la web: fotografía del Dr. Agramonte a sangre junto al titular «Atención Médica Integral en Medicina Interna», con sus años de experiencia, la ubicación en Palma de Mallorca y el acceso directo a solicitar cita](frontend/pictures/Imagenwebapp.png)
+![Portada de la web: fotografía del Dr. Agramonte a sangre junto al titular «Atención Médica Integral en Medicina Interna», con sus años de experiencia, la ubicación en Palma de Mallorca y el acceso directo a solicitar cita](docs/capturas/01-portada.jpg)
 
 ---
 
@@ -39,7 +44,7 @@ Este proyecto digitaliza esa parte concreta, sin tocar lo que sí requiere trato
 - **Bilingüe** castellano/catalán, con la preferencia guardada en el navegador.
 - **PWA instalable**, accesible (WCAG 2.1 AA), con modo oscuro y modo sin conexión.
 
-![Pantalla de reserva: los dos centros de consulta, el calendario del mes con el día elegido, los huecos libres de mañana y tarde, y a la derecha el formulario con modalidad, cobertura y forma de pago](frontend/pictures/reserva-calendario.png)
+![Pantalla de reserva: los dos centros de consulta, el calendario del mes con el día elegido, los huecos libres de mañana y tarde, y a la derecha el formulario con modalidad y cobertura](docs/capturas/04-reserva-huecos.png)
 
 *La reserva, paso a paso: centro, fecha y hora. Los huecos salen de la agenda real del médico,
 calculados en el servidor para el centro y el día elegidos.*
@@ -162,7 +167,7 @@ de V6, el 409 por hueco ocupado y el 401/403 por rol. Los datos ficticios viven 
 accesos directos «Entrar como médico» y «Entrar como paciente», es lo único que la demo
 añade a la interfaz real.
 
-![Reserva en la demo: los dos centros con sus días de consulta (Lun / Mar / Jue y Mie / Vie / Sab), el calendario de septiembre con los únicos días hábiles seleccionables, los dieciséis huecos libres de mañana y tarde, y a la derecha el formulario con modalidad, cobertura y forma de pago](docs/demo-reserva.png)
+![Reserva en la demo: los dos centros con sus días de consulta (Lun / Mar / Jue y Mie / Vie / Sab), el calendario con los únicos días hábiles seleccionables, los dieciséis huecos libres de mañana y tarde, el formulario a la derecha y abajo la franja amarilla de la demo](docs/demo-reserva.png)
 
 Telegram también funciona, contra un chat simulado en la propia página en vez del bot real.
 La vinculación usa un token de un solo uso con 15 minutos de validez. Al pulsar «Iniciar»
@@ -188,6 +193,9 @@ todas las páginas `noindex` para no competir con el dominio real. `frontend/` n
 así que la imagen de producción nunca lleva el modo demo. Cada push a `main` que afecte al
 frontend la publica con [`.github/workflows/demo.yml`](.github/workflows/demo.yml).
 
+Si prefieres no pulsar nada, las mismas pantallas están en el
+[recorrido en imágenes](docs/CAPTURAS.md).
+
 Lo que la demo no puede enseñar es la concurrencia real. El bloqueo pesimista solo existe
 contra PostgreSQL, y para eso están las pruebas de integración.
 
@@ -197,12 +205,12 @@ contra PostgreSQL, y para eso están las pruebas de integración.
 cd backend && mvn test
 ```
 
-**47 pruebas en tres niveles**: unitarias de servicio, de seguridad y roles sobre la capa
+**54 pruebas en tres niveles**: unitarias de servicio, de seguridad y roles sobre la capa
 REST (`@WebMvcTest` con la `SecurityConfig` real) y de integración end-to-end contra un
 PostgreSQL levantado con Testcontainers. Cubren las ramas críticas: 409 por doble reserva,
 403 por rol, validez del JWT, cancelación y el secreto del webhook.
 
-Las 5 de integración necesitan Docker en marcha; si no lo hay se marcan como saltadas en
+Las 6 de integración necesitan Docker en marcha; si no lo hay se marcan como saltadas en
 lugar de fallar. La cobertura todavía no está medida con JaCoCo.
 
 En cada push y cada pull request a `main` las ejecuta GitHub Actions
@@ -302,7 +310,7 @@ producción **no levanta**. En local se dejan sin definir y vale la de demostrac
 ├── frontend/         Sitio estático, PWA y nginx.conf
 ├── demo/             API simulada para la demo en GitHub Pages
 ├── postman/          Colección de la API
-├── scripts/          deploy.sh, backup-db.sh y build-demo.sh
+├── scripts/          deploy.sh, backup-db.sh, build-demo.sh y capturar-pantallas.sh
 ├── docs/             Memoria del proyecto, diagramas y guías
 ├── Caddyfile         HTTPS, apex → www y cabeceras de seguridad
 ├── docker-compose.yml        Local:  nginx · Spring Boot · PostgreSQL
@@ -353,6 +361,7 @@ scripts.
 
 | Documento | Contenido |
 |-----------|-----------|
+| [docs/CAPTURAS.md](docs/CAPTURAS.md) | La aplicación pantalla a pantalla, en imágenes |
 | [docs/EVOLUCION.md](docs/EVOLUCION.md) | Cómo creció el proyecto, fase a fase |
 | [docs/BASE-DE-DATOS.md](docs/BASE-DE-DATOS.md) | Esquema, diagrama relacional, integridad y concurrencia |
 | [docs/SINCRONIZACION-CITAS.md](docs/SINCRONIZACION-CITAS.md) | Una sola fuente de verdad entre las tres vistas de citas |
