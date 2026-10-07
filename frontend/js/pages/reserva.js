@@ -489,7 +489,7 @@ function renderSlots() {
     let lastPeriod = null;
     state.allHoras.forEach((hora) => {
         const h = Number(hora.split(':')[0]);
-        const period = h < CFG.horario.descanso.ini ? 'Manana' : 'Tarde';
+        const period = h < CFG.horario.descanso.ini ? 'Mañana' : 'Tarde';
         if (period !== lastPeriod) {
             const label = document.createElement('div');
             label.className = 'period-label';
@@ -523,7 +523,7 @@ async function renderSlotsFromBackend() {
 
         state.allHoras.forEach((hora) => {
             const h = Number(hora.split(':')[0]);
-            const period = h < CFG.horario.descanso.ini ? 'Manana' : 'Tarde';
+            const period = h < CFG.horario.descanso.ini ? 'Mañana' : 'Tarde';
             if (period !== lastPeriod) {
                 const label = document.createElement('div');
                 label.className = 'period-label';
