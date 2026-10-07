@@ -44,7 +44,6 @@ fi
 # ── Compilación de la demo + arnés de capturas ───────────────────────────────
 OUT="$TRABAJO" bash "$RAIZ/scripts/build-demo.sh" >/dev/null
 cp "$AUX/escenarios.js" "$TRABAJO/js/demo/escenarios.js"
-cp "$AUX/movil.html" "$TRABAJO/__cap-movil.html"
 
 # Una copia de cada página con el arnés inyectado, para no alterar las que genera
 # build-demo.sh (que son, tal cual, las que se publican en Pages).

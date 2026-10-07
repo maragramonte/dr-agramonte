@@ -113,14 +113,23 @@ y deja a mano lo que ya estaba en caché, en vez del error del navegador.
 
 ## Cómo están hechas estas capturas
 
-Con Chrome headless contra la compilación de la demo servida en local, no a mano:
+Con Chrome contra la compilación de la demo servida en local, no a mano:
 [`scripts/capturar-pantallas.sh`](../scripts/capturar-pantallas.sh) las regenera todas (o una
-suelta, pasándole su nombre) sin necesidad de Docker ni base de datos. Prepara cada
-escenario (elegir centro y día, iniciar sesión como paciente o como médico, cambiar de
-idioma o de tema), espera a que la pantalla esté montada y recorta el encuadre con Pillow. Dos detalles que no son evidentes: las páginas se capturan en una ventana más
-alta que la propia página, porque en una página con scroll el día elegido sale sin resaltar;
-y el ancho de móvil se consigue metiendo la página en un iframe de 390 px, porque Chrome no
-abre ventanas tan estrechas y recortar el PNG simularía desbordes que no existen.
+suelta, pasándole su nombre), sin necesidad de Docker ni base de datos. Prepara cada
+escenario —elegir centro y día, entrar como paciente o como médico, cambiar de idioma o de
+tema—, espera a que la pantalla esté montada y recorta por el rectángulo del elemento.
+
+Va por el protocolo de DevTools y no por `chrome --screenshot`, por dos motivos. El primero
+es el ancho de móvil: por línea de órdenes Chrome no baja de unos 500 px de ventana, se le
+piden 390 y da 504, y recortar después el PNG simularía desbordes que no existen; con
+emulación de dispositivo el viewport es de 390 px de verdad. El segundo es el momento del
+disparo, que así espera a que la página avise de que está lista en vez de confiar en el
+tiempo virtual.
+
+Queda una rareza del modo *headless*: con la página más alta que el viewport, el día elegido
+del calendario se pinta sin su relleno. Antes de capturar esas pantallas el viewport se
+estira a la altura de la página —lo mismo que hace DevTools al capturar a tamaño completo— y
+el guion comprueba el color en el PNG, para no publicar una captura que engañe.
 
 Lo que ninguna captura puede enseñar es la concurrencia: el bloqueo pesimista que impide que
 dos pacientes se queden con el mismo hueco solo existe contra PostgreSQL, y de eso se ocupan

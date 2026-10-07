@@ -156,6 +156,28 @@
             Math.round(r.width) + ' ' + Math.round(r.height));
     };
 
+    /* El relleno del día elegido se pierde de vez en cuando: es una carrera de
+     * pintado de headless, no un fallo de la web (la clase está puesta y
+     * getComputedStyle devuelve el teal). Se publica su rectángulo para que
+     * capturar.py mire el color en el PNG y no dé por buena una captura mala. */
+    const medirDia = () => {
+        const dia = document.querySelector('.cal-day.selected');
+        if (!dia) return;
+        const r = dia.getBoundingClientRect();
+        // Por si la página se captura dentro de un marco: el PNG seria el del
+        // documento de fuera, asi que habria que sumar su desplazamiento.
+        let dx = 0, dy = 0;
+        try {
+            const marco = window.frameElement;
+            if (marco) {
+                const m = marco.getBoundingClientRect();
+                dx = m.left; dy = m.top;
+            }
+        } catch (e) { return; }   // marco de otro origen: mejor no comprobar nada
+        console.log('CAP-DIA ' + Math.round(r.left + dx) + ' ' + Math.round(r.top + dy) +
+            ' ' + Math.round(r.width) + ' ' + Math.round(r.height));
+    };
+
     const correr = async () => {
         try {
             // Los scripts de cada pagina atan sus listeners en su propio
@@ -164,10 +186,17 @@
             await pausa(900);
             await (PASOS[shot] || (async () => { await pausa(300); }))();
             await pausa(600);
+            // Con --virtual-time-budget los temporizadores se cumplen al momento,
+            // asi que una pausa no garantiza que se haya pintado nada: el relleno
+            // del dia elegido se perdia en la mitad de las capturas. Dos marcos
+            // seguidos si garantizan que el anterior ya esta compuesto.
+            await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
             medir();
+            medirDia();
             console.log('CAP-OK ' + shot);
         } catch (e) {
             medir();
+            medirDia();
             console.log('CAP-FAIL ' + shot + ': ' + e.message);
         }
     };

@@ -1,26 +1,32 @@
 # -*- coding: utf-8 -*-
-"""Dispara Chrome headless contra dist-demo y recorta cada captura con Pillow.
+"""Saca las capturas de docs/capturas/ con Chrome por el protocolo de DevTools.
 
 Lo invoca scripts/capturar-pantallas.sh, que es quien construye la demo, inyecta
 el arnes (escenarios.js) y levanta el servidor local. No ejecutar suelto.
 
-Tres cosas que no son evidentes y explican los numeros de la tabla:
+Tres cosas que no son evidentes:
 
-- La ventana se pide MAS ALTA que la pagina. Si la pagina queda con scroll, el dia
-  elegido del calendario se pinta sin su relleno, y la captura sale enganyosa.
-- Debajo de ~500 px Chrome no estrecha la ventana (pide 390, da 504) y luego
-  recorta el PNG, simulando desbordes falsos: el ancho de movil se consigue
-  metiendo la pagina en un iframe (modo MOVIL, ver movil.html).
+- Va por el protocolo (devtools.py) y no por "chrome --screenshot". Por linea de
+  ordenes no hay forma de pedir un viewport de movil -Chrome no baja de unos
+  500 px de ancho de ventana, da 504 y luego recorta el PNG, simulando desbordes
+  que no existen- ni de esperar a que la pantalla este pintada: el tiempo virtual
+  dispara la captura cuando le toca, y de ahi salian capturas a medias.
+- Antes de disparar, el viewport se estira a la altura de la pagina. Con la
+  pagina mas alta que el viewport, el dia elegido del calendario se pinta sin su
+  relleno. Es lo mismo que hace DevTools al capturar a tamanyo completo.
 - El tema claro hay que forzarlo: headless responde "dark" a prefers-color-scheme.
+
+El recorte lo hace el propio Chrome por el rectangulo del elemento (clip), asi
+que Pillow solo interviene para el JPEG de las fotos y para reducir la del movil.
 """
 import os
 import re
-import shutil
-import subprocess
 import sys
 import tempfile
 
 from PIL import Image
+
+from devtools import Navegador
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 RAIZ = os.path.dirname(os.path.dirname(AQUI))
@@ -29,117 +35,143 @@ GALERIA = os.path.join(DOCS, "capturas")
 
 CHROME = os.environ.get("CHROME_BIN")
 BASE = "http://127.0.0.1:" + os.environ.get("PUERTO", "8731")
+# Relleno del dia elegido en el calendario (--teal-fill) y densidad del movil.
+TEAL = (15, 118, 110)
+DENSIDAD_MOVIL = 2
 
 # nombre | pagina | query | ancho | alto | encuadre | margen | destino
 #
-# encuadre: selector CSS a recortar, None para dejar el viewport entero,
-#           "MOVIL" para el iframe de 390 px, o "SUP:<y>" para cortar solo por
-#           arriba (asi la franja de la demo, que va fija abajo, sigue en cuadro).
+# ancho y alto son el viewport. encuadre: selector CSS a recortar, None para
+# dejar el viewport entero, "SUP:<y>" para cortar solo por arriba (asi la franja
+# de la demo, que va fija abajo, sigue en cuadro), o "MOVIL:<selector>" para
+# emular un dispositivo en vez de un escritorio.
 SHOTS = [
     ("01-portada", "index", "cap=portada",
      1280, 1000, ".hero-section", 0, "capturas/01-portada.jpg"),
     ("02-servicios", "servicios", "cap=servicios",
-     1280, 2600, "main", 0, "capturas/02-servicios.png"),
+     1280, 1000, "main", 0, "capturas/02-servicios.png"),
     ("03-reserva-centros", "reservar", "cap=reserva-centros",
-     1280, 2200, ".reserva-grid > .card", 20, "capturas/03-reserva-centros.png"),
+     1280, 1000, ".reserva-grid > .card", 20, "capturas/03-reserva-centros.png"),
     ("04-reserva-huecos", "reservar", "cap=reserva-huecos",
-     1280, 2400, ".reserva-grid", 20, "capturas/04-reserva-huecos.png"),
+     1280, 1000, ".reserva-grid", 20, "capturas/04-reserva-huecos.png"),
     ("05-reserva-formulario", "reservar", "cap=reserva-formulario",
-     1280, 3000, ".sticky-panel", 20, "capturas/05-reserva-formulario.png"),
+     1280, 1000, ".sticky-panel", 20, "capturas/05-reserva-formulario.png"),
     ("06-mis-citas", "reservar", "cap=mis-citas&sesion=paciente",
-     1280, 3000, ".appointments-panel", 20, "capturas/06-mis-citas.png"),
+     1280, 1000, ".appointments-panel", 20, "capturas/06-mis-citas.png"),
     ("07-telegram", "reservar", "cap=telegram&sesion=paciente&tg=1",
      1280, 1000, None, 0, "capturas/07-telegram.png"),
     ("08-cuadro-mando", "estadisticas", "cap=cuadro-mando&sesion=medico",
-     1280, 2600, "#dashContent", 20, "capturas/08-cuadro-mando.png"),
-    ("09-movil", "movil",
-     "src=__cap-reservar.html%3Fcap%3Dreserva-huecos%26encuadre%3D.reserva-grid%20%3E%20.card&alto=2700",
-     700, 2750, "MOVIL", 0, "capturas/09-movil.png"),
+     1280, 1000, "#dashContent", 20, "capturas/08-cuadro-mando.png"),
+    ("09-movil", "reservar", "cap=reserva-huecos",
+     390, 844, "MOVIL:.reserva-grid > .card", 16, "capturas/09-movil.png"),
     ("10-modo-oscuro", "reservar", "cap=reserva-huecos&tema=dark",
-     1280, 2400, ".reserva-grid", 20, "capturas/10-modo-oscuro.png"),
+     1280, 1000, ".reserva-grid", 20, "capturas/10-modo-oscuro.png"),
     ("11-catalan", "index", "cap=portada&lang=ca",
      1280, 1000, ".hero-section", 0, "capturas/11-catalan.jpg"),
     ("12-sin-conexion", "offline", "cap=offline",
-     1280, 1600, ".offline-card", 28, "capturas/12-sin-conexion.png"),
+     1280, 1000, ".offline-card", 28, "capturas/12-sin-conexion.png"),
     # La del README que ensenya la demo: con su franja amarilla y sin recortarla.
     ("demo-reserva", "reservar", "cap=reserva-huecos&banner=1",
-     1280, 2120, "SUP:730", 0, "demo-reserva.png"),
+     1280, 1000, "SUP:730", 0, "demo-reserva.png"),
 ]
 
 
-def chrome(url, ancho, alto, destino_png, tema_claro):
-    perfil = tempfile.mkdtemp(prefix="capturas-chrome-")
-    orden = [
-        CHROME, "--headless=new", "--disable-gpu", "--no-sandbox", "--hide-scrollbars",
-        "--force-prefers-reduced-motion",
-        # El presupuesto de tiempo virtual corre mucho mas rapido que el reloj: si
-        # se queda corto, Chrome dispara la captura (o se va sin escribir nada)
-        # mientras la pagina todavia pide datos. El cuadro de mando, que ademas
-        # tiene que pintar cinco graficos, es el que lo nota.
-        "--virtual-time-budget=30000",
-        "--run-all-compositor-stages-before-draw",
-        "--user-data-dir=" + perfil,
-        "--window-size={0},{1}".format(ancho, alto),
-        "--screenshot=" + destino_png,
-        "--enable-logging=stderr", "--v=0",
-    ]
-    if tema_claro:
-        orden.append("--blink-settings=preferredColorScheme=1")
-    orden.append(url)
+def tomar(url, ancho, alto, encuadre, margen, bruta):
+    """Abre la pagina, deja que el arnes monte la pantalla y captura. Devuelve
+    lo que la pagina escribio en consola y la densidad del PNG resultante."""
+    movil = bool(encuadre and encuadre.startswith("MOVIL:"))
+    densidad = DENSIDAD_MOVIL if movil else 1
+    selector = encuadre[6:] if movil else (None if not encuadre or encuadre.startswith("SUP:") else encuadre)
+    if selector:
+        url += "&encuadre=" + selector.replace("#", "%23").replace(" ", "%20")
+
+    extras = [] if "tema=dark" in url else ["--blink-settings=preferredColorScheme=1"]
+    nav = Navegador(CHROME, extras=extras)
     try:
-        p = subprocess.run(orden, capture_output=True, text=True, errors="replace", timeout=180)
-        return (p.stderr or "") + (p.stdout or "")
+        nav.emular(ancho, alto, densidad, movil)
+        log = "\n".join(nav.abrir(url))
+        rect = re.search(r"CAP-RECT (-?\d+) (-?\d+) (\d+) (\d+)", log)
+
+        # El viewport se estira a toda la pagina solo si hay un dia elegido en
+        # el calendario, que es lo unico que se pinta mal con scroll (ver arriba).
+        # Estirarlo siempre no es gratis: Chart.js se re-dibuja al cambiar el
+        # tamanyo y el cuadro de mando salia con los cinco graficos en blanco.
+        completo = max(alto, nav.alto_pagina())
+        if "CAP-DIA" in log:
+            nav.emular(ancho, min(completo, 16000), densidad, movil)
+            nav.reposar(0.8)
+
+        recorte = None
+        if movil and rect:
+            # Una pantalla de telefono se mira entera, desde la cabecera.
+            recorte = (0, 0, ancho, int(rect.group(2)) + int(rect.group(4)) + margen)
+        elif rect:
+            x, y, w, h = (int(v) for v in rect.groups())
+            recorte = (max(0, x - margen), max(0, y - margen), w + 2 * margen, h + 2 * margen)
+        elif encuadre and encuadre.startswith("SUP:"):
+            desde = int(encuadre[4:])
+            recorte = (0, desde, ancho, completo - desde)
+        elif not encuadre:
+            recorte = (0, 0, ancho, alto)
+        nav.capturar(bruta, recorte=recorte)
+        return log, densidad, recorte or (0, 0, ancho, completo)
     finally:
-        shutil.rmtree(perfil, ignore_errors=True)
+        nav.cerrar()
 
 
-def recortar_movil(img, log):
-    """El iframe ocupa los 390 px de la izquierda; abajo se corta por el encuadre
-    que haya medido la propia pagina, y si no, por donde acaba el contenido."""
-    alto = img.height
-    rect = re.search(r"CAP-RECT (-?\d+) (-?\d+) (\d+) (\d+)", log)
-    if rect:
-        alto = min(alto, int(rect.group(2)) + int(rect.group(4)) + 16)
-    img = img.crop((0, 0, 390, alto))
-    fondo = img.getpixel((5, img.height - 5))
-    ultima = img.height - 1
-    for y in range(img.height - 1, -1, -1):
-        fila = [img.getpixel((x, y)) for x in range(0, 390, 13)]
-        if any(sum(abs(a - b) for a, b in zip(p, fondo)) > 12 for p in fila):
-            ultima = y
-            break
-    return img.crop((0, 0, 390, min(img.height, ultima + 24)))
+# Disparos por captura antes de darla por mala (ver el comentario de capturar()).
+INTENTOS_DIA = 4
+
+
+def dia_resaltado(bruta, log, densidad, recorte):
+    """Comprueba que el dia elegido salio con su relleno.
+
+    El arnes publica su rectangulo con CAP-DIA en coordenadas de la pagina; aqui
+    se pasa a las del PNG restando el recorte y multiplicando por la densidad, y
+    se mira el color del centro. Las capturas sin calendario no publican nada y
+    se dan por buenas.
+    """
+    dia = re.search(r"CAP-DIA (-?\d+) (-?\d+) (\d+) (\d+)", log)
+    if not dia:
+        return True
+    x, y, w, h = (int(v) for v in dia.groups())
+    cx = (x + w // 2 - recorte[0]) * densidad
+    cy = (y + h // 2 - recorte[1]) * densidad
+    img = Image.open(bruta).convert("RGB")
+    if not (0 <= cx < img.width and 0 <= cy < img.height):
+        return True  # el dia no entra en el encuadre: nada que comprobar
+    centro = img.getpixel((cx, cy))
+    vale = sum(abs(a - b) for a, b in zip(centro, TEAL)) <= 24
+    if not vale and os.environ.get("CAP_DEBUG"):
+        print("    [debug] dia en {0}, color {1}, PNG {2}".format((cx, cy), centro, img.size))
+    return vale
 
 
 def capturar(nombre, pagina, query, ancho, alto, encuadre, margen, destino):
     bruta = os.path.join(TMP, nombre + ".png")
     url = "{0}/__cap-{1}.html?{2}".format(BASE, pagina, query)
-    if encuadre and not encuadre.startswith(("MOVIL", "SUP:")):
-        url += "&encuadre=" + encuadre.replace("#", "%23").replace(" ", "%20")
 
-    log = chrome(url, ancho, alto, bruta, "tema=dark" not in query)
-    if not os.path.exists(bruta):
-        # Chrome falla de vez en cuando sin escribir nada ni decir por que.
-        log = chrome(url, ancho, alto, bruta, "tema=dark" not in query)
-    estado = "OK" if "CAP-OK" in log else ("FALLO" if "CAP-FAIL" in log else "¿?")
-    fallo = re.search(r"CAP-FAIL ([^\n\"]+)", log)
-    if not os.path.exists(bruta):
-        print("  {0}: sin PNG ({1}) {2}".format(nombre, estado, fallo.group(1).strip() if fallo else ""))
+    # El relleno del dia se pierde por una carrera de pintado de headless. Medido
+    # sobre esta misma captura: fallaba la mitad de las veces antes de que
+    # escenarios.js esperase a un par de marcos, y una de cada cinco despues. Con
+    # un solo reintento una tanda completa seguia saliendo mal muy a menudo.
+    for _ in range(INTENTOS_DIA):
+        log, densidad, recorte = tomar(url, ancho, alto, encuadre, margen, bruta)
+        if dia_resaltado(bruta, log, densidad, recorte):
+            break
+    else:
+        print("  {0}: el dia elegido sale sin resaltar en {1} intentos, no la publico".format(
+            nombre, INTENTOS_DIA))
         return False
 
+    estado = "OK" if "CAP-OK" in log else ("FALLO" if "CAP-FAIL" in log else "¿?")
+    fallo = re.search(r"CAP-FAIL ([^\n\"]+)", log)
+
     img = Image.open(bruta).convert("RGB")
-    if encuadre == "MOVIL":
-        img = recortar_movil(img, log)
-    elif encuadre and encuadre.startswith("SUP:"):
-        img = img.crop((0, int(encuadre[4:]), img.width, img.height))
-    elif encuadre:
-        rect = re.search(r"CAP-RECT (-?\d+) (-?\d+) (\d+) (\d+)", log)
-        if rect:
-            x, y, w, h = (int(v) for v in rect.groups())
-            caja = (max(0, x - margen), max(0, y - margen),
-                    min(img.width, x + w + margen), min(img.height, y + h + margen))
-            if caja[2] - caja[0] > 50 and caja[3] - caja[1] > 50:
-                img = img.crop(caja)
+    if densidad > 1:
+        # Viene a 2x del dispositivo emulado: se reduce para que pese como las
+        # demas, y de paso el texto queda mas limpio que renderizado a 1x.
+        img = img.resize((img.width // densidad, img.height // densidad), Image.LANCZOS)
 
     ruta = os.path.join(DOCS, destino)
     os.makedirs(os.path.dirname(ruta), exist_ok=True)
@@ -148,8 +180,9 @@ def capturar(nombre, pagina, query, ancho, alto, encuadre, margen, destino):
         img.save(ruta, quality=86, optimize=True, progressive=True)
     else:
         img.save(ruta, optimize=True)
-    print("  {0}: {1} {2}x{3} {4} KB".format(
-        nombre, estado, img.width, img.height, os.path.getsize(ruta) // 1024))
+    print("  {0}: {1} {2}x{3} {4} KB {5}".format(
+        nombre, estado, img.width, img.height, os.path.getsize(ruta) // 1024,
+        fallo.group(1).strip() if fallo else ""))
     return estado == "OK"
 
 
@@ -164,11 +197,7 @@ for p in pedidas:
         sys.exit("✗ no existe la captura «{0}». Hay: {1}".format(p, ", ".join(conocidas)))
 
 os.makedirs(GALERIA, exist_ok=True)
-try:
-    fallos = [s[0] for s in SHOTS
-              if (not pedidas or s[0] in pedidas) and not capturar(*s)]
-finally:
-    shutil.rmtree(TMP, ignore_errors=True)
+fallos = [s[0] for s in SHOTS if (not pedidas or s[0] in pedidas) and not capturar(*s)]
 
 if fallos:
     sys.exit("✗ no salieron bien: " + ", ".join(fallos))
