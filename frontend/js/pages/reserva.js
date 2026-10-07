@@ -5,8 +5,6 @@ import apiClient from '../modules/api-client.js';
 const CFG = {
     medicoIdDefault: 1,
     horario: { inicio: 9, fin: 19, intervalo: 30, descanso: { ini: 14, fin: 16 } },
-    extraHoras: ['19:30', '20:00', '20:30'],
-    extraFeeAmount: 25,
     maxPorDia: 8,
     minAnticipacion: 1,
     maxAnticipacion: 90,
@@ -33,12 +31,6 @@ const SERVICIOS_RESERVA = {
         label: 'Chequeos Preventivos',
         tipo: 'revision',
         motivo: 'Chequeo preventivo'
-    },
-    'telemedicina': {
-        label: 'Telemedicina',
-        tipo: 'primera-visita',
-        modalidad: 'online',
-        motivo: 'Videoconsulta / telemedicina'
     },
     'interpretacion-analiticas': {
         label: 'Interpretación de Analíticas',
@@ -71,7 +63,6 @@ const state = {
     centrosDias: null,
     dateISO: null,
     hour: null,
-    modalidad: 'presencial',
     allHoras: genHorasBase()
 };
 
@@ -92,7 +83,6 @@ const formatIsoTime = (d) => {
     const min = String(d.getMinutes()).padStart(2, '0');
     return `${h}:${min}`;
 };
-const isExtraHour = (h) => CFG.extraHoras.includes(h);
 const hasConnectedFlowReady = () => !!state.medicoId && !!state.centroId && !!state.dateISO && !!state.hour;
 
 // Un unico temporizador para todos los avisos: antes cada llamada programaba el
@@ -278,10 +268,6 @@ function genHorasBase() {
     return h;
 }
 
-function genHorasConExtra(inc) {
-    return inc ? [...genHorasBase(), ...CFG.extraHoras] : genHorasBase();
-}
-
 function isValidReserva(date) {
     const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
     const min = new Date(hoy); min.setDate(min.getDate() + CFG.minAnticipacion);
@@ -326,11 +312,9 @@ function mapBackendCitaToFrontend(cita) {
         hora: formatIsoTime(dt),
         paciente: { nombre: localStorage.getItem('nombre') || 'Paciente', telefono: '', email: localStorage.getItem('email') || '' },
         tipo: 'revision',
-        modalidad: 'presencial',
         motivo: cita.motivo || '',
         notas: '',
         estado: estadoMap[estadoRaw] || 'pendiente',
-        extraPagado: false,
         creadaEn: cita.fechaHora
     };
 }
@@ -499,7 +483,7 @@ function renderSlots() {
         }
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = `slot ${isExtraHour(hora) ? 'extra-fee' : ''}`.trim();
+        btn.className = 'slot';
         btn.textContent = hora;
         if (ocupadas.includes(hora)) btn.disabled = true;
         else btn.addEventListener('click', () => selectHour(hora, btn));
@@ -534,7 +518,7 @@ async function renderSlotsFromBackend() {
 
             const btn = document.createElement('button');
             btn.type = 'button';
-            btn.className = `slot ${isExtraHour(hora) ? 'extra-fee' : ''}`.trim();
+            btn.className = 'slot';
             btn.textContent = hora;
             const isAvailable = disponibles.has(hora);
             if (!isAvailable) btn.disabled = true;
@@ -559,8 +543,7 @@ async function selectDate(iso, btn) {
     $('hiddenHora').value = '';
     $('selectedDateLabel').textContent = fmtFecha(iso);
     updateSummaryChip();
-    state.modalidad = document.querySelector('input[name="modalidad"]:checked')?.value || 'presencial';
-    state.allHoras = genHorasConExtra(state.modalidad === 'online');
+    state.allHoras = genHorasBase();
     const loaded = await renderSlotsFromBackend();
     if (!loaded) renderSlots();
     setStep(3);
@@ -574,9 +557,6 @@ function selectHour(hora, btn) {
     $('hiddenHora').value = hora;
     updateSummaryChip();
     setStep(4);
-    const isExtra = isExtraHour(hora) && state.modalidad === 'online';
-    $('extraFeeWarning').style.display = isExtra ? 'flex' : 'none';
-    $('extraFeeCheckboxDiv').style.display = isExtra ? 'flex' : 'none';
     updateSubmitState();
 }
 
@@ -596,7 +576,6 @@ function validarCampos() {
     if (!/^(\+34|34)?[6789]\d{8}$/.test(telefono)) return showToast('Telefono invalido', 'error'), false;
     if (!$('tipoConsulta').value) return showToast('Selecciona un tipo de consulta', 'error'), false;
     if (!$('acepto').checked) return showToast('Acepta la politica de privacidad', 'error'), false;
-    if (isExtraHour(state.hour) && state.modalidad === 'online' && !$('acceptExtraFee').checked) return showToast('Acepta el suplemento extra', 'error'), false;
     const pwd = $('passwordInvitado')?.value?.trim();
     if (pwd && pwd.length < 6) return showToast('La contraseña debe tener al menos 6 caracteres', 'error'), false;
     return true;
@@ -610,7 +589,7 @@ function exportICS(cita) {
         'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Dr.Agramonte//ES', 'BEGIN:VEVENT',
         `UID:${cita.id}@dragramonte.com`, `DTSTAMP:${fmt(new Date())}`, `DTSTART:${fmt(start)}`, `DTEND:${fmt(end)}`,
         'SUMMARY:Cita medica - Dr. Agramonte', `DESCRIPTION:${cita.motivo || 'Consulta medica'}`,
-        `LOCATION:${cita.modalidad === 'online' ? 'Videoconsulta' : (cita.centroDireccion || 'Consulta')}`,
+        `LOCATION:${cita.centroDireccion || 'Consulta'}`,
         'END:VEVENT', 'END:VCALENDAR'
     ].join('\n');
     const a = document.createElement('a');
@@ -697,13 +676,11 @@ async function onSubmit(e) {
     const btn = $('btnSubmit');
     btn.disabled = true; btn.classList.add('loading');
     await new Promise((r) => setTimeout(r, 300));
-    const modalidad = document.querySelector('input[name="modalidad"]:checked').value;
     const cobertura = document.querySelector('input[name="cobertura"]:checked')?.value || 'privada';
     const aseguradora = cobertura === 'seguro' ? ($('aseguradora').value || null) : null;
     const numeroTarjetaSanitaria = cobertura === 'seguro' ? ($('numTarjeta').value.trim() || null) : null;
-    const preferenciaPago = cobertura === 'privada'
-        ? (document.querySelector('input[name="preferenciaPago"]:checked')?.value || 'en-consulta')
-        : null;
+    // Solo se paga en la consulta: el pago online no existe, así que ya no se pregunta.
+    const preferenciaPago = cobertura === 'privada' ? 'en-consulta' : null;
     const cita = {
         id: `CITA-${Date.now().toString(36).toUpperCase()}`,
         centroId: state.centroId,
@@ -713,7 +690,6 @@ async function onSubmit(e) {
         hora: state.hour,
         paciente: { nombre: $('nombre').value.trim(), telefono: $('telefono').value.trim(), email: $('email').value.trim() },
         tipo: $('tipoConsulta').value,
-        modalidad,
         cobertura,
         aseguradora,
         numeroTarjetaSanitaria,
@@ -721,7 +697,6 @@ async function onSubmit(e) {
         motivo: $('motivo').value.trim(),
         notas: $('notas').value.trim(),
         estado: 'pendiente',
-        extraPagado: isExtraHour(state.hour) && modalidad === 'online',
         creadaEn: new Date().toISOString()
     };
     try {
@@ -784,24 +759,12 @@ function actualizarCobertura() {
     const bloquePrivada = $('bloquePrivada');
     if (bloqueSeguro) bloqueSeguro.style.display = esSeguro ? 'block' : 'none';
     if (bloquePrivada) bloquePrivada.style.display = esSeguro ? 'none' : 'block';
-    const nota = $('notaPagoOnline');
-    if (nota) {
-        const pagoOnline = (document.querySelector('input[name="preferenciaPago"]:checked')?.value) === 'online';
-        nota.style.display = (!esSeguro && pagoOnline) ? 'block' : 'none';
-    }
 }
 
 function bindEvents() {
     $('btnPrevMonth').addEventListener('click', () => { state.month--; if (state.month < 0) { state.month = 11; state.year--; } renderCalendar(); });
     $('btnNextMonth').addEventListener('click', () => { state.month++; if (state.month > 11) { state.month = 0; state.year++; } renderCalendar(); });
-    document.querySelectorAll('input[name="modalidad"]').forEach((rad) => rad.addEventListener('change', async () => {
-        state.modalidad = rad.value;
-        state.allHoras = genHorasConExtra(state.modalidad === 'online');
-        if (!state.dateISO) return;
-        const loaded = await renderSlotsFromBackend();
-        if (!loaded) renderSlots();
-    }));
-    document.querySelectorAll('input[name="cobertura"], input[name="preferenciaPago"]')
+    document.querySelectorAll('input[name="cobertura"]')
         .forEach((rad) => rad.addEventListener('change', actualizarCobertura));
     actualizarCobertura();
     $('medicoSelect').addEventListener('change', async (e) => {
@@ -846,15 +809,6 @@ function applyServicioFromUrl() {
     if (sel && cfg.tipo) {
         const opt = [...sel.options].find((o) => o.value === cfg.tipo);
         if (opt) sel.value = cfg.tipo;
-    }
-
-    if (cfg.modalidad) {
-        const rad = document.querySelector(`input[name="modalidad"][value="${cfg.modalidad}"]`);
-        if (rad) {
-            rad.checked = true;
-            state.modalidad = cfg.modalidad;
-            state.allHoras = genHorasConExtra(state.modalidad === 'online');
-        }
     }
 
     const motivo = $('motivo');

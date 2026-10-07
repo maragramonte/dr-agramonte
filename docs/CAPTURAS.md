@@ -22,7 +22,7 @@ la tarjeta inferior, sin obligarle a bajar ni a buscar un teléfono.
 
 ## 2. Servicios
 
-![Catálogo de servicios en tarjetas escalonadas: consulta general, control de enfermedades crónicas, chequeos preventivos, telemedicina, interpretación de analíticas y asesoramiento en estilo de vida, con el proceso de atención en cuatro pasos debajo](capturas/02-servicios.png)
+![Catálogo de servicios en tarjetas escalonadas: consulta general, control de enfermedades crónicas, chequeos preventivos, interpretación de analíticas y asesoramiento en estilo de vida, con el proceso de atención en cuatro pasos debajo](capturas/02-servicios.png)
 
 Cada tarjeta lleva a la reserva con el servicio ya elegido (`reservar.html?servicio=…`), de
 modo que el paciente no tiene que volver a decidir lo que ya decidió aquí.
@@ -38,7 +38,7 @@ datos desde la migración V6 (ver [BASE-DE-DATOS.md](BASE-DE-DATOS.md)).
 
 ## 4. Reservar: huecos y formulario, a la vez
 
-![Pantalla completa de reserva: a la izquierda el centro, el calendario con el día 8 seleccionado y los dieciséis huecos de mañana y tarde; a la derecha el formulario con modalidad y cobertura](capturas/04-reserva-huecos.png)
+![Pantalla completa de reserva: a la izquierda el centro, el calendario con el día 8 seleccionado y los dieciséis huecos de mañana y tarde; a la derecha el formulario con especialista, tipo de consulta y cobertura](capturas/04-reserva-huecos.png)
 
 Los huecos libres salen de la agenda del médico para ese centro y ese día. En producción los
 calcula el servidor (`GET /api/disponibilidad`), no el navegador: es lo que impide que dos
@@ -47,10 +47,10 @@ intermedios ni recargas.
 
 ## 5. Los datos de la cita
 
-![Formulario completo: especialista Dr. Juan Manuel Agramonte – Medicina Interna, modalidad presencial, primera visita, cobertura de consulta privada con el importe de 80 €, los datos personales rellenos y el motivo de consulta](capturas/05-reserva-formulario.png)
+![Formulario completo: especialista Dr. Juan Manuel Agramonte – Medicina Interna, primera visita, cobertura de consulta privada con el importe de 80 €, los datos personales rellenos y el motivo de consulta](capturas/05-reserva-formulario.png)
 
-Modalidad, tipo de consulta y cobertura. Si el paciente elige seguro médico, el formulario
-pide la aseguradora; si elige privada, enseña el importe y cuándo se abona. La cuenta es
+Tipo de consulta y cobertura. Si el paciente elige seguro médico, el formulario pide la
+aseguradora; si elige privada, enseña el importe y cuándo se abona. La cuenta es
 opcional: se puede reservar sin registrarse y poner contraseña después.
 
 ## 6. Mis citas
@@ -113,14 +113,23 @@ y deja a mano lo que ya estaba en caché, en vez del error del navegador.
 
 ## Cómo están hechas estas capturas
 
-Con Chrome headless contra la compilación de la demo servida en local, no a mano:
+Con Chrome contra la compilación de la demo servida en local, no a mano:
 [`scripts/capturar-pantallas.sh`](../scripts/capturar-pantallas.sh) las regenera todas (o una
-suelta, pasándole su nombre) sin necesidad de Docker ni base de datos. Prepara cada
-escenario (elegir centro y día, iniciar sesión como paciente o como médico, cambiar de
-idioma o de tema), espera a que la pantalla esté montada y recorta el encuadre con Pillow. Dos detalles que no son evidentes: las páginas se capturan en una ventana más
-alta que la propia página, porque en una página con scroll el día elegido sale sin resaltar;
-y el ancho de móvil se consigue metiendo la página en un iframe de 390 px, porque Chrome no
-abre ventanas tan estrechas y recortar el PNG simularía desbordes que no existen.
+suelta, pasándole su nombre), sin necesidad de Docker ni base de datos. Prepara cada
+escenario —elegir centro y día, entrar como paciente o como médico, cambiar de idioma o de
+tema—, espera a que la pantalla esté montada y recorta por el rectángulo del elemento.
+
+Va por el protocolo de DevTools y no por `chrome --screenshot`, por dos motivos. El primero
+es el ancho de móvil: por línea de órdenes Chrome no baja de unos 500 px de ventana, se le
+piden 390 y da 504, y recortar después el PNG simularía desbordes que no existen; con
+emulación de dispositivo el viewport es de 390 px de verdad. El segundo es el momento del
+disparo, que así espera a que la página avise de que está lista en vez de confiar en el
+tiempo virtual.
+
+Queda una rareza del modo *headless*: con la página más alta que el viewport, el día elegido
+del calendario se pinta sin su relleno. Antes de capturar esas pantallas el viewport se
+estira a la altura de la página —lo mismo que hace DevTools al capturar a tamaño completo— y
+el guion comprueba el color en el PNG, para no publicar una captura que engañe.
 
 Lo que ninguna captura puede enseñar es la concurrencia: el bloqueo pesimista que impide que
 dos pacientes se queden con el mismo hueco solo existe contra PostgreSQL, y de eso se ocupan

@@ -1,6 +1,6 @@
 /**
  * SERVICIOS - Dr. Agramonte
- * Versión: 3.0 (Simplificado, usa sistema unificado de telemedicina)
+ * Versión: 3.0 (Simplificado, se apoya en el sistema global de dr-agramonte.js)
  */
 
 'use strict';
@@ -139,9 +139,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const contacto = new ContactoManager();
     contacto.init();
 
-    // Nota: la videollamada (clase Telemedicina) y el menú móvil (clase Navegacion)
-    // los gestiona dr-agramonte.js de forma global. No los dupliques aquí para
-    // evitar handlers en conflicto (doble acción / toggles que se anulan).
+    // Nota: el menú móvil (clase Navegacion) lo gestiona dr-agramonte.js de forma
+    // global. No lo dupliques aquí para evitar handlers en conflicto (doble acción
+    // / toggles que se anulan).
 
     console.log('✅ Servicios inicializados');
 });

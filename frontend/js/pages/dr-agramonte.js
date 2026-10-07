@@ -10,8 +10,8 @@
  *   4. ANIMACIONES → reveal al hacer scroll (IntersectionObserver)
  *   5. LAZY LOAD   → imágenes que cargan al aparecer en pantalla
  *   6. AUTOCOMPLETE→ sugerencias en el campo "motivo"
- *   7. TELEMEDICINA→ genera sala Jitsi con código único
- *   8. PWA         → Service Worker + notificaciones online/offline
+ *   7. PWA         → Service Worker + notificaciones online/offline
+ *   8. TEMA        → alternancia claro / oscuro
  *   9. ACCESIBILIDAD→ skip-link, landmark main
  *  10. INIT        → arranca todo en DOMContentLoaded (una sola vez)
  */
@@ -26,7 +26,6 @@ const CONFIG = Object.freeze({
     version: '11.0',
 
     urls: {
-        telemedicina: 'https://meet.jit.si/DrAgramonte',
         doctoralia:   'https://www.doctoralia.es/juan-manuel-agramonte-bucho'
     },
 
@@ -404,89 +403,7 @@ class Autocompletado {
 
 
 /* ══════════════════════════════════════════════
-   7. TELEMEDICINA
-   Genera un enlace único de sala Jitsi y lo muestra
-   en un modal nativo <dialog>.
-══════════════════════════════════════════════ */
-class Telemedicina {
-
-    #modal = null;
-
-    init() {
-        // Escucha clics en cualquier botón de videollamada de la página
-        document.addEventListener('click', e => {
-            if (e.target.closest('#btnVideollamada, [data-action="videollamada"]')) {
-                e.preventDefault();
-                this._abrirModal();
-            }
-        });
-    }
-
-    _generarCodigo() {
-        const d   = new Date();
-        const pad = n => String(n).padStart(2, '0');
-        const rand = Math.random().toString(36).slice(2, 7).toUpperCase();
-        return `DRAG-${pad(d.getDate())}${pad(d.getMonth() + 1)}${String(d.getFullYear()).slice(-2)}-${rand}`;
-    }
-
-    _abrirModal() {
-        const codigo = this._generarCodigo();
-        const enlace = `${CONFIG.urls.telemedicina}-${codigo}`;
-
-        const modal = document.createElement('dialog');
-        modal.setAttribute('aria-modal', 'true');
-        modal.innerHTML = `
-            <div style="padding:2rem;max-width:480px">
-                <h3 style="margin-bottom:1rem;color:var(--teal-dark)">
-                    <i class="fas fa-video" aria-hidden="true"></i> Videoconsulta
-                </h3>
-                <p>Código: <strong>${Utils.escape(codigo)}</strong></p>
-                <p style="margin:.8rem 0;word-break:break-all">
-                    <a href="${Utils.escape(enlace)}" target="_blank" rel="noopener noreferrer">${Utils.escape(enlace)}</a>
-                </p>
-                <div style="display:flex;gap:.8rem;flex-wrap:wrap;margin-top:1.2rem">
-                    <button id="_copiar" class="btn btn--primary">
-                        <i class="fas fa-copy" aria-hidden="true"></i> Copiar enlace
-                    </button>
-                    <a href="${Utils.escape(enlace)}" target="_blank" rel="noopener noreferrer" class="btn btn--secondary">
-                        Abrir sala
-                    </a>
-                    <button id="_cerrar" class="btn btn--secondary">Cerrar</button>
-                </div>
-                <p style="font-size:.8rem;margin-top:1rem;color:var(--text-light)">
-                    <i class="fas fa-info-circle" aria-hidden="true"></i>
-                    Comparte este enlace solo con el Dr. Agramonte.
-                </p>
-            </div>
-        `;
-
-        document.body.appendChild(modal);
-        modal.showModal?.() || (modal.style.cssText = 'display:block;position:fixed;inset:0;margin:auto;z-index:10000');
-        this.#modal = modal;
-
-        modal.querySelector('#_copiar').addEventListener('click', async () => {
-            try {
-                await navigator.clipboard.writeText(enlace);
-                Utils.notify('Enlace copiado', 'success');
-            } catch {
-                Utils.notify('Copia el enlace manualmente', 'info');
-            }
-        });
-
-        modal.querySelector('#_cerrar').addEventListener('click', () => this._cerrar());
-        modal.addEventListener('keydown', e => { if (e.key === 'Escape') this._cerrar(); });
-    }
-
-    _cerrar() {
-        this.#modal?.close?.();
-        this.#modal?.remove();
-        this.#modal = null;
-    }
-}
-
-
-/* ══════════════════════════════════════════════
-   8. PWA — Service Worker
+   7. PWA — Service Worker
    Registra el SW para que la app funcione offline
    y notifica al usuario si pierde la conexión.
 ══════════════════════════════════════════════ */
@@ -506,7 +423,7 @@ class PWA {
 
 
 /* ══════════════════════════════════════════════
-   9. TEMA CLARO / OSCURO
+   8. TEMA CLARO / OSCURO
    Botón con icono luna (claro) / sol (oscuro); persiste en localStorage.
 ══════════════════════════════════════════════ */
 class ThemeToggle {
@@ -576,7 +493,7 @@ class ThemeToggle {
 
 
 /* ══════════════════════════════════════════════
-   10. ACCESIBILIDAD
+   9. ACCESIBILIDAD
    - Skip-link: permite saltar el menú con teclado
    - Asegura que el <main> tiene id para el skip-link
 ══════════════════════════════════════════════ */
@@ -614,8 +531,8 @@ class Accesibilidad {
 
 
 /* ══════════════════════════════════════════════
-   11. INICIALIZACIÓN — arranca todo una sola vez
-   Orden: infraestructura (nav, a11y) → visual (animaciones) → funcional (telemedicina, pwa)
+   10. INICIALIZACIÓN — arranca todo una sola vez
+   Orden: infraestructura (nav, a11y) → visual (animaciones) → funcional (autocompletado, pwa)
 ══════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
     try {
@@ -625,7 +542,6 @@ document.addEventListener('DOMContentLoaded', () => {
         new AnimacionesScroll().init(); // reveal al hacer scroll
         new LazyLoad().init();          // imágenes diferidas
         new Autocompletado().init();    // sugerencias en formulario
-        new Telemedicina().init();      // videollamadas Jitsi
         new PWA().init();              // service worker
         if (window.AuthUI) new AuthUI().init();
 
