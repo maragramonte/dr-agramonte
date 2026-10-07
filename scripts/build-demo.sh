@@ -9,7 +9,7 @@
 set -euo pipefail
 
 RAIZ="$(cd "$(dirname "$0")/.." && pwd)"
-OUT="$RAIZ/dist-demo"
+OUT="${OUT:-$RAIZ/dist-demo}"
 
 rm -rf "$OUT"
 cp -r "$RAIZ/frontend" "$OUT"
@@ -61,4 +61,4 @@ for f in "$OUT"/*.html; do
     inyectadas=$((inyectadas + 1))
 done
 
-echo "✓ dist-demo/ generado · $inyectadas páginas con modo demo"
+echo "✓ $(basename "$OUT")/ generado · $inyectadas páginas con modo demo"
