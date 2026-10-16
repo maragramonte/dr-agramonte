@@ -1,0 +1,75 @@
+# Revisión automática de cada pull request con un modelo de IA.
+#
+# Va aparte del CI (.github/workflows/ci.yml) a propósito: el CI decide si la PR
+# se puede integrar (compila, pasan las pruebas, se construye la imagen); esto
+# solo deja un comentario con riesgos que un test no ve. Nunca bloquea el merge.
+#
+# Necesita el secret ANTHROPIC_API_KEY (Settings > Secrets and variables >
+# Actions). Sin él, el job termina en verde y avisa de que se ha omitido.
+name: Revisión IA
+
+on:
+  # pull_request y NO pull_request_target: así una PR desde un fork nunca ejecuta
+  # su código con acceso a los secrets del repo. A cambio, en esas PR no hay
+  # revisión (no reciben la clave), que es el precio razonable.
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+# Lo mínimo: leer el código y escribir comentarios en la PR.
+permissions:
+  contents: read
+  pull-requests: write
+
+# Si se empujan varios commits seguidos, solo se revisa el último.
+concurrency:
+  group: revision-ia-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  # El revisor también tiene pruebas, y van antes: si su lógica está rota, no se
+  # publica nada en la PR.
+  pruebas-revisor:
+    name: Pruebas del revisor
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Pasar las pruebas
+        run: python -m unittest discover -s .github/scripts -v
+
+  revision:
+    name: Revisión automática
+    needs: pruebas-revisor
+    # Los borradores no se revisan: se revisan al marcarlos como listos.
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # Historial completo para poder calcular el diff base...head.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Revisar el diff y comentar en la PR
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Se puede cambiar sin tocar código desde Settings > Variables.
+          MODELO: ${{ vars.MODELO_REVISION }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUMERO: ${{ github.event.pull_request.number }}
+          # Título y descripción van por variables de entorno, nunca interpolados
+          # en el script: así un título malicioso no puede inyectar comandos.
+          PR_TITULO: ${{ github.event.pull_request.title }}
+          PR_DESCRIPCION: ${{ github.event.pull_request.body }}
+        run: python .github/scripts/revision_ia.py
