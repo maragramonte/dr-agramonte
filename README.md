@@ -12,6 +12,9 @@ una API simulada en el navegador y datos ficticios. Se puede reservar, cancelar,
 Telegram y entrar como médico para ver el cuadro de mando. No hay servidor detrás ni se envía ningún aviso
 ([cómo funciona](#demo-en-línea)).
 
+**Para probarla en un minuto:** pulsa «Entrar como paciente» en la franja amarilla y reserva una cita.
+Después pulsa «Entrar como médico» para verla en la agenda y en el cuadro de mando. Los datos se reinician cada día.
+
 **🖼 [Verla sin probar nada](docs/CAPTURAS.md)** — las doce pantallas en imágenes, con lo que
 hay detrás de cada una: la portada, la reserva paso a paso, los avisos de Telegram, el cuadro
 de mando del médico, el móvil, el modo oscuro y el catalán. Y si prefieres leer el proyecto
