@@ -72,7 +72,7 @@ Para el estado actual del sistema, ver el [README principal](../README.md).
 ## Fase 7 — Reserva invitado y sincronización unificada
 
 - **`POST /api/citas/reserva-publica`**: reserva sin JWT; cuenta invitada (`cuenta_invitada` en BD, Flyway **V4**); contraseña opcional.  
-- **`GET /api/citas/por-email`** y **`DELETE /api/citas/publica/{id}`**: el invitado consulta y cancela citas con su email (prototipo TFG).  
+- **`GET /api/citas/por-email`** y **`DELETE /api/citas/publica/{id}`**: el invitado consulta y cancela citas con su email (prototipo TFG). *Retirado en la Fase 9: el email no prueba identidad.*  
 - **`syncMisCitas()`** en `reserva.js`: alinea **Mis citas programadas** con PostgreSQL (misma fuente que el panel).  
 - Eliminación de reservas antiguas solo locales (ids `CITA-...`).  
 - Cancelación invitado actualiza el servidor → el panel refleja el cambio.  
@@ -88,3 +88,55 @@ Para el estado actual del sistema, ver el [README principal](../README.md).
 - Vinculación con **token de un solo uso** (15 min de validez) emitido solo para el usuario del JWT.
 - Webhook público autenticado con el secreto compartido de `setWebhook`, comparado en tiempo constante.
 - Migraciones **V9** y **V10**; los dos canales son independientes y ninguno puede tumbar una reserva.
+
+---
+
+## Fase 9 — Acceso de invitado con token por cita (dos fallos de seguridad)
+
+**Problema detectado.** Una revisión de QA encontró dos fallos en el flujo de reserva sin
+cuenta, los dos con la misma raíz: el **email se usaba como prueba de identidad**, y un
+correo electrónico no es un secreto.
+
+1. `GET /api/citas/por-email` estaba en `permitAll`: cualquiera, sin token, podía pedir las
+   citas de un paciente conociendo su correo. La respuesta incluía fecha, médico, centro,
+   cobertura, aseguradora, número de tarjeta sanitaria y el **motivo de consulta** en texto
+   libre, es decir datos de salud (art. 9 del RGPD). Los correos, además, son enumerables.
+2. En `CitaService.reservaPublica()`, la guarda de conflicto solo protegía a las cuentas que
+   *ya tenían contraseña*. Si la cuenta era de invitado, el flujo caía en la rama que
+   sobrescribía **nombre, teléfono y contraseña** con los datos de quien llamaba, marcaba la
+   cuenta como no invitada y devolvía en la misma respuesta un **JWT de la víctima**: un
+   secuestro de cuenta completo sabiendo solo el email, que además dejaba a la víctima fuera
+   de su propia cuenta.
+
+**Solución.**
+
+- Primero **dos pruebas que reproducían los fallos** (401 esperado donde había 200; 409
+  esperado donde había 201 con sesión ajena), y solo después el arreglo.
+- **Token de acceso por cita** en lugar del email: 32 bytes de `SecureRandom` en Base64
+  URL-safe (`security/TokenAccesoCita`), entregados una sola vez en `accesoToken` al reservar.
+  En base de datos solo se guarda el **SHA-256** (`citas.acceso_token_hash`, Flyway **V11**
+  para PostgreSQL y MySQL). No es BCrypt porque hay que buscar por hash y su sal aleatoria no
+  es reproducible; al no ser una contraseña elegible, un SHA-256 sin sal no es atacable por
+  diccionario. La comparación va en tiempo constante.
+- El token viaja en la cabecera **`X-Cita-Token`**, nunca en la URL: las rutas quedan en los
+  logs del servidor, en el historial del navegador y en el `Referer`.
+- `GET /api/citas/por-email` **desaparece**; la sustituye `GET /api/citas/publica/{id}`.
+  Dejarla solo autenticada no bastaba: cualquier paciente con sesión habría podido leer las
+  citas de otro pasando su email.
+- Token ausente o que no es el de la cita → **404**, igual que si no existiera, para no
+  confirmar su existencia.
+- Una **cuenta de invitado que ya existe no se modifica nunca** desde la ruta pública, y
+  nunca devuelve sesión. Sin contraseña, la cita se asocia a esa cuenta; con contraseña,
+  **409**, porque poner contraseña es tomar el control de la cuenta.
+- `SecurityConfig` responde **401** a las peticiones sin credenciales (antes, al no haber
+  mecanismo de login, Spring Security devolvía su 403 por defecto); el 403 queda para
+  «autenticado pero sin rol».
+- `syncMisCitas()` en `reserva.js` ya no pregunta por email: recorre los tokens guardados en
+  `localStorage` (`citas_tokens_dr_agramonte_v1`). Se retiró el disparador que resincronizaba
+  al teclear el correo, que era el gesto del flujo antiguo.
+- La API simulada de la demo (`demo/demo-api.js`) replica las mismas reglas, para que la demo
+  de GitHub Pages no se quede describiendo el comportamiento vulnerable.
+
+**Queda pendiente**: enviar el enlace con el token por email (hoy el token solo vive en el
+navegador donde se reservó) y un «recuperar acceso» para que un invitado pueda ponerse
+contraseña.

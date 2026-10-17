@@ -33,16 +33,17 @@ Consecuencias antiguas: citas que aparecían en «Mis citas» pero no en el pane
          ┌─────────────────────┼─────────────────────┐
          │                     │                     │
          ▼                     ▼                     ▼
- GET /citas/mias      GET /por-email?email=   GET /agenda/reservas
- (JWT paciente)       (invitado TFG)          (panel TFG)
+ GET /citas/mias      GET /citas/publica/{id} GET /agenda/reservas
+ (JWT paciente)       (X-Cita-Token)          (rol MEDICO/ADMIN)
          │                     │                     │
          ▼                     ▼                     ▼
    syncMisCitas()         syncMisCitas()      panel-pruebas.js
          │                     │
          └──────────┬──────────┘
                     ▼
-         localStorage citas_dr_agramonte_v3
-         (solo caché UI en reservar.html)
+         localStorage citas_dr_agramonte_v3  (caché UI)
+         localStorage citas_tokens_dr_agramonte_v1
+         ({ idCita: token }: la credencial del invitado)
 ```
 
 **Regla:** lo que cuenta es lo que está en **BD**. `localStorage` solo refleja esa lista tras cada sincronización.
@@ -52,16 +53,22 @@ Consecuencias antiguas: citas que aparecían en «Mis citas» pero no en el pane
 | Situación | Petición | Efecto en «Mis citas» |
 |-----------|----------|------------------------|
 | Usuario con **JWT** | `GET /api/citas/mias` | Sustituye la caché local por citas del servidor |
-| **Invitado** con email en formulario o `localStorage` | `GET /api/citas/por-email?email=...` | Igual: solo citas de ese email en BD |
-| Sin email válido | No llama al API | Elimina entradas locales con id `CITA-...` (legacy) |
+| **Invitado** con tokens guardados | Un `GET /api/citas/publica/{id}` por token, con la cabecera `X-Cita-Token` | Sustituye la caché por las citas que ese navegador puede acreditar |
+| Invitado sin tokens guardados | No llama al API | Elimina entradas locales con id `CITA-...` (legacy) |
+
+Si un token recibe **404** (la cita no existe o el token no es el suyo) se descarta de
+`localStorage`. Un fallo de red, en cambio, lo conserva: perderlo dejaría la cita
+inaccesible para siempre, porque el token solo se entrega una vez.
 
 **Cuándo se ejecuta:**
 
 - Al cargar `reservar.html` (tras cargar médicos).  
 - Tras **confirmar** una reserva (paciente o invitado).  
 - Tras **cancelar** (si la cita tiene id numérico del servidor).  
-- Al **escribir el email** (debounce 600 ms).  
 - Tras **login/logout** (`auth-changed`).
+
+Ya **no** se sincroniza al escribir el email: ese disparador existía cuando el correo daba
+acceso a las citas, y la lista ahora se construye con los tokens guardados.
 
 ## Flujos de reserva y cancelación
 
@@ -74,10 +81,11 @@ Consecuencias antiguas: citas que aparecían en «Mis citas» pero no en el pane
 ### Invitado (sin sesión)
 
 1. `POST /api/citas/reserva-publica` (nombre, email, teléfono, médico, fecha/hora; contraseña opcional).  
-2. Backend: crea o reutiliza usuario `PACIENTE` (`cuenta_invitada=true` hasta que fije contraseña).  
-3. Si el email ya tiene cuenta **con contraseña** → HTTP **409** («Inicia sesión»).  
-4. `syncMisCitas()` con el email del formulario.  
-5. Cancelar: `DELETE /api/citas/publica/{id}?email=...` (mismo email que la cita).
+2. Backend: crea la cuenta `PACIENTE` (`cuenta_invitada=true`) o **reutiliza sin modificar** la que ya hubiera con ese email.  
+3. Si el email ya tiene cuenta **con contraseña** → HTTP **409** («Inicia sesión»). Si ya tiene reservas **como invitado** y se envía contraseña, también **409**: poner contraseña es tomar el control de la cuenta.  
+4. La respuesta trae `accesoToken`, el token de esa cita. Solo se entrega aquí; el cliente lo guarda en `citas_tokens_dr_agramonte_v1`.  
+5. `syncMisCitas()` recorre los tokens guardados: `GET /api/citas/publica/{id}` con `X-Cita-Token`.  
+6. Cancelar: `DELETE /api/citas/publica/{id}` con la cabecera `X-Cita-Token` de esa cita.
 
 ### Panel TFG (`panel-pruebas.html`)
 
@@ -93,9 +101,10 @@ Consecuencias antiguas: citas que aparecían en «Mis citas» pero no en el pane
 |---------|-----------------|
 | `frontend/js/pages/reserva.js` | `syncMisCitas()`, reserva, cancelación, lista «Mis citas» |
 | `frontend/js/pages/panel-pruebas.js` | Tabla `GET /api/citas/agenda/reservas`, refresco entre pestañas |
-| `frontend/js/modules/api-client.js` | `postReservaPublica`, `getCitasPorEmail`, `cancelarReservaPublica` |
-| `backend/.../CitaService.java` | `reservaPublica`, `findByPacienteEmail`, `cancelarCitaPublica` |
-| `backend/.../SecurityConfig.java` | Rutas públicas de invitado y agenda TFG |
+| `frontend/js/modules/api-client.js` | `postReservaPublica`, `getCitaPublica`, `cancelarReservaPublica` |
+| `backend/.../CitaService.java` | `reservaPublica`, `buscarCitaPublica`, `cancelarCitaPublica` |
+| `backend/.../TokenAccesoCita.java` | Genera el token de acceso, lo hashea (SHA-256) y lo compara en tiempo constante |
+| `backend/.../SecurityConfig.java` | Rutas públicas de invitado y agenda TFG; entry point 401 |
 
 ---
 
@@ -104,9 +113,11 @@ Consecuencias antiguas: citas que aparecían en «Mis citas» pero no en el pane
 | Concepto | Valor / comportamiento |
 |----------|------------------------|
 | Caché local | `localStorage` → clave `citas_dr_agramonte_v3` |
+| Tokens de invitado | `localStorage` → clave `citas_tokens_dr_agramonte_v1` (`{ idCita: token }`) |
 | Id de cita en servidor | Numérico (`"1"`, `"2"`, …) |
-| Reservas legacy solo locales | Id `CITA-...` → se eliminan al sincronizar con email válido |
+| Reservas legacy solo locales | Id `CITA-...` → se eliminan al sincronizar |
 | Cuenta invitado en BD | Columna `cuenta_invitada` (Flyway V4) |
+| Token de cita en BD | Columna `acceso_token_hash`: SHA-256 del token, nunca el token (Flyway V11) |
 | Aviso al panel | `BroadcastChannel('dr-agramonte-citas')` + `localStorage` `dr-agramonte-cita-creada` |
 
 ---
@@ -147,8 +158,10 @@ docker compose ps   # postgres, backend, frontend → Up (healthy)
 # Todas las reservas del médico 1 (lo que ve el panel)
 Invoke-RestMethod "http://localhost:8080/api/citas/agenda/reservas?medicoId=1"
 
-# Citas de un email (lo que usa syncMisCitas para invitado)
-Invoke-RestMethod "http://localhost:8080/api/citas/por-email?email=test.sync@example.com"
+# Cita de un invitado (lo que usa syncMisCitas). El token lo devolvió la reserva en
+# accesoToken y viaja en cabecera, nunca en la URL.
+Invoke-RestMethod "http://localhost:8080/api/citas/publica/1" `
+  -Headers @{ 'X-Cita-Token' = '<accesoToken de la reserva>' }
 ```
 
 Ambas listas deben contener la misma cita (mismo `id` / `citaId`).
@@ -159,8 +172,8 @@ Ambas listas deben contener la misma cita (mismo `id` / `citaId`).
 
 Importar `postman/` y seguir el orden de [postman/README.md](../postman/README.md):
 
-1. **Reserva pública (sin JWT)**  
-2. **Citas por email (invitado)**  
+1. **Reserva pública (sin JWT)** — guarda `ultima_cita_id` y `cita_acceso_token`  
+2. **Cita de invitado (token de acceso)**  
 3. **Historial reservas prueba** (panel)  
 4. **Cancelar cita pública (invitado)** → repetir paso 3
 
@@ -170,19 +183,37 @@ Importar `postman/` y seguir el orden de [postman/README.md](../postman/README.m
 
 | Síntoma | Causa probable | Qué hacer |
 |---------|----------------|-----------|
-| Mis citas muestra citas que el panel no tiene | Entradas `CITA-...` antiguas o reserva antes de Fase 7 | Escribir email en el formulario (dispara sync) o borrar `citas_dr_agramonte_v3` en DevTools |
+| Mis citas muestra citas que el panel no tiene | Entradas `CITA-...` antiguas o reserva antes de Fase 7 | Recargar `reservar.html` (dispara sync) o borrar `citas_dr_agramonte_v3` en DevTools |
 | Panel vacío pero Mis citas llena | Backend caído al reservar o panel sin refrescar | `docker compose logs backend`; **Actualizar tabla** |
 | No aparece bloque «Cuenta (opcional)» | Service worker con HTML viejo | Ctrl+Shift+R; Application → Unregister service worker |
 | 409 al reservar invitado | Email ya registrado con contraseña | Iniciar sesión o usar otro email |
-| Cancelar invitado no actualiza panel | Email del formulario distinto al de la reserva | Mismo email en el campo antes de cancelar |
+| 409 al reservar invitado enviando contraseña | Ese email ya tiene reservas como invitado; la cuenta no se toca desde la ruta pública | Reservar sin contraseña |
+| «No tenemos su clave de acceso» al cancelar | La cita se reservó en otro navegador: aquí no está su token | Cancelar desde el navegador original o por teléfono |
+| 404 al consultar o cancelar una cita de invitado | Token ausente, de otra cita, o enviado en la URL en vez de en `X-Cita-Token` | Enviar la cabecera con el token de esa cita |
 
 ---
 
 ## Seguridad (nota para la memoria)
 
-Los endpoints `GET /por-email` y `DELETE /publica/{id}` son de nivel **prototipo**: cualquiera que conozca el email puede consultar o cancelar esas citas. En producción harían falta un enlace firmado, un código de un solo uso enviado por email o login obligatorio.
+El acceso de invitado **por email** se retiró (ver [Fase 9](EVOLUCION.md)). Un correo no es
+un secreto, así que no prueba identidad: mientras existió, cualquiera que conociera el email
+de un paciente podía leer su historial de citas —con el motivo de consulta, dato de salud del
+art. 9 del RGPD— y cancelárselas.
 
-Otras dos limitaciones conocidas:
+Ahora cada cita reservada sin cuenta lleva su propio **token de acceso**: 32 bytes de
+`SecureRandom` que se entregan una sola vez, en el campo `accesoToken` de la reserva, y de los
+que en base de datos solo queda el SHA-256 (`citas.acceso_token_hash`, Flyway **V11**). Viaja
+en la cabecera `X-Cita-Token` y no en la URL, porque las rutas acaban en los logs del
+servidor, en el historial del navegador y en la cabecera `Referer`. Si el token falta o no es
+el de esa cita, la respuesta es **404** y no 403: un 403 confirmaría que la cita existe, y el
+id es un entero correlativo fácil de recorrer.
 
-- «Mis citas» en otro navegador u otro equipo solo aparece si se usa el **mismo email** (el API filtra por email) o se inicia sesión.
-- El panel lista **todas** las reservas del médico. Ya exige rol `MEDICO`/`ADMIN`, pero sigue siendo una vista de demostración, no el panel clínico final.
+Limitaciones que siguen en pie:
+
+- «Mis citas» en otro navegador u otro equipo **no** aparece: el token vive en el
+  `localStorage` del navegador donde se reservó. La salida natural es enviar el enlace con el
+  token por email, que aún no está hecho.
+- Un invitado con reservas previas no puede ponerse contraseña desde la reserva pública
+  (recibe 409); falta un «recuperar acceso» por email.
+- El panel lista **todas** las reservas del médico. Ya exige rol `MEDICO`/`ADMIN`, pero sigue
+  siendo una vista de demostración, no el panel clínico final.

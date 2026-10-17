@@ -248,8 +248,9 @@ dicho en el resumen del run en vez de fallar.
 | `GET` | `/api/disponibilidad` | Huecos por médico, fecha y centro |
 | `POST` | `/api/citas` | Crear cita (paciente autenticado) |
 | `POST` | `/api/citas/reserva-publica` | Reservar sin cuenta previa |
-| `GET` | `/api/citas/mias` · `/api/citas/por-email` | Citas del paciente / del invitado |
-| `DELETE` | `/api/citas/{id}` · `/api/citas/publica/{id}` | Cancelación |
+| `GET` | `/api/citas/mias` | Citas del paciente autenticado |
+| `GET` | `/api/citas/publica/{id}` | Cita de invitado — cabecera `X-Cita-Token` |
+| `DELETE` | `/api/citas/{id}` · `/api/citas/publica/{id}` | Cancelación (la de invitado, con `X-Cita-Token`) |
 | `GET` | `/api/citas/agenda/reservas`, `/agenda/pacientes` | Agenda del médico — rol `MEDICO`/`ADMIN` |
 | `GET` | `/api/estadisticas` | Cuadro de mando — rol `MEDICO`/`ADMIN` |
 | `GET`&nbsp;`POST`&nbsp;`DELETE` | `/api/telegram/vinculacion` | Alta y baja del canal Telegram |

@@ -155,9 +155,13 @@
               "listen": "test",
               "script": {
                 "exec": [
+                  "// Sin contraseña a propósito: si ese email ya tiene reservas de invitado,",
+                  "// enviarla responde 409 (la cuenta existente no se toca desde la ruta pública).",
                   "if (pm.response.code === 201) {",
                   "    const body = pm.response.json();",
                   "    if (body.cita && body.cita.id) pm.environment.set('ultima_cita_id', String(body.cita.id));",
+                  "    // accesoToken se entrega solo aquí: es la credencial de esta cita.",
+                  "    if (body.accesoToken) pm.environment.set('cita_acceso_token', body.accesoToken);",
                   "    if (body.sesion && body.sesion.token) pm.environment.set('jwt_token', body.sesion.token);",
                   "}"
                 ],
@@ -171,7 +175,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Paciente Invitado\",\n  \"email\": \"{{invitado_email}}\",\n  \"telefono\": \"+34600000099\",\n  \"medicoId\": {{medico_id}},\n  \"fechaHora\": \"{{fecha_disponibilidad}}T11:00:00\",\n  \"motivo\": \"Reserva pública TFG\",\n  \"password\": \"Invitado123\"\n}"
+              "raw": "{\n  \"nombre\": \"Paciente Invitado\",\n  \"email\": \"{{invitado_email}}\",\n  \"telefono\": \"+34600000099\",\n  \"medicoId\": {{medico_id}},\n  \"fechaHora\": \"{{fecha_disponibilidad}}T11:00:00\",\n  \"motivo\": \"Reserva pública TFG\"\n}"
             },
             "url": "{{base_url}}/api/citas/reserva-publica"
           }
@@ -210,25 +214,22 @@
           }
         },
         {
-          "name": "Citas por email (invitado)",
+          "name": "Cita de invitado (token de acceso)",
           "request": {
             "auth": { "type": "noauth" },
             "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/citas/por-email?email={{invitado_email}}",
-              "host": ["{{base_url}}"],
-              "path": ["api", "citas", "por-email"],
-              "query": [{ "key": "email", "value": "{{invitado_email}}" }]
-            }
+            "header": [{ "key": "X-Cita-Token", "value": "{{cita_acceso_token}}" }],
+            "url": "{{base_url}}/api/citas/publica/{{ultima_cita_id}}"
           },
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
+                  "// El token va en la cabecera X-Cita-Token, nunca en la URL: las rutas quedan",
+                  "// en los logs del servidor y en el historial del navegador.",
                   "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                  "const rows = pm.response.json();",
-                  "if (rows.length && rows[0].id) pm.environment.set('ultima_cita_id', String(rows[0].id));"
+                  "pm.test('Devuelve la cita del token', () => pm.expect(pm.response.json()).to.have.property('id'));"
                 ],
                 "type": "text/javascript"
               }
@@ -247,12 +248,8 @@
           "request": {
             "auth": { "type": "noauth" },
             "method": "DELETE",
-            "url": {
-              "raw": "{{base_url}}/api/citas/publica/{{ultima_cita_id}}?email={{invitado_email}}",
-              "host": ["{{base_url}}"],
-              "path": ["api", "citas", "publica", "{{ultima_cita_id}}"],
-              "query": [{ "key": "email", "value": "{{invitado_email}}" }]
-            }
+            "header": [{ "key": "X-Cita-Token", "value": "{{cita_acceso_token}}" }],
+            "url": "{{base_url}}/api/citas/publica/{{ultima_cita_id}}"
           }
         }
       ]
