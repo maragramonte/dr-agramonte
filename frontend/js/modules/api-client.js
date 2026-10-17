@@ -2,6 +2,11 @@
 // v2.0 — añade soporte multi-centro y endpoint de disponibilidad filtrada
 const API_BASE_URL = window.API_BASE_URL || '/api';
 
+// El token de acceso de una cita de invitado va en cabecera, nunca en la URL: las rutas
+// quedan en los logs del servidor, en el historial del navegador y en el Referer.
+const CITA_TOKEN_HEADER = 'X-Cita-Token';
+const cabeceraCitaToken = (token) => ({ [CITA_TOKEN_HEADER]: token });
+
 class ApiClient {
     async request(endpoint, options = {}) {
         const headers = {
@@ -24,7 +29,9 @@ class ApiClient {
             } catch (_) {
                 // Respuesta no JSON (p.ej. 204/empty body)
             }
-            throw new Error(errorMessage);
+            const error = new Error(errorMessage);
+            error.status = response.status;
+            throw error;
         }
         if (response.status === 204) return null;
         const contentType = response.headers.get('content-type') || '';
@@ -32,8 +39,8 @@ class ApiClient {
     }
 
     // ── Métodos base ──────────────────────────────────────────────────────────
-    get(endpoint) {
-        return this.request(endpoint, { method: 'GET' });
+    get(endpoint, headers) {
+        return this.request(endpoint, { method: 'GET', headers });
     }
 
     post(endpoint, data) {
@@ -44,8 +51,8 @@ class ApiClient {
         return this.request(endpoint, { method: 'PUT', body: JSON.stringify(data) });
     }
 
-    delete(endpoint) {
-        return this.request(endpoint, { method: 'DELETE' });
+    delete(endpoint, headers) {
+        return this.request(endpoint, { method: 'DELETE', headers });
     }
 
     // Multi-centro: nuevos endpoints
@@ -93,12 +100,17 @@ class ApiClient {
         return this.post('/citas/reserva-publica', data);
     }
 
-    getCitasPorEmail(email) {
-        return this.get(`/citas/por-email?email=${encodeURIComponent(email)}`);
+    /**
+     * Consulta una cita reservada sin cuenta con su token de acceso.
+     * El email ya no da acceso a nada: cualquiera puede conocerlo.
+     */
+    getCitaPublica(citaId, token) {
+        return this.get(`/citas/publica/${citaId}`, cabeceraCitaToken(token));
     }
 
-    cancelarReservaPublica(citaId, email) {
-        return this.delete(`/citas/publica/${citaId}?email=${encodeURIComponent(email)}`);
+    /** Cancela una cita de invitado; exige el token de acceso de esa misma cita. */
+    cancelarReservaPublica(citaId, token) {
+        return this.delete(`/citas/publica/${citaId}`, cabeceraCitaToken(token));
     }
 
     /*

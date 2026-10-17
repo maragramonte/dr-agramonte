@@ -18,15 +18,6 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
     List<Cita> findByUsuario(Usuario usuario);
     List<Cita> findByUsuarioId(Long usuarioId);
 
-    @Query("""
-            SELECT c FROM Cita c
-            JOIN FETCH c.usuario
-            JOIN FETCH c.medico
-            WHERE LOWER(c.usuario.email) = LOWER(:email)
-            ORDER BY c.fechaHora DESC
-            """)
-    List<Cita> findByUsuarioEmailWithMedico(@Param("email") String email);
-
     List<Cita> findByMedicoId(Long medicoId);
 
     @Query("""

@@ -208,8 +208,10 @@ async function cargar() {
         setConn(true, `Conectado · ${data.totalCitas} cita(s) analizadas`);
     } catch (err) {
         console.warn(err);
-        // 401/403 desde el backend (token caducado o rol insuficiente)
-        if (/403|401|prohib|forbidden|unauthor/i.test(err.message)) {
+        // 401 (sin credenciales o token caducado) o 403 (rol insuficiente) del backend.
+        // Se mira el código y no el mensaje: esas respuestas llegan con el cuerpo vacío,
+        // así que el texto nunca contenía "401" ni "403" y la rama no se activaba.
+        if (err.status === 401 || err.status === 403) {
             mostrarGate('Sesión no autorizada para gestión. Inicia sesión como <code>MEDICO</code> / <code>ADMIN</code>.');
         } else {
             setConn(false, 'No se pudo cargar. ¿Está el backend en marcha? (docker compose up)');

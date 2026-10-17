@@ -10,6 +10,12 @@ import lombok.NoArgsConstructor;
 public class ReservaPublicaResponse {
 
     private CitaResponse cita;
-    /** Presente si el paciente indicó contraseña y quedó autenticado. */
+    /** Presente solo si se creó la cuenta en esta reserva con contraseña. */
     private AuthResponse sesion;
+    /**
+     * Token de acceso a esta cita para quien reserva sin cuenta. Es la única vez que se
+     * entrega (en BD solo queda su hash): el cliente debe guardarlo, porque es lo que le
+     * permite consultarla y cancelarla sin sesión.
+     */
+    private String accesoToken;
 }

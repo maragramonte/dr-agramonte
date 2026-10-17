@@ -17,9 +17,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -28,7 +30,10 @@ import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -166,13 +171,25 @@ class CitaControllerWebMvcTest {
         verify(citaService, never()).listarReservasPrueba(anyLong(), any());
     }
 
+    @Test
+    @DisplayName("GET /api/citas/por-email ya no es pública: anónimo recibe 401")
+    void citasPorEmail_anonimo_debeExigirAutenticacion() throws Exception {
+        // El acceso por email se retiró del controller: el listado incluía el motivo de
+        // consulta en texto libre, es decir datos de salud (RGPD art. 9), y un correo no
+        // es un secreto, así que no servía como prueba de identidad. Esta prueba fija que
+        // la ruta tampoco vuelva a quedar abierta si alguien la reintroduce: la cubre la
+        // regla anyRequest().authenticated() de SecurityConfig.
+        mockMvc.perform(get("/api/citas/por-email").param("email", "invitado@example.com"))
+                .andExpect(status().isUnauthorized());
+    }
+
     // ── Rutas públicas (reserva sin cuenta) ─────────────────────────────────
 
     @Test
     @DisplayName("POST /api/citas/reserva-publica es público y crea la cita (201)")
     void reservaPublica_anonimo_creada() throws Exception {
         when(citaService.reservaPublica(any()))
-                .thenReturn(new ReservaPublicaResponse(citaConfirmada(), null));
+                .thenReturn(new ReservaPublicaResponse(citaConfirmada(), null, "token-de-acceso-de-prueba"));
 
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("nombre", "Paciente Invitado");
@@ -185,6 +202,39 @@ class CitaControllerWebMvcTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json(body)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.cita.estado").value("CONFIRMADA"));
+                .andExpect(jsonPath("$.cita.estado").value("CONFIRMADA"))
+                // El token de acceso viaja en la respuesta: es lo que sustituye al email
+                // como credencial del invitado para consultar y cancelar su cita.
+                .andExpect(jsonPath("$.accesoToken").value("token-de-acceso-de-prueba"));
+    }
+
+    @Test
+    @DisplayName("GET /api/citas/publica/{id} es público pero sin la cabecera del token no abre nada (404)")
+    void citaPublica_sinToken_noAbreNada() throws Exception {
+        when(citaService.buscarCitaPublica(eq(7L), isNull()))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Cita no encontrada"));
+
+        mockMvc.perform(get("/api/citas/publica/7"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("DELETE /api/citas/publica/{id} con email en vez de token: no se cancela nada (404)")
+    void cancelarCitaPublica_conEmailEnVezDeToken_noCancelaNada() throws Exception {
+        // Ni el parámetro 'email' del flujo antiguo ni un token en la query string sirven:
+        // la credencial va en la cabecera X-Cita-Token, así que la petición llega sin token
+        // y el servicio responde 404 sin tocar la cita.
+        doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Cita no encontrada"))
+                .when(citaService).cancelarCitaPublica(eq(7L), isNull());
+
+        mockMvc.perform(delete("/api/citas/publica/7").param("email", "invitado@example.com"))
+                .andExpect(status().isNotFound());
+
+        // Y el token en la URL tampoco: ahí es donde no queremos que viaje.
+        mockMvc.perform(delete("/api/citas/publica/7").param("token", "token-en-la-url"))
+                .andExpect(status().isNotFound());
+
+        // Y en ningún caso se ha intentado cancelar con el email como credencial.
+        verify(citaService, never()).cancelarCitaPublica(anyLong(), anyString());
     }
 }
