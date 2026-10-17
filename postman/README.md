@@ -72,13 +72,13 @@ La colección usa `base_url` (puerto 8080).
 
 ### Flujo invitado + sincronización (Fase 7)
 
-Comprueba que invitado, «Mis citas» (vía `por-email`) y panel (`agenda/reservas`) coinciden:
+Comprueba que invitado, «Mis citas» (vía `/citas/publica/{id}` con `X-Cita-Token`) y panel (`agenda/reservas`) coinciden:
 
 1. **Disponibilidad** — anota una hora libre.  
-2. **Reserva pública (sin JWT)** — ajusta `fechaHora` en el body si hace falta. Guarda `ultima_cita_id`.  
-3. **Citas por email (invitado)** — debe devolver la misma cita que el paso 2.  
+2. **Reserva pública (sin JWT)** — ajusta `fechaHora` en el body si hace falta. Guarda `ultima_cita_id` y `cita_acceso_token`.  
+3. **Cita de invitado (token de acceso)** — debe devolver la misma cita que el paso 2.  
 4. **Historial reservas prueba** — misma fila en el listado del médico (panel).  
-5. **Cancelar cita pública (invitado)** — query `email` = el del paso 2.  
+5. **Cancelar cita pública (invitado)** — usa la cabecera `X-Cita-Token` del paso 2; sin ella responde 404.  
 6. Repetir **Historial reservas prueba** — estado `CANCELADA`.
 
 Documentación ampliada: [docs/SINCRONIZACION-CITAS.md](../docs/SINCRONIZACION-CITAS.md).
@@ -101,7 +101,7 @@ Petición: **Login médico (V3)** → **Agenda pacientes**.
 |---------|-----------|
 | Auth | Registro, login paciente, login médico |
 | Médicos y disponibilidad | Público |
-| Citas (paciente JWT) | Reserva pública, crear cita, mis citas, por-email, cancelar JWT/pública |
+| Citas (paciente JWT) | Reserva pública, crear cita, mis citas, cita de invitado por token, cancelar JWT/pública |
 | Agenda TFG (público demo) | Lo que consume `panel-pruebas.html` |
 | Health / Contacto | Actuator, formulario contacto |
 

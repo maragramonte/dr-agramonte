@@ -12,7 +12,11 @@ const CFG = {
     meses: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
     mesesCorto: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
     diasSemana: ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'],
-    storageKey: 'citas_dr_agramonte_v3'
+    storageKey: 'citas_dr_agramonte_v3',
+    // Tokens de acceso de las citas reservadas sin cuenta: { idCita: token }. Es la
+    // credencial que entrega el backend al reservar y lo único que permite consultar
+    // o cancelar esa cita sin sesión.
+    tokensKey: 'citas_tokens_dr_agramonte_v1'
 };
 
 /** Servicios desde servicios.html → ?servicio=... */
@@ -70,6 +74,11 @@ const $ = (id) => document.getElementById(id);
 const loadCitas = () => { try { return JSON.parse(localStorage.getItem(CFG.storageKey) || '[]'); } catch { return []; } };
 const saveCitas = (citas) => localStorage.setItem(CFG.storageKey, JSON.stringify(citas));
 const isAuthenticated = () => !!localStorage.getItem('token');
+const loadTokens = () => { try { return JSON.parse(localStorage.getItem(CFG.tokensKey) || '{}'); } catch { return {}; } };
+const saveTokens = (tokens) => localStorage.setItem(CFG.tokensKey, JSON.stringify(tokens));
+const tokenDeCita = (id) => loadTokens()[String(id)] || null;
+const guardarTokenCita = (id, token) => { const t = loadTokens(); t[String(id)] = token; saveTokens(t); };
+const olvidarTokenCita = (id) => { const t = loadTokens(); delete t[String(id)]; saveTokens(t); };
 const toISO = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 const parseDate = (iso) => { const [y, m, d] = iso.split('-'); return new Date(+y, +m - 1, +d); };
 const formatIsoDate = (d) => {
@@ -323,32 +332,60 @@ function isServerCitaId(id) {
     return /^\d+$/.test(String(id));
 }
 
-function emailParaSync() {
-    return ($('email')?.value || localStorage.getItem('email') || '').trim().toLowerCase();
-}
-
-/** Alinea "Mis citas" con PostgreSQL (JWT o email de invitado). Elimina reservas solo locales antiguas. */
+/**
+ * Alinea "Mis citas" con PostgreSQL. Con sesión, pidiendo las del paciente autenticado;
+ * sin ella, cita a cita con el token de acceso que devolvió cada reserva. El email ya no
+ * sirve para esto: no es un secreto, así que no prueba quién es quien pregunta.
+ */
 async function syncMisCitas() {
-    try {
-        let citasBackend;
-        if (isAuthenticated()) {
-            citasBackend = await apiClient.get('/citas/mias');
-        } else {
-            const email = emailParaSync();
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                saveCitas(loadCitas().filter((c) => isServerCitaId(c.id)));
-                return;
-            }
-            citasBackend = await apiClient.getCitasPorEmail(email);
-        }
-        saveCitas((citasBackend || []).map(mapBackendCitaToFrontend));
-    } catch (err) {
-        console.error(err);
-        saveCitas(loadCitas().filter((c) => isServerCitaId(c.id)));
-        if (isAuthenticated() || emailParaSync()) {
+    if (isAuthenticated()) {
+        try {
+            const citasBackend = await apiClient.get('/citas/mias');
+            saveCitas((citasBackend || []).map(mapBackendCitaToFrontend));
+        } catch (err) {
+            console.error(err);
+            saveCitas(loadCitas().filter((c) => isServerCitaId(c.id)));
             showToast('No se pudo sincronizar citas con el servidor', 'warning');
         }
+        return;
     }
+
+    const tokens = loadTokens();
+    const ids = Object.keys(tokens);
+    if (!ids.length) {
+        // Sin tokens guardados no hay nada que consultar (se reservó en otro navegador o
+        // se borró el almacenamiento). Se purgan las reservas solo locales, como antes.
+        saveCitas(loadCitas().filter((c) => isServerCitaId(c.id)));
+        return;
+    }
+
+    let huboErrorDeRed = false;
+    const citas = await Promise.all(ids.map(async (id) => {
+        try {
+            return mapBackendCitaToFrontend(await apiClient.getCitaPublica(id, tokens[id]));
+        } catch (err) {
+            // 404 = ese token ya no abre nada (cita inexistente o token que no es el suyo):
+            // se descarta. Un fallo de red, en cambio, no debe hacernos perder el token.
+            if (err.status === 404) {
+                olvidarTokenCita(id);
+            } else {
+                console.error(err);
+                huboErrorDeRed = true;
+            }
+            return null;
+        }
+    }));
+
+    const recuperadas = citas.filter(Boolean);
+    if (huboErrorDeRed) {
+        showToast('No se pudo sincronizar citas con el servidor', 'warning');
+        // Se conserva lo que ya había para no vaciar la lista por un error puntual.
+        const previas = loadCitas().filter((c) => isServerCitaId(c.id)
+            && !recuperadas.some((r) => r.id === c.id));
+        saveCitas([...recuperadas, ...previas]);
+        return;
+    }
+    saveCitas(recuperadas);
 }
 
 async function cargarMedicos() {
@@ -637,12 +674,13 @@ function renderAppointments() {
             if (isAuthenticated()) {
                 await apiClient.cancelarReserva(cita.id);
             } else if (isServerCitaId(cita.id)) {
-                const email = emailParaSync() || cita.paciente?.email;
-                if (!email) {
-                    showToast('Indica tu email en el formulario para cancelar en el servidor', 'error');
+                const token = tokenDeCita(cita.id);
+                if (!token) {
+                    showToast('Esta cita se reservó en otro navegador: no tenemos su clave de acceso. Llama a la consulta para cancelarla', 'error');
                     return;
                 }
-                await apiClient.cancelarReservaPublica(cita.id, email);
+                await apiClient.cancelarReservaPublica(cita.id, token);
+                olvidarTokenCita(cita.id);
                 notificarCitaCreada();
             } else {
                 const allCitas = loadCitas();
@@ -729,6 +767,11 @@ async function onSubmit(e) {
             };
             if (pwd) body.password = pwd;
             const resp = await apiClient.postReservaPublica(body);
+            // El token de acceso solo se entrega aquí: si no se guarda, la cita queda
+            // inaccesible desde este navegador (el email ya no la recupera).
+            if (resp?.cita?.id && resp.accesoToken) {
+                guardarTokenCita(resp.cita.id, resp.accesoToken);
+            }
             guardarSesionDesdeReserva(resp.sesion, cita.paciente.telefono);
             localStorage.setItem('email', cita.paciente.email);
             if (cita.paciente.telefono) localStorage.setItem('telefono', cita.paciente.telefono);
@@ -787,16 +830,9 @@ function bindEvents() {
     $('nombre').addEventListener('input', updateSubmitState);
     $('email').addEventListener('input', updateSubmitState);
     $('telefono').addEventListener('input', updateSubmitState);
-    let emailSyncTimer;
-    $('email').addEventListener('input', () => {
-        clearTimeout(emailSyncTimer);
-        emailSyncTimer = setTimeout(() => {
-            syncMisCitas().finally(() => {
-                renderAppointments();
-                renderCalendar();
-            });
-        }, 600);
-    });
+    // Antes, al teclear el email se resincronizaba "Mis citas": era el flujo en el que el
+    // correo daba acceso a las citas. Ya no: la lista se construye con los tokens de acceso
+    // guardados, así que escribir el email no desencadena ninguna consulta.
     $('formReserva').addEventListener('submit', onSubmit);
 }
 

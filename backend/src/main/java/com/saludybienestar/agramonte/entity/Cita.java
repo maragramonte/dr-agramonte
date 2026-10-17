@@ -1,5 +1,6 @@
 package com.saludybienestar.agramonte.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -62,6 +63,21 @@ public class Cita {
 
     /** Preferencia de pago si es privada: 'en-consulta' u 'online'. Nullable. */
     private String preferenciaPago;
+
+    /**
+     * SHA-256 en hexadecimal del token de acceso entregado al reservar sin cuenta.
+     * Es la credencial con la que un invitado consulta y cancela SU cita: antes se
+     * usaba el email, que cualquiera puede conocer.
+     *
+     * <p>No se guarda el token en claro, y se compara por hash, así que no puede ser
+     * BCrypt: su sal aleatoria no es reproducible. Como el token son 32 bytes de
+     * {@code SecureRandom} y no una contraseña elegida por una persona, un SHA-256
+     * sin sal no es atacable por diccionario ni por tablas precalculadas.
+     *
+     * <p>Nullable: las citas creadas con sesión se identifican con el JWT del paciente.
+     */
+    @Column(name = "acceso_token_hash", length = 64)
+    private String accesoTokenHash;
 
     // Igualdad por identidad (id): segura para JPA y para usar la entidad en colecciones.
     @Override

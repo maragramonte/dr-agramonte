@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -18,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -55,8 +57,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/centros").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/disponibilidad/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/citas/reserva-publica").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/citas/por-email").permitAll()
-                        .requestMatchers(HttpMethod.DELETE, "/api/citas/publica/**").permitAll()
+                        // Las dos rutas de invitado llevan su propia credencial: el token de
+                        // acceso de la cita, que solo recibe quien la reservó. Son públicas
+                        // para la cadena de filtros (no hay JWT), pero no son anónimas: sin
+                        // el token correcto el servicio responde 404.
+                        // Ya NO existe acceso por email: el correo no prueba identidad, y la
+                        // regla anyRequest().authenticated() de más abajo cierra esa ruta.
+                        .requestMatchers(HttpMethod.GET, "/api/citas/publica/*").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/citas/publica/*").permitAll()
                         // Lo llama Telegram, no un usuario: no puede presentar JWT.
                         .requestMatchers(HttpMethod.POST, "/api/telegram/webhook").permitAll()
                         // Permisos de Pacientes
@@ -76,6 +84,13 @@ public class SecurityConfig {
                         // Bloqueo del resto de endpoints
                         .anyRequest().authenticated()
                 )
+                // Sin credenciales la respuesta correcta es 401 (no te has identificado).
+                // Por defecto, al no haber mecanismo de login (ni formulario ni basic),
+                // Spring Security contestaría 403 a una petición anónima, que es el código
+                // de «identificado pero sin permiso». Un usuario autenticado al que le
+                // falta el rol sigue recibiendo 403, que lo resuelve el AccessDeniedHandler.
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(
+                        new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

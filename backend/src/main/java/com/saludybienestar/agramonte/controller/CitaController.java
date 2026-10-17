@@ -21,6 +21,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CitaController {
 
+    /** Cabecera que transporta el token de acceso de una cita de invitado. */
+    public static final String CABECERA_TOKEN = "X-Cita-Token";
+
     private final CitaService citaService;
 
     @PostMapping
@@ -42,16 +45,30 @@ public class CitaController {
         return citaService.findByPaciente(user.getId());
     }
 
-    /** Citas del paciente por email (invitado sin JWT). Solo para prototipo TFG. */
-    @GetMapping("/por-email")
-    public List<CitaResponse> citasPorEmail(@RequestParam String email) {
-        return citaService.findByPacienteEmail(email);
+    /**
+     * Consulta de una cita reservada sin cuenta. La credencial es el token de acceso que
+     * devolvió la reserva, no el email: un correo lo puede conocer cualquiera, así que
+     * identificar al paciente por él dejaba su historial (y el motivo de consulta, que es
+     * dato de salud) a la vista de quien lo supiera.
+     *
+     * <p>El token viaja en la cabecera {@code X-Cita-Token} y no en la URL: las rutas
+     * acaban en los logs del servidor, en el historial del navegador y en la cabecera
+     * {@code Referer}, y ahí no debe quedar una credencial. Se declara opcional para que
+     * un token ausente y uno equivocado reciban la misma respuesta (404) en lugar de
+     * distinguirse con un 400.
+     */
+    @GetMapping("/publica/{id}")
+    public CitaResponse citaPublica(@PathVariable Long id,
+                                    @RequestHeader(name = CABECERA_TOKEN, required = false) String token) {
+        return citaService.buscarCitaPublica(id, token);
     }
 
+    /** Cancelación de una cita de invitado; exige el token de acceso de esa misma cita. */
     @DeleteMapping("/publica/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void cancelarCitaPublica(@PathVariable Long id, @RequestParam String email) {
-        citaService.cancelarCitaPublica(email, id);
+    public void cancelarCitaPublica(@PathVariable Long id,
+                                    @RequestHeader(name = CABECERA_TOKEN, required = false) String token) {
+        citaService.cancelarCitaPublica(id, token);
     }
 
     /**

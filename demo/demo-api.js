@@ -274,6 +274,28 @@
         return toCitaResponse(cita);
     }
 
+    /** Cabecera que transporta el token de acceso de una cita (igual que en CitaController). */
+    const CITA_TOKEN_HEADER = 'X-Cita-Token';
+
+    /** Token de acceso de una cita de invitado (equivalente a TokenAccesoCita.generar()). */
+    function nuevoAccesoToken() {
+        const bytes = new Uint8Array(32);
+        crypto.getRandomValues(bytes);
+        return btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    /**
+     * Cita cuyo token coincide con el presentado. Responde 404 tanto si la cita no existe
+     * como si el token no es el suyo, igual que el backend: un 403 confirmaría que existe.
+     */
+    function citaConToken(db, citaId, token) {
+        const cita = db.citas.find((c) => c.id === citaId);
+        if (!cita || !token || !cita.accesoToken || cita.accesoToken !== token) {
+            throw new ApiError(404, 'Cita no encontrada');
+        }
+        return cita;
+    }
+
     function cancelar(db, cita) {
         if (cita.estado === 'CANCELADA') throw new ApiError(409, 'La cita ya esta cancelada');
         cita.estado = 'CANCELADA';
@@ -438,34 +460,40 @@
             const email = String(body.email).trim().toLowerCase();
             const conPassword = !!(body.password && String(body.password).trim());
             let u = usuarioPorEmail(email);
+            const cuentaNueva = !u;
             if (!u) {
                 u = { id: db.nextUsuarioId++, email, nombre: body.nombre.trim(), telefono: body.telefono.trim(), rol: 'PACIENTE', password: conPassword ? body.password : null, cuentaInvitada: !conPassword };
                 db.usuarios.push(u);
             } else {
+                // Como en CitaService: una cuenta que ya existe no se toca desde aquí, que
+                // es una ruta pública donde quien llama solo ha demostrado saber un email.
                 if (u.rol !== 'PACIENTE') throw new ApiError(409, 'Este email no puede usarse para reservas de paciente');
                 if (!u.cuentaInvitada) throw new ApiError(409, 'Este email ya tiene cuenta. Inicia sesión para reservar.');
-                u.nombre = body.nombre.trim(); u.telefono = body.telefono.trim();
-                if (conPassword) { u.password = body.password; u.cuentaInvitada = false; }
+                if (conPassword) throw new ApiError(409, 'Este email ya tiene reservas como invitado. Reserva sin contraseña.');
             }
-            const cita = crearCita(db, u, body);
-            return [201, { cita, sesion: conPassword ? authResponse(u) : null }];
+            // El teléfono no se propaga a crearCita: escribiría sobre la cuenta del paciente.
+            const cita = crearCita(db, u, { ...body, telefono: null });
+            // Token de acceso a esa cita. En el backend real solo se guarda su hash; aquí
+            // la "BD" es el localStorage del propio navegador, así que se guarda tal cual.
+            const accesoToken = nuevoAccesoToken();
+            db.citas.find((c) => c.id === cita.id).accesoToken = accesoToken;
+            guardarDb();
+            return [201, { cita, sesion: (cuentaNueva && conPassword) ? authResponse(u) : null, accesoToken }];
         }
         if (method === 'GET' && path === '/citas/mias') {
             const u = requerirUsuario(headers);
             return [200, db.citas.filter((c) => c.usuarioId === u.id).map(toCitaResponse)];
         }
-        if (method === 'GET' && path === '/citas/por-email') {
-            const email = (query.get('email') || '').trim().toLowerCase();
-            if (!email) throw new ApiError(400, 'Email obligatorio');
-            const u = usuarioPorEmail(email);
-            return [200, u ? db.citas.filter((c) => c.usuarioId === u.id).map(toCitaResponse) : []];
+        // La consulta por email ya no existe: un correo no prueba identidad, así que
+        // entregaba el historial del paciente a cualquiera que lo conociera. Ahora la
+        // credencial del invitado es el token de acceso de SU cita.
+        // El token va en la cabecera X-Cita-Token, no en la URL: una ruta acaba en los
+        // logs del servidor, en el historial del navegador y en el Referer.
+        if (method === 'GET' && (m = path.match(/^\/citas\/publica\/(\d+)$/))) {
+            return [200, toCitaResponse(citaConToken(db, Number(m[1]), headers.get(CITA_TOKEN_HEADER)))];
         }
         if (method === 'DELETE' && (m = path.match(/^\/citas\/publica\/(\d+)$/))) {
-            const cita = db.citas.find((c) => c.id === Number(m[1]));
-            if (!cita) throw new ApiError(404, 'Cita no encontrada');
-            const u = db.usuarios.find((x) => x.id === cita.usuarioId);
-            if (u.email !== (query.get('email') || '').trim().toLowerCase()) throw new ApiError(403, 'El email no coincide con esta cita');
-            cancelar(db, cita);
+            cancelar(db, citaConToken(db, Number(m[1]), headers.get(CITA_TOKEN_HEADER)));
             return [204, null];
         }
         if (method === 'GET' && path === '/citas/agenda/pacientes') {

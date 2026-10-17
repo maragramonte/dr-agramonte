@@ -7,6 +7,7 @@ import com.saludybienestar.agramonte.dto.response.CitaResponse;
 import com.saludybienestar.agramonte.dto.response.ReservaPublicaResponse;
 import com.saludybienestar.agramonte.entity.*;
 import com.saludybienestar.agramonte.repository.*;
+import com.saludybienestar.agramonte.security.TokenAccesoCita;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -46,8 +47,9 @@ public class CitaService {
         boolean conPassword = passwordPlano != null && !passwordPlano.isBlank();
 
         Usuario paciente = usuarioRepository.findByEmail(email).orElse(null);
+        boolean cuentaNueva = paciente == null;
 
-        if (paciente == null) {
+        if (cuentaNueva) {
             paciente = new Usuario();
             paciente.setEmail(email);
             paciente.setNombre(request.getNombre().trim());
@@ -63,6 +65,10 @@ public class CitaService {
             }
             paciente = usuarioRepository.save(paciente);
         } else {
+            // Una cuenta que YA existe no se modifica nunca desde esta ruta pública: quien
+            // llama solo ha demostrado conocer un email, y un email no es un secreto. Antes
+            // este camino sobrescribía el nombre, el teléfono y hasta la contraseña de la
+            // cuenta ajena, y devolvía una sesión a nombre de su dueño.
             if (paciente.getRol() != Rol.PACIENTE) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         "Este email no puede usarse para reservas de paciente");
@@ -71,37 +77,53 @@ public class CitaService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         "Este email ya tiene cuenta. Inicia sesión para reservar.");
             }
-            paciente.setNombre(request.getNombre().trim());
-            paciente.setTelefono(request.getTelefono().trim());
             if (conPassword) {
-                paciente.setPassword(passwordEncoder.encode(passwordPlano));
-                paciente.setCuentaInvitada(false);
+                // Poner contraseña es tomar el control de la cuenta, así que solo puede
+                // hacerlo su dueño ya autenticado, nunca una reserva anónima.
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "Este email ya tiene reservas como invitado. Reserva sin contraseña.");
             }
-            paciente = usuarioRepository.save(paciente);
         }
 
         CrearCitaRequest citaRequest = new CrearCitaRequest();
         citaRequest.setMedicoId(request.getMedicoId());
         citaRequest.setFechaHora(request.getFechaHora());
         citaRequest.setMotivo(request.getMotivo());
-        citaRequest.setTelefono(request.getTelefono());
+        // El teléfono NO viaja en el request de la cita: crearCita() lo escribiría sobre la
+        // cuenta del paciente, y una cuenta invitada preexistente no se toca. Si la cuenta
+        // es nueva, el teléfono ya quedó guardado arriba.
         citaRequest.setCentroCodigo(request.getCentroCodigo());
         citaRequest.setCobertura(request.getCobertura());
         citaRequest.setAseguradora(request.getAseguradora());
         citaRequest.setNumeroTarjetaSanitaria(request.getNumeroTarjetaSanitaria());
         citaRequest.setPreferenciaPago(request.getPreferenciaPago());
 
-        CitaResponse cita = crearCita(paciente.getId(), citaRequest);
+        // Token de acceso a ESTA cita: se entrega una sola vez, aquí, y es lo que permite
+        // al invitado consultarla y cancelarla sin cuenta. En la BD solo queda su hash.
+        // Se emite siempre, también cuando además se abre sesión, para que el acceso a la
+        // cita siga funcionando si esa sesión se cierra.
+        String tokenAcceso = TokenAccesoCita.generar();
+        CitaResponse cita = crearCita(paciente.getId(), citaRequest, TokenAccesoCita.hash(tokenAcceso));
 
+        // Solo se devuelve sesión si la cuenta se acaba de crear con contraseña: para una
+        // cuenta preexistente sería entregar un JWT de otra persona.
         AuthResponse sesion = null;
-        if (conPassword) {
+        if (cuentaNueva && conPassword) {
             sesion = authService.tokenTrasAutenticacion(email, passwordPlano);
         }
-        return new ReservaPublicaResponse(cita, sesion);
+        return new ReservaPublicaResponse(cita, sesion, tokenAcceso);
     }
 
     @Transactional
     public CitaResponse crearCita(Long pacienteId, CrearCitaRequest request) {
+        return crearCita(pacienteId, request, null);
+    }
+
+    /**
+     * @param accesoTokenHash hash del token de acceso del invitado, o {@code null} si la
+     *                        cita se crea con sesión (el JWT ya identifica a su dueño).
+     */
+    private CitaResponse crearCita(Long pacienteId, CrearCitaRequest request, String accesoTokenHash) {
         Usuario paciente = usuarioRepository.findById(pacienteId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente no encontrado"));
         Medico medico = medicoRepository.findById(request.getMedicoId())
@@ -139,6 +161,7 @@ public class CitaService {
         cita.setAseguradora(request.getAseguradora());
         cita.setNumeroTarjetaSanitaria(request.getNumeroTarjetaSanitaria());
         cita.setPreferenciaPago(request.getPreferenciaPago());
+        cita.setAccesoTokenHash(accesoTokenHash);
         cita.setEstado(EstadoCita.CONFIRMADA);
 
         horario.setDisponible(false);
@@ -153,14 +176,14 @@ public class CitaService {
         return citaRepository.findByUsuarioId(id).stream().map(this::toResponse).toList();
     }
 
-    public List<CitaResponse> findByPacienteEmail(String email) {
-        String normalized = email.trim().toLowerCase();
-        if (normalized.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email obligatorio");
-        }
-        return citaRepository.findByUsuarioEmailWithMedico(normalized).stream()
-                .map(this::toResponse)
-                .toList();
+    /**
+     * Cita de un invitado identificada por su token de acceso. Sustituye a la antigua
+     * consulta por email, que entregaba el historial del paciente (con el motivo de
+     * consulta, que es dato de salud) a cualquiera que conociera su correo.
+     */
+    @Transactional(readOnly = true)
+    public CitaResponse buscarCitaPublica(Long citaId, String token) {
+        return toResponse(citaConTokenValido(citaId, token));
     }
 
     /**
@@ -246,16 +269,23 @@ public class CitaService {
     }
 
     @Transactional
-    public void cancelarCitaPublica(String email, Long citaId) {
-        String normalized = email.trim().toLowerCase();
+    public void cancelarCitaPublica(Long citaId, String token) {
+        aplicarCancelacion(citaConTokenValido(citaId, token));
+    }
+
+    /**
+     * Carga la cita y exige que el token presentado sea exactamente el de esa cita.
+     * Cuando no cuadra responde 404 y no 403: un 403 confirmaría que la cita existe, y
+     * el id es un entero correlativo trivial de recorrer.
+     */
+    private Cita citaConTokenValido(Long citaId, String token) {
         Cita cita = citaRepository.findById(citaId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cita no encontrada"));
 
-        if (!cita.getUsuario().getEmail().equalsIgnoreCase(normalized)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El email no coincide con esta cita");
+        if (!TokenAccesoCita.coincide(token, cita.getAccesoTokenHash())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cita no encontrada");
         }
-
-        aplicarCancelacion(cita);
+        return cita;
     }
 
     private void aplicarCancelacion(Cita cita) {
