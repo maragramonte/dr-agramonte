@@ -255,31 +255,29 @@
       ]
     },
     {
-      "name": "Agenda TFG (público demo)",
+      "name": "Agenda del médico (rol MEDICO/ADMIN)",
       "item": [
         {
           "name": "Agenda pacientes",
           "request": {
-            "auth": { "type": "noauth" },
             "method": "GET",
+            "description": "Exige JWT con rol MEDICO o ADMIN (hereda el bearer de la colección: ejecuta antes «Login»). Sin medicoId: de quién es la agenda lo deduce el backend del token. Un MEDICO recibe siempre la suya y el parámetro se ignora; solo un ADMIN puede pedir una agenda concreta, y entonces es obligatorio.",
             "url": {
-              "raw": "{{base_url}}/api/citas/agenda/pacientes?medicoId={{medico_id}}",
+              "raw": "{{base_url}}/api/citas/agenda/pacientes",
               "host": ["{{base_url}}"],
-              "path": ["api", "citas", "agenda", "pacientes"],
-              "query": [{ "key": "medicoId", "value": "{{medico_id}}" }]
+              "path": ["api", "citas", "agenda", "pacientes"]
             }
           }
         },
         {
           "name": "Historial reservas prueba",
           "request": {
-            "auth": { "type": "noauth" },
             "method": "GET",
+            "description": "Mismo criterio que «Agenda pacientes»: rol MEDICO/ADMIN y el médico sale del JWT.",
             "url": {
-              "raw": "{{base_url}}/api/citas/agenda/reservas?medicoId={{medico_id}}",
+              "raw": "{{base_url}}/api/citas/agenda/reservas",
               "host": ["{{base_url}}"],
-              "path": ["api", "citas", "agenda", "reservas"],
-              "query": [{ "key": "medicoId", "value": "{{medico_id}}" }]
+              "path": ["api", "citas", "agenda", "reservas"]
             }
           }
         }

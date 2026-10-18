@@ -89,7 +89,7 @@ acceso a las citas, y la lista ahora se construye con los tokens guardados.
 
 ### Panel TFG (`panel-pruebas.html`)
 
-- Carga: `GET /api/citas/agenda/reservas?medicoId=1`.  
+- Carga: `GET /api/citas/agenda/reservas`, con el JWT del médico. De quién es la agenda lo deduce el backend del token (`medicos.usuario_id`, V12); solo un `ADMIN` puede pasar `medicoId`.  
 - Refresco automático al reservar en otra pestaña (`BroadcastChannel` + clave `dr-agramonte-cita-creada`).  
 - Botón **Actualizar tabla** y al volver a la pestaña (`visibilitychange`).
 
@@ -155,8 +155,13 @@ docker compose ps   # postgres, backend, frontend → Up (healthy)
 ### 5. Comprobación API (opcional)
 
 ```powershell
-# Todas las reservas del médico 1 (lo que ve el panel)
-Invoke-RestMethod "http://localhost:8080/api/citas/agenda/reservas?medicoId=1"
+# Las reservas del médico (lo que ve el panel). Exige rol MEDICO/ADMIN, y el médico
+# sale del propio token: pasar medicoId no sirve para ver la agenda de otro.
+$sesion = Invoke-RestMethod -Method Post "http://localhost:8080/api/auth/login" `
+  -ContentType "application/json" `
+  -Body '{"email":"dr.agramonte@example.com","password":"Medico123!"}'
+Invoke-RestMethod "http://localhost:8080/api/citas/agenda/reservas" `
+  -Headers @{ Authorization = "Bearer $($sesion.token)" }
 
 # Cita de un invitado (lo que usa syncMisCitas). El token lo devolvió la reserva en
 # accesoToken y viaja en cabecera, nunca en la URL.
