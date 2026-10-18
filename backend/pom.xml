@@ -155,6 +155,16 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- GreenMail: servidor SMTP en memoria. La activación de una cuenta invitada
+             solo es segura si el enlace llega por correo, así que la prueba de
+             integración tiene que leer ese correo de verdad, no simular el envío. -->
+        <dependency>
+            <groupId>com.icegreen</groupId>
+            <artifactId>greenmail-junit5</artifactId>
+            <version>2.1.3</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Testcontainers para pruebas integración -->
         <dependency>
             <groupId>org.testcontainers</groupId>
