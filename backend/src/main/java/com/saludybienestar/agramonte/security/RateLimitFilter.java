@@ -22,7 +22,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 /**
  * Límite de peticiones por IP para las rutas públicas que escriben o gastan CPU.
  *
- * <p>Sin esto, tres rutas quedaban abiertas de par en par: {@code /api/auth/login},
+ * <p>Sin esto, estas rutas quedaban abiertas de par en par: {@code /api/auth/login},
  * donde cada intento cuesta un BCrypt de coste 12 (así que la fuerza bruta no solo
  * prueba contraseñas, también tumba el servidor), {@code /api/contact}, que escribe
  * en el log y manda un correo por petición, y {@code /api/citas/reserva-publica},
@@ -92,7 +92,12 @@ public class RateLimitFilter extends OncePerRequestFilter {
         if (ruta == null) {
             return null;
         }
-        if (ruta.endsWith("/api/auth/login") || ruta.endsWith("/api/auth/registro")) {
+        // Mismo cubo para las tres: todas son intentos contra credenciales. En
+        // /api/auth/activar lo que se probaría a ciegas es el token del correo, y aunque
+        // son 32 bytes de SecureRandom, no hay motivo para dejar barrer sin freno.
+        if (ruta.endsWith("/api/auth/login")
+                || ruta.endsWith("/api/auth/registro")
+                || ruta.endsWith("/api/auth/activar")) {
             return "auth";
         }
         if (ruta.endsWith("/api/contact")) {

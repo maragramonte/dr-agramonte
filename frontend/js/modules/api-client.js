@@ -147,6 +147,14 @@ class ApiClient {
     }
 
     /**
+     * Activa una cuenta invitada con el token que llegó por correo. Devuelve sesión.
+     * POST /api/auth/activar
+     */
+    activarCuenta(token, password) {
+        return this.post('/auth/activar', { token, password });
+    }
+
+    /**
      * Estado del canal Telegram del usuario en sesión.
      * GET /api/telegram/vinculacion → { vinculado, vinculacionPendiente, canalActivo }.
      */

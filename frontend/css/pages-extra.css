@@ -208,3 +208,75 @@ body.offline-page {
 [data-theme="dark"] .medico-list-header {
     background: var(--gray-100);
 }
+
+/* ── Activar cuenta (activar.html) ─────────────────────────────────────────── */
+
+.activar-form {
+    display: flex;
+    flex-direction: column;
+    gap: .4rem;
+    margin-top: 1.5rem;
+}
+
+.activar-form label {
+    font-weight: 600;
+    font-size: .9rem;
+}
+
+.activar-form input {
+    padding: .7rem .9rem;
+    border: 1px solid var(--border);
+    border-radius: .5rem;
+    background: var(--card);
+    color: var(--text);
+    font-size: 1rem;
+    margin-bottom: .6rem;
+}
+
+.activar-form input:focus-visible {
+    outline: 2px solid var(--teal);
+    outline-offset: 1px;
+}
+
+.activar-form button {
+    margin-top: .6rem;
+    align-self: flex-start;
+}
+
+.activar-aviso {
+    margin-top: 1.25rem;
+    padding: .8rem 1rem;
+    border-radius: .5rem;
+    border: 1px solid var(--border);
+    font-size: .95rem;
+}
+
+/* El par fondo/texto se fija junto para que el contraste no dependa del tema. */
+.activar-aviso--ok {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+    color: #065f46;
+}
+
+.activar-aviso--error {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #991b1b;
+}
+
+[data-theme="dark"] .activar-aviso--ok {
+    background: #052e2b;
+    border-color: #115e56;
+    color: #a7f3d0;
+}
+
+[data-theme="dark"] .activar-aviso--error {
+    background: #3f1212;
+    border-color: #7f1d1d;
+    color: #fecaca;
+}
+
+.activar-pie {
+    margin-top: 2rem;
+    font-size: .9rem;
+}

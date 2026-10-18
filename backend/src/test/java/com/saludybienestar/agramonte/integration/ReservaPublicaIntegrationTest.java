@@ -193,8 +193,8 @@ class ReservaPublicaIntegrationTest {
     }
 
     @Test
-    @DisplayName("Reserva pública con el email de una cuenta invitada existente: 409 y la cuenta queda intacta")
-    void reservaPublica_emailDeCuentaInvitadaExistente_rechazaSinModificarLaCuenta() throws Exception {
+    @DisplayName("Reserva pública con el email de una cuenta invitada existente: nadie se apropia de la cuenta")
+    void reservaPublica_emailDeCuentaInvitadaExistente_noSeApropiaDeLaCuenta() throws Exception {
         // 1. La víctima reserva sin contraseña: queda una cuenta invitada con SUS datos.
         String email = "invitado.victima@example.com";
         LocalDateTime franjaVictima = primeraFranjaLibre();
@@ -228,10 +228,15 @@ class ReservaPublicaIntegrationTest {
         intruso.put("medicoId", 1);
         intruso.put("fechaHora", franjaIntruso);
 
+        // Antes esto era un 409 seco. Ahora el camino correcto es mandar un enlace de
+        // activación a ese buzón, pero esta clase no tiene SMTP configurado, así que la
+        // petición muere con 503: sin correo no hay forma de probar quién es el dueño, y
+        // seguir adelante sería justamente regalar la cuenta. Que el enlace se envía
+        // cuando sí hay correo lo cubre ActivacionCuentaIntegrationTest.
         mockMvc.perform(post("/api/citas/reserva-publica")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(intruso)))
-                .andExpect(status().isConflict());
+                .andExpect(status().isServiceUnavailable());
 
         // 3. La cuenta de la víctima sigue siendo suya: ni nombre, ni teléfono, ni contraseña,
         //    ni la marca de invitada han cambiado. Si cuentaInvitada pasara a false, la víctima

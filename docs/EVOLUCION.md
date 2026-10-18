@@ -127,7 +127,9 @@ correo electrónico no es un secreto.
   confirmar su existencia.
 - Una **cuenta de invitado que ya existe no se modifica nunca** desde la ruta pública, y
   nunca devuelve sesión. Sin contraseña, la cita se asocia a esa cuenta; con contraseña,
-  **409**, porque poner contraseña es tomar el control de la cuenta.
+  la cita se crea igual pero la contraseña no se guarda: sale un enlace de activación al
+  buzón (**V13**), porque poner contraseña es tomar el control de la cuenta. Al principio
+  esto era un **409**, que cerraba el agujero pero dejaba al invitado sin ninguna salida.
 - `SecurityConfig` responde **401** a las peticiones sin credenciales (antes, al no haber
   mecanismo de login, Spring Security devolvía su 403 por defecto); el 403 queda para
   «autenticado pero sin rol».
