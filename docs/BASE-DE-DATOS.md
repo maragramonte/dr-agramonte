@@ -1,6 +1,6 @@
 # Base de datos — referencia para la defensa
 
-> **TFG DAM · Dr. Agramonte.** Esquema real reconstruido de las migraciones **Flyway V1–V10** (`backend/src/main/resources/db/migration/postgresql/`). **PostgreSQL 15.** Hibernate arranca con `ddl-auto: validate`, así que el esquema de esta referencia coincide exactamente con las entidades JPA.
+> **TFG DAM · Dr. Agramonte.** Esquema real reconstruido de las migraciones **Flyway V1–V11** (`backend/src/main/resources/db/migration/postgresql/`). **PostgreSQL 15.** Hibernate arranca con `ddl-auto: validate`, así que el esquema de esta referencia coincide exactamente con las entidades JPA.
 
 ## Resumen en una frase
 6 tablas en **3ª forma normal**, claves `BIGSERIAL`, integridad referencial con **claves foráneas** (unas en `CASCADE`, otras en `SET NULL` según convenga conservar o no el dato), un **índice único** que —junto al bloqueo pesimista— evita las dobles reservas, e **índices** sobre las consultas más frecuentes.
@@ -68,6 +68,7 @@ erDiagram
         varchar  aseguradora "V8 (null)"
         varchar  numero_tarjeta_sanitaria "V8 (null)"
         varchar  preferencia_pago "V8 (null)"
+        varchar  acceso_token_hash "V11 (null)"
     }
     NOTIFICACIONES {
         bigint   id PK
@@ -148,7 +149,8 @@ erDiagram
 | `cobertura` | VARCHAR(20) | **V8** — `privada` o `seguro` |
 | `aseguradora` | VARCHAR(100) | **V8** — nullable (si paga por seguro) |
 | `numero_tarjeta_sanitaria` | VARCHAR(100) | **V8** — nullable |
-| `preferencia_pago` | VARCHAR(20) | **V8** — nullable (`en-consulta` / `online`) |
+| `preferencia_pago` | VARCHAR(20) | **V8** — nullable (`en-consulta`) |
+| `acceso_token_hash` | VARCHAR(64) | **V11** — nullable; SHA-256 del token de acceso de la cita |
 
 > La cita **hereda el centro de su horario** (no se elige aparte): al reservar, `centro_id` se toma del horario bloqueado.
 
@@ -210,7 +212,7 @@ Está **probado**: `ReservaPublicaIntegrationTest` lanza dos hilos en paralelo c
 ## Decisiones de diseño (resumen para responder rápido)
 - **Claves `BIGSERIAL`/`BIGINT`:** autoincremento nativo de PostgreSQL; margen de crecimiento frente a `INT`.
 - **Enums como `VARCHAR` + `@Enumerated(STRING)`:** dominios pequeños y estables (estado, rol, canal); legibles en la BD y sin una tabla-catálogo que sería sobre-ingeniería.
-- **Columnas nuevas siempre `nullable`** (centro_id V5/V6, recordatorio V2, cobertura V8, Telegram V9/V10): no rompen las filas existentes al migrar (compatibilidad hacia atrás).
+- **Columnas nuevas siempre `nullable`** (centro_id V5/V6, recordatorio V2, cobertura V8, Telegram V9/V10, token de acceso V11): no rompen las filas existentes al migrar (compatibilidad hacia atrás).
 - **Flyway forward-only:** cada cambio es una migración numerada; el esquema se reconstruye idéntico en cualquier entorno. No hay *undo* automático (edición community): se corrige con una nueva V.
 - **Normalización 3FN:** sin datos repetidos; cada hecho vive en un único sitio y se referencia por FK.
 
