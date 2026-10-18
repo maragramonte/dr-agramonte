@@ -56,6 +56,20 @@ public class Usuario {
     @Column(name = "telegram_link_token_expira_en")
     private LocalDateTime telegramLinkTokenExpiraEn;
 
+    /**
+     * SHA-256 del token con el que el dueño del buzón convierte esta cuenta invitada en
+     * una cuenta con contraseña. Se guarda el hash y no el token (a diferencia del de
+     * Telegram, que está en claro) porque con él se toma el control de la cuenta: un
+     * volcado de la tabla no debe bastar para activar cuentas ajenas.
+     *
+     * <p>De un solo uso: al activarse, esta columna y su caducidad vuelven a NULL.
+     */
+    @Column(name = "activacion_token", unique = true, length = 64)
+    private String activacionToken;
+
+    @Column(name = "activacion_token_expira_en")
+    private LocalDateTime activacionTokenExpiraEn;
+
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
