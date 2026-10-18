@@ -53,9 +53,15 @@ public class DisponibilidadService {
         final String centro = (centroCodigo == null || centroCodigo.isBlank())
                 ? null : centroCodigo.trim().toLowerCase();
 
-        // Filtrar: disponibles, no ocupados y (si se pidió) del centro indicado
+        // Una franja vencida sigue en la tabla con disponible = true (nadie la reservó y
+        // nada la retira al pasar la hora), así que hay que descartarla aquí: ofrecerla
+        // como hueco libre dejaba pedir cita para ayer.
+        LocalDateTime ahora = LocalDateTime.now();
+
+        // Filtrar: disponibles, aún por llegar, no ocupados y (si se pidió) del centro indicado
         return horariosDia.stream()
                 .filter(Horario::isDisponible)
+                .filter(h -> h.getInicio() != null && h.getInicio().isAfter(ahora))
                 .filter(h -> centro == null
                         || (h.getCentro() != null && centro.equals(h.getCentro().getCodigo())))
                 .map(Horario::getInicio)

@@ -19,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.saludybienestar.agramonte.dto.response.CitaAgendaItemResponse;
 import com.saludybienestar.agramonte.dto.response.PacienteAgendaResponse;
 import com.saludybienestar.agramonte.dto.response.ReservaPruebaResponse;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -124,6 +125,15 @@ public class CitaService {
      *                        cita se crea con sesión (el JWT ya identifica a su dueño).
      */
     private CitaResponse crearCita(Long pacienteId, CrearCitaRequest request, String accesoTokenHash) {
+        // Invariante de negocio, no solo validación de entrada: una cita en el pasado no
+        // existe. La anotación @Future de los DTO cubre la API, pero la regla se repite
+        // aquí porque reservaPublica() arma su propio CrearCitaRequest y porque las
+        // franjas vencidas siguen en la tabla marcadas como disponibles.
+        if (request.getFechaHora() == null || !request.getFechaHora().isAfter(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "No se puede reservar una cita en una fecha ya pasada");
+        }
+
         Usuario paciente = usuarioRepository.findById(pacienteId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente no encontrado"));
         Medico medico = medicoRepository.findById(request.getMedicoId())

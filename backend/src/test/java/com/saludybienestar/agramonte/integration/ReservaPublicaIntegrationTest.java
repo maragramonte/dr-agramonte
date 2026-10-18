@@ -10,6 +10,7 @@ import com.saludybienestar.agramonte.entity.Rol;
 import com.saludybienestar.agramonte.entity.Usuario;
 import com.saludybienestar.agramonte.repository.CitaRepository;
 import com.saludybienestar.agramonte.repository.HorarioRepository;
+import com.saludybienestar.agramonte.repository.MedicoRepository;
 import com.saludybienestar.agramonte.repository.UsuarioRepository;
 import com.saludybienestar.agramonte.security.TokenAccesoCita;
 import com.saludybienestar.agramonte.service.CitaService;
@@ -80,14 +81,25 @@ class ReservaPublicaIntegrationTest {
     @Autowired private CitaRepository citaRepository;
     @Autowired private UsuarioRepository usuarioRepository;
     @Autowired private CitaService citaService;
+    @Autowired private MedicoRepository medicoRepository;
 
     /** Cabecera con el token de acceso de la cita, tal como la envía el frontend. */
     private static final String CABECERA_TOKEN = "X-Cita-Token";
 
+    /**
+     * Primera franja libre <em>futura</em>. Se filtra y se ordena en vez de coger el
+     * primer elemento que devuelva la consulta: el orden no está garantizado y, desde
+     * que no se puede reservar hacia atrás, una franja ya vencida daría un 400 y haría
+     * fallar pruebas que no van de eso.
+     */
     private LocalDateTime primeraFranjaLibre() {
-        List<Horario> libres = horarioRepository.findByMedicoIdAndDisponibleTrue(1L);
-        assertThat(libres).as("las migraciones deben sembrar huecos libres del médico 1").isNotEmpty();
-        return libres.get(0).getInicio();
+        LocalDateTime ahora = LocalDateTime.now();
+        return horarioRepository.findByMedicoIdAndDisponibleTrue(1L).stream()
+                .map(Horario::getInicio)
+                .filter(inicio -> inicio.isAfter(ahora))
+                .min(LocalDateTime::compareTo)
+                .orElseThrow(() -> new AssertionError(
+                        "las migraciones deben sembrar huecos libres futuros del médico 1"));
     }
 
     /** Hace una reserva pública correcta y devuelve la respuesta parseada (cita + accesoToken). */
@@ -431,5 +443,37 @@ class ReservaPublicaIntegrationTest {
                         .header(CABECERA_TOKEN, reserva.path("accesoToken").asText()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.centroCodigo").value("palma"));
+    }
+
+
+    @Test
+    @DisplayName("Una franja vencida ni se ofrece como hueco libre ni se deja reservar")
+    void franjaVencida_noSeOfreceNiSeReserva() throws Exception {
+        // Un horario pasado sigue en la tabla con disponible = true: nada lo retira al
+        // pasar la hora. Antes eso bastaba para reservar una cita hacia atrás.
+        LocalDateTime ayer = LocalDate.now().minusDays(1).atTime(10, 0);
+        Horario vencido = new Horario();
+        vencido.setMedico(medicoRepository.findById(1L).orElseThrow());
+        vencido.setInicio(ayer);
+        vencido.setFin(ayer.plusMinutes(30));
+        vencido.setDisponible(true);
+        horarioRepository.save(vencido);
+
+        assertThat(huecos(ayer.toLocalDate().toString(), ""))
+                .as("la disponibilidad no ofrece horas que ya han pasado")
+                .isEmpty();
+
+        mockMvc.perform(post("/api/citas/reserva-publica")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(cuerpoReserva("cita.en.el.pasado@example.com", ayer)))
+                .andExpect(status().isBadRequest());
+
+        assertThat(usuarioRepository.findByEmail("cita.en.el.pasado@example.com"))
+                .as("una reserva rechazada no deja cuenta creada")
+                .isEmpty();
+
+        // Se retira: las pruebas comparten la misma base y una franja vencida suelta
+        // confundiría a cualquier otra que busque «el primer hueco libre».
+        horarioRepository.delete(vencido);
     }
 }
