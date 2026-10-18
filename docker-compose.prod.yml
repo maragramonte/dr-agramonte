@@ -42,7 +42,17 @@ services:
     container_name: agramonte_app
     restart: unless-stopped
     expose:
-      - "8080" # visible solo para Caddy, no publicado en la IP del servidor
+      # «expose», NO «ports»: el puerto queda visible para Caddy dentro de la red
+      # de Docker y no se publica en la IP del servidor.
+      #
+      # No lo cambies por «ports: - 8080:8080». RateLimitFilter da por buena la
+      # primera entrada de X-Forwarded-For, y puede hacerlo porque el único camino
+      # hasta la aplicación pasa por Caddy, que reescribe esa cabecera. Con el
+      # puerto publicado se podría llegar a la aplicación saltándose el proxy y
+      # mandar la cabecera a mano: una IP inventada en cada petición es un cupo
+      # nuevo en cada petición, y el límite deja de existir. Si alguna vez hace
+      # falta publicarlo, hay que atar antes el filtro a proxies de confianza.
+      - "8080"
     depends_on:
       postgres:
         condition: service_healthy
