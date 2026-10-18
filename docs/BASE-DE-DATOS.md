@@ -1,6 +1,6 @@
 # Base de datos — referencia para la defensa
 
-> **TFG DAM · Dr. Agramonte.** Esquema real reconstruido de las migraciones **Flyway V1–V11** (`backend/src/main/resources/db/migration/postgresql/`). **PostgreSQL 15.** Hibernate arranca con `ddl-auto: validate`, así que el esquema de esta referencia coincide exactamente con las entidades JPA.
+> **TFG DAM · Dr. Agramonte.** Esquema real reconstruido de las migraciones **Flyway V1–V12** (`backend/src/main/resources/db/migration/postgresql/`). **PostgreSQL 15.** Hibernate arranca con `ddl-auto: validate`, así que el esquema de esta referencia coincide exactamente con las entidades JPA.
 
 ## Resumen en una frase
 6 tablas en **3ª forma normal**, claves `BIGSERIAL`, integridad referencial con **claves foráneas** (unas en `CASCADE`, otras en `SET NULL` según convenga conservar o no el dato), un **índice único** que —junto al bloqueo pesimista— evita las dobles reservas, e **índices** sobre las consultas más frecuentes.
@@ -36,6 +36,7 @@ erDiagram
     }
     MEDICOS {
         bigint   id PK
+        bigint   usuario_id FK UK "V12 → usuarios (null)"
         varchar  nombre "NOT NULL"
         varchar  especialidad
         varchar  email
@@ -110,9 +111,16 @@ erDiagram
 | Columna | Tipo | Restricción |
 |---|---|---|
 | `id` | BIGSERIAL | **PK** |
+| `usuario_id` | BIGINT | **V12** — **FK → usuarios**, nullable, **UNIQUE**, `ON DELETE SET NULL` |
 | `nombre` | VARCHAR(255) | NOT NULL |
 | `especialidad` | VARCHAR(255) | nullable |
 | `email` | VARCHAR(255) | nullable |
+
+> `usuario_id` es la cuenta con la que entra ese médico, y es lo que decide **de quién es
+> una agenda**. Antes el médico llegaba por parámetro (`?medicoId=`) en
+> `/api/citas/agenda/**`, así que cualquier cuenta con rol `MEDICO` podía leer la agenda de
+> otro cambiando un número en la URL. El `email` de la ficha no sirve para eso:
+> `MedicoCuentaInicializador` puede renombrar el correo de la cuenta sin tocar el de la ficha.
 
 ### `centros` — ubicaciones de consulta (**V5**)
 | Columna | Tipo | Restricción |
@@ -172,6 +180,7 @@ erDiagram
 
 | Relación | Cardinalidad | `ON DELETE` | Por qué |
 |---|---|---|---|
+| usuarios → medicos | 1:1 (opc.) | **SET NULL** | borrar la cuenta no debe arrastrar la ficha ni su historial de citas — **V12** |
 | usuarios → citas | 1:N | **CASCADE** | si se borra un paciente, sus citas no tienen sentido |
 | medicos → citas | 1:N | **CASCADE** | ídem para el médico |
 | medicos → horarios | 1:N | **CASCADE** | la agenda pertenece al médico |
@@ -206,13 +215,14 @@ Está **probado**: `ReservaPublicaIntegrationTest` lanza dos hilos en paralelo c
 | `idx_citas_recordatorio` (estado, recordatorio_enviado, fecha_hora) | citas | barrido del recordatorio 24 h |
 | `uk_usuarios_telegram_chat_id` (UNIQUE) | usuarios | un chat de Telegram pertenece como mucho a un paciente — **V9** |
 | `uk_usuarios_telegram_link_token` (UNIQUE) | usuarios | el token de vinculación es irrepetible — **V9** |
+| `ux_medicos_usuario` (UNIQUE) | medicos | una cuenta gobierna como mucho una agenda — **V12** |
 
 ---
 
 ## Decisiones de diseño (resumen para responder rápido)
 - **Claves `BIGSERIAL`/`BIGINT`:** autoincremento nativo de PostgreSQL; margen de crecimiento frente a `INT`.
 - **Enums como `VARCHAR` + `@Enumerated(STRING)`:** dominios pequeños y estables (estado, rol, canal); legibles en la BD y sin una tabla-catálogo que sería sobre-ingeniería.
-- **Columnas nuevas siempre `nullable`** (centro_id V5/V6, recordatorio V2, cobertura V8, Telegram V9/V10, token de acceso V11): no rompen las filas existentes al migrar (compatibilidad hacia atrás).
+- **Columnas nuevas siempre `nullable`** (centro_id V5/V6, recordatorio V2, cobertura V8, Telegram V9/V10, token de acceso V11, cuenta del médico V12): no rompen las filas existentes al migrar (compatibilidad hacia atrás).
 - **Flyway forward-only:** cada cambio es una migración numerada; el esquema se reconstruye idéntico en cualquier entorno. No hay *undo* automático (edición community): se corrige con una nueva V.
 - **Normalización 3FN:** sin datos repetidos; cada hecho vive en un único sitio y se referencia por FK.
 

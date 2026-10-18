@@ -84,7 +84,7 @@ autoalojados. Un tercero colado por descuido deja de cargar en vez de pasar inad
 
 ## Decisiones técnicas
 
-Las cinco que más me costaron y mejor explican el proyecto.
+Las seis que más me costaron y mejor explican el proyecto.
 
 ### Dos pacientes, el mismo hueco, el mismo segundo
 
@@ -127,6 +127,21 @@ final de la ventana. Solo inserta las franjas que aún no existen —el índice
 vuelve a marcar como libre uno ocupado. El patrón semanal (horas de consulta y qué centro
 atiende cada día) salió del `.sql` y vive ahora en `AgendaProperties`, que es donde se puede
 cambiar sin tocar una migración ya aplicada.
+
+### De quién es una agenda no lo decide la URL
+
+`/api/citas/agenda/**` recibía el médico por parámetro, con `defaultValue = "1"`. El rol
+estaba bien comprobado —hacía falta ser `MEDICO` o `ADMIN`—, pero nadie comprobaba *qué*
+médico: bastaba cambiar el número de la URL para leer la agenda de otro, con los nombres,
+correos, teléfonos y motivos de consulta de sus pacientes. Autenticado no es lo mismo que
+autorizado, y es un fallo que ninguna prueba de roles detecta, porque el rol era correcto.
+
+Ahora el médico sale del JWT a través de `medicos.usuario_id` (V12). El detalle que más
+vueltas me costó es qué contestar cuando un médico pide la agenda de otro: lo natural
+parece un 403, pero un 403 confirma que ese médico existe, y los id son enteros
+correlativos. Así que se le devuelve la suya, con un 200 corriente, y el parámetro se
+ignora en silencio. Un `ADMIN` sí elige, pero tiene que decir cuál: el «médico 1 por
+defecto» era una suposición disfrazada de valor por defecto.
 
 ### Frontend sin framework
 
@@ -219,13 +234,13 @@ contra PostgreSQL, y para eso están las pruebas de integración.
 cd backend && mvn test
 ```
 
-**73 pruebas en tres niveles**: unitarias de servicio, de seguridad y roles sobre la capa
+**80 pruebas en tres niveles**: unitarias de servicio, de seguridad y roles sobre la capa
 REST (`@WebMvcTest` con la `SecurityConfig` real) y de integración end-to-end contra un
 PostgreSQL levantado con Testcontainers. Cubren las ramas críticas: 409 por doble reserva,
-403 por rol, validez del JWT, cancelación, el secreto del webhook, el límite de peticiones
-y la regeneración de la agenda.
+403 por rol, validez del JWT, cancelación, el secreto del webhook, el límite de peticiones,
+la regeneración de la agenda y el aislamiento entre las agendas de dos médicos.
 
-Las 10 de integración necesitan Docker en marcha; si no lo hay se marcan como saltadas en
+Las 12 de integración necesitan Docker en marcha; si no lo hay se marcan como saltadas en
 lugar de fallar. La cobertura todavía no está medida con JaCoCo.
 
 En cada push y cada pull request a `main` las ejecuta GitHub Actions
@@ -266,7 +281,7 @@ dicho en el resumen del run en vez de fallar.
 | `GET` | `/api/citas/mias` | Citas del paciente autenticado |
 | `GET` | `/api/citas/publica/{id}` | Cita de invitado — cabecera `X-Cita-Token` |
 | `DELETE` | `/api/citas/{id}` · `/api/citas/publica/{id}` | Cancelación (la de invitado, con `X-Cita-Token`) |
-| `GET` | `/api/citas/agenda/reservas`, `/agenda/pacientes` | Agenda del médico — rol `MEDICO`/`ADMIN` |
+| `GET` | `/api/citas/agenda/reservas`, `/agenda/pacientes` | Agenda del médico — rol `MEDICO`/`ADMIN`; el médico sale del JWT, no de `medicoId` |
 | `GET` | `/api/estadisticas` | Cuadro de mando — rol `MEDICO`/`ADMIN` |
 | `GET`&nbsp;`POST`&nbsp;`DELETE` | `/api/telegram/vinculacion` | Alta y baja del canal Telegram |
 | `POST` | `/api/telegram/webhook` | Lo invoca Telegram; valida el secreto de `setWebhook` |
@@ -324,7 +339,7 @@ producción **no levanta**. En local se dejan sin definir y vale la de demostrac
 ```
 .
 ├── backend/          API Spring Boot (controller · service · repository · DTOs)
-│   └── src/main/resources/db/migration/   Flyway V1–V11 (postgresql/ y mysql/)
+│   └── src/main/resources/db/migration/   Flyway V1–V12 (postgresql/ y mysql/)
 ├── frontend/         Sitio estático, PWA y nginx.conf
 ├── demo/             API simulada para la demo en GitHub Pages
 ├── postman/          Colección de la API
