@@ -222,7 +222,14 @@ class AuthUI {
             const err = await res.json().catch(() => ({}));
             throw new Error(err.message || 'No se pudo registrar');
         }
-        return { data: await res.json(), telefono: payload.telefono };
+        const cuerpo = await res.json().catch(() => ({}));
+        // 202 = ese correo ya tenía citas reservadas como invitado. No se ha creado ni
+        // tocado nada: ha salido un enlace hacia ese buzón, porque poner la contraseña es
+        // tomar el control de la cuenta y eso solo puede hacerlo quien lo abra.
+        if (res.status === 202) {
+            return { activacionPendiente: true, mensaje: cuerpo.message };
+        }
+        return { data: cuerpo, telefono: payload.telefono };
     }
 
     #renderModal() {
@@ -490,8 +497,14 @@ class AuthUI {
             errEl.hidden = true;
             this.#setFormLoading(regForm, true);
             try {
-                const { data, telefono } = await this.#submitRegistro(regForm);
-                this.#saveSession(data, telefono);
+                const resultado = await this.#submitRegistro(regForm);
+                if (resultado.activacionPendiente) {
+                    this.close();
+                    window.DrAgramonte?.notify?.(
+                        resultado.mensaje || AuthUI.textoRevisaTuCorreo(), 'success');
+                    return;
+                }
+                this.#saveSession(resultado.data, resultado.telefono);
                 this.close();
                 window.DrAgramonte?.notify?.('Cuenta creada correctamente', 'success');
             } catch (err) {
@@ -503,5 +516,16 @@ class AuthUI {
         });
     }
 }
+
+/**
+ * Aviso de «revisa tu correo», en el idioma activo. El backend ya manda uno en español;
+ * esto cubre el catalán y el caso de que la respuesta llegue sin cuerpo.
+ */
+AuthUI.textoRevisaTuCorreo = function () {
+    const ca = document.documentElement.lang === 'ca';
+    return ca
+        ? "Revisa el teu correu: t'hem enviat un enllaç per acabar de crear el compte."
+        : 'Revisa tu correo: te hemos enviado un enlace para terminar de crear la cuenta.';
+};
 
 window.AuthUI = AuthUI;

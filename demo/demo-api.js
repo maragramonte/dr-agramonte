@@ -423,6 +423,24 @@
         };
     }
 
+    /**
+     * Emite el token de activación de una cuenta invitada y devuelve el enlace.
+     *
+     * En la demo no hay buzón al que mandarlo, así que en vez de fingir un envío se
+     * devuelve el enlace para que se pueda recorrer el flujo entero. En el backend real
+     * esto es un correo y el token no se enseña nunca (en la base solo queda su hash).
+     */
+    function emitirActivacion(db, usuario) {
+        const token = nuevoAccesoToken();
+        usuario.activacionToken = token;
+        usuario.activacionExpira = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+        const base = location.pathname.replace(/[^/]*$/, '');
+        return `${location.origin}${base}activar.html#${token}`;
+    }
+
+    const avisoActivacionDemo = (enlace) =>
+        `(Demo) Aquí no hay correo. En la web real recibirías un enlace; ábrelo aquí: ${enlace}`;
+
     // ── Router ───────────────────────────────────────────────────────────
     function enrutar(method, path, query, body, headers) {
         const db = cargarDb();
@@ -430,6 +448,20 @@
         let m;
 
         // Auth
+        if (method === 'POST' && path === '/auth/activar') {
+            const u = db.usuarios.find((x) => x.activacionToken && x.activacionToken === body.token);
+            if (!u || !u.activacionExpira || Date.parse(u.activacionExpira) < Date.now()) {
+                // El mismo texto para inexistente, caducado y ya usado, como el backend.
+                throw new ApiError(400, 'El enlace no es válido o ha caducado. Pide uno nuevo desde «Crear cuenta».');
+            }
+            if (!body.password || String(body.password).length < 6) throw new ApiError(400, 'Error de validacion en la solicitud: password');
+            u.password = body.password;
+            u.cuentaInvitada = false;
+            u.activacionToken = null;
+            u.activacionExpira = null;
+            guardarDb();
+            return [200, authResponse(u)];
+        }
         if (method === 'POST' && path === '/auth/login') {
             const u = usuarioPorEmail(body.email);
             if (!u || u.cuentaInvitada || u.password !== body.password) throw new ApiError(401, 'Credenciales incorrectas');
@@ -441,9 +473,16 @@
             const email = String(body.email).trim().toLowerCase();
             const existente = usuarioPorEmail(email);
             if (existente && !existente.cuentaInvitada) throw new ApiError(409, 'El email ya está registrado');
-            const u = existente || { id: db.nextUsuarioId++, email, rol: 'PACIENTE' };
+            // Una cuenta invitada NO se toma por escribir su correo en el formulario: sale
+            // un enlace hacia ese buzón. Misma regla que AuthService.registro en el backend.
+            if (existente) {
+                const enlace = emitirActivacion(db, existente);
+                guardarDb();
+                return [202, { message: avisoActivacionDemo(enlace) }];
+            }
+            const u = { id: db.nextUsuarioId++, email, rol: 'PACIENTE' };
             Object.assign(u, { nombre: body.nombre.trim(), password: body.password, telefono: body.telefono || null, cuentaInvitada: false });
-            if (!existente) db.usuarios.push(u);
+            db.usuarios.push(u);
             guardarDb();
             return [201, authResponse(u)];
         }
@@ -487,16 +526,33 @@
                 // es una ruta pública donde quien llama solo ha demostrado saber un email.
                 if (u.rol !== 'PACIENTE') throw new ApiError(409, 'Este email no puede usarse para reservas de paciente');
                 if (!u.cuentaInvitada) throw new ApiError(409, 'Este email ya tiene cuenta. Inicia sesión para reservar.');
-                if (conPassword) throw new ApiError(409, 'Este email ya tiene reservas como invitado. Reserva sin contraseña.');
+                // Antes esto era un 409 sin salida. Ahora la reserva sigue y, si venía
+                // contraseña, sale un enlace de activación: la cuenta no se toma por
+                // escribir su correo en un formulario.
             }
             // El teléfono no se propaga a crearCita: escribiría sobre la cuenta del paciente.
             const cita = crearCita(db, u, { ...body, telefono: null });
             // Token de acceso a esa cita. En el backend real solo se guarda su hash; aquí
             // la "BD" es el localStorage del propio navegador, así que se guarda tal cual.
+            // Contraseña sobre una cuenta invitada que ya existía: la cita se crea, pero
+            // la cuenta no se toma. Sale un enlace de activación, como en el backend.
+            let avisoActivacion = null;
+            if (!cuentaNueva && conPassword) {
+                avisoActivacion = avisoActivacionDemo(emitirActivacion(db, u));
+            }
             const accesoToken = nuevoAccesoToken();
             db.citas.find((c) => c.id === cita.id).accesoToken = accesoToken;
             guardarDb();
-            return [201, { cita, sesion: (cuentaNueva && conPassword) ? authResponse(u) : null, accesoToken }];
+            return [201, {
+                cita,
+                sesion: (cuentaNueva && conPassword) ? authResponse(u) : null,
+                accesoToken,
+                activacionPendiente: avisoActivacion !== null,
+                // Solo la demo rellena esto: en producción el enlace va por correo y no
+                // se enseña nunca. El frontend lo usa si está, y si no pone «revisa tu
+                // correo», que es lo correcto contra el backend real.
+                mensajeActivacion: avisoActivacion
+            }];
         }
         if (method === 'GET' && path === '/citas/mias') {
             const u = requerirUsuario(headers);
