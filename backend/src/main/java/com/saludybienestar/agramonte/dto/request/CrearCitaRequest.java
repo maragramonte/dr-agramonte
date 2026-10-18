@@ -1,5 +1,6 @@
 package com.saludybienestar.agramonte.dto.request;
 
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -10,7 +11,14 @@ public class CrearCitaRequest {
     @NotNull
     private Long medicoId;
 
+    /**
+     * Momento de la cita. {@code @Future} porque la validación de tamaño no bastaba:
+     * las franjas sembradas van quedando en el pasado sin dejar de estar marcadas como
+     * disponibles, así que una petición directa a la API podía reservar en una fecha
+     * ya vencida y colar una cita que el médico vería en su agenda hacia atrás.
+     */
     @NotNull
+    @Future
     private LocalDateTime fechaHora;
 
     @Size(max = 500)
@@ -36,7 +44,7 @@ public class CrearCitaRequest {
     @Size(max = 100)
     private String numeroTarjetaSanitaria;
 
-    /** Preferencia de pago si es privada: 'en-consulta' u 'online'. */
+    /** Preferencia de pago si es privada: 'en-consulta' (el pago online se retiró). */
     @Size(max = 20)
     private String preferenciaPago;
 }

@@ -51,7 +51,17 @@ class CitaServiceTest {
 
     @InjectMocks private CitaService citaService;
 
-    private static final LocalDateTime FRANJA = LocalDateTime.of(2026, 6, 10, 9, 0);
+    /**
+     * Franja siempre futura. Antes era una fecha fija (10/06/2026) y eso convertía la
+     * prueba en una bomba de relojería: al pasar ese día, la cita que la prueba daba por
+     * buena era una cita en el pasado. Relativa a hoy, la prueba sigue valiendo mañana.
+     */
+    private static final LocalDateTime FRANJA =
+            LocalDateTime.now().plusDays(7).withHour(9).withMinute(0).withSecond(0).withNano(0);
+
+    /** Franja ya vencida, para comprobar que no se puede reservar hacia atrás. */
+    private static final LocalDateTime FRANJA_PASADA =
+            LocalDateTime.now().minusDays(7).withHour(9).withMinute(0).withSecond(0).withNano(0);
 
     private Usuario paciente(Long id) {
         Usuario u = new Usuario();
@@ -129,6 +139,25 @@ class CitaServiceTest {
                 .isInstanceOf(ResponseStatusException.class)
                 .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
                         .isEqualTo(HttpStatus.NOT_FOUND));
+    }
+
+    @Test
+    @DisplayName("crearCita: una fecha ya pasada se rechaza con 400 y no llega a tocar la agenda")
+    void crearCita_fechaPasada_lanza400() {
+        // Las franjas vencidas siguen en la tabla marcadas como disponibles, así que sin
+        // esta regla una petición directa a la API reservaba para ayer. Se comprueba que
+        // corta antes de buscar paciente, médico u horario: nada de la agenda se consulta.
+        CrearCitaRequest req = crearCitaRequest();
+        req.setFechaHora(FRANJA_PASADA);
+
+        assertThatThrownBy(() -> citaService.crearCita(1L, req))
+                .isInstanceOf(ResponseStatusException.class)
+                .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
+                        .isEqualTo(HttpStatus.BAD_REQUEST));
+
+        verify(usuarioRepository, never()).findById(any());
+        verify(horarioRepository, never()).findByMedicoIdAndInicioAndDisponibleTrueForUpdate(any(), any());
+        verify(citaRepository, never()).save(any());
     }
 
     @Test

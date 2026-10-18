@@ -2,6 +2,7 @@
  * Centro de pruebas TFG: historial de reservas + vista médico integrada.
  */
 import apiClient from '../modules/api-client.js';
+import { html } from '../modules/html.js';
 
 const PANEL_SYNC_CHANNEL = 'dr-agramonte-citas';
 const SYNC_MS = 12_000;
@@ -48,7 +49,7 @@ async function loadMedicos() {
     try {
         const medicos = await apiClient.getMedicos();
         sel.innerHTML = medicos.map((m) =>
-            `<option value="${m.id}">${m.nombre}${m.especialidad ? ` — ${m.especialidad}` : ''}</option>`
+            html`<option value="${m.id}">${m.nombre}${m.especialidad ? ` — ${m.especialidad}` : ''}</option>`
         ).join('');
         medicoId = Number(sel.value) || 1;
     } catch {
@@ -82,7 +83,7 @@ async function loadReservas() {
             if (r.estado === 'CONFIRMADA' || r.estado === 'PENDIENTE') confirmadas++;
             if (r.estado === 'CANCELADA') canceladas++;
             const cls = r.estado === 'CANCELADA' ? 'estado-cancelada' : 'estado-activa';
-            return `<tr>
+            return html`<tr>
                 <td>#${r.citaId}</td>
                 <td><strong>${r.pacienteNombre}</strong><br><span class="muted">${r.pacienteEmail}</span></td>
                 <td>${r.pacienteTelefono || '—'}</td>
@@ -108,13 +109,16 @@ function renderDetallePaciente(p) {
     const det = $('medicoDetalle');
     if (!det || !p) return;
 
-    const citasHtml = (p.citas || []).map((c) => `
+    // Sin .join(''): se deja como array de fragmentos para interpolarlo abajo. Unirlo
+    // aquí lo convertiría en texto plano y la plantilla de fuera lo volvería a escapar,
+    // de modo que las etiquetas se verían literalmente en pantalla.
+    const citasHtml = (p.citas || []).map((c) => html`
         <li>
             <strong>${formatFecha(c.fechaHora)}</strong> — ${estadoLabel(c.estado)}
-            ${c.motivo ? `<br><span class="muted">Motivo: ${c.motivo}</span>` : ''}
-        </li>`).join('');
+            ${c.motivo ? html`<br><span class="muted">Motivo: ${c.motivo}</span>` : ''}
+        </li>`);
 
-    det.innerHTML = `
+    det.innerHTML = html`
         <h3><i class="fas fa-user-injured"></i> ${p.nombre}</h3>
         <dl class="medico-kv">
             <div><dt>Email</dt><dd>${p.email || '—'}</dd></div>
@@ -122,7 +126,7 @@ function renderDetallePaciente(p) {
             <div><dt>ID usuario</dt><dd>${p.usuarioId}</dd></div>
         </dl>
         <h4 style="font-size:.9rem;color:var(--teal);margin-bottom:.5rem"><i class="fas fa-calendar-check"></i> Citas reservadas</h4>
-        <ul class="medico-citas-list">${citasHtml || '<li>Sin citas activas</li>'}</ul>
+        <ul class="medico-citas-list">${citasHtml.length ? citasHtml : html`<li>Sin citas activas</li>`}</ul>
         <p style="font-size:.75rem;color:var(--gray-400);margin-top:1rem">
             Datos desde <code>GET /api/citas/agenda/pacientes</code> — lo que vería el médico al abrir su agenda.
         </p>`;
@@ -139,7 +143,7 @@ function renderListaPacientesMedico() {
         return;
     }
 
-    lista.innerHTML = pacientesAgenda.map((p) => `
+    lista.innerHTML = pacientesAgenda.map((p) => html`
         <div class="medico-patient${pacienteSeleccionado?.usuarioId === p.usuarioId ? ' active' : ''}"
              data-uid="${p.usuarioId}" role="button" tabindex="0">
             <strong>${p.nombre}</strong>

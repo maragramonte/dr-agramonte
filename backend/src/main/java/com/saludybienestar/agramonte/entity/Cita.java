@@ -61,7 +61,7 @@ public class Cita {
     /** Nº de tarjeta sanitaria / póliza si paga por seguro. Nullable. */
     private String numeroTarjetaSanitaria;
 
-    /** Preferencia de pago si es privada: 'en-consulta' u 'online'. Nullable. */
+    /** Preferencia de pago si es privada: 'en-consulta' (el pago online se retiró). Nullable. */
     private String preferenciaPago;
 
     /**

@@ -1,4 +1,5 @@
 import apiClient from '../modules/api-client.js';
+import { html, crudo } from '../modules/html.js';
 
 'use strict';
 
@@ -191,12 +192,12 @@ async function solicitarVinculacionTelegram() {
             ? new Date(data.expiraEn).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
             : null;
         const aviso = data.yaVinculado
-            ? '<p class="telegram-note">Ya tenías un chat vinculado: seguirá recibiendo los avisos hasta que completes esta nueva vinculación.</p>'
+            ? crudo('<p class="telegram-note">Ya tenías un chat vinculado: seguirá recibiendo los avisos hasta que completes esta nueva vinculación.</p>')
             : '';
         const enlace = data.enlace
-            ? `<a class="telegram-open" href="${data.enlace}" target="_blank" rel="noopener"><i class="fab fa-telegram"></i> Abrir Telegram y vincular</a>`
+            ? html`<a class="telegram-open" href="${data.enlace}" target="_blank" rel="noopener"><i class="fab fa-telegram"></i> Abrir Telegram y vincular</a>`
             : '';
-        result.innerHTML = `${aviso}${enlace}
+        result.innerHTML = html`${aviso}${enlace}
             <p class="telegram-note">O escribe al bot <code>/start ${data.token}</code>${caduca ? ` — caduca a las ${caduca}.` : '.'}</p>`;
         result.hidden = false;
         showToast('Enlace de vinculación generado', 'success');
@@ -397,9 +398,9 @@ async function cargarMedicos() {
             medicoSelect.innerHTML = '<option value="">No hay especialistas disponibles</option>';
             return;
         }
-        medicoSelect.innerHTML = `
+        medicoSelect.innerHTML = html`
             <option value="">Selecciona especialista...</option>
-            ${medicos.map((m) => `<option value="${m.id}">${m.nombre}${m.especialidad ? ` - ${m.especialidad}` : ''}</option>`).join('')}
+            ${medicos.map((m) => html`<option value="${m.id}">${m.nombre}${m.especialidad ? ` - ${m.especialidad}` : ''}</option>`)}
         `;
     } catch (err) {
         console.error(err);
@@ -637,7 +638,7 @@ function exportICS(cita) {
 }
 
 function showModalConfirm(cita) {
-    $('modalDetails').innerHTML = `
+    $('modalDetails').innerHTML = html`
         <div class="modal-detail-row"><i class="fas fa-map-marker-alt"></i><span class="modal-detail-label">Centro</span><span>${cita.centroNombre}</span></div>
         <div class="modal-detail-row"><i class="fas fa-calendar-day"></i><span class="modal-detail-label">Fecha</span><span>${fmtFecha(cita.fecha)}</span></div>
         <div class="modal-detail-row"><i class="fas fa-clock"></i><span class="modal-detail-label">Hora</span><span>${cita.hora}</span></div>
@@ -663,7 +664,7 @@ function renderAppointments() {
     }
     list.innerHTML = pending.map((c) => {
         const d = parseDate(c.fecha);
-        return `<div class="apt-item"><div class="apt-date"><span class="day">${d.getDate()}</span><span class="month">${CFG.mesesCorto[d.getMonth()]}</span></div><div class="apt-info"><div class="apt-time">${c.hora}</div><div class="apt-centro"><i class="fas fa-map-marker-alt"></i> ${c.centroNombre || 'Consulta'}</div></div><div class="apt-actions"><button class="apt-btn" data-action="export" data-id="${c.id}"><i class="fas fa-calendar-plus"></i></button><button class="apt-btn danger" data-action="cancel" data-id="${c.id}"><i class="fas fa-times"></i></button></div></div>`;
+        return html`<div class="apt-item"><div class="apt-date"><span class="day">${d.getDate()}</span><span class="month">${CFG.mesesCorto[d.getMonth()]}</span></div><div class="apt-info"><div class="apt-time">${c.hora}</div><div class="apt-centro"><i class="fas fa-map-marker-alt"></i> ${c.centroNombre || 'Consulta'}</div></div><div class="apt-actions"><button class="apt-btn" data-action="export" data-id="${c.id}"><i class="fas fa-calendar-plus"></i></button><button class="apt-btn danger" data-action="cancel" data-id="${c.id}"><i class="fas fa-times"></i></button></div></div>`;
     }).join('');
     list.querySelectorAll('[data-action]').forEach((btn) => btn.addEventListener('click', async () => {
         const cita = pending.find((c) => c.id === btn.dataset.id);

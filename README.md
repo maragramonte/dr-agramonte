@@ -87,7 +87,7 @@ autoalojados. Un tercero colado por descuido deja de cargar en vez de pasar inad
 
 ## Decisiones técnicas
 
-Las cuatro que más me costaron y mejor explican el proyecto.
+Las cinco que más me costaron y mejor explican el proyecto.
 
 ### Dos pacientes, el mismo hueco, el mismo segundo
 
@@ -116,6 +116,20 @@ sigue avisando.
 
 La vinculación del bot usa un token de un solo uso con 15 minutos de validez, emitido
 siempre para el usuario del JWT en sesión, nunca para un email recibido por parámetro.
+
+### Una migración se ejecuta una vez; una agenda hay que seguir creándola
+
+Los huecos de la consulta los sembraban las migraciones V3 y V6: unos 90 días contados
+desde el primer arranque. Pero Flyway ejecuta cada migración **una sola vez**, así que al
+consumirse esa ventana el calendario se quedaba vacío y la web dejaba de admitir citas sin
+dar ningún error: simplemente no había días que ofrecer.
+
+Lo resuelve `GeneradorAgendaScheduler`, que cada madrugada añade el tramo que falta al
+final de la ventana. Solo inserta las franjas que aún no existen —el índice
+`UNIQUE (medico_id, inicio)` lo garantiza—, de modo que ni resucita un hueco ya reservado ni
+vuelve a marcar como libre uno ocupado. El patrón semanal (horas de consulta y qué centro
+atiende cada día) salió del `.sql` y vive ahora en `AgendaProperties`, que es donde se puede
+cambiar sin tocar una migración ya aplicada.
 
 ### Frontend sin framework
 
@@ -208,12 +222,13 @@ contra PostgreSQL, y para eso están las pruebas de integración.
 cd backend && mvn test
 ```
 
-**54 pruebas en tres niveles**: unitarias de servicio, de seguridad y roles sobre la capa
+**73 pruebas en tres niveles**: unitarias de servicio, de seguridad y roles sobre la capa
 REST (`@WebMvcTest` con la `SecurityConfig` real) y de integración end-to-end contra un
 PostgreSQL levantado con Testcontainers. Cubren las ramas críticas: 409 por doble reserva,
-403 por rol, validez del JWT, cancelación y el secreto del webhook.
+403 por rol, validez del JWT, cancelación, el secreto del webhook, el límite de peticiones
+y la regeneración de la agenda.
 
-Las 6 de integración necesitan Docker en marcha; si no lo hay se marcan como saltadas en
+Las 10 de integración necesitan Docker en marcha; si no lo hay se marcan como saltadas en
 lugar de fallar. La cobertura todavía no está medida con JaCoCo.
 
 En cada push y cada pull request a `main` las ejecuta GitHub Actions
@@ -276,6 +291,8 @@ certificado.
 | `TWILIO_*` | Credenciales, canal (`whatsapp`/`sms`) y horas del recordatorio |
 | `TELEGRAM_*` | Token del bot, usuario del bot y secreto del webhook |
 | `MAIL_*`, `CONTACT_INBOX` | Correo del formulario de contacto |
+| `AGENDA_DIAS_FUTURO`, `AGENDA_CRON` | Ventana de huecos que se mantiene abierta (90 días) y cuándo se amplía |
+| `RATE_LIMIT_*` | Peticiones por IP permitidas en las rutas públicas de escritura |
 
 Con los canales desactivados la aplicación funciona igual; simplemente no envía mensajes.
 
@@ -310,7 +327,7 @@ producción **no levanta**. En local se dejan sin definir y vale la de demostrac
 ```
 .
 ├── backend/          API Spring Boot (controller · service · repository · DTOs)
-│   └── src/main/resources/db/migration/   Flyway V1–V10 (postgresql/ y mysql/)
+│   └── src/main/resources/db/migration/   Flyway V1–V11 (postgresql/ y mysql/)
 ├── frontend/         Sitio estático, PWA y nginx.conf
 ├── demo/             API simulada para la demo en GitHub Pages
 ├── postman/          Colección de la API
@@ -340,6 +357,7 @@ producción **no levanta**. En local se dejan sin definir y vale la de demostrac
 | `js/modules/api-client.js` | Cliente REST y gestión del JWT |
 | `js/modules/api-config.js` | URL base de la API |
 | `js/modules/auth-ui.js` | Login y registro desde el menú |
+| `js/modules/html.js` | Plantillas etiquetadas que escapan lo interpolado: datos del paciente en la pantalla del médico |
 | `js/modules/i18n.js` | Traducción al catalán por `data-i18n`, sin dependencias |
 | `js/modules/theme-init.js` | Fija el tema antes de pintar, para que no parpadee |
 | `js/pages/reserva.js` | Reserva, `syncMisCitas()`, «Mis citas» y vinculación con Telegram |

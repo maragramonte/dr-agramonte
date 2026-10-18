@@ -10,7 +10,9 @@ import com.saludybienestar.agramonte.entity.Rol;
 import com.saludybienestar.agramonte.entity.Usuario;
 import com.saludybienestar.agramonte.repository.CitaRepository;
 import com.saludybienestar.agramonte.repository.HorarioRepository;
+import com.saludybienestar.agramonte.repository.MedicoRepository;
 import com.saludybienestar.agramonte.repository.UsuarioRepository;
+import com.saludybienestar.agramonte.scheduler.GeneradorAgendaScheduler;
 import com.saludybienestar.agramonte.security.TokenAccesoCita;
 import com.saludybienestar.agramonte.service.CitaService;
 import org.junit.jupiter.api.DisplayName;
@@ -58,7 +60,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * <p>Aprovecha los datos semilla de las migraciones Flyway: médico {@code id=1}
  * con huecos disponibles generados a futuro.
  */
-@SpringBootTest
+// El límite de peticiones se apaga aquí: esta clase hace una decena de reservas
+// seguidas desde la misma dirección, que es justo lo que RateLimitFilter corta. Su
+// comportamiento se prueba aparte, en RateLimitFilterTest.
+@SpringBootTest(properties = "app.rate-limit.enabled=false")
 @AutoConfigureMockMvc
 @Testcontainers(disabledWithoutDocker = true)   // se omite (no falla) si no hay un Docker compatible
 class ReservaPublicaIntegrationTest {
@@ -80,14 +85,26 @@ class ReservaPublicaIntegrationTest {
     @Autowired private CitaRepository citaRepository;
     @Autowired private UsuarioRepository usuarioRepository;
     @Autowired private CitaService citaService;
+    @Autowired private GeneradorAgendaScheduler generadorAgenda;
+    @Autowired private MedicoRepository medicoRepository;
 
     /** Cabecera con el token de acceso de la cita, tal como la envía el frontend. */
     private static final String CABECERA_TOKEN = "X-Cita-Token";
 
+    /**
+     * Primera franja libre <em>futura</em>. Se filtra y se ordena en vez de coger el
+     * primer elemento que devuelva la consulta: el orden no está garantizado y, desde
+     * que no se puede reservar hacia atrás, una franja ya vencida daría un 400 y haría
+     * fallar pruebas que no van de eso.
+     */
     private LocalDateTime primeraFranjaLibre() {
-        List<Horario> libres = horarioRepository.findByMedicoIdAndDisponibleTrue(1L);
-        assertThat(libres).as("las migraciones deben sembrar huecos libres del médico 1").isNotEmpty();
-        return libres.get(0).getInicio();
+        LocalDateTime ahora = LocalDateTime.now();
+        return horarioRepository.findByMedicoIdAndDisponibleTrue(1L).stream()
+                .map(Horario::getInicio)
+                .filter(inicio -> inicio.isAfter(ahora))
+                .min(LocalDateTime::compareTo)
+                .orElseThrow(() -> new AssertionError(
+                        "las migraciones deben sembrar huecos libres futuros del médico 1"));
     }
 
     /** Hace una reserva pública correcta y devuelve la respuesta parseada (cita + accesoToken). */
@@ -431,5 +448,78 @@ class ReservaPublicaIntegrationTest {
                         .header(CABECERA_TOKEN, reserva.path("accesoToken").asText()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.centroCodigo").value("palma"));
+    }
+
+    // ── La agenda no se agota ────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("Agenda agotada: el generador la repuebla y se puede volver a reservar")
+    void agendaAgotada_elGeneradorLaRepuebla() throws Exception {
+        // Reproduce lo que pasaba a los ~90 días de desplegar: las migraciones V3 y V6
+        // sembraron una ventana de huecos y no vuelven a ejecutarse nunca, así que al
+        // consumirse esa ventana el calendario se quedaba vacío y nadie podía pedir cita.
+        // Aquí se vacía a propósito la agenda futura del médico 1 y se comprueba que el
+        // generador la deja otra vez reservable.
+        LocalDateTime ahora = LocalDateTime.now();
+        List<Horario> futuros = horarioRepository.findByMedicoIdAndDisponibleTrue(1L).stream()
+                .filter(h -> h.getInicio().isAfter(ahora))
+                .toList();
+        assertThat(futuros).as("partimos de una agenda con huecos").isNotEmpty();
+        horarioRepository.deleteAll(futuros);
+
+        assertThat(horarioRepository.findByMedicoIdAndDisponibleTrue(1L).stream()
+                .filter(h -> h.getInicio().isAfter(ahora))
+                .toList())
+                .as("la agenda queda agotada, como a los 90 días de desplegar")
+                .isEmpty();
+
+        generadorAgenda.generarHuecosFuturos();
+
+        List<Horario> repuestos = horarioRepository.findByMedicoIdAndDisponibleTrue(1L).stream()
+                .filter(h -> h.getInicio().isAfter(ahora))
+                .toList();
+        assertThat(repuestos).as("el generador vuelve a llenar la agenda").isNotEmpty();
+        assertThat(repuestos.stream().map(Horario::getInicio).max(LocalDateTime::compareTo).orElseThrow())
+                .as("y la deja cubierta a dos meses vista")
+                .isAfter(ahora.plusDays(60));
+
+        // Y lo que importa de verdad: con esos huecos se puede reservar de nuevo por la API.
+        LocalDateTime franja = repuestos.stream()
+                .map(Horario::getInicio)
+                .min(LocalDateTime::compareTo)
+                .orElseThrow();
+        JsonNode reserva = reservaPublicaOk(cuerpoReserva("agenda.repuesta@example.com", franja));
+        assertThat(reserva.path("cita").path("estado").asText()).isEqualTo("CONFIRMADA");
+    }
+
+    @Test
+    @DisplayName("Una franja vencida ni se ofrece como hueco libre ni se deja reservar")
+    void franjaVencida_noSeOfreceNiSeReserva() throws Exception {
+        // Un horario pasado sigue en la tabla con disponible = true: nada lo retira al
+        // pasar la hora. Antes eso bastaba para reservar una cita hacia atrás.
+        LocalDateTime ayer = LocalDate.now().minusDays(1).atTime(10, 0);
+        Horario vencido = new Horario();
+        vencido.setMedico(medicoRepository.findById(1L).orElseThrow());
+        vencido.setInicio(ayer);
+        vencido.setFin(ayer.plusMinutes(30));
+        vencido.setDisponible(true);
+        horarioRepository.save(vencido);
+
+        assertThat(huecos(ayer.toLocalDate().toString(), ""))
+                .as("la disponibilidad no ofrece horas que ya han pasado")
+                .isEmpty();
+
+        mockMvc.perform(post("/api/citas/reserva-publica")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(cuerpoReserva("cita.en.el.pasado@example.com", ayer)))
+                .andExpect(status().isBadRequest());
+
+        assertThat(usuarioRepository.findByEmail("cita.en.el.pasado@example.com"))
+                .as("una reserva rechazada no deja cuenta creada")
+                .isEmpty();
+
+        // Se retira: las pruebas comparten la misma base y una franja vencida suelta
+        // confundiría a cualquier otra que busque «el primer hueco libre».
+        horarioRepository.delete(vencido);
     }
 }

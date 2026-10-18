@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dr-agramonte-v39';
+const CACHE_NAME = 'dr-agramonte-v40';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -21,11 +21,17 @@ const urlsToCache = [
     '/js/modules/api-config.js',
     '/js/modules/api-client.js',
     '/js/modules/auth-ui.js',
+    // Lo importan reserva.js y panel-pruebas.js: si faltara de esta lista, esas dos
+    // paginas se precargarian pero su modulo no, y sin conexion fallarian al importarlo.
+    '/js/modules/html.js',
     '/js/pages/dr-agramonte.js',
     '/js/pages/reserva.js',
     '/js/pages/contacto.js',
     '/js/pages/panel-pruebas.js',
     '/js/pages/estadisticas.js',
+    // Faltaba: servicios.html si estaba precargada, pero su script no, asi que sin
+    // conexion la pagina cargaba sin el catalogo ni los enlaces a la reserva.
+    '/js/pages/servicios.js',
     // Extraidos del HTML para poder aplicar la CSP; sin ellos la pagina sin
     // conexion se quedaria sin menu ni reintento de reconexion.
     '/js/pages/index-preload.js',
