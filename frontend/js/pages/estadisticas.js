@@ -43,6 +43,9 @@ function mostrarGate(msg) {
     $('dashContent').hidden = true;
     const gate = $('dashGate');
     gate.hidden = false;
+    // innerHTML a propósito: los tres avisos son texto fijo de este fichero y llevan
+    // <code> dentro. Si algún día el mensaje viniera del servidor, hay que pasarlo por
+    // la plantilla html`` de js/modules/html.js, como el panel del médico.
     if (msg) $('dashGateMsg').innerHTML = msg;
 }
 
