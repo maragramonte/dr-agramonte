@@ -1,6 +1,6 @@
 # Base de datos — referencia para la defensa
 
-> **TFG DAM · Dr. Agramonte.** Esquema real reconstruido de las migraciones **Flyway V1–V12** (`backend/src/main/resources/db/migration/postgresql/`). **PostgreSQL 15.** Hibernate arranca con `ddl-auto: validate`, así que el esquema de esta referencia coincide exactamente con las entidades JPA.
+> **TFG DAM · Dr. Agramonte.** Esquema real reconstruido de las migraciones **Flyway V1–V13** (`backend/src/main/resources/db/migration/postgresql/`). **PostgreSQL 15.** Hibernate arranca con `ddl-auto: validate`, así que el esquema de esta referencia coincide exactamente con las entidades JPA.
 
 ## Resumen en una frase
 6 tablas en **3ª forma normal**, claves `BIGSERIAL`, integridad referencial con **claves foráneas** (unas en `CASCADE`, otras en `SET NULL` según convenga conservar o no el dato), un **índice único** que —junto al bloqueo pesimista— evita las dobles reservas, e **índices** sobre las consultas más frecuentes.
@@ -31,6 +31,8 @@ erDiagram
         varchar  telegram_chat_id UK "V9 (null)"
         varchar  telegram_link_token UK "V9 (null)"
         timestamp telegram_link_token_expira_en "V10 (null)"
+        varchar  activacion_token UK "V13 (null)"
+        timestamp activacion_token_expira_en "V13 (null)"
         timestamp created_at
         timestamp updated_at
     }
@@ -105,6 +107,8 @@ erDiagram
 | `telegram_chat_id` | VARCHAR(64) | **V9** — nullable, **UNIQUE**; chat vinculado al que se envían los avisos |
 | `telegram_link_token` | VARCHAR(64) | **V9** — nullable, **UNIQUE**; token de un solo uso para vincular el chat |
 | `telegram_link_token_expira_en` | TIMESTAMP | **V10** — nullable; caducidad del token (15 min) |
+| `activacion_token` | VARCHAR(64) | **V13** — nullable, **UNIQUE**; SHA-256 del token con el que el dueño del buzón convierte su cuenta invitada en una cuenta con contraseña |
+| `activacion_token_expira_en` | TIMESTAMP | **V13** — nullable; caducidad del enlace (30 min) |
 | `created_at`, `updated_at` | TIMESTAMP | auditoría básica |
 
 ### `medicos` — catálogo de especialistas
@@ -215,6 +219,7 @@ Está **probado**: `ReservaPublicaIntegrationTest` lanza dos hilos en paralelo c
 | `idx_citas_recordatorio` (estado, recordatorio_enviado, fecha_hora) | citas | barrido del recordatorio 24 h |
 | `uk_usuarios_telegram_chat_id` (UNIQUE) | usuarios | un chat de Telegram pertenece como mucho a un paciente — **V9** |
 | `uk_usuarios_telegram_link_token` (UNIQUE) | usuarios | el token de vinculación es irrepetible — **V9** |
+| `uk_usuarios_activacion_token` (UNIQUE) | usuarios | el token de activación es irrepetible — **V13** |
 | `ux_medicos_usuario` (UNIQUE) | medicos | una cuenta gobierna como mucho una agenda — **V12** |
 
 ---
@@ -222,7 +227,7 @@ Está **probado**: `ReservaPublicaIntegrationTest` lanza dos hilos en paralelo c
 ## Decisiones de diseño (resumen para responder rápido)
 - **Claves `BIGSERIAL`/`BIGINT`:** autoincremento nativo de PostgreSQL; margen de crecimiento frente a `INT`.
 - **Enums como `VARCHAR` + `@Enumerated(STRING)`:** dominios pequeños y estables (estado, rol, canal); legibles en la BD y sin una tabla-catálogo que sería sobre-ingeniería.
-- **Columnas nuevas siempre `nullable`** (centro_id V5/V6, recordatorio V2, cobertura V8, Telegram V9/V10, token de acceso V11, cuenta del médico V12): no rompen las filas existentes al migrar (compatibilidad hacia atrás).
+- **Columnas nuevas siempre `nullable`** (centro_id V5/V6, recordatorio V2, cobertura V8, Telegram V9/V10, token de acceso V11, cuenta del médico V12, activación V13): no rompen las filas existentes al migrar (compatibilidad hacia atrás).
 - **Flyway forward-only:** cada cambio es una migración numerada; el esquema se reconstruye idéntico en cualquier entorno. No hay *undo* automático (edición community): se corrige con una nueva V.
 - **Normalización 3FN:** sin datos repetidos; cada hecho vive en un único sitio y se referencia por FK.
 

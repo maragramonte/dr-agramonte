@@ -76,6 +76,8 @@ services:
       MAIL_PASSWORD: ${MAIL_PASSWORD:-}
       MAIL_FROM: ${MAIL_FROM:-}
       CONTACT_INBOX: ${CONTACT_INBOX:-}
+      # Base de los enlaces que viajan por correo (activación de cuenta invitada).
+      APP_URL_PUBLICA: ${APP_URL_PUBLICA:-https://${DOMAIN_WWW}}
       TWILIO_ENABLED: ${TWILIO_ENABLED:-false}
       TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
       TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}

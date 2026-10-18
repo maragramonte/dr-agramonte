@@ -53,6 +53,7 @@ npx postman-cli collection run postman/Dr-Agramonte-API.postman_collection.json 
 | `base_url` | `http://localhost:8080` | API directo (Docker `backend`) |
 | `base_url_nginx` | `http://localhost` | Mismo API vía nginx (`/api/...`) |
 | `paciente_email` / `invitado_email` | Ver entorno | Pruebas paciente / invitado |
+| `activacion_token` | Vacía | Token del correo, para **Activar cuenta invitada** |
 
 La colección usa `base_url` (puerto 8080).
 
@@ -82,6 +83,22 @@ Comprueba que invitado, «Mis citas» (vía `/citas/publica/{id}` con `X-Cita-To
 6. Repetir **Historial reservas prueba** — estado `CANCELADA`.
 
 Documentación ampliada: [docs/SINCRONIZACION-CITAS.md](../docs/SINCRONIZACION-CITAS.md).
+
+### Flujo «el invitado se hace una cuenta» (V13)
+
+Un correo no prueba identidad, así que la cuenta invitada no se convierte en cuenta con
+contraseña por rellenar un formulario: hace falta abrir el enlace que llega al buzón.
+
+1. **Reserva pública (sin JWT)** con un email nuevo → nace la cuenta invitada.  
+2. **Registro paciente** con *ese mismo* email → **202** y el aviso de revisar el correo.
+   La cuenta no ha cambiado: la contraseña del formulario todavía no sirve para entrar.  
+3. Saca el token del correo. En local, sin SMTP, el paso 2 responde **503** a propósito:
+   nunca se activa una cuenta sin haber enviado el correo. Para probarlo entero hace falta
+   un SMTP (las variables `MAIL_*`); el enlace es `activar.html#<token>` y caduca en 30 min.  
+4. Pega el token en la variable de entorno `activacion_token`.  
+5. **Activar cuenta invitada** → **200** con sesión; guarda `jwt_token`.  
+6. **Mis citas** → la cita del paso 1 sigue ahí.  
+7. Repetir **Activar cuenta invitada** → **400**: el enlace es de un solo uso.
 
 ### Médico de prueba (V3)
 
