@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saludybienestar.agramonte.dto.request.CrearCitaRequest;
 import com.saludybienestar.agramonte.entity.EstadoCita;
+import com.saludybienestar.agramonte.entity.Cita;
 import com.saludybienestar.agramonte.entity.Horario;
+import com.saludybienestar.agramonte.entity.Medico;
 import com.saludybienestar.agramonte.entity.Rol;
 import com.saludybienestar.agramonte.entity.Usuario;
 import com.saludybienestar.agramonte.repository.CitaRepository;
@@ -15,6 +17,7 @@ import com.saludybienestar.agramonte.repository.UsuarioRepository;
 import com.saludybienestar.agramonte.scheduler.GeneradorAgendaScheduler;
 import com.saludybienestar.agramonte.security.TokenAccesoCita;
 import com.saludybienestar.agramonte.service.CitaService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,6 +90,7 @@ class ReservaPublicaIntegrationTest {
     @Autowired private CitaService citaService;
     @Autowired private GeneradorAgendaScheduler generadorAgenda;
     @Autowired private MedicoRepository medicoRepository;
+    @Autowired private PasswordEncoder passwordEncoder;
 
     /** Cabecera con el token de acceso de la cita, tal como la envía el frontend. */
     private static final String CABECERA_TOKEN = "X-Cita-Token";
@@ -521,5 +525,116 @@ class ReservaPublicaIntegrationTest {
         // Se retira: las pruebas comparten la misma base y una franja vencida suelta
         // confundiría a cualquier otra que busque «el primer hueco libre».
         horarioRepository.delete(vencido);
+    }
+
+    // ── La agenda de un médico no se abre con un parámetro ───────────────────
+
+    /** Crea un médico con su cuenta vinculada (columna medicos.usuario_id, V12). */
+    private Medico medicoConCuenta(String nombre, String email, String password) {
+        Usuario cuenta = new Usuario();
+        cuenta.setEmail(email);
+        cuenta.setNombre(nombre);
+        cuenta.setPassword(passwordEncoder.encode(password));
+        cuenta.setRol(Rol.MEDICO);
+        cuenta.setEnabled(true);
+        cuenta = usuarioRepository.save(cuenta);
+
+        Medico medico = new Medico();
+        medico.setNombre(nombre);
+        medico.setEspecialidad("Medicina Interna");
+        medico.setEmail(email);
+        medico.setUsuario(cuenta);
+        return medicoRepository.save(medico);
+    }
+
+    /** Paciente con una cita de ese médico, para que su agenda tenga algo que filtrar. */
+    private Usuario pacienteConCita(Medico medico, String nombre, String email) {
+        Usuario paciente = new Usuario();
+        paciente.setEmail(email);
+        paciente.setNombre(nombre);
+        paciente.setPassword(passwordEncoder.encode("no-se-usa-" + email));
+        paciente.setRol(Rol.PACIENTE);
+        paciente.setEnabled(true);
+        paciente.setCuentaInvitada(true);
+        paciente = usuarioRepository.save(paciente);
+
+        Cita cita = new Cita();
+        cita.setUsuario(paciente);
+        cita.setMedico(medico);
+        cita.setFechaHora(LocalDateTime.now().plusDays(3).withNano(0));
+        cita.setMotivo("Motivo reservado de " + nombre);
+        cita.setEstado(EstadoCita.CONFIRMADA);
+        citaRepository.save(cita);
+        return paciente;
+    }
+
+    /** Token real, pasando por /api/auth/login como lo haría el navegador. */
+    private String tokenDe(String email, String password) throws Exception {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("email", email);
+        body.put("password", password);
+        String json = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(body)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        return objectMapper.readTree(json).path("token").asText();
+    }
+
+    @Test
+    @DisplayName("Dos médicos reales: ninguno ve la agenda del otro, ni pidiéndola por su id")
+    void agendaDeOtroMedico_noSeFiltraNingunDato() throws Exception {
+        // Antes /api/citas/agenda/** recibía el médico por parámetro, así que cualquier
+        // cuenta con rol MEDICO leía la agenda ajena cambiando un número en la URL:
+        // nombre, correo, teléfono y motivo de consulta de los pacientes de otro.
+        Medico medicaA = medicoConCuenta("Dra. Agenda A", "agenda.a@example.com", "ClaveA123!");
+        Medico medicoB = medicoConCuenta("Dr. Agenda B", "agenda.b@example.com", "ClaveB123!");
+        pacienteConCita(medicaA, "Paciente De A", "paciente.de.a@example.com");
+        pacienteConCita(medicoB, "Paciente De B", "paciente.de.b@example.com");
+
+        String tokenA = tokenDe("agenda.a@example.com", "ClaveA123!");
+
+        // A pide descaradamente la agenda de B.
+        String json = mockMvc.perform(get("/api/citas/agenda/pacientes")
+                        .param("medicoId", String.valueOf(medicoB.getId()))
+                        .header("Authorization", "Bearer " + tokenA))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        // Recibe la suya: 200 y no 403, para que la respuesta no revele si B existe.
+        assertThat(json)
+                .as("A solo debe ver a su paciente")
+                .contains("Paciente De A")
+                .doesNotContain("Paciente De B")
+                .doesNotContain("paciente.de.b@example.com")
+                .doesNotContain("Motivo reservado de Paciente De B");
+
+        // Y lo mismo en el otro sentido, para descartar que el filtro acierte por azar.
+        String tokenB = tokenDe("agenda.b@example.com", "ClaveB123!");
+        String jsonB = mockMvc.perform(get("/api/citas/agenda/reservas")
+                        .param("medicoId", String.valueOf(medicaA.getId()))
+                        .header("Authorization", "Bearer " + tokenB))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        assertThat(jsonB)
+                .contains("Paciente De B")
+                .doesNotContain("Paciente De A")
+                .doesNotContain("paciente.de.a@example.com");
+    }
+
+    @Test
+    @DisplayName("La migración V12 deja vinculada la cuenta del médico sembrado")
+    void migracionV12_vinculaElMedicoDeLaSemilla() {
+        // V1 crea la ficha del médico y V3 su usuario, los dos con dr.agramonte@example.com.
+        // Si el enlace por correo de V12 fallara, el médico de la demo entraría y se
+        // encontraría un 403 en su propia agenda.
+        Usuario cuenta = usuarioRepository.findByEmail("dr.agramonte@example.com").orElseThrow();
+        assertThat(medicoRepository.findByUsuarioId(cuenta.getId()))
+                .as("la ficha del médico 1 debe quedar vinculada a su cuenta")
+                .isPresent()
+                .get()
+                .extracting(Medico::getId)
+                .isEqualTo(1L);
     }
 }

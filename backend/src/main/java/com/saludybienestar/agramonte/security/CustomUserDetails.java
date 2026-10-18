@@ -1,5 +1,6 @@
 package com.saludybienestar.agramonte.security;
 
+import com.saludybienestar.agramonte.entity.Rol;
 import com.saludybienestar.agramonte.entity.Usuario;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -40,6 +41,11 @@ public class CustomUserDetails implements UserDetails {
 
     public String getNombre() {
         return usuario.getNombre();
+    }
+
+    /** Rol con tipo, para decidir sin reconstruirlo a partir de la cadena del authority. */
+    public Rol getRol() {
+        return usuario.getRol();
     }
 
     @Override

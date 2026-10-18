@@ -5,8 +5,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.HashSet;
 import java.util.Objects;
@@ -34,6 +37,20 @@ public class Medico {
     private String especialidad;
 
     private String email;
+
+    /**
+     * Cuenta con la que entra este médico. Es lo que permite deducir del JWT de quién
+     * es la agenda, en vez de aceptar un {@code ?medicoId=} que cualquier médico podía
+     * cambiar para leer la de otro.
+     *
+     * <p>Nullable: una ficha puede existir sin cuenta (los datos de demostración lo son).
+     * El {@code UNIQUE} de la columna (V12) impide que una misma cuenta gobierne dos
+     * agendas. El correo de la ficha no sirve como vínculo en caliente:
+     * {@code MedicoCuentaInicializador} puede renombrar el de la cuenta sin tocar el suyo.
+     */
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", unique = true)
+    private Usuario usuario;
 
     @OneToMany(mappedBy = "medico", cascade = CascadeType.ALL)
     private Set<Horario> horarios = new HashSet<>();
