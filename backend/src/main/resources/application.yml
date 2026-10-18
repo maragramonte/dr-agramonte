@@ -41,6 +41,13 @@ app:
     password: ${MEDICO_PASSWORD:}
   contact:
     inbox: ${CONTACT_INBOX:}
+  # Generación continua de la agenda. Las migraciones V3/V6 sembraron ~90 días desde
+  # el primer arranque y no vuelven a ejecutarse, así que pasada esa ventana no
+  # quedaba ningún hueco reservable. GeneradorAgendaScheduler la mantiene al día con
+  # este mismo patrón (ver AgendaProperties para el resto de valores por defecto).
+  agenda:
+    dias-futuro: ${AGENDA_DIAS_FUTURO:90}
+    cron: ${AGENDA_CRON:0 30 3 * * *}
   twilio:
     enabled: ${TWILIO_ENABLED:false}
     account-sid: ${TWILIO_ACCOUNT_SID:}

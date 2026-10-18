@@ -78,6 +78,10 @@ services:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       TELEGRAM_BOT_USERNAME: ${TELEGRAM_BOT_USERNAME:-}
       TELEGRAM_WEBHOOK_SECRET: ${TELEGRAM_WEBHOOK_SECRET:-}
+      # La agenda se amplía sola cada madrugada: las migraciones solo sembraron
+      # ~90 días y no vuelven a ejecutarse, así que sin esto se agotaba.
+      AGENDA_DIAS_FUTURO: ${AGENDA_DIAS_FUTURO:-90}
+      AGENDA_CRON: ${AGENDA_CRON:-0 30 3 * * *}
     healthcheck:
       # La imagen JRE no trae curl; /dev/tcp de bash basta para saber si Tomcat escucha.
       test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/127.0.0.1/8080'"]

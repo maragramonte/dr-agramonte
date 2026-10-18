@@ -12,6 +12,7 @@ import com.saludybienestar.agramonte.repository.CitaRepository;
 import com.saludybienestar.agramonte.repository.HorarioRepository;
 import com.saludybienestar.agramonte.repository.MedicoRepository;
 import com.saludybienestar.agramonte.repository.UsuarioRepository;
+import com.saludybienestar.agramonte.scheduler.GeneradorAgendaScheduler;
 import com.saludybienestar.agramonte.security.TokenAccesoCita;
 import com.saludybienestar.agramonte.service.CitaService;
 import org.junit.jupiter.api.DisplayName;
@@ -81,6 +82,7 @@ class ReservaPublicaIntegrationTest {
     @Autowired private CitaRepository citaRepository;
     @Autowired private UsuarioRepository usuarioRepository;
     @Autowired private CitaService citaService;
+    @Autowired private GeneradorAgendaScheduler generadorAgenda;
     @Autowired private MedicoRepository medicoRepository;
 
     /** Cabecera con el token de acceso de la cita, tal como la envía el frontend. */
@@ -445,6 +447,47 @@ class ReservaPublicaIntegrationTest {
                 .andExpect(jsonPath("$.centroCodigo").value("palma"));
     }
 
+    // ── La agenda no se agota ────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("Agenda agotada: el generador la repuebla y se puede volver a reservar")
+    void agendaAgotada_elGeneradorLaRepuebla() throws Exception {
+        // Reproduce lo que pasaba a los ~90 días de desplegar: las migraciones V3 y V6
+        // sembraron una ventana de huecos y no vuelven a ejecutarse nunca, así que al
+        // consumirse esa ventana el calendario se quedaba vacío y nadie podía pedir cita.
+        // Aquí se vacía a propósito la agenda futura del médico 1 y se comprueba que el
+        // generador la deja otra vez reservable.
+        LocalDateTime ahora = LocalDateTime.now();
+        List<Horario> futuros = horarioRepository.findByMedicoIdAndDisponibleTrue(1L).stream()
+                .filter(h -> h.getInicio().isAfter(ahora))
+                .toList();
+        assertThat(futuros).as("partimos de una agenda con huecos").isNotEmpty();
+        horarioRepository.deleteAll(futuros);
+
+        assertThat(horarioRepository.findByMedicoIdAndDisponibleTrue(1L).stream()
+                .filter(h -> h.getInicio().isAfter(ahora))
+                .toList())
+                .as("la agenda queda agotada, como a los 90 días de desplegar")
+                .isEmpty();
+
+        generadorAgenda.generarHuecosFuturos();
+
+        List<Horario> repuestos = horarioRepository.findByMedicoIdAndDisponibleTrue(1L).stream()
+                .filter(h -> h.getInicio().isAfter(ahora))
+                .toList();
+        assertThat(repuestos).as("el generador vuelve a llenar la agenda").isNotEmpty();
+        assertThat(repuestos.stream().map(Horario::getInicio).max(LocalDateTime::compareTo).orElseThrow())
+                .as("y la deja cubierta a dos meses vista")
+                .isAfter(ahora.plusDays(60));
+
+        // Y lo que importa de verdad: con esos huecos se puede reservar de nuevo por la API.
+        LocalDateTime franja = repuestos.stream()
+                .map(Horario::getInicio)
+                .min(LocalDateTime::compareTo)
+                .orElseThrow();
+        JsonNode reserva = reservaPublicaOk(cuerpoReserva("agenda.repuesta@example.com", franja));
+        assertThat(reserva.path("cita").path("estado").asText()).isEqualTo("CONFIRMADA");
+    }
 
     @Test
     @DisplayName("Una franja vencida ni se ofrece como hueco libre ni se deja reservar")

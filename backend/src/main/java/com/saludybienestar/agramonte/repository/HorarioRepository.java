@@ -18,6 +18,21 @@ public interface HorarioRepository extends JpaRepository<Horario, Long> {
     List<Horario> findByMedicoIdAndInicioBetween(Long medicoId, LocalDateTime start, LocalDateTime end);
     Optional<Horario> findByMedicoIdAndInicio(Long medicoId, LocalDateTime inicio);
 
+    /**
+     * Solo las fechas y horas ya ocupadas por una franja del médico en un rango. Lo usa
+     * el generador de agenda para saber qué falta por crear sin traerse las entidades
+     * enteras (son ~1.300 en una ventana de 90 días).
+     */
+    @Query("""
+            SELECT h.inicio FROM Horario h
+            WHERE h.medico.id = :medicoId
+              AND h.inicio BETWEEN :desde AND :hasta
+            """)
+    List<LocalDateTime> findInicios(
+            @Param("medicoId") Long medicoId,
+            @Param("desde") LocalDateTime desde,
+            @Param("hasta") LocalDateTime hasta);
+
     // Bloqueo pesimista para la reserva
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT h FROM Horario h WHERE h.medico.id = :medicoId AND h.inicio = :fechaHora AND h.disponible = true")
