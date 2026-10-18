@@ -7,6 +7,13 @@ const API_BASE_URL = window.API_BASE_URL || '/api';
 const CITA_TOKEN_HEADER = 'X-Cita-Token';
 const cabeceraCitaToken = (token) => ({ [CITA_TOKEN_HEADER]: token });
 
+// El médico de una agenda solo viaja cuando quien pregunta es un ADMIN; para un médico
+// lo pone el backend desde su JWT y el parámetro se ignora.
+const consultaMedico = (medicoId) =>
+    (medicoId === undefined || medicoId === null || medicoId === '')
+        ? ''
+        : `?medicoId=${encodeURIComponent(medicoId)}`;
+
 class ApiClient {
     async request(endpoint, options = {}) {
         const headers = {
@@ -123,14 +130,20 @@ class ApiClient {
 
     /**
      * Pacientes con citas del médico (panel médico).
-     * GET /api/citas/agenda/pacientes?medicoId=1
+     * GET /api/citas/agenda/pacientes
+     *
+     * Sin medicoId: de quién es la agenda lo decide el backend a partir del JWT. Antes
+     * se mandaba `?medicoId=1` por defecto y era el servidor quien se fiaba del número,
+     * así que un médico podía leer la agenda de otro cambiándolo. Solo un ADMIN puede
+     * pedir una agenda concreta, y entonces sí tiene que indicarla.
      */
-    getPacientesAgenda(medicoId = 1) {
-        return this.get(`/citas/agenda/pacientes?medicoId=${medicoId}`);
+    getPacientesAgenda(medicoId) {
+        return this.get(`/citas/agenda/pacientes${consultaMedico(medicoId)}`);
     }
 
-    getReservasPrueba(medicoId = 1) {
-        return this.get(`/citas/agenda/reservas?medicoId=${medicoId}`);
+    /** Historial de reservas. Mismo criterio que getPacientesAgenda. */
+    getReservasPrueba(medicoId) {
+        return this.get(`/citas/agenda/reservas${consultaMedico(medicoId)}`);
     }
 
     /**

@@ -244,6 +244,24 @@
         if (!['MEDICO', 'ADMIN'].includes(u.rol)) throw new ApiError(403, 'Acceso denegado');
         return u;
     }
+    /**
+     * De quién es la agenda, con la misma regla que CitaController.agendaDe: a un médico
+     * la suya (el medicoId de la URL se ignora), a un admin la que pida, y si no pide
+     * ninguna, 400. En la demo el vínculo médico-cuenta es el de MEDICOS[0] con el
+     * usuario 1, que es lo que en el backend guarda la columna medicos.usuario_id (V12).
+     */
+    function agendaDe(u, query) {
+        if (u.rol === 'ADMIN') {
+            const pedido = query.get('medicoId');
+            if (pedido === null || pedido === '') {
+                throw new ApiError(400, 'Indica de qué médico quieres ver la agenda (medicoId)');
+            }
+            return Number(pedido);
+        }
+        const medico = MEDICOS.find((m) => m.id === u.id);
+        if (!medico) throw new ApiError(403, 'Tu cuenta no tiene ninguna agenda asociada');
+        return medico.id;
+    }
     const obligatorio = (v, campo) => {
         if (v === undefined || v === null || String(v).trim() === '') {
             throw new ApiError(400, `Error de validacion en la solicitud: ${campo}`);
@@ -497,8 +515,7 @@
             return [204, null];
         }
         if (method === 'GET' && path === '/citas/agenda/pacientes') {
-            requerirGestion(headers);
-            const medicoId = Number(query.get('medicoId') || 1);
+            const medicoId = agendaDe(requerirGestion(headers), query);
             const porUsuario = new Map();
             db.citas.filter((c) => c.medicoId === medicoId).forEach((c) => {
                 if (!porUsuario.has(c.usuarioId)) porUsuario.set(c.usuarioId, []);
@@ -512,8 +529,7 @@
             }).sort((a, b) => a.nombre.localeCompare(b.nombre))];
         }
         if (method === 'GET' && path === '/citas/agenda/reservas') {
-            requerirGestion(headers);
-            const medicoId = Number(query.get('medicoId') || 1);
+            const medicoId = agendaDe(requerirGestion(headers), query);
             const centro = (query.get('centroCodigo') || '').trim().toLowerCase() || null;
             return [200, db.citas
                 .filter((c) => c.medicoId === medicoId && (!centro || c.centroCodigo === centro))

@@ -7,7 +7,11 @@ import { html } from '../modules/html.js';
 const PANEL_SYNC_CHANNEL = 'dr-agramonte-citas';
 const SYNC_MS = 12_000;
 
-let medicoId = 1;
+// Solo un ADMIN elige de qué médico es la agenda. Un médico recibe la suya y punto: el
+// backend la deduce de su JWT, así que mandar un medicoId no cambiaría nada (y antes sí
+// lo cambiaba, que era justamente el fallo).
+const esAdmin = () => (localStorage.getItem('rol') || '').toUpperCase() === 'ADMIN';
+let medicoId = null;
 let pollTimer = null;
 let pacientesAgenda = [];
 let pacienteSeleccionado = null;
@@ -46,14 +50,23 @@ function switchTab(name) {
 async function loadMedicos() {
     const sel = $('medicoSelect');
     if (!sel) return;
+    // El selector es una herramienta de administración: a un médico se le oculta, porque
+    // elegir no le serviría de nada y sugeriría que puede ver agendas ajenas.
+    const campo = sel.closest('.field-inline');
+    if (!esAdmin()) {
+        if (campo) campo.hidden = true;
+        return;
+    }
+    if (campo) campo.hidden = false;
     try {
         const medicos = await apiClient.getMedicos();
         sel.innerHTML = medicos.map((m) =>
             html`<option value="${m.id}">${m.nombre}${m.especialidad ? ` — ${m.especialidad}` : ''}</option>`
         ).join('');
-        medicoId = Number(sel.value) || 1;
+        if (!medicoId) medicoId = Number(sel.value) || null;
+        sel.value = String(medicoId ?? '');
     } catch {
-        sel.innerHTML = '<option value="1">Dr. Juan Manuel Agramonte</option>';
+        sel.innerHTML = html`<option value="">No se pudieron cargar los médicos</option>`;
     }
 }
 
@@ -64,7 +77,7 @@ async function loadReservas() {
 
     tbody.innerHTML = '<tr><td colspan="7" class="loading-cell"><i class="fas fa-spinner fa-spin"></i> Cargando…</td></tr>';
     try {
-        const rows = await apiClient.getReservasPrueba(medicoId);
+        const rows = await apiClient.getReservasPrueba(esAdmin() ? medicoId : undefined);
         setConn(true, `Conectado · ${rows.length} reserva(s) · ${window.API_BASE_URL || '/api'}`);
 
         if (!rows.length) {
@@ -175,7 +188,7 @@ async function loadAgendaMedico() {
 
     lista.innerHTML = '<p class="medico-placeholder"><i class="fas fa-spinner fa-spin"></i> Cargando agenda…</p>';
     try {
-        pacientesAgenda = await apiClient.getPacientesAgenda(medicoId);
+        pacientesAgenda = await apiClient.getPacientesAgenda(esAdmin() ? medicoId : undefined);
         renderListaPacientesMedico();
     } catch (err) {
         console.warn(err);
@@ -212,8 +225,8 @@ document.querySelectorAll('.pruebas-tab').forEach((tab) => {
 $('btnRefreshReservas')?.addEventListener('click', loadReservas);
 $('btnRefreshMedico')?.addEventListener('click', loadAgendaMedico);
 $('medicoSelect')?.addEventListener('change', (e) => {
-    medicoId = Number(e.target.value) || 1;
-    localStorage.setItem('medicoId', String(medicoId));
+    medicoId = Number(e.target.value) || null;
+    localStorage.setItem('medicoId', String(medicoId ?? ''));
     pacienteSeleccionado = null;
     refreshAll();
 });
@@ -224,10 +237,8 @@ document.addEventListener('visibilitychange', () => {
 
 (async function init() {
     const saved = localStorage.getItem('medicoId');
-    if (saved) medicoId = Number(saved) || 1;
+    if (saved && esAdmin()) medicoId = Number(saved) || null;
     await loadMedicos();
-    const sel = $('medicoSelect');
-    if (sel) sel.value = String(medicoId);
     switchTab('reservas');
     await loadReservas();
     iniciarSyncEntrePestanas();
