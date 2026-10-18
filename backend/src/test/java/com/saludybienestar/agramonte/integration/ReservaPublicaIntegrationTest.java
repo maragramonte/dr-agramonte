@@ -60,7 +60,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * <p>Aprovecha los datos semilla de las migraciones Flyway: médico {@code id=1}
  * con huecos disponibles generados a futuro.
  */
-@SpringBootTest
+// El límite de peticiones se apaga aquí: esta clase hace una decena de reservas
+// seguidas desde la misma dirección, que es justo lo que RateLimitFilter corta. Su
+// comportamiento se prueba aparte, en RateLimitFilterTest.
+@SpringBootTest(properties = "app.rate-limit.enabled=false")
 @AutoConfigureMockMvc
 @Testcontainers(disabledWithoutDocker = true)   // se omite (no falla) si no hay un Docker compatible
 class ReservaPublicaIntegrationTest {

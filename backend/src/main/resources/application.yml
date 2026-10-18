@@ -48,6 +48,12 @@ app:
   agenda:
     dias-futuro: ${AGENDA_DIAS_FUTURO:90}
     cron: ${AGENDA_CRON:0 30 3 * * *}
+  # Límite por IP de las rutas públicas que escriben o gastan CPU (login, contacto y
+  # reserva sin cuenta). Ver RateLimitFilter.
+  rate-limit:
+    enabled: ${RATE_LIMIT_ENABLED:true}
+    max-peticiones: ${RATE_LIMIT_MAX:10}
+    ventana-segundos: ${RATE_LIMIT_VENTANA_SEGUNDOS:300}
   twilio:
     enabled: ${TWILIO_ENABLED:false}
     account-sid: ${TWILIO_ACCOUNT_SID:}

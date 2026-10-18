@@ -2,6 +2,7 @@ package com.saludybienestar.agramonte;
 
 import com.saludybienestar.agramonte.config.AgendaProperties;
 import com.saludybienestar.agramonte.config.MedicoCuentaProperties;
+import com.saludybienestar.agramonte.config.RateLimitProperties;
 import com.saludybienestar.agramonte.config.TelegramProperties;
 import com.saludybienestar.agramonte.config.TwilioProperties;
 import org.springframework.boot.SpringApplication;
@@ -13,7 +14,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @EnableConfigurationProperties({TwilioProperties.class, TelegramProperties.class, MedicoCuentaProperties.class,
-        AgendaProperties.class})
+        AgendaProperties.class, RateLimitProperties.class})
 public class DrAgramontApiApplication {
     public static void main(String[] args) {
         SpringApplication.run(DrAgramontApiApplication.class, args);

@@ -1,6 +1,7 @@
 package com.saludybienestar.agramonte.config;
 
 import com.saludybienestar.agramonte.security.JwtAuthFilter;
+import com.saludybienestar.agramonte.security.RateLimitFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,6 +36,7 @@ import java.util.Collections;
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final RateLimitFilter rateLimitFilter;
     private final UserDetailsService userDetailsService;
 
     @Bean
@@ -92,7 +94,10 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(
                         new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                // El límite de peticiones va primero: una petición que se va a rechazar no
+                // debe gastar ni el BCrypt del login ni la consulta de usuario del JWT.
+                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(jwtAuthFilter, RateLimitFilter.class);
 
         return http.build();
     }
