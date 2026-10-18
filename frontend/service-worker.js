@@ -1,10 +1,11 @@
-const CACHE_NAME = 'dr-agramonte-v40';
+const CACHE_NAME = 'dr-agramonte-v41';
 const urlsToCache = [
     '/',
     '/index.html',
     '/panel-pruebas.html',
     '/estadisticas.html',
     '/reservar.html',
+    '/activar.html',
     '/contacto.html',
     '/servicios.html',
     '/sobre-mi.html',
@@ -32,6 +33,7 @@ const urlsToCache = [
     // Faltaba: servicios.html si estaba precargada, pero su script no, asi que sin
     // conexion la pagina cargaba sin el catalogo ni los enlaces a la reserva.
     '/js/pages/servicios.js',
+    '/js/pages/activar.js',
     // Extraidos del HTML para poder aplicar la CSP; sin ellos la pagina sin
     // conexion se quedaria sin menu ni reintento de reconexion.
     '/js/pages/index-preload.js',

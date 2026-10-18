@@ -50,6 +50,15 @@
         'footer.sabadoHoras': '9:00 - 13:00 (amb cita)',
         'footer.enlaces': 'Enllaços',
         'footer.privacidad': 'Política de Privacitat',
+
+        // ---- Activar cuenta (enlace del correo) ----
+        'activar.titulo': 'Acaba de crear el teu compte',
+        'activar.intro': 'Tria una contrasenya per a aquest correu. Les teves cites anteriors hi seguiran.',
+        'activar.password': 'Contrasenya nova',
+        'activar.password.ph': 'Com a mínim 6 caràcters',
+        'activar.repetir': 'Repeteix la contrasenya',
+        'activar.enviar': 'Activa el meu compte',
+        'activar.volver': 'Torna a les meves cites',
         'footer.offline': 'Mode Fora de línia',
         'footer.cuadro': 'Quadre de comandament',
         'footer.copyright': '© 2026 Dr. Juan Manuel Agramonte.',

@@ -82,14 +82,14 @@ acceso a las citas, y la lista ahora se construye con los tokens guardados.
 
 1. `POST /api/citas/reserva-publica` (nombre, email, teléfono, médico, fecha/hora; contraseña opcional).  
 2. Backend: crea la cuenta `PACIENTE` (`cuenta_invitada=true`) o **reutiliza sin modificar** la que ya hubiera con ese email.  
-3. Si el email ya tiene cuenta **con contraseña** → HTTP **409** («Inicia sesión»). Si ya tiene reservas **como invitado** y se envía contraseña, también **409**: poner contraseña es tomar el control de la cuenta.  
+3. Si el email ya tiene cuenta **con contraseña** → HTTP **409** («Inicia sesión»). Si ya tiene reservas **como invitado** y se envía contraseña, la cita **sí** se crea, pero la contraseña **no** se guarda: sale un enlace de activación hacia ese buzón y la respuesta trae `activacionPendiente: true`. Poner contraseña es tomar el control de la cuenta, y eso solo puede hacerlo quien abre el correo.  
 4. La respuesta trae `accesoToken`, el token de esa cita. Solo se entrega aquí; el cliente lo guarda en `citas_tokens_dr_agramonte_v1`.  
 5. `syncMisCitas()` recorre los tokens guardados: `GET /api/citas/publica/{id}` con `X-Cita-Token`.  
 6. Cancelar: `DELETE /api/citas/publica/{id}` con la cabecera `X-Cita-Token` de esa cita.
 
 ### Panel TFG (`panel-pruebas.html`)
 
-- Carga: `GET /api/citas/agenda/reservas?medicoId=1`.  
+- Carga: `GET /api/citas/agenda/reservas`, con el JWT del médico. De quién es la agenda lo deduce el backend del token (`medicos.usuario_id`, V12); solo un `ADMIN` puede pasar `medicoId`.  
 - Refresco automático al reservar en otra pestaña (`BroadcastChannel` + clave `dr-agramonte-cita-creada`).  
 - Botón **Actualizar tabla** y al volver a la pestaña (`visibilitychange`).
 
@@ -155,8 +155,13 @@ docker compose ps   # postgres, backend, frontend → Up (healthy)
 ### 5. Comprobación API (opcional)
 
 ```powershell
-# Todas las reservas del médico 1 (lo que ve el panel)
-Invoke-RestMethod "http://localhost:8080/api/citas/agenda/reservas?medicoId=1"
+# Las reservas del médico (lo que ve el panel). Exige rol MEDICO/ADMIN, y el médico
+# sale del propio token: pasar medicoId no sirve para ver la agenda de otro.
+$sesion = Invoke-RestMethod -Method Post "http://localhost:8080/api/auth/login" `
+  -ContentType "application/json" `
+  -Body '{"email":"dr.agramonte@example.com","password":"Medico123!"}'
+Invoke-RestMethod "http://localhost:8080/api/citas/agenda/reservas" `
+  -Headers @{ Authorization = "Bearer $($sesion.token)" }
 
 # Cita de un invitado (lo que usa syncMisCitas). El token lo devolvió la reserva en
 # accesoToken y viaja en cabecera, nunca en la URL.
@@ -187,7 +192,8 @@ Importar `postman/` y seguir el orden de [postman/README.md](../postman/README.m
 | Panel vacío pero Mis citas llena | Backend caído al reservar o panel sin refrescar | `docker compose logs backend`; **Actualizar tabla** |
 | No aparece bloque «Cuenta (opcional)» | Service worker con HTML viejo | Ctrl+Shift+R; Application → Unregister service worker |
 | 409 al reservar invitado | Email ya registrado con contraseña | Iniciar sesión o usar otro email |
-| 409 al reservar invitado enviando contraseña | Ese email ya tiene reservas como invitado; la cuenta no se toca desde la ruta pública | Reservar sin contraseña |
+| 201 con `activacionPendiente` al reservar enviando contraseña | Ese email ya tenía cuenta invitada; la cita se crea pero la cuenta no se toma | Abrir el enlace del correo (`activar.html`) |
+| 503 al reservar o registrarse con un email de cuenta invitada | No hay SMTP configurado, así que no se puede probar quién es el dueño del buzón | Configurar `MAIL_*`; nunca se activa la cuenta sin enviar el correo |
 | «No tenemos su clave de acceso» al cancelar | La cita se reservó en otro navegador: aquí no está su token | Cancelar desde el navegador original o por teléfono |
 | 404 al consultar o cancelar una cita de invitado | Token ausente, de otra cita, o enviado en la URL en vez de en `X-Cita-Token` | Enviar la cabecera con el token de esa cita |
 
@@ -213,7 +219,9 @@ Limitaciones que siguen en pie:
 - «Mis citas» en otro navegador u otro equipo **no** aparece: el token vive en el
   `localStorage` del navegador donde se reservó. La salida natural es enviar el enlace con el
   token por email, que aún no está hecho.
-- Un invitado con reservas previas no puede ponerse contraseña desde la reserva pública
-  (recibe 409); falta un «recuperar acceso» por email.
+- ~~Un invitado con reservas previas no puede ponerse contraseña~~. **Resuelto (V13):**
+  `POST /api/auth/registro` con el correo de una cuenta invitada responde **202** y envía
+  un enlace de un solo uso (30 min) a ese buzón; `POST /api/auth/activar` fija la
+  contraseña y devuelve sesión. Las citas previas y sus tokens de acceso siguen valiendo.
 - El panel lista **todas** las reservas del médico. Ya exige rol `MEDICO`/`ADMIN`, pero sigue
   siendo una vista de demostración, no el panel clínico final.

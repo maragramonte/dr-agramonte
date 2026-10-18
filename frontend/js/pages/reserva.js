@@ -238,6 +238,13 @@ function guardarSesionDesdeReserva(sesion, telefono) {
     window.dispatchEvent(new CustomEvent('auth-changed'));
 }
 
+/** Aviso de «revisa tu correo» en el idioma activo (ES/CA). */
+function textoRevisaTuCorreo() {
+    return document.documentElement.lang === 'ca'
+        ? "Revisa el teu correu: t'hem enviat un enllaç per acabar de crear el compte."
+        : 'Revisa tu correo: te hemos enviado un enlace para terminar de crear la cuenta.';
+}
+
 function notificarCitaCreada() {
     try {
         const ch = new BroadcastChannel('dr-agramonte-citas');
@@ -774,6 +781,12 @@ async function onSubmit(e) {
                 guardarTokenCita(resp.cita.id, resp.accesoToken);
             }
             guardarSesionDesdeReserva(resp.sesion, cita.paciente.telefono);
+            // Puso contraseña sobre un correo que YA tenía cuenta invitada: la cita se ha
+            // creado, pero la cuenta no se toma por escribir un email en un formulario.
+            // Ha salido un enlace hacia ese buzón, que es la única prueba que vale.
+            if (resp?.activacionPendiente) {
+                showToast(resp.mensajeActivacion || textoRevisaTuCorreo(), 'success');
+            }
             localStorage.setItem('email', cita.paciente.email);
             if (cita.paciente.telefono) localStorage.setItem('telefono', cita.paciente.telefono);
             if (cita.paciente.nombre) localStorage.setItem('nombre', cita.paciente.nombre);

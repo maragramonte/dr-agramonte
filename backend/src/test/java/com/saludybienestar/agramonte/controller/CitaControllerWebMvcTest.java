@@ -5,8 +5,10 @@ import com.saludybienestar.agramonte.config.SecurityConfig;
 import com.saludybienestar.agramonte.dto.response.CitaResponse;
 import com.saludybienestar.agramonte.dto.response.ReservaPublicaResponse;
 import com.saludybienestar.agramonte.entity.EstadoCita;
+import com.saludybienestar.agramonte.entity.Medico;
 import com.saludybienestar.agramonte.entity.Rol;
 import com.saludybienestar.agramonte.entity.Usuario;
+import com.saludybienestar.agramonte.repository.MedicoRepository;
 import com.saludybienestar.agramonte.security.CustomUserDetails;
 import com.saludybienestar.agramonte.security.CustomUserDetailsService;
 import com.saludybienestar.agramonte.security.JwtAuthFilter;
@@ -27,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -63,6 +66,7 @@ class CitaControllerWebMvcTest {
     @MockitoBean private CitaService citaService;
     @MockitoBean private JwtProvider jwtProvider;
     @MockitoBean private CustomUserDetailsService customUserDetailsService;
+    @MockitoBean private MedicoRepository medicoRepository;
 
     private CustomUserDetails userDetails(Long id, Rol rol) {
         Usuario u = new Usuario();
@@ -83,6 +87,14 @@ class CitaControllerWebMvcTest {
 
     private String json(Map<String, Object> body) throws Exception {
         return objectMapper.writeValueAsString(body);
+    }
+
+    /** Ficha de médico vinculada a una cuenta, como la deja la columna medicos.usuario_id (V12). */
+    private void medicoVinculado(Long usuarioId, Long medicoId) {
+        Medico m = new Medico();
+        m.setId(medicoId);
+        m.setNombre("Dr. Médico " + medicoId);
+        when(medicoRepository.findByUsuarioId(usuarioId)).thenReturn(Optional.of(m));
     }
 
     // ── Rutas protegidas ────────────────────────────────────────────────────
@@ -148,16 +160,92 @@ class CitaControllerWebMvcTest {
     }
 
     @Test
-    @DisplayName("GET /api/citas/agenda/pacientes con rol MEDICO devuelve la agenda (200)")
+    @DisplayName("GET /api/citas/agenda/pacientes con rol MEDICO devuelve SU agenda (200)")
     void agendaPacientes_comoMedico_permitido() throws Exception {
-        when(citaService.listarPacientesAgenda(1L)).thenReturn(List.of());
+        medicoVinculado(7L, 42L);
+        when(citaService.listarPacientesAgenda(42L)).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/citas/agenda/pacientes")
+                        .with(user(userDetails(7L, Rol.MEDICO))))
+                .andExpect(status().isOk());
+
+        // 42 sale de su cuenta, no de la URL: ya no hace falta mandar medicoId.
+        verify(citaService).listarPacientesAgenda(42L);
+    }
+
+    // ── El médico de la agenda sale del JWT, no del parámetro ───────────────
+
+    @Test
+    @DisplayName("Un médico que pide la agenda de otro recibe la suya, sin 403 que delate si ese otro existe")
+    void agendaPacientes_medicoPideLaDeOtro_recibeLaSuya() throws Exception {
+        // Antes el parámetro mandaba y con ?medicoId=99 se leían los pacientes del médico
+        // 99: nombres, correos, teléfonos y motivos de consulta. Ahora se ignora.
+        medicoVinculado(7L, 42L);
+        when(citaService.listarPacientesAgenda(42L)).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/citas/agenda/pacientes")
+                        .param("medicoId", "99")
+                        .with(user(userDetails(7L, Rol.MEDICO))))
+                .andExpect(status().isOk());
+
+        // Responder 200 con lo suyo, y no 403, es deliberado: un código distinto según el
+        // id pedido diría si ese médico existe, y los id son enteros correlativos.
+        verify(citaService).listarPacientesAgenda(42L);
+        verify(citaService, never()).listarPacientesAgenda(99L);
+    }
+
+    @Test
+    @DisplayName("Lo mismo en /agenda/reservas: el medicoId ajeno no se usa")
+    void agendaReservas_medicoPideLaDeOtro_recibeLaSuya() throws Exception {
+        medicoVinculado(7L, 42L);
+        when(citaService.listarReservasPrueba(eq(42L), any())).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/citas/agenda/reservas")
+                        .param("medicoId", "99")
+                        .with(user(userDetails(7L, Rol.MEDICO))))
+                .andExpect(status().isOk());
+
+        verify(citaService).listarReservasPrueba(eq(42L), any());
+        verify(citaService, never()).listarReservasPrueba(eq(99L), any());
+    }
+
+    @Test
+    @DisplayName("Un médico sin ficha vinculada no tiene agenda que ver (403)")
+    void agendaPacientes_medicoSinFicha_prohibido() throws Exception {
+        when(medicoRepository.findByUsuarioId(7L)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/citas/agenda/pacientes")
                         .param("medicoId", "1")
                         .with(user(userDetails(7L, Rol.MEDICO))))
+                .andExpect(status().isForbidden());
+
+        verify(citaService, never()).listarPacientesAgenda(anyLong());
+    }
+
+    @Test
+    @DisplayName("Un ADMIN sí elige la agenda que quiere ver")
+    void agendaPacientes_comoAdmin_usaElMedicoIdPedido() throws Exception {
+        when(citaService.listarPacientesAgenda(99L)).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/citas/agenda/pacientes")
+                        .param("medicoId", "99")
+                        .with(user(userDetails(1L, Rol.ADMIN))))
                 .andExpect(status().isOk());
 
-        verify(citaService).listarPacientesAgenda(1L);
+        verify(citaService).listarPacientesAgenda(99L);
+        // A un admin no se le busca ficha: administra, no tiene agenda propia.
+        verify(medicoRepository, never()).findByUsuarioId(anyLong());
+    }
+
+    @Test
+    @DisplayName("Un ADMIN sin medicoId recibe 400: no se adivina de quién es la agenda")
+    void agendaPacientes_comoAdminSinMedicoId_devuelve400() throws Exception {
+        // El antiguo defaultValue = \"1\" servía al médico 1 sin que nadie lo pidiera.
+        mockMvc.perform(get("/api/citas/agenda/pacientes")
+                        .with(user(userDetails(1L, Rol.ADMIN))))
+                .andExpect(status().isBadRequest());
+
+        verify(citaService, never()).listarPacientesAgenda(anyLong());
     }
 
     @Test
@@ -189,7 +277,7 @@ class CitaControllerWebMvcTest {
     @DisplayName("POST /api/citas/reserva-publica es público y crea la cita (201)")
     void reservaPublica_anonimo_creada() throws Exception {
         when(citaService.reservaPublica(any()))
-                .thenReturn(new ReservaPublicaResponse(citaConfirmada(), null, "token-de-acceso-de-prueba"));
+                .thenReturn(new ReservaPublicaResponse(citaConfirmada(), null, "token-de-acceso-de-prueba", false));
 
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("nombre", "Paciente Invitado");

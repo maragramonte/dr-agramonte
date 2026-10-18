@@ -41,6 +41,9 @@ app:
     password: ${MEDICO_PASSWORD:}
   contact:
     inbox: ${CONTACT_INBOX:}
+  # Base pública de la web. Solo se usa para construir el enlace del correo de
+  # activación: dentro de un correo, un enlace a localhost no sirve de nada.
+  url-publica: ${APP_URL_PUBLICA:https://www.dragramonte.com}
   # Generación continua de la agenda. Las migraciones V3/V6 sembraron ~90 días desde
   # el primer arranque y no vuelven a ejecutarse, así que pasada esa ventana no
   # quedaba ningún hueco reservable. GeneradorAgendaScheduler la mantiene al día con
