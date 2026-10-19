@@ -86,7 +86,7 @@ acceso a las citas, y la lista ahora se construye con los tokens guardados.
 4. La respuesta trae `accesoToken`, el token de esa cita. Solo se entrega aquí; el cliente lo guarda en `citas_tokens_dr_agramonte_v1`.  
 5. Además sale un correo con el enlace `reservar.html#cita-<id>.<token>`, para que la cita no quede atada a ese navegador. Al abrirlo, `importarTokenDelEnlace()` guarda el token en el dispositivo y borra el fragmento de la barra de direcciones. El envío es **prescindible**: sin SMTP, o si el servidor de correo falla, la reserva no se entera (`CorreoAccesoCitaService` lo registra y devuelve `false`).  
 6. `syncMisCitas()` recorre los tokens guardados: `GET /api/citas/publica/{id}` con `X-Cita-Token`.  
-7. Cancelar: `DELETE /api/citas/publica/{id}` con la cabecera `X-Cita-Token` de esa cita.
+7. Cancelar: `DELETE /api/citas/publica/{id}` con la cabecera `X-Cita-Token` de esa cita. Sale un correo que lo confirma, **sin enlace**: la cita cancelada no tiene nada que gestionar.
 
 ### Panel TFG (`panel-pruebas.html`)
 
@@ -107,6 +107,7 @@ acceso a las citas, y la lista ahora se construye con los tokens guardados.
 | `backend/.../TokenAccesoCita.java` | Genera el token de acceso, lo hashea (SHA-256) y lo compara en tiempo constante |
 | `backend/.../CorreoAccesoCitaService.java` | Correo con el enlace de la cita al reservar; un fallo de envío no tumba la reserva |
 | `backend/.../CorreoRecordatorioCitaService.java` | Recordatorio de la víspera por correo, con el enlace si la cita no tiene cuenta detrás |
+| `backend/.../CorreoCancelacionCitaService.java` | Comprobante de cancelación; sin credenciales, apunta a pedir otra hora |
 | `backend/.../CitaReminderScheduler.java` | Barrido de las citas de dentro de ~24 h; emite el token del recordatorio y avisa por todos los canales |
 | `backend/.../CorreoSaliente.java` | Remitente, URL pública y `disponible()`: lo común a los dos correos |
 | `backend/.../SecurityConfig.java` | Rutas públicas de invitado y agenda TFG; entry point 401 |

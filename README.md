@@ -129,14 +129,17 @@ la cita, con un **segundo token** (Flyway V14): del de la reserva solo se guarda
 rotarlo habría invalidado el enlace del correo anterior y el token del navegador que reservó.
 Ese token solo se emite para las citas sin cuenta detrás; quien tiene cuenta entra en ella.
 
-### Dos correos con reglas opuestas a propósito
+### Tres correos de una cita, y dos reglas opuestas a propósito
 
 El enlace de **activación de cuenta** es la prueba de identidad: sin servicio de correo la
 operación se niega con un **503**, porque seguir adelante sería regalar una cuenta a quien
 solo ha demostrado saber escribir un email.
 
-El enlace de **acceso a una cita** reservada sin cuenta es una comodidad: sale tras el commit
-y con el fallo capturado, así que un SMTP caído no impide reservar. Existe porque el token de
+Los otros dos son comodidades: el enlace de **acceso a una cita** reservada sin cuenta y el
+**comprobante de cancelación**. Los dos salen tras el commit y con el fallo capturado, así que
+un SMTP caído no impide reservar ni anular. El de cancelación no lleva credenciales —una cita
+anulada no tiene nada que gestionar— y avisa de que, si no fue el paciente quien canceló,
+llame: la hora liberada puede habérsela quedado otro. Existe porque el token de
 la cita se entrega una sola vez y, sin ese correo, la cita quedaba atada al navegador donde se
 reservó: en base de datos solo está su SHA-256, de modo que nadie puede reenviarlo. El token
 viaja en el fragmento del enlace (`reservar.html#cita-<id>.<token>`), que no se manda al
@@ -262,7 +265,7 @@ contra PostgreSQL, y para eso están las pruebas de integración.
 cd backend && mvn test
 ```
 
-**112 pruebas en tres niveles**: unitarias de servicio, de seguridad y roles sobre la capa
+**115 pruebas en tres niveles**: unitarias de servicio, de seguridad y roles sobre la capa
 REST (`@WebMvcTest` con la `SecurityConfig` real) y de integración end-to-end contra un
 PostgreSQL levantado con Testcontainers. Cubren las ramas críticas: 409 por doble reserva,
 403 por rol, validez del JWT, cancelación, el secreto del webhook, el límite de peticiones,

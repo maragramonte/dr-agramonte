@@ -216,6 +216,29 @@ delante los avisos de Telegram, y aun así la tarea lo hacía un nivel más arri
 - La ventana y el cron pasan a `app.recordatorio.*`, porque esto ya no es cosa de Twilio, pero
   siguen aceptando las claves `app.twilio.reminder-*` para no romper los `.env` que las tengan.
 
+---
+
+## Fase 12 — Comprobante de cancelación
+
+**Problema detectado.** Cancelar era la única operación del paciente que no dejaba ningún
+rastro en su buzón. La reserva manda su enlace y la víspera manda el recordatorio, pero al
+anular solo salían los avisos de Twilio y Telegram, que son justo los que un invitado no
+tiene. Quien cancelaba se quedaba sin comprobante, y una cita médica que uno cree anulada y no
+lo está —o al contrario— es el tipo de duda que acaba en una llamada a la consulta.
+
+**Solución.**
+
+- Al cancelar, por cualquiera de las dos rutas (con sesión o con el token de la cita), sale un
+  correo que confirma la cancelación con fecha, médico y centro, y dice que la hora vuelve a
+  estar libre.
+- **Sin enlace de la cita.** El token sigue abriéndola, porque la fila no se borra, pero ya no
+  hay nada que gestionar ahí; lo que puede querer quien lee el correo es otra hora, así que
+  apunta a la página de reserva sin credencial alguna.
+- Avisa de que, si no ha sido el paciente quien ha cancelado, llame: eso es lo único que no
+  puede deshacer solo, porque la hora liberada puede habérsela quedado otro.
+- Como los otros dos, se manda **tras el commit** y con el fallo capturado: la cita ya está
+  cancelada y la franja ya está libre cuando esto se envía.
+
 **Queda pendiente**: revisar si la demo de GitHub Pages debería simular los envíos (hoy no lo
 hace: no hay servidor de correo en el navegador, así que la demo solo refleja el camino del
 `localStorage`).
