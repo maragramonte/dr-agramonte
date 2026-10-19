@@ -41,6 +41,7 @@ public class CitaService {
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
     private final ActivacionCuentaService activacionCuentaService;
+    private final CorreoAccesoCitaService correoAccesoCitaService;
 
     @Transactional
     public ReservaPublicaResponse reservaPublica(ReservaPublicaRequest request) {
@@ -123,6 +124,25 @@ public class CitaService {
         if (activacionPendiente) {
             activacionCuentaService.solicitarActivacion(paciente);
         }
+
+        // El enlace con el token también va por correo, porque hasta ahora el token solo
+        // vivía en el navegador que reservó: quien reservaba desde un móvil prestado o en
+        // una ventana privada se quedaba sin acceso a su propia cita, y en la BD solo está
+        // el hash, así que no había forma de devolvérselo.
+        //
+        // Tras el commit y sin poder romper nada: la cita ya está confirmada y el token ya
+        // viaja en la respuesta, así que un SMTP caído no debe convertirse en un error para
+        // quien acaba de reservar. Mismo trato que los avisos de Twilio y Telegram.
+        //
+        // Se manda siempre que se emite token, también cuando la reserva abre sesión: el
+        // token sigue valiendo si esa sesión se cierra, y el correo hace de confirmación.
+        // Los datos se copian a variables locales porque el envío corre fuera de la
+        // transacción, cuando la entidad ya está desligada.
+        String buzonPaciente = paciente.getEmail();
+        String nombrePaciente = paciente.getNombre();
+        notificarTrasCommit(() ->
+                correoAccesoCitaService.enviar(buzonPaciente, nombrePaciente, cita, tokenAcceso));
+
         return new ReservaPublicaResponse(cita, sesion, tokenAcceso, activacionPendiente);
     }
 

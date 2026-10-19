@@ -245,6 +245,52 @@ function textoRevisaTuCorreo() {
         : 'Revisa tu correo: te hemos enviado un enlace para terminar de crear la cuenta.';
 }
 
+function textoCitaRecuperada() {
+    return document.documentElement.lang === 'ca'
+        ? 'Hem recuperat la teva cita en aquest dispositiu.'
+        : 'Hemos recuperado tu cita en este dispositivo.';
+}
+
+/**
+ * Enlace que llega por correo tras reservar sin cuenta: `reservar.html#cita-<id>.<token>`.
+ * El token es Base64 URL-safe, cuyo alfabeto no incluye el punto, así que el separador no
+ * es ambiguo. El prefijo no lleva `=` porque el cuerpo del correo viaja en
+ * quoted-printable, donde el igual es el carácter de escape y el enlace acababa escrito
+ * como `cita=3D12.` en el origen del mensaje.
+ */
+const ENLACE_CITA = /^cita-(\d+)\.([A-Za-z0-9_-]+)$/;
+
+/**
+ * Trae a este dispositivo el token de una cita reservada en otro. Es lo que hace útil el
+ * correo: el token solo se entrega al reservar y en la base de datos no queda más que su
+ * huella, así que sin esto la cita quedaba atada al navegador donde se hizo la reserva.
+ *
+ * Nada más leerlo se borra de la barra de direcciones (`replaceState`, que no recarga ni
+ * deja entrada en el historial): es una credencial, y si se queda ahí viaja en cualquier
+ * enlace que se comparta copiando la URL. Igual que en `activar.js`.
+ *
+ * Con la cita ya guardada, no hace falta pintar nada más: `syncMisCitas()` la consulta al
+ * servidor con ese token y aparece en «Mis citas programadas», desde donde ya se puede
+ * cancelar.
+ *
+ * Todo va dentro de un `try`: `decodeURIComponent` lanza con un fragmento mal formado
+ * (`#%E0%A4%A`), y esto corre en el arranque de la página de reserva, así que una URL
+ * rara no puede llevarse por delante el resto de la inicialización.
+ */
+function importarTokenDelEnlace() {
+    try {
+        const fragmento = decodeURIComponent((window.location.hash || '').replace(/^#/, '')).trim();
+        const partes = ENLACE_CITA.exec(fragmento);
+        if (!partes) return;
+
+        guardarTokenCita(partes[1], partes[2]);
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+        showToast(textoCitaRecuperada(), 'success');
+    } catch (err) {
+        console.error(err);
+    }
+}
+
 function notificarCitaCreada() {
     try {
         const ch = new BroadcastChannel('dr-agramonte-citas');
@@ -876,6 +922,9 @@ function applyServicioFromUrl() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Antes que nada: si se llega desde el enlace del correo, el token tiene que estar
+    // guardado cuando syncMisCitas() pregunte por las citas de este dispositivo.
+    importarTokenDelEnlace();
     applyServicioFromUrl();
     preloadPacienteData();
     renderCentros();

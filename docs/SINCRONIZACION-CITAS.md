@@ -84,8 +84,9 @@ acceso a las citas, y la lista ahora se construye con los tokens guardados.
 2. Backend: crea la cuenta `PACIENTE` (`cuenta_invitada=true`) o **reutiliza sin modificar** la que ya hubiera con ese email.  
 3. Si el email ya tiene cuenta **con contraseña** → HTTP **409** («Inicia sesión»). Si ya tiene reservas **como invitado** y se envía contraseña, la cita **sí** se crea, pero la contraseña **no** se guarda: sale un enlace de activación hacia ese buzón y la respuesta trae `activacionPendiente: true`. Poner contraseña es tomar el control de la cuenta, y eso solo puede hacerlo quien abre el correo.  
 4. La respuesta trae `accesoToken`, el token de esa cita. Solo se entrega aquí; el cliente lo guarda en `citas_tokens_dr_agramonte_v1`.  
-5. `syncMisCitas()` recorre los tokens guardados: `GET /api/citas/publica/{id}` con `X-Cita-Token`.  
-6. Cancelar: `DELETE /api/citas/publica/{id}` con la cabecera `X-Cita-Token` de esa cita.
+5. Además sale un correo con el enlace `reservar.html#cita-<id>.<token>`, para que la cita no quede atada a ese navegador. Al abrirlo, `importarTokenDelEnlace()` guarda el token en el dispositivo y borra el fragmento de la barra de direcciones. El envío es **prescindible**: sin SMTP, o si el servidor de correo falla, la reserva no se entera (`CorreoAccesoCitaService` lo registra y devuelve `false`).  
+6. `syncMisCitas()` recorre los tokens guardados: `GET /api/citas/publica/{id}` con `X-Cita-Token`.  
+7. Cancelar: `DELETE /api/citas/publica/{id}` con la cabecera `X-Cita-Token` de esa cita.
 
 ### Panel TFG (`panel-pruebas.html`)
 
@@ -104,6 +105,8 @@ acceso a las citas, y la lista ahora se construye con los tokens guardados.
 | `frontend/js/modules/api-client.js` | `postReservaPublica`, `getCitaPublica`, `cancelarReservaPublica` |
 | `backend/.../CitaService.java` | `reservaPublica`, `buscarCitaPublica`, `cancelarCitaPublica` |
 | `backend/.../TokenAccesoCita.java` | Genera el token de acceso, lo hashea (SHA-256) y lo compara en tiempo constante |
+| `backend/.../CorreoAccesoCitaService.java` | Correo con el enlace de la cita; un fallo de envío no tumba la reserva |
+| `backend/.../CorreoSaliente.java` | Remitente, URL pública y `disponible()`: lo común a los dos correos |
 | `backend/.../SecurityConfig.java` | Rutas públicas de invitado y agenda TFG; entry point 401 |
 
 ---
@@ -216,9 +219,13 @@ id es un entero correlativo fácil de recorrer.
 
 Limitaciones que siguen en pie:
 
-- «Mis citas» en otro navegador u otro equipo **no** aparece: el token vive en el
-  `localStorage` del navegador donde se reservó. La salida natural es enviar el enlace con el
-  token por email, que aún no está hecho.
+- ~~«Mis citas» en otro navegador u otro equipo **no** aparece~~. **Resuelto:** al reservar
+  sale un correo con el enlace `reservar.html#cita-<id>.<token>`, que importa el token en el
+  dispositivo donde se abra. El token va en el **fragmento** y no en la query porque el
+  fragmento no se manda al servidor, y la página lo borra de la barra de direcciones nada más
+  leerlo. Ese correo es la única copia recuperable: en base de datos solo está el hash, así
+  que **no se puede reenviar**. Si el SMTP no está configurado o falla, la reserva sigue
+  adelante sin él: el token viaja en la respuesta y el navegador que reservó lo guarda.
 - ~~Un invitado con reservas previas no puede ponerse contraseña~~. **Resuelto (V13):**
   `POST /api/auth/registro` con el correo de una cuenta invitada responde **202** y envía
   un enlace de un solo uso (30 min) a ese buzón; `POST /api/auth/activar` fija la
