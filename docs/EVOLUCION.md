@@ -239,6 +239,33 @@ lo está —o al contrario— es el tipo de duda que acaba en una llamada a la c
 - Como los otros dos, se manda **tras el commit** y con el fallo capturado: la cita ya está
   cancelada y la franja ya está libre cuando esto se envía.
 
-**Queda pendiente**: revisar si la demo de GitHub Pages debería simular los envíos (hoy no lo
-hace: no hay servidor de correo en el navegador, así que la demo solo refleja el camino del
-`localStorage`).
+---
+
+## Fase 13 — El buzón de la demo, y un enlace que no se abría
+
+**Problema detectado.** Con cuatro correos en juego, la demo de GitHub Pages había dejado de
+describir el producto. El único que representaba era el de activación, y lo hacía pegando el
+enlace en un aviso; de los otros tres no había ni rastro, así que quien probaba la demo no
+veía la pieza que sostiene todo el flujo de invitado: que el enlace llega a un buzón.
+
+**Solución.**
+
+- **Buzón simulado** junto al chat de Telegram que ya existía, con la misma idea: no se envía
+  nada, se enseña lo que el servidor habría enviado. Recoge los cuatro correos con sus textos
+  exactos y sus enlaces, que apuntan a las páginas de la propia demo y **se pueden pulsar**.
+- La demo emite también el **segundo token del recordatorio** (V14) y acepta los dos al
+  comprobar una cita, de modo que replica la regla y no solo el texto.
+- Muestra todos los correos, no los de un usuario con sesión: el flujo que más importa
+  —reservar sin cuenta— no tiene sesión ninguna. De ahí el nombre, «buzón de demostración».
+
+**Lo que apareció al probarlo en un navegador de verdad.** Pulsar el enlace del correo
+estando ya en `reservar.html` no hacía nada. El navegador solo cambia el fragmento y **no
+recarga el documento**, así que `DOMContentLoaded` no se vuelve a disparar y el token no se
+importaba. Pasa también fuera de la demo: al pegar la URL en la barra estando en esa página,
+al volver con el historial y al abrir el enlace en la pestaña donde ya estaba la web. Se
+arregla escuchando `hashchange` además de la carga inicial, y es un arreglo del frontend
+real, no de la demo.
+
+**Queda pendiente**: la demo sigue sin poder demostrar la concurrencia real (el bloqueo
+pesimista solo existe contra PostgreSQL) ni el envío de correo de verdad: son límites de no
+tener servidor, no cosas por hacer.
