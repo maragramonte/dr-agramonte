@@ -17,7 +17,12 @@
  *  - /citas/agenda/** y /estadisticas exigen rol MEDICO/ADMIN (401/403).
  *  - Telegram simulado: vinculación con token de un solo uso (15 min) y los mismos
  *    textos de CitaNotificationService, mostrados en un chat de Telegram de mentira.
- *  - Nunca se envía nada de verdad: ni SMS, ni Telegram, ni correo.
+ *  - Buzón simulado: los cuatro correos que manda el backend (activación de cuenta
+ *    invitada, enlace de acceso al reservar, recordatorio de la víspera con su segundo
+ *    token —V14— y comprobante de cancelación), con sus textos y sus enlaces, que aquí
+ *    se pueden pulsar porque apuntan a las páginas de la propia demo.
+ *  - Nunca se envía nada de verdad: ni SMS, ni Telegram, ni correo. Lo que se ve en el
+ *    chat y en el buzón es lo que el servidor habría enviado, no un envío.
  */
 (function () {
     'use strict';
@@ -165,7 +170,7 @@
         for (let i = citas.length - 1; i >= 0; i--) if (citas[i].fechaHora === toLocalISO(futuro)) citas.splice(i, 1);
         nuevaCita(2, futuro, 'CONFIRMADA');
 
-        return { version: 1, creada: new Date().toISOString(), usuarios, citas, telegram: {}, nextCitaId: nextId, nextUsuarioId: 3 + PACIENTES.length };
+        return { version: 1, creada: new Date().toISOString(), usuarios, citas, telegram: {}, correos: [], nextCitaId: nextId, nextUsuarioId: 3 + PACIENTES.length };
     }
 
     // ── Persistencia (localStorage con respaldo en memoria) ─────────────────
@@ -179,6 +184,7 @@
                 // La semilla es relativa a "hoy": si es de otro día, se regenera.
                 if (db.version === 1 && new Date(db.creada).toDateString() === new Date().toDateString()) {
                     db.telegram = db.telegram || {};
+                    db.correos = db.correos || [];   // buzón: no existía en las primeras demos
                     memoria = db;
                     return db;
                 }
@@ -308,9 +314,11 @@
      */
     function citaConToken(db, citaId, token) {
         const cita = db.citas.find((c) => c.id === citaId);
-        if (!cita || !token || !cita.accesoToken || cita.accesoToken !== token) {
-            throw new ApiError(404, 'Cita no encontrada');
-        }
+        // Dos tokens abren la misma cita: el de la reserva y el del recordatorio (V14).
+        const coincide = token && cita
+            && ((cita.accesoToken && cita.accesoToken === token)
+                || (cita.recordatorioToken && cita.recordatorioToken === token));
+        if (!coincide) throw new ApiError(404, 'Cita no encontrada');
         return cita;
     }
 
@@ -319,6 +327,7 @@
         cita.estado = 'CANCELADA';
         guardarDb();
         avisarPorTelegram(db, cita, mensajeCancelacion);
+        correoCancelacion(db, cita);
     }
 
     // ── Telegram simulado (CitaNotificationService + TelegramWebhookController) ──
@@ -386,8 +395,126 @@
         const proxima = db.citas
             .filter((c) => c.usuarioId === usuarioId && c.fechaHora > ahora && ['CONFIRMADA', 'PENDIENTE'].includes(c.estado))
             .sort((a, b) => a.fechaHora.localeCompare(b.fechaHora))[0];
-        if (proxima) mensajeBot(db, usuarioId, mensajeRecordatorio(db, proxima));
-        else mensajeBot(db, usuarioId, '(Demo) No tiene citas próximas: reserve una para ver el recordatorio.', 'sistema');
+        if (!proxima) {
+            mensajeBot(db, usuarioId, '(Demo) No tiene citas próximas: reserve una para ver el recordatorio.', 'sistema');
+            return;
+        }
+        mensajeBot(db, usuarioId, mensajeRecordatorio(db, proxima));
+        // Y por correo, como CitaReminderScheduler. El enlace solo va si la cita se
+        // reservó sin cuenta: quien tiene cuenta la gestiona entrando en ella.
+        const usuario = db.usuarios.find((u) => u.id === usuarioId);
+        let token = null;
+        if (proxima.accesoToken) {
+            token = nuevoAccesoToken();
+            proxima.recordatorioToken = token;
+            guardarDb();
+        }
+        if (usuario) correoRecordatorio(db, usuario, proxima, token);
+    }
+
+    // ── Correo simulado (CorreoSaliente y los tres correos de una cita) ──────────
+    //
+    // En la demo no hay servidor SMTP, pero sí hay buzón: cada correo que el backend
+    // habría mandado se guarda y se muestra en BuzonDemo con el mismo texto. Los enlaces
+    // apuntan a las páginas de la propia demo, así que se pueden pulsar y recorrer el
+    // flujo entero —importar el token de una cita, activar una cuenta— sin salir de aquí.
+    //
+    // Antes, el único correo que la demo representaba era el de activación, y lo hacía
+    // pegando el enlace en un aviso. Funcionaba, pero describía mal el producto: no se
+    // veía que el enlace llega a un buzón, que es justamente la prueba de identidad.
+
+    /** Enlace a una página de la demo con un secreto en el fragmento (CorreoSaliente.enlace). */
+    function enlaceDemo(pagina, fragmento) {
+        const base = location.pathname.replace(/[^/]*$/, '');
+        const url = `${location.origin}${base}${pagina}`;
+        return fragmento ? `${url}#${fragmento}` : url;
+    }
+
+    /** Solo el nombre de pila, y solo si lo hay (CorreoSaliente.nombreDeCortesia). */
+    const nombreDeCortesia = (nombre) => (nombre ? ` ${String(nombre).trim().split(/\s+/)[0]}` : '');
+
+    function entregarCorreo(db, para, asunto, cuerpo) {
+        if (!para) return false;
+        db.correos = db.correos || [];
+        db.correos.push({ id: `c${db.correos.length + 1}`, para, asunto, cuerpo, ts: Date.now() });
+        guardarDb();
+        setTimeout(() => BuzonDemo.recibir(), 0);
+        return true;
+    }
+
+    /** Fecha larga de los correos: «24/10/2026 a las 09:00» (DateTimeFormatter del backend). */
+    const fechaCorreo = (fh) => {
+        const d = parseLocal(fh);
+        return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} a las ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    };
+    const centroDeCita = (c) => centroPorCodigo(c.centroCodigo)?.nombre || '—';
+    const medicoDeCita = (c) => medicoPorId(c.medicoId)?.nombre || '—';
+
+    /** CorreoActivacionService: el enlace que convierte una cuenta invitada en cuenta. */
+    function correoActivacion(db, usuario, enlace) {
+        entregarCorreo(db, usuario.email, 'Activa tu cuenta — Dr. Agramonte',
+            `Hola${nombreDeCortesia(usuario.nombre)}:\n\n`
+            + 'Has pedido crear una cuenta con este correo, que ya tenía citas reservadas\n'
+            + 'como invitado. Para poner una contraseña y conservar esas citas, abre este\n'
+            + `enlace:\n\n${enlace}\n\n`
+            + 'El enlace caduca en 30 minutos y solo puede usarse una vez.\n\n'
+            + 'Si no has sido tú, no hagas nada: sin abrir el enlace no cambia nada en la\n'
+            + 'cuenta ni en tus citas.\n\n'
+            + 'Consulta del Dr. Juan Manuel Agramonte');
+    }
+
+    /** CorreoAccesoCitaService: el enlace de la cita, entregado una sola vez al reservar. */
+    function correoAccesoCita(db, usuario, cita, token) {
+        entregarCorreo(db, usuario.email, `Tu cita del ${fechaCorreo(cita.fechaHora)} — Dr. Agramonte`,
+            `Hola${nombreDeCortesia(usuario.nombre)}:\n\n`
+            + 'Tu cita queda confirmada:\n\n'
+            + `  Fecha:  ${fechaCorreo(cita.fechaHora)}\n`
+            + `  Médico: ${medicoDeCita(cita)}\n`
+            + `  Centro: ${centroDeCita(cita)}\n\n`
+            + 'Para consultarla o cancelarla desde cualquier dispositivo, abre este enlace:\n\n'
+            + `${enlaceDemo('reservar.html', `cita-${cita.id}.${token}`)}\n\n`
+            + 'Guarda este correo. El enlace es la única forma de llegar a la cita si has\n'
+            + 'reservado sin cuenta, y no se puede volver a enviar: en nuestra base de datos\n'
+            + 'no queda copia, solo una huella que sirve para comprobarlo pero no para\n'
+            + 'reconstruirlo.\n\n'
+            + 'No lo reenvíes a nadie: quien lo abra puede ver y cancelar esta cita.\n\n'
+            + 'Consulta del Dr. Juan Manuel Agramonte');
+    }
+
+    /** CorreoRecordatorioCitaService: la víspera, con el segundo token (V14) si no hay cuenta. */
+    function correoRecordatorio(db, usuario, cita, token) {
+        const cierre = token
+            ? 'Si no puedes acudir, cancélala desde este enlace y la hora quedará libre para\n'
+                + `otro paciente:\n\n${enlaceDemo('reservar.html', `cita-${cita.id}.${token}`)}\n\n`
+                + 'No lo reenvíes a nadie: quien lo abra puede ver y cancelar esta cita.'
+            : 'Si no puedes acudir, entra en tu cuenta para cancelarla y dejar la hora\n'
+                + 'libre para otro paciente.';
+        entregarCorreo(db, usuario.email, `Recordatorio: tu cita del ${fechaCorreo(cita.fechaHora)} — Dr. Agramonte`,
+            `Hola${nombreDeCortesia(usuario.nombre)}:\n\n`
+            + 'Te recordamos tu cita de mañana:\n\n'
+            + `  Fecha:  ${fechaCorreo(cita.fechaHora)}\n`
+            + `  Médico: ${medicoDeCita(cita)}\n`
+            + `  Centro: ${centroDeCita(cita)}\n\n`
+            + `${cierre}\n\n`
+            + 'Consulta del Dr. Juan Manuel Agramonte');
+    }
+
+    /** CorreoCancelacionCitaService: comprobante, sin ninguna credencial dentro. */
+    function correoCancelacion(db, cita) {
+        const usuario = db.usuarios.find((u) => u.id === cita.usuarioId);
+        if (!usuario) return;
+        entregarCorreo(db, usuario.email, `Cita cancelada: ${fechaCorreo(cita.fechaHora)} — Dr. Agramonte`,
+            `Hola${nombreDeCortesia(usuario.nombre)}:\n\n`
+            + 'Tu cita queda cancelada:\n\n'
+            + `  Fecha:  ${fechaCorreo(cita.fechaHora)}\n`
+            + `  Médico: ${medicoDeCita(cita)}\n`
+            + `  Centro: ${centroDeCita(cita)}\n\n`
+            + 'La hora vuelve a estar libre, así que ya no te esperamos. Si necesitas otra\n'
+            + 'fecha, puedes pedirla aquí:\n\n'
+            + `${enlaceDemo('reservar.html')}\n\n`
+            + 'Si no has sido tú quien ha cancelado, llámanos: una vez anulada, la hora puede\n'
+            + 'habérsela quedado otro paciente.\n\n'
+            + 'Consulta del Dr. Juan Manuel Agramonte');
     }
 
     function estadisticas(db) {
@@ -424,22 +551,24 @@
     }
 
     /**
-     * Emite el token de activación de una cuenta invitada y devuelve el enlace.
+     * Emite el token de activación de una cuenta invitada y lo deja en el buzón.
      *
-     * En la demo no hay buzón al que mandarlo, así que en vez de fingir un envío se
-     * devuelve el enlace para que se pueda recorrer el flujo entero. En el backend real
-     * esto es un correo y el token no se enseña nunca (en la base solo queda su hash).
+     * Antes devolvía el enlace para pegarlo en un aviso, porque la demo no tenía buzón.
+     * Ahora el correo se entrega como el resto, que es lo que describe bien el producto:
+     * el enlace llega a un buzón, y eso es justamente la prueba de identidad. Devuelve el
+     * enlace igual, porque quien llama lo usa en el texto del aviso.
      */
     function emitirActivacion(db, usuario) {
         const token = nuevoAccesoToken();
         usuario.activacionToken = token;
         usuario.activacionExpira = new Date(Date.now() + 30 * 60 * 1000).toISOString();
-        const base = location.pathname.replace(/[^/]*$/, '');
-        return `${location.origin}${base}activar.html#${token}`;
+        const enlace = enlaceDemo('activar.html', token);
+        correoActivacion(db, usuario, enlace);
+        return enlace;
     }
 
-    const avisoActivacionDemo = (enlace) =>
-        `(Demo) Aquí no hay correo. En la web real recibirías un enlace; ábrelo aquí: ${enlace}`;
+    const avisoActivacionDemo = () =>
+        '(Demo) Revisa el buzón simulado, abajo a la derecha: ahí está el enlace de activación.';
 
     // ── Router ───────────────────────────────────────────────────────────
     function enrutar(method, path, query, body, headers) {
@@ -476,9 +605,9 @@
             // Una cuenta invitada NO se toma por escribir su correo en el formulario: sale
             // un enlace hacia ese buzón. Misma regla que AuthService.registro en el backend.
             if (existente) {
-                const enlace = emitirActivacion(db, existente);
+                emitirActivacion(db, existente);
                 guardarDb();
-                return [202, { message: avisoActivacionDemo(enlace) }];
+                return [202, { message: avisoActivacionDemo() }];
             }
             const u = { id: db.nextUsuarioId++, email, rol: 'PACIENTE' };
             Object.assign(u, { nombre: body.nombre.trim(), password: body.password, telefono: body.telefono || null, cuentaInvitada: false });
@@ -538,11 +667,16 @@
             // la cuenta no se toma. Sale un enlace de activación, como en el backend.
             let avisoActivacion = null;
             if (!cuentaNueva && conPassword) {
-                avisoActivacion = avisoActivacionDemo(emitirActivacion(db, u));
+                emitirActivacion(db, u);
+                avisoActivacion = avisoActivacionDemo();
             }
             const accesoToken = nuevoAccesoToken();
-            db.citas.find((c) => c.id === cita.id).accesoToken = accesoToken;
+            const guardada = db.citas.find((c) => c.id === cita.id);
+            guardada.accesoToken = accesoToken;
             guardarDb();
+            // Como CitaService tras el commit: el correo con el enlace de la cita, que es
+            // lo que permite llegar a ella desde otro dispositivo.
+            correoAccesoCita(db, u, guardada, accesoToken);
             return [201, {
                 cita,
                 sesion: (cuentaNueva && conPassword) ? authResponse(u) : null,
@@ -817,6 +951,136 @@
         };
     })();
 
+    // ── Buzón simulado ───────────────────────────────────────────────────
+    //
+    // Muestra TODOS los correos de la demo, no los de un usuario con sesión: el flujo que
+    // más importa —reservar sin cuenta— no tiene sesión ninguna, y los datos de aquí son
+    // ficticios y viven solo en este navegador. Por eso se llama buzón de demostración y
+    // no «tu correo».
+    const BuzonDemo = (() => {
+        let abierto = false;
+        let sinLeer = 0;
+        let raiz = null;
+        const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const hora = (ts) => new Date(ts).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+        /**
+         * Escapa el cuerpo y convierte en enlaces pulsables las URL de la propia demo.
+         * Se escapa primero y se enlaza después sobre el texto ya escapado, así que lo
+         * que acaba en el href nunca es texto sin tratar.
+         */
+        function cuerpoHtml(texto) {
+            const propio = `${location.origin}${location.pathname.replace(/[^/]*$/, '')}`;
+            return esc(texto).replace(/https?:\/\/[^\s]+/g, (url) =>
+                url.startsWith(propio)
+                    ? `<a class="mail-demo__enlace" href="${url}">${url}</a>`
+                    : url);
+        }
+
+        function montar() {
+            if (raiz || !document.body) return;
+            const style = document.createElement('style');
+            style.textContent = `
+                .mail-demo{--m-acento:#0F766E;--m-fondo:#F1F5F9;--m-card:#fff;--m-txt:#0F172A;--m-sub:#64748B;--m-bd:#CBD5E1;
+                    position:fixed;left:16px;z-index:950;font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--m-txt)}
+                [data-theme="dark"] .mail-demo{--m-fondo:#0B1220;--m-card:#17212B;--m-txt:#E2E8F0;--m-sub:#94A3B8;--m-bd:#243140}
+                .mail-demo__lanzador{width:52px;height:52px;border-radius:50%;border:0;background:var(--m-acento);color:#fff;font-size:22px;cursor:pointer;
+                    box-shadow:0 4px 14px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;position:relative}
+                .mail-demo__lanzador:focus-visible,.mail-demo button:focus-visible,.mail-demo a:focus-visible{outline:3px solid #0B5F8A;outline-offset:2px}
+                .mail-demo__badge{position:absolute;top:-2px;right:-2px;min-width:20px;height:20px;border-radius:10px;background:#DC2626;color:#fff;
+                    font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px}
+                .mail-demo__panel{width:370px;max-width:calc(100vw - 32px);height:460px;max-height:calc(100vh - 160px);display:flex;flex-direction:column;
+                    background:var(--m-fondo);border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.3);margin-bottom:10px;border:1px solid var(--m-bd)}
+                .mail-demo__cab{background:var(--m-acento);color:#fff;padding:10px 12px;display:flex;align-items:center;gap:10px}
+                .mail-demo__cab b{display:block;font-size:15px}
+                .mail-demo__cab small{opacity:.9;font-size:12px}
+                .mail-demo__cerrar{margin-left:auto;background:none;border:0;color:#fff;font-size:22px;cursor:pointer;line-height:1;padding:4px 6px}
+                .mail-demo__lista{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px}
+                .mail-demo__vacio{margin:auto;text-align:center;color:var(--m-sub);font-size:13px;padding:0 14px}
+                .mail-demo__correo{background:var(--m-card);border:1px solid var(--m-bd);border-radius:10px;overflow:hidden}
+                .mail-demo__asunto{width:100%;background:none;border:0;text-align:left;padding:9px 11px;cursor:pointer;color:inherit;font:inherit;display:flex;gap:8px;align-items:baseline}
+                .mail-demo__asunto b{flex:1;font-weight:600}
+                .mail-demo__asunto time{font-size:11.5px;color:var(--m-sub);flex:none}
+                .mail-demo__meta{display:block;padding:0 11px 8px;font-size:11.5px;color:var(--m-sub)}
+                .mail-demo__cuerpo{margin:0;padding:10px 11px;border-top:1px dashed var(--m-bd);white-space:pre-wrap;word-break:break-word;font:12.5px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace}
+                .mail-demo__enlace{color:var(--m-acento);text-decoration:underline}
+                [data-theme="dark"] .mail-demo__enlace{color:#5EEAD4}
+                .mail-demo__pie{background:var(--m-card);padding:9px 12px;border-top:1px solid var(--m-bd);font-size:12px;color:var(--m-sub);text-align:center}
+                .mail-demo[hidden],.mail-demo [hidden]{display:none!important}`;
+            document.head.appendChild(style);
+            raiz = document.createElement('div');
+            raiz.className = 'mail-demo';
+            raiz.innerHTML = `
+                <div class="mail-demo__panel" role="dialog" aria-label="Buzón de correo simulado" hidden></div>
+                <button type="button" class="mail-demo__lanzador" aria-label="Abrir buzón simulado" title="Buzón (simulado)">
+                    <i class="fas fa-envelope" aria-hidden="true"></i><span class="mail-demo__badge" hidden></span>
+                </button>`;
+            raiz.querySelector('.mail-demo__lanzador').addEventListener('click', () => (abierto ? cerrar() : abrir()));
+            raiz.addEventListener('click', (e) => {
+                const accion = e.target.closest('[data-mail]')?.dataset.mail;
+                if (accion === 'cerrar') cerrar();
+                if (accion) return;
+                const abrirCorreo = e.target.closest('[data-correo]');
+                if (abrirCorreo) {
+                    const cuerpo = abrirCorreo.parentElement.querySelector('.mail-demo__cuerpo');
+                    if (cuerpo) cuerpo.hidden = !cuerpo.hidden;
+                }
+            });
+            document.body.appendChild(raiz);
+            colocar();
+            window.addEventListener('resize', colocar);
+        }
+
+        function colocar() {
+            if (!raiz) return;
+            const banner = document.getElementById('demoBanner');
+            raiz.style.bottom = `${(banner?.offsetHeight || 0) + 12}px`;
+        }
+
+        function pintar() {
+            if (!raiz) return;
+            const badge = raiz.querySelector('.mail-demo__badge');
+            badge.hidden = sinLeer === 0;
+            badge.textContent = sinLeer;
+            const panel = raiz.querySelector('.mail-demo__panel');
+            panel.hidden = !abierto;
+            if (!abierto) return;
+
+            const correos = (cargarDb().correos || []).slice().reverse();
+            panel.innerHTML = `
+                <div class="mail-demo__cab">
+                    <span><b>Buzón de demostración</b><small>lo que el servidor habría enviado</small></span>
+                    <button type="button" class="mail-demo__cerrar" data-mail="cerrar" aria-label="Cerrar buzón">&times;</button>
+                </div>
+                <div class="mail-demo__lista" aria-live="polite">
+                    ${correos.length ? correos.map((c, i) => `
+                        <article class="mail-demo__correo">
+                            <button type="button" class="mail-demo__asunto" data-correo="${esc(c.id)}"
+                                    aria-expanded="${i === 0 ? 'true' : 'false'}">
+                                <b>${esc(c.asunto)}</b><time>${hora(c.ts)}</time>
+                            </button>
+                            <small class="mail-demo__meta">Para: ${esc(c.para)}</small>
+                            <pre class="mail-demo__cuerpo"${i === 0 ? '' : ' hidden'}>${cuerpoHtml(c.cuerpo)}</pre>
+                        </article>`).join('')
+                        : '<p class="mail-demo__vacio">Aquí llegarán los correos de la cita: el enlace al reservar sin cuenta, el recordatorio de la víspera y el comprobante al cancelar.</p>'}
+                </div>
+                <div class="mail-demo__pie">Los enlaces funcionan: abren esta misma demo.</div>`;
+        }
+
+        function abrir() { montar(); abierto = true; sinLeer = 0; colocar(); pintar(); }
+        function cerrar() { abierto = false; pintar(); raiz?.querySelector('.mail-demo__lanzador').focus(); }
+
+        return {
+            iniciar() { montar(); pintar(); },
+            abrir() { abrir(); },
+            recibir() {
+                montar();
+                if (!abierto) sinLeer += 1;
+                pintar();
+            }
+        };
+    })();
+
     // El enlace "Abrir Telegram y vincular" apunta a #telegram-demo: abre el chat simulado.
     document.addEventListener('click', (e) => {
         const a = e.target.closest?.('a[href="#telegram-demo"]');
@@ -828,11 +1092,11 @@
     // ── Banner de demo ───────────────────────────────────────────────────
     const TEXTOS = {
         es: {
-            corto: 'Datos ficticios.', aviso: 'No hay servidor: todo vive en tu navegador y no se envía ningún aviso.',
+            corto: 'Datos ficticios.', aviso: 'No hay servidor: todo vive en tu navegador. Los avisos no se envían: se ven en el buzón y el chat simulados.',
             medico: 'Entrar como médico', paciente: 'Entrar como paciente', reiniciar: 'Reiniciar demo', codigo: 'Código'
         },
         ca: {
-            corto: 'Dades fictícies.', aviso: 'No hi ha servidor: tot viu al teu navegador i no s\'envia cap avís.',
+            corto: 'Dades fictícies.', aviso: 'No hi ha servidor: tot viu al teu navegador. Els avisos no s\'envien: es veuen a la safata i el xat simulats.',
             medico: 'Entrar com a metge', paciente: 'Entrar com a pacient', reiniciar: 'Reiniciar demo', codigo: 'Codi'
         }
     };
@@ -901,7 +1165,7 @@
         window.addEventListener('resize', ajustar);
     }
 
-    const alCargar = () => { pintarBanner(); ChatTelegram.iniciar(); };
+    const alCargar = () => { pintarBanner(); ChatTelegram.iniciar(); BuzonDemo.iniciar(); };
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', alCargar);
     else alCargar();
 

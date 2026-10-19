@@ -237,6 +237,14 @@ confirmación, la cancelación y el recordatorio, con los textos exactos de
 
 ![Chat de Telegram simulado sobre la página de reserva: el mensaje /start con el token de un solo uso, la respuesta del bot confirmando la vinculación y el aviso de cita confirmada con fecha, médico, motivo y dirección, más un botón para simular el recordatorio de 24 horas](docs/demo-telegram.png)
 
+El correo tiene su propio buzón simulado, abajo a la izquierda: recoge los cuatro que manda
+el backend —activación de cuenta, enlace de acceso al reservar, recordatorio de la víspera y
+comprobante de cancelación— con sus textos exactos. Sus enlaces **se pueden pulsar**, porque
+apuntan a las páginas de la propia demo: al abrir el de una cita, el token se importa en ese
+navegador y la cita aparece en «Mis citas», que es justo el camino que el correo resuelve en
+producción. Antes, el único correo representado era el de activación y la demo se limitaba a
+pegar su enlace en un aviso.
+
 Entrando como médico se llega al cuadro de mando, que en la demo agrega las citas ficticias
 igual que el backend agrega las reales con `GROUP BY`:
 
