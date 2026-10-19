@@ -179,6 +179,43 @@ llamando por teléfono.
 - Sin migraciones: la columna del hash es la de la **V11**, y el enlace se construye con
   `APP_URL_PUBLICA`, la variable que ya había traído la activación.
 
-**Queda pendiente**: que el correo de cancelación recuerde el enlace de la cita, y revisar si
-la demo de GitHub Pages debería simular el envío (hoy no lo hace: no hay servidor de correo en
-el navegador, así que la demo solo refleja el camino del `localStorage`).
+---
+
+## Fase 11 — El recordatorio de la víspera, también por correo
+
+**Problema detectado.** Dos cosas, y la segunda solo se vio al mirar la primera.
+
+El recordatorio de 24 h salía por Twilio y Telegram, que son justo los dos canales que un
+invitado no suele tener: Telegram hay que vincularlo desde una sesión y la cuenta de prueba de
+Twilio obliga al paciente a darse de alta en su *sandbox*. Quien reservaba sin cuenta —el caso
+que toda la Fase 9 vino a sostener— no recibía ningún aviso.
+
+Y la tarea programada empezaba con un `return` si Twilio estaba apagado, de modo que sin Twilio
+**no se mandaba ningún recordatorio, ni siquiera por Telegram**, que no tiene nada que ver con
+Twilio. El propio código ya advertía en un comentario que `notifyPatients` no debía llevarse por
+delante los avisos de Telegram, y aun así la tarea lo hacía un nivel más arriba.
+
+**Solución.**
+
+- El recordatorio sale ahora también por correo, y lleva el **enlace de la cita**: recordarle
+  una cita a quien no puede ir y no darle forma de cancelarla deja la franja ocupada igual.
+- **Dos tokens para la misma cita** (`citas.recordatorio_token_hash`, Flyway **V14**). Hacen
+  falta dos porque del token de la reserva solo se guarda el SHA-256, así que la víspera no se
+  puede reconstruir para reenviarlo. La alternativa era rotarlo, y eso habría invalidado el
+  enlace del correo de la reserva y, peor, el token que el navegador que reservó tiene en
+  `localStorage`: al recibir un 404 el front lo descarta, así que la cita habría desaparecido
+  de «Mis citas programadas» en ese dispositivo sin que nadie lo pidiera. Los dos abren esa
+  cita y solo esa, y se comprueban los dos siempre, sin cortocircuito, para que el tiempo de
+  respuesta no delate cuál se ha presentado.
+- El token del recordatorio **solo se emite para las citas reservadas sin cuenta**. Quien tiene
+  cuenta gestiona la cita entrando en ella, y mandarle un token por correo le abriría un acceso
+  que hoy no existe: bastaría con entrar en su buzón para cancelarle la cita.
+- El hash se guarda **solo si el correo salió**, para no dejar vivo en la base un token que
+  nadie ha recibido. El riesgo que queda es el inverso —correo enviado y transacción revertida—
+  y ahí el enlace simplemente no abre nada, que es el lado seguro del fallo.
+- La ventana y el cron pasan a `app.recordatorio.*`, porque esto ya no es cosa de Twilio, pero
+  siguen aceptando las claves `app.twilio.reminder-*` para no romper los `.env` que las tengan.
+
+**Queda pendiente**: revisar si la demo de GitHub Pages debería simular los envíos (hoy no lo
+hace: no hay servidor de correo en el navegador, así que la demo solo refleja el camino del
+`localStorage`).
