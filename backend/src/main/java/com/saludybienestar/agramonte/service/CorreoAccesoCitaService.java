@@ -73,22 +73,9 @@ public class CorreoAccesoCitaService {
         return "Tu cita del %s — Dr. Agramonte".formatted(cita.getFechaHora().format(FECHA));
     }
 
-    /**
-     * El enlace lleva el identificador y el token en el fragmento, separados por un
-     * punto: el token es Base64 URL-safe, cuyo alfabeto no incluye el punto, así que no
-     * hay ambigüedad al partirlo. {@code reservar.html} es la página que ya tiene «Mis
-     * citas programadas» y el botón de cancelar, de modo que el enlace no necesita una
-     * pantalla nueva: importa el token en ese dispositivo y la cita aparece.
-     *
-     * <p>El separador es {@code cita-} y no {@code cita=} porque el cuerpo viaja en
-     * quoted-printable (lo obligan los acentos) y ahí el igual es el carácter de escape:
-     * el enlace salía escrito como {@code cita=3D12.} en el correo. Los clientes lo
-     * descodifican bien, pero deja un enlace ilegible en el origen del mensaje y una
-     * trampa para cualquiera que lo copie de ahí.
-     */
+    /** El formato del enlace vive en {@link CorreoSaliente#enlaceDeCita}: lo comparte con el recordatorio. */
     private String cuerpo(String nombre, CitaResponse cita, String token) {
-        String enlace = correoSaliente.enlace(
-                "reservar.html", "cita-%d.%s".formatted(cita.getId(), token));
+        String enlace = correoSaliente.enlaceDeCita(cita.getId(), token);
 
         return """
                 Hola%s:

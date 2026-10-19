@@ -16,6 +16,7 @@ import com.saludybienestar.agramonte.entity.Cita;
 import com.saludybienestar.agramonte.entity.Horario;
 import com.saludybienestar.agramonte.repository.CitaRepository;
 import com.saludybienestar.agramonte.repository.HorarioRepository;
+import com.saludybienestar.agramonte.scheduler.CitaReminderScheduler;
 import com.saludybienestar.agramonte.security.TokenAccesoCita;
 import jakarta.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
@@ -86,6 +87,7 @@ class AccesoCitaPorCorreoIntegrationTest {
     @Autowired private ObjectMapper objectMapper;
     @Autowired private HorarioRepository horarioRepository;
     @Autowired private CitaRepository citaRepository;
+    @Autowired private CitaReminderScheduler scheduler;
 
     private static final String CABECERA_TOKEN = "X-Cita-Token";
 
@@ -147,6 +149,62 @@ class AccesoCitaPorCorreoIntegrationTest {
     }
 
     @Test
+    @DisplayName("Recordatorio de la víspera: llega con su propio enlace y el de la reserva sigue valiendo")
+    void recordatorio_mandaSuEnlaceSinInvalidarElDeLaReserva() throws Exception {
+        JsonNode reserva = reservaPublica("recordatorio-" + System.nanoTime() + "@example.com",
+                primeraFranjaLibre());
+        long citaId = reserva.path("cita").path("id").asLong();
+        String tokenDeLaReserva = reserva.path("accesoToken").asText();
+
+        // La cita se mueve a la ventana del recordatorio (~24 h). Es más honesto que
+        // mover el reloj de la prueba: la tarea programada se ejecuta tal cual.
+        Cita cita = citaRepository.findById(citaId).orElseThrow();
+        cita.setFechaHora(LocalDateTime.now().plusHours(24));
+        citaRepository.save(cita);
+
+        int correosAntes = SMTP.getReceivedMessages().length;
+        scheduler.enviarRecordatorios24h();
+
+        // 1) Ha llegado el recordatorio de ESTA cita, con un token distinto del de la
+        //    reserva: el de la reserva no se puede reenviar porque solo queda su hash.
+        String tokenDelRecordatorio = tokenDelRecordatorioDe(citaId, correosAntes);
+        assertThat(tokenDelRecordatorio)
+                .as("el recordatorio trae su propio token, no el de la reserva")
+                .isNotBlank()
+                .isNotEqualTo(tokenDeLaReserva);
+
+        // 2) El enlace del recordatorio abre la cita sin sesión, que es para lo que está.
+        mockMvc.perform(get("/api/citas/publica/" + citaId)
+                        .header(CABECERA_TOKEN, tokenDelRecordatorio))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(citaId));
+
+        // 3) Y el de la reserva SIGUE valiendo. Es la invariante que obligó a guardar dos
+        //    tokens en vez de rotar uno: si este dejara de abrir, la cita desaparecería
+        //    de «Mis citas programadas» en el navegador donde se reservó, porque el front
+        //    descarta los tokens que reciben 404.
+        mockMvc.perform(get("/api/citas/publica/" + citaId)
+                        .header(CABECERA_TOKEN, tokenDeLaReserva))
+                .andExpect(status().isOk());
+
+        // 4) En la base están los dos hashes, y ninguno de los dos tokens en claro.
+        Cita guardada = citaRepository.findById(citaId).orElseThrow();
+        assertThat(guardada.getAccesoTokenHash()).isEqualTo(TokenAccesoCita.hash(tokenDeLaReserva));
+        assertThat(guardada.getRecordatorioTokenHash())
+                .isEqualTo(TokenAccesoCita.hash(tokenDelRecordatorio))
+                .isNotEqualTo(tokenDelRecordatorio);
+        assertThat(guardada.isRecordatorioEnviado())
+                .as("marcada como avisada para que el siguiente pase no repita el correo")
+                .isTrue();
+
+        // 5) Y con el token del recordatorio se puede cancelar, que es el objetivo del
+        //    enlace: que quien no puede acudir libere la hora sin llamar por teléfono.
+        mockMvc.perform(delete("/api/citas/publica/" + citaId)
+                        .header(CABECERA_TOKEN, tokenDelRecordatorio))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
     @DisplayName("El token de un correo no abre la cita de otro paciente")
     void tokenDeUnCorreo_noAbreLaCitaDeOtro() throws Exception {
         JsonNode primera = reservaPublica("uno-" + System.nanoTime() + "@example.com", primeraFranjaLibre());
@@ -188,6 +246,32 @@ class AccesoCitaPorCorreoIntegrationTest {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
         return objectMapper.readTree(json);
+    }
+
+    /**
+     * Token del correo de recordatorio de una cita concreta, buscando entre los que han
+     * llegado después de {@code correosAntes}.
+     *
+     * <p>No vale mirar «el último»: la tarea programada recorre todas las citas de la
+     * ventana, y otras pruebas de esta clase dejan citas en la agenda sembrada que pueden
+     * caer dentro de ella. Por eso se filtra por el texto del recordatorio y por el
+     * identificador de la cita.
+     */
+    private String tokenDelRecordatorioDe(long citaId, int correosAntes) {
+        MimeMessage[] recibidos = SMTP.getReceivedMessages();
+        for (int i = correosAntes; i < recibidos.length; i++) {
+            String cuerpo = GreenMailUtil.getBody(recibidos[i])
+                    .replace("\r\n", "\n")
+                    .replace("=\n", "");
+            if (!cuerpo.contains("Te recordamos tu cita")) {
+                continue;
+            }
+            Matcher m = ENLACE.matcher(cuerpo);
+            if (m.find() && m.group(1).equals(String.valueOf(citaId))) {
+                return m.group(2);
+            }
+        }
+        throw new AssertionError("no ha llegado el recordatorio de la cita " + citaId);
     }
 
     /**
