@@ -42,6 +42,7 @@ public class CitaService {
     private final AuthService authService;
     private final ActivacionCuentaService activacionCuentaService;
     private final CorreoAccesoCitaService correoAccesoCitaService;
+    private final CorreoCancelacionCitaService correoCancelacionCitaService;
 
     @Transactional
     public ReservaPublicaResponse reservaPublica(ReservaPublicaRequest request) {
@@ -348,7 +349,14 @@ public class CitaService {
         ).ifPresent(h -> h.setDisponible(true));
 
         citaRepository.save(cita);
-        notificarTrasCommit(() -> citaNotificationService.notifyCancelacion(cita));
+        notificarTrasCommit(() -> {
+            citaNotificationService.notifyCancelacion(cita);
+            // Comprobante en el buzón del paciente. Cancelar era la única operación que no
+            // dejaba rastro por correo, y los otros dos canales son los que un invitado no
+            // suele tener. También tras el commit: la hora ya está libre, así que un SMTP
+            // caído no debe convertirse en un error para quien acaba de anular.
+            correoCancelacionCitaService.enviar(cita);
+        });
     }
 
     /**
