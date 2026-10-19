@@ -2,10 +2,6 @@ package com.saludybienestar.agramonte.security;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Base64;
-import java.util.HexFormat;
 
 /**
  * Token de acceso a una cita reservada sin cuenta: la credencial que permite a un
@@ -18,29 +14,17 @@ import java.util.HexFormat;
  */
 public final class TokenAccesoCita {
 
-    private static final SecureRandom RANDOM = new SecureRandom();
-    private static final Base64.Encoder ENCODER = Base64.getUrlEncoder().withoutPadding();
-
     private TokenAccesoCita() {
     }
 
     /** 32 bytes aleatorios en Base64 URL-safe: 43 caracteres válidos como parámetro de consulta. */
     public static String generar() {
-        byte[] bytes = new byte[32];
-        RANDOM.nextBytes(bytes);
-        return ENCODER.encodeToString(bytes);
+        return TokenOpaco.generar();
     }
 
     /** SHA-256 del token en hexadecimal minúsculo (64 caracteres), que es lo único que se persiste. */
     public static String hash(String token) {
-        try {
-            byte[] digest = MessageDigest.getInstance("SHA-256")
-                    .digest(token.getBytes(StandardCharsets.UTF_8));
-            return HexFormat.of().formatHex(digest);
-        } catch (NoSuchAlgorithmException e) {
-            // SHA-256 es obligatorio en toda JVM: si falta, el entorno está roto.
-            throw new IllegalStateException("SHA-256 no disponible en esta JVM", e);
-        }
+        return TokenOpaco.hash(token);
     }
 
     /**

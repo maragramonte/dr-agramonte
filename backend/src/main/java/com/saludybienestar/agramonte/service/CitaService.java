@@ -40,6 +40,7 @@ public class CitaService {
     private final CitaNotificationService citaNotificationService;
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
+    private final ActivacionCuentaService activacionCuentaService;
 
     @Transactional
     public ReservaPublicaResponse reservaPublica(ReservaPublicaRequest request) {
@@ -49,6 +50,7 @@ public class CitaService {
 
         Usuario paciente = usuarioRepository.findByEmail(email).orElse(null);
         boolean cuentaNueva = paciente == null;
+        boolean activacionPendiente = false;
 
         if (cuentaNueva) {
             paciente = new Usuario();
@@ -79,10 +81,12 @@ public class CitaService {
                         "Este email ya tiene cuenta. Inicia sesión para reservar.");
             }
             if (conPassword) {
-                // Poner contraseña es tomar el control de la cuenta, así que solo puede
-                // hacerlo su dueño ya autenticado, nunca una reserva anónima.
-                throw new ResponseStatusException(HttpStatus.CONFLICT,
-                        "Este email ya tiene reservas como invitado. Reserva sin contraseña.");
+                // Poner contraseña es tomar el control de la cuenta, y eso solo puede
+                // hacerlo quien abra ese buzón: aquí quien llama únicamente ha demostrado
+                // conocer un correo. Antes esto era un 409 que dejaba al invitado sin
+                // ninguna salida; ahora la reserva sigue adelante como invitada y se
+                // manda un enlace de activación. La contraseña NO se guarda.
+                activacionPendiente = true;
             }
         }
 
@@ -112,7 +116,14 @@ public class CitaService {
         if (cuentaNueva && conPassword) {
             sesion = authService.tokenTrasAutenticacion(email, passwordPlano);
         }
-        return new ReservaPublicaResponse(cita, sesion, tokenAcceso);
+
+        // El correo va al final, con la cita ya creada: si el envío falla, la reserva se
+        // deshace entera y el paciente lo ve, en vez de quedarse con una cita y sin saber
+        // que el enlace nunca salió.
+        if (activacionPendiente) {
+            activacionCuentaService.solicitarActivacion(paciente);
+        }
+        return new ReservaPublicaResponse(cita, sesion, tokenAcceso, activacionPendiente);
     }
 
     @Transactional

@@ -30,6 +30,13 @@
                   "    const body = pm.response.json();",
                   "    if (body.token) pm.environment.set('jwt_token', body.token);",
                   "    pm.test('Token recibido', () => pm.expect(body.token).to.be.a('string').and.not.empty);",
+                  "}",
+                  "// 202 = ese correo ya tenia cuenta invitada. No se ha creado ni tocado nada:",
+                  "// ha salido un enlace de activacion a ese buzon, que es la unica prueba de",
+                  "// identidad que vale. El token NO viaja en esta respuesta; sale por correo.",
+                  "if (pm.response.code === 202) {",
+                  "    pm.test('Avisa de que hay que revisar el correo', () =>",
+                  "        pm.expect(pm.response.json().message).to.include('correo'));",
                   "}"
                 ],
                 "type": "text/javascript"
@@ -45,6 +52,34 @@
               "raw": "{\n  \"email\": \"{{paciente_email}}\",\n  \"nombre\": \"Paciente Prueba Postman\",\n  \"password\": \"{{paciente_password}}\",\n  \"telefono\": \"+34600000001\"\n}"
             },
             "url": "{{base_url}}/api/auth/registro"
+          }
+        },
+        {
+          "name": "Activar cuenta invitada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    if (body.token) pm.environment.set('jwt_token', body.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "description": "Segundo paso del alta de una cuenta invitada. El token sale del enlace que llega por correo (activar.html#<token>), caduca a los 30 minutos y solo sirve una vez. Pegalo en la variable activacion_token del entorno. Token inexistente, caducado o ya usado dan el mismo 400.",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{activacion_token}}\",\n  \"password\": \"{{paciente_password}}\"\n}"
+            },
+            "url": "{{base_url}}/api/auth/activar"
           }
         },
         {
@@ -255,31 +290,29 @@
       ]
     },
     {
-      "name": "Agenda TFG (público demo)",
+      "name": "Agenda del médico (rol MEDICO/ADMIN)",
       "item": [
         {
           "name": "Agenda pacientes",
           "request": {
-            "auth": { "type": "noauth" },
             "method": "GET",
+            "description": "Exige JWT con rol MEDICO o ADMIN (hereda el bearer de la colección: ejecuta antes «Login»). Sin medicoId: de quién es la agenda lo deduce el backend del token. Un MEDICO recibe siempre la suya y el parámetro se ignora; solo un ADMIN puede pedir una agenda concreta, y entonces es obligatorio.",
             "url": {
-              "raw": "{{base_url}}/api/citas/agenda/pacientes?medicoId={{medico_id}}",
+              "raw": "{{base_url}}/api/citas/agenda/pacientes",
               "host": ["{{base_url}}"],
-              "path": ["api", "citas", "agenda", "pacientes"],
-              "query": [{ "key": "medicoId", "value": "{{medico_id}}" }]
+              "path": ["api", "citas", "agenda", "pacientes"]
             }
           }
         },
         {
           "name": "Historial reservas prueba",
           "request": {
-            "auth": { "type": "noauth" },
             "method": "GET",
+            "description": "Mismo criterio que «Agenda pacientes»: rol MEDICO/ADMIN y el médico sale del JWT.",
             "url": {
-              "raw": "{{base_url}}/api/citas/agenda/reservas?medicoId={{medico_id}}",
+              "raw": "{{base_url}}/api/citas/agenda/reservas",
               "host": ["{{base_url}}"],
-              "path": ["api", "citas", "agenda", "reservas"],
-              "query": [{ "key": "medicoId", "value": "{{medico_id}}" }]
+              "path": ["api", "citas", "agenda", "reservas"]
             }
           }
         }

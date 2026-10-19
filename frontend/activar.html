@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="Activa tu cuenta de paciente del Dr. Agramonte y elige una contraseña.">
+    <!-- Esta página se abre desde un enlace de correo y es de un solo uso: no debe
+         aparecer en buscadores ni en el sitemap. -->
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="author" content="Dr. Juan Manuel Agramonte">
+    <title>Activar cuenta | Dr. Agramonte</title>
+
+    <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
+    <link rel="apple-touch-icon" href="icons/app-icon.svg">
+    <meta name="theme-color" content="#0F766E">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Dr. Agramonte">
+    <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="css/dr-agramonte.css">
+    <link rel="stylesheet" href="css/pages-extra.css">
+    <script src="js/modules/theme-init.js"></script>
+    <script src="js/modules/i18n.js"></script>
+</head>
+<body>
+<header class="main-header" role="banner">
+    <div class="container">
+        <div class="header-content">
+            <div class="logo-section">
+                <a href="index.html" class="logo-link" aria-label="Inicio - Dr. Agramonte">
+                    <div class="logo-icon" aria-hidden="true"><i class="fas fa-user-md"></i></div>
+                    <div class="logo-text">
+                        <h1 class="logo-title">Dr. Agramonte</h1>
+                        <p class="logo-subtitle" data-i18n="logo.subtitle">Especialista en Medicina Interna</p>
+                    </div>
+                </a>
+            </div>
+            <nav class="main-nav" aria-label="Navegación principal">
+                <ul class="nav-menu">
+                    <li class="nav-item"><a href="sobre-mi.html" class="nav-link" data-i18n="nav.sobre">Sobre el Dr.</a></li>
+                    <li class="nav-item"><a href="servicios.html" class="nav-link" data-i18n="nav.servicios">Servicios</a></li>
+                    <li class="nav-item"><a href="contacto.html" class="nav-link" data-i18n="nav.contacto">Contacto</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <a href="reservar.html" class="nav-cta" aria-label="Reservar cita"><i class="fas fa-calendar-plus" aria-hidden="true"></i><span class="nav-cta-text" data-i18n="nav.reservar">Reservar cita</span></a>
+                <div class="header-utils">
+                    <div class="lang-switch" role="group" aria-label="Idioma"><button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" aria-pressed="true">ES</button><button type="button" class="lang-btn" data-lang-btn="ca" aria-pressed="false">CA</button></div>
+                    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Activar modo oscuro" title="Cambiar tema claro / oscuro" aria-pressed="false">
+                        <i class="fas fa-moon" id="themeToggleIcon" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="mega-menu" aria-label="Abrir el menú"><span class="nav-toggle-icon" aria-hidden="true"></span><span class="nav-toggle-text" data-i18n="nav.menu">Menú</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mapa completo del sitio. Vive en el header para que el botón «Menú» lo abra
+         a cualquier ancho: en escritorio se despliega en columnas y en móvil se
+         apila. Es HTML estático, no generado por JS, para que siga siendo navegable
+         e indexable aunque el script no llegue a cargar. -->
+    <div class="mega-menu" id="mega-menu" hidden>
+        <div class="mega-menu__inner">
+            <div class="mega-menu__group">
+                <h2 class="mega-menu__title" data-i18n="menu.consulta">La consulta</h2>
+                <ul class="mega-menu__list">
+                    <li><a href="index.html" class="mega-link"><i class="fas fa-home" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.inicio">Inicio</span><span class="mega-link__hint" data-i18n="menu.inicio.hint">Portada y resumen</span></span></a></li>
+                    <li><a href="sobre-mi.html" class="mega-link"><i class="fas fa-user-md" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.sobre">El Dr. Agramonte</span><span class="mega-link__hint" data-i18n="menu.sobre.hint">Trayectoria y formación</span></span></a></li>
+                    <li><a href="servicios.html" class="mega-link"><i class="fas fa-stethoscope" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.servicios">Servicios</span><span class="mega-link__hint" data-i18n="menu.servicios.hint">Qué se atiende en consulta</span></span></a></li>
+                    <li><a href="testimonios.html" class="mega-link"><i class="fas fa-star" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.testimonios">Testimonios</span><span class="mega-link__hint" data-i18n="menu.testimonios.hint">Opiniones de pacientes</span></span></a></li>
+                </ul>
+            </div>
+            <div class="mega-menu__group">
+                <h2 class="mega-menu__title" data-i18n="menu.citas">Citas</h2>
+                <ul class="mega-menu__list" data-auth-slot>
+                    <li><a href="reservar.html" class="mega-link mega-link--destacado"><i class="fas fa-calendar-plus" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.reservar">Reservar cita</span><span class="mega-link__hint" data-i18n="menu.reservar.hint">Elija centro, día y hora</span></span></a></li>
+                    <li><a href="contacto.html" class="mega-link"><i class="fas fa-envelope" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.contacto">Contacto</span><span class="mega-link__hint" data-i18n="menu.contacto.hint">Formulario y ubicación</span></span></a></li>
+                </ul>
+            </div>
+            <div class="mega-menu__group mega-menu__group--herramientas">
+                <h2 class="mega-menu__title" data-i18n="menu.herramientas">Herramientas</h2>
+                <ul class="mega-menu__list">
+                    <li><a href="estadisticas.html" class="mega-link"><i class="fas fa-chart-line" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="footer.cuadro">Cuadro de mando</span><span class="mega-link__hint" data-i18n="menu.cuadro.hint">Estadísticas de la agenda</span></span></a></li>
+                    <li><a href="offline.html" class="mega-link"><i class="fas fa-plug-circle-xmark" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="footer.offline">Modo offline</span><span class="mega-link__hint" data-i18n="menu.offline.hint">La web sin conexión</span></span></a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="mega-menu__pie">
+            <a href="privacidad.html" class="mega-menu__legal"><i class="fas fa-shield-alt" aria-hidden="true"></i> <span data-i18n="footer.privacidad">Política de Privacidad</span></a>
+            <!-- Copia del selector de idioma para los anchos en los que no cabe en la barra. -->
+            <div class="lang-switch lang-switch--menu" role="group" aria-label="Idioma"><button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" aria-pressed="true">ES</button><button type="button" class="lang-btn" data-lang-btn="ca" aria-pressed="false">CA</button></div>
+        </div>
+    </div>
+</header>
+
+<main class="container" style="max-width:36rem;padding:3rem 1rem 4rem">
+    <h2 data-i18n="activar.titulo">Termina de crear tu cuenta</h2>
+    <p data-i18n="activar.intro">
+        Elige una contraseña para este correo. Tus citas anteriores seguirán ahí.
+    </p>
+
+    <div id="activarAviso" class="activar-aviso" role="status" aria-live="polite" hidden></div>
+
+    <form id="activarForm" class="activar-form" novalidate hidden>
+        <label for="activarPassword" data-i18n="activar.password">Contraseña nueva</label>
+        <input type="password" id="activarPassword" name="password" required minlength="6"
+               autocomplete="new-password" data-i18n-attr="placeholder:activar.password.ph"
+               placeholder="Al menos 6 caracteres">
+
+        <label for="activarPassword2" data-i18n="activar.repetir">Repite la contraseña</label>
+        <input type="password" id="activarPassword2" name="password2" required minlength="6"
+               autocomplete="new-password">
+
+        <button type="submit" class="btn btn-primary" id="activarBtn" data-i18n="activar.enviar">
+            Activar mi cuenta
+        </button>
+    </form>
+
+    <p class="activar-pie">
+        <a href="reservar.html" data-i18n="activar.volver">Volver a mis citas</a>
+    </p>
+</main>
+
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section"><h3>Dr. Agramonte</h3><p data-i18n="footer.especialista">Especialista en Medicina Interna</p><p data-i18n="footer.ubicacion">Palma de Mallorca, Islas Baleares</p></div>
+        <div class="footer-section"><h3 data-i18n="footer.contacto">Contacto</h3><a href="mailto:contacto@dragramonte.com"><i class="fas fa-envelope"></i> contacto@dragramonte.com</a><p><i class="fas fa-map-marker-alt"></i> Palma de Mallorca</p></div>
+        <div class="footer-section"><h3 data-i18n="footer.horario">Horario</h3><p><strong data-i18n="footer.lunVie">Lunes a Viernes</strong><br>9:00 - 14:00<br>16:00 - 19:00</p><p><strong data-i18n="footer.sabado">Sábados</strong><br><span data-i18n="footer.sabadoHoras">9:00 - 13:00 (con cita)</span></p></div>
+        <div class="footer-section"><h3 data-i18n="footer.enlaces">Enlaces</h3><a href="sobre-mi.html"><i class="fas fa-user-md"></i> El Dr. Agramonte</a><a href="servicios.html"><i class="fas fa-stethoscope"></i> <span data-i18n="nav.servicios">Servicios</span></a><a href="testimonios.html"><i class="fas fa-star"></i> <span data-i18n="nav.testimonios">Testimonios</span></a><a href="contacto.html"><i class="fas fa-envelope"></i> <span data-i18n="nav.contacto">Contacto</span></a><a href="reservar.html"><i class="fas fa-calendar-plus"></i> <span data-i18n="nav.reservar">Reservar cita</span></a><a href="privacidad.html"><i class="fas fa-shield-alt"></i> <span data-i18n="footer.privacidad">Política de Privacidad</span></a><a href="offline.html"><i class="fas fa-plug-circle-xmark"></i> <span data-i18n="footer.offline">Modo Offline</span></a><a href="estadisticas.html"><i class="fas fa-chart-line"></i> <span data-i18n="footer.cuadro">Cuadro de mando</span></a></div>
+    </div>
+    <div class="footer-bottom"><p><span data-i18n="footer.copyright">© 2026 Dr. Juan Manuel Agramonte.</span> <a href="privacidad.html" data-i18n="footer.privacidad">Política de Privacidad</a></p></div>
+</footer>
+
+
+<script src="js/modules/api-config.js"></script>
+<script src="js/modules/auth-ui.js" defer></script>
+<script type="module" src="js/pages/activar.js"></script>
+<script src="js/pages/dr-agramonte.js" defer></script>
+</body>
+</html>
