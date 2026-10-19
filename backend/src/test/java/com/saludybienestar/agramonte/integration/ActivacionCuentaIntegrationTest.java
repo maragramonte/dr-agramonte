@@ -17,7 +17,9 @@ import com.saludybienestar.agramonte.repository.HorarioRepository;
 import com.saludybienestar.agramonte.repository.UsuarioRepository;
 import jakarta.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -109,15 +111,44 @@ class ActivacionCuentaIntegrationTest {
         return respuesta.isBlank() ? objectMapper.createObjectNode() : objectMapper.readTree(respuesta);
     }
 
-    /** Lee el último correo recibido y saca de él el token de activación. */
+    /**
+     * Saca el token de activación del correo más reciente que lo traiga.
+     *
+     * <p>Antes miraba solo el último mensaje del buzón. Dejó de valer cuando la reserva
+     * pública empezó a mandar también el enlace de acceso a la cita: en ese flujo el
+     * último correo es el de la cita, no el de la activación, y la prueba fallaba por el
+     * orden de los envíos en vez de por lo que quería comprobar.
+     */
     private String tokenDelUltimoCorreo() {
         MimeMessage[] recibidos = SMTP.getReceivedMessages();
         assertThat(recibidos).as("debe haber llegado un correo de activación").isNotEmpty();
 
-        String cuerpo = GreenMailUtil.getBody(recibidos[recibidos.length - 1]);
-        Matcher m = ENLACE.matcher(cuerpo.replace("\r\n", "\n").replace("=\n", ""));
-        assertThat(m.find()).as("el correo debe traer el enlace de activación: %s", cuerpo).isTrue();
-        return m.group(1);
+        for (int i = recibidos.length - 1; i >= 0; i--) {
+            Matcher m = ENLACE.matcher(cuerpoNormalizado(recibidos[i]));
+            if (m.find()) {
+                return m.group(1);
+            }
+        }
+        throw new AssertionError("ningún correo del buzón trae el enlace de activación: "
+                + cuerposRecibidosDesde(0));
+    }
+
+    /** Cuerpos de los correos recibidos a partir de una posición, ya normalizados. */
+    private List<String> cuerposRecibidosDesde(int desde) {
+        MimeMessage[] recibidos = SMTP.getReceivedMessages();
+        List<String> cuerpos = new ArrayList<>();
+        for (int i = desde; i < recibidos.length; i++) {
+            cuerpos.add(cuerpoNormalizado(recibidos[i]));
+        }
+        return cuerpos;
+    }
+
+    /**
+     * Deshace los saltos de línea blandos del quoted-printable: el token es largo y el
+     * servidor de correo puede partirlo, con lo que no se encontraría de una pieza.
+     */
+    private String cuerpoNormalizado(MimeMessage mensaje) {
+        return GreenMailUtil.getBody(mensaje).replace("\r\n", "\n").replace("=\n", "");
     }
 
     @Test
@@ -254,9 +285,16 @@ class ActivacionCuentaIntegrationTest {
         assertThat(despues.getNombre()).isEqualTo("Dueño Del Buzón");
         assertThat(despues.isCuentaInvitada()).isTrue();
 
+        // Dos correos, no uno, y son dos cosas distintas: el de activación, que va al dueño
+        // del buzón y es la única forma de poner contraseña, y el de acceso a la cita, que
+        // lleva el token de la cita recién creada. Esta reserva crea una cita de verdad, así
+        // que su enlace de acceso tiene que salir igual que en cualquier otra.
         assertThat(SMTP.getReceivedMessages().length)
-                .as("ha salido un correo de activación hacia el dueño del buzón")
-                .isEqualTo(correosAntes + 1);
+                .as("salen los dos correos: activación de la cuenta y acceso a la cita")
+                .isEqualTo(correosAntes + 2);
+        assertThat(cuerposRecibidosDesde(correosAntes))
+                .as("uno de ellos es el enlace de activación hacia el dueño del buzón")
+                .anyMatch(cuerpo -> cuerpo.contains("activar.html"));
 
         // Y con esa contraseña no se entra.
         Map<String, Object> login = new LinkedHashMap<>();

@@ -48,6 +48,7 @@ class CitaServiceTest {
     @Mock private CitaNotificationService citaNotificationService;
     @Mock private PasswordEncoder passwordEncoder;
     @Mock private AuthService authService;
+    @Mock private CorreoAccesoCitaService correoAccesoCitaService;
 
     @InjectMocks private CitaService citaService;
 

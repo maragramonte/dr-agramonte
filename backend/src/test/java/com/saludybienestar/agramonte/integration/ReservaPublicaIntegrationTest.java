@@ -193,6 +193,26 @@ class ReservaPublicaIntegrationTest {
     }
 
     @Test
+    @DisplayName("Sin SMTP configurado la reserva sigue funcionando: el enlace por correo es una comodidad, no un requisito")
+    void reservaPublica_sinServicioDeCorreo_sigueCreandoLaCitaYEntregandoElToken() throws Exception {
+        // Esta clase no configura spring.mail.host a propósito, así que aquí no hay forma
+        // de mandar el correo con el enlace de acceso. La reserva no debe enterarse: la
+        // cita ya está confirmada y el token viaja en la respuesta. Es la diferencia con
+        // la activación de cuenta, donde el correo SÍ es imprescindible (503) porque es la
+        // prueba de identidad; si esta ruta se comportara igual, un SMTP mal configurado
+        // dejaría la consulta sin poder dar citas.
+        JsonNode reserva = reservaPublicaOk(
+                cuerpoReserva("sin-correo@example.com", primeraFranjaLibre()));
+
+        long citaId = reserva.path("cita").path("id").asLong();
+        String token = reserva.path("accesoToken").asText();
+        assertThat(token).as("el token se entrega aunque el correo no haya podido salir").isNotBlank();
+
+        mockMvc.perform(get("/api/citas/publica/" + citaId).header(CABECERA_TOKEN, token))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     @DisplayName("Reserva pública con el email de una cuenta invitada existente: nadie se apropia de la cuenta")
     void reservaPublica_emailDeCuentaInvitadaExistente_noSeApropiaDeLaCuenta() throws Exception {
         // 1. La víctima reserva sin contraseña: queda una cuenta invitada con SUS datos.
