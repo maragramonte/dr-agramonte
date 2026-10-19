@@ -139,6 +139,46 @@ correo electrónico no es un secreto.
 - La API simulada de la demo (`demo/demo-api.js`) replica las mismas reglas, para que la demo
   de GitHub Pages no se quede describiendo el comportamiento vulnerable.
 
-**Queda pendiente**: enviar el enlace con el token por email (hoy el token solo vive en el
-navegador donde se reservó) y un «recuperar acceso» para que un invitado pueda ponerse
-contraseña.
+El «recuperar acceso» para que un invitado se ponga contraseña llegó con la activación por
+correo (**V13**); el enlace con el token, en la fase siguiente.
+
+---
+
+## Fase 10 — El enlace de la cita, por correo
+
+**Problema detectado.** El token de acceso se entregaba una sola vez, en la respuesta de la
+reserva, y el navegador lo guardaba en `localStorage`. Eso ataba la cita al dispositivo donde
+se hizo: quien reservaba desde un ordenador prestado, en una ventana privada o con el
+almacenamiento configurado para borrarse al cerrar, se quedaba sin **ningún** acceso a su
+propia cita, ni para consultarla ni para cancelarla. Y no había forma de devolvérselo, porque
+en base de datos solo está el SHA-256: la consulta podía ver la cita en su agenda, pero no
+reconstruir la credencial. El resultado práctico era una cita que solo se podía anular
+llamando por teléfono.
+
+**Solución.**
+
+- Al reservar sin cuenta sale un correo con el enlace
+  `reservar.html#cita-<id>.<token>`. El token va en el **fragmento**, que no se manda al
+  servidor, así que no aparece en los registros de acceso de Caddy ni en la cabecera
+  `Referer`; es la misma decisión que en el enlace de activación.
+- No hace falta pantalla nueva: `reservar.html` ya tiene «Mis citas programadas» con su botón
+  de cancelar. `importarTokenDelEnlace()` guarda el token en ese dispositivo, lo borra de la
+  barra de direcciones con `replaceState` (si se queda ahí, viaja en cualquier URL que se
+  comparta copiando) y deja que `syncMisCitas()` haga el resto.
+- **Un fallo de correo no puede tumbar la reserva.** Es la diferencia de fondo con el enlace
+  de activación, donde el correo *es* la prueba de identidad y sin él se responde 503. Aquí la
+  cita ya está confirmada y el token ya viaja en la respuesta, así que el envío va **tras el
+  commit** y con el fallo capturado, igual que los avisos de Twilio y Telegram. Si esto
+  lanzara, un SMTP caído daría un error a quien acaba de dejar ocupada una franja.
+- El correo no lleva el **motivo de consulta**: es dato de salud (art. 9 del RGPD) y para
+  reconocer la cita basta fecha, médico y centro. Sí avisa de que no se reenvíe, porque quien
+  abra el enlace puede cancelar la cita, y de que no hay segunda copia.
+- Lo común a los dos correos (remitente, URL pública, `disponible()`) se extrajo a
+  `CorreoSaliente`, para no tener dos copias de lo mismo divergiendo: es lo que ya había
+  pasado con los tokens antes de `TokenOpaco`.
+- Sin migraciones: la columna del hash es la de la **V11**, y el enlace se construye con
+  `APP_URL_PUBLICA`, la variable que ya había traído la activación.
+
+**Queda pendiente**: que el correo de cancelación recuerde el enlace de la cita, y revisar si
+la demo de GitHub Pages debería simular el envío (hoy no lo hace: no hay servidor de correo en
+el navegador, así que la demo solo refleja el camino del `localStorage`).

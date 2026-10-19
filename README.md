@@ -117,6 +117,19 @@ sigue avisando.
 La vinculación del bot usa un token de un solo uso con 15 minutos de validez, emitido
 siempre para el usuario del JWT en sesión, nunca para un email recibido por parámetro.
 
+### Dos correos con reglas opuestas a propósito
+
+El enlace de **activación de cuenta** es la prueba de identidad: sin servicio de correo la
+operación se niega con un **503**, porque seguir adelante sería regalar una cuenta a quien
+solo ha demostrado saber escribir un email.
+
+El enlace de **acceso a una cita** reservada sin cuenta es una comodidad: sale tras el commit
+y con el fallo capturado, así que un SMTP caído no impide reservar. Existe porque el token de
+la cita se entrega una sola vez y, sin ese correo, la cita quedaba atada al navegador donde se
+reservó: en base de datos solo está su SHA-256, de modo que nadie puede reenviarlo. El token
+viaja en el fragmento del enlace (`reservar.html#cita-<id>.<token>`), que no se manda al
+servidor, y la página lo borra de la barra de direcciones nada más leerlo.
+
 ### Una migración se ejecuta una vez; una agenda hay que seguir creándola
 
 Los huecos de la consulta los sembraban las migraciones V3 y V6: unos 90 días contados
@@ -237,14 +250,16 @@ contra PostgreSQL, y para eso están las pruebas de integración.
 cd backend && mvn test
 ```
 
-**95 pruebas en tres niveles**: unitarias de servicio, de seguridad y roles sobre la capa
+**102 pruebas en tres niveles**: unitarias de servicio, de seguridad y roles sobre la capa
 REST (`@WebMvcTest` con la `SecurityConfig` real) y de integración end-to-end contra un
 PostgreSQL levantado con Testcontainers. Cubren las ramas críticas: 409 por doble reserva,
 403 por rol, validez del JWT, cancelación, el secreto del webhook, el límite de peticiones,
-la regeneración de la agenda, el aislamiento entre las agendas de dos médicos y la
-activación de una cuenta invitada (con un SMTP real en memoria, GreenMail).
+la regeneración de la agenda, el aislamiento entre las agendas de dos médicos, la
+activación de una cuenta invitada y el enlace de acceso a la cita (las dos, con un SMTP
+real en memoria, GreenMail: el token se saca del correo recibido y se comprueba que abre
+la cita contra la API).
 
-Las 14 de integración necesitan Docker en marcha; si no lo hay se marcan como saltadas en
+Las 17 de integración necesitan Docker en marcha; si no lo hay se marcan como saltadas en
 lugar de fallar. La cobertura todavía no está medida con JaCoCo.
 
 En cada push y cada pull request a `main` las ejecuta GitHub Actions
@@ -307,7 +322,7 @@ certificado.
 | `MEDICO_EMAIL`, `MEDICO_PASSWORD` | Cuenta real del médico; **obligatorias en producción** |
 | `TWILIO_*` | Credenciales, canal (`whatsapp`/`sms`) y horas del recordatorio |
 | `TELEGRAM_*` | Token del bot, usuario del bot y secreto del webhook |
-| `MAIL_*`, `CONTACT_INBOX` | Correo del formulario de contacto y del enlace de activación |
+| `MAIL_*`, `CONTACT_INBOX` | Correo del formulario de contacto, del enlace de activación y del enlace de acceso a la cita |
 | `APP_URL_PUBLICA` | Base de los enlaces que viajan por correo (por defecto, el dominio www) |
 | `AGENDA_DIAS_FUTURO`, `AGENDA_CRON` | Ventana de huecos que se mantiene abierta (90 días) y cuándo se amplía |
 | `RATE_LIMIT_*` | Peticiones por IP permitidas en las rutas públicas de escritura |
