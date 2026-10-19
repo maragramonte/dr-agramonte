@@ -323,7 +323,14 @@ public class CitaService {
         Cita cita = citaRepository.findById(citaId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cita no encontrada"));
 
-        if (!TokenAccesoCita.coincide(token, cita.getAccesoTokenHash())) {
+        // Dos tokens abren la misma cita: el de la reserva y el del correo de
+        // recordatorio (V14). Los dos se comprueban en tiempo constante y siempre los
+        // dos, sin cortocircuito: parar en el primer acierto haría que el tiempo de
+        // respuesta delatara cuál de ellos se ha presentado.
+        boolean esElDeLaReserva = TokenAccesoCita.coincide(token, cita.getAccesoTokenHash());
+        boolean esElDelRecordatorio = TokenAccesoCita.coincide(token, cita.getRecordatorioTokenHash());
+
+        if (!esElDeLaReserva && !esElDelRecordatorio) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cita no encontrada");
         }
         return cita;
