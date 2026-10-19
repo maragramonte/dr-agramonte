@@ -57,6 +57,12 @@ app:
     enabled: ${RATE_LIMIT_ENABLED:true}
     max-peticiones: ${RATE_LIMIT_MAX:10}
     ventana-segundos: ${RATE_LIMIT_VENTANA_SEGUNDOS:300}
+  # Recordatorio de la víspera. Ya no es cosa de Twilio (sale también por correo y
+  # por Telegram), así que tiene sus propias claves; las antiguas TWILIO_REMINDER_*
+  # siguen valiendo como respaldo para no romper los .env que ya las tienen.
+  recordatorio:
+    horas-antes: ${RECORDATORIO_HORAS:${TWILIO_REMINDER_HOURS:24}}
+    cron: ${RECORDATORIO_CRON:${TWILIO_REMINDER_CRON:0 */15 * * * *}}
   twilio:
     enabled: ${TWILIO_ENABLED:false}
     account-sid: ${TWILIO_ACCOUNT_SID:}

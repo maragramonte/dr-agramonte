@@ -117,6 +117,18 @@ sigue avisando.
 La vinculación del bot usa un token de un solo uso con 15 minutos de validez, emitido
 siempre para el usuario del JWT en sesión, nunca para un email recibido por parámetro.
 
+### El recordatorio sale por los tres canales, y cada uno decide
+
+El aviso de la víspera iba solo por Twilio y Telegram, que son justo los dos que un paciente
+sin cuenta no tiene: Telegram se vincula desde una sesión y la cuenta de prueba de Twilio
+obliga a darse de alta en un *sandbox*. Peor: la tarea programada empezaba con un `return` si
+Twilio estaba apagado, así que sin Twilio no salía **ningún** recordatorio, ni por Telegram.
+
+Ahora recorre las citas siempre y cada canal comprueba lo suyo. El correo añade el enlace de
+la cita, con un **segundo token** (Flyway V14): del de la reserva solo se guarda el hash, y
+rotarlo habría invalidado el enlace del correo anterior y el token del navegador que reservó.
+Ese token solo se emite para las citas sin cuenta detrás; quien tiene cuenta entra en ella.
+
 ### Dos correos con reglas opuestas a propósito
 
 El enlace de **activación de cuenta** es la prueba de identidad: sin servicio de correo la
@@ -250,16 +262,17 @@ contra PostgreSQL, y para eso están las pruebas de integración.
 cd backend && mvn test
 ```
 
-**102 pruebas en tres niveles**: unitarias de servicio, de seguridad y roles sobre la capa
+**112 pruebas en tres niveles**: unitarias de servicio, de seguridad y roles sobre la capa
 REST (`@WebMvcTest` con la `SecurityConfig` real) y de integración end-to-end contra un
 PostgreSQL levantado con Testcontainers. Cubren las ramas críticas: 409 por doble reserva,
 403 por rol, validez del JWT, cancelación, el secreto del webhook, el límite de peticiones,
 la regeneración de la agenda, el aislamiento entre las agendas de dos médicos, la
-activación de una cuenta invitada y el enlace de acceso a la cita (las dos, con un SMTP
-real en memoria, GreenMail: el token se saca del correo recibido y se comprueba que abre
-la cita contra la API).
+activación de una cuenta invitada, el enlace de acceso a la cita y el recordatorio de la
+víspera (los tres, con un SMTP real en memoria, GreenMail: el token se saca del correo
+recibido y se comprueba que abre la cita contra la API, y que el enlace del recordatorio no
+invalida el de la reserva).
 
-Las 17 de integración necesitan Docker en marcha; si no lo hay se marcan como saltadas en
+Las 18 de integración necesitan Docker en marcha; si no lo hay se marcan como saltadas en
 lugar de fallar. La cobertura todavía no está medida con JaCoCo.
 
 En cada push y cada pull request a `main` las ejecuta GitHub Actions
@@ -322,9 +335,10 @@ certificado.
 | `MEDICO_EMAIL`, `MEDICO_PASSWORD` | Cuenta real del médico; **obligatorias en producción** |
 | `TWILIO_*` | Credenciales, canal (`whatsapp`/`sms`) y horas del recordatorio |
 | `TELEGRAM_*` | Token del bot, usuario del bot y secreto del webhook |
-| `MAIL_*`, `CONTACT_INBOX` | Correo del formulario de contacto, del enlace de activación y del enlace de acceso a la cita |
+| `MAIL_*`, `CONTACT_INBOX` | Correo del formulario de contacto, del enlace de activación, del acceso a la cita y del recordatorio |
 | `APP_URL_PUBLICA` | Base de los enlaces que viajan por correo (por defecto, el dominio www) |
 | `AGENDA_DIAS_FUTURO`, `AGENDA_CRON` | Ventana de huecos que se mantiene abierta (90 días) y cuándo se amplía |
+| `RECORDATORIO_HORAS`, `RECORDATORIO_CRON` | Cuánto antes se avisa (24 h) y cada cuánto se barre. Siguen valiendo las antiguas `TWILIO_REMINDER_*` |
 | `RATE_LIMIT_*` | Peticiones por IP permitidas en las rutas públicas de escritura |
 
 Con los canales desactivados la aplicación funciona igual; simplemente no envía mensajes.

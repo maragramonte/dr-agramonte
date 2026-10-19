@@ -82,6 +82,26 @@ public class CorreoSaliente {
         return "%s/%s#%s".formatted(urlPublica.replaceAll("/+$", ""), pagina, fragmento);
     }
 
+    /**
+     * Enlace a una cita con su token de acceso. Lo usan los dos correos que lo llevan
+     * —el de la reserva y el del recordatorio—, así que el formato vive aquí y no en
+     * cada uno: el del navegador que lo interpreta ({@code importarTokenDelEnlace} en
+     * {@code reserva.js}) ya es un segundo sitio, y un tercero sería de más.
+     *
+     * <p>{@code reservar.html} es la página que tiene «Mis citas programadas» y el
+     * botón de cancelar, así que el enlace no necesita pantalla propia: importa el
+     * token en ese dispositivo y la cita aparece.
+     *
+     * <p>El separador es {@code cita-} y no {@code cita=} porque el cuerpo de los
+     * correos viaja en quoted-printable (lo obligan los acentos) y ahí el igual es el
+     * carácter de escape: el enlace salía escrito como {@code cita=3D12.} en el origen
+     * del mensaje. El punto separa sin ambigüedad porque el alfabeto Base64 URL-safe
+     * del token no lo incluye.
+     */
+    public String enlaceDeCita(Long citaId, String token) {
+        return enlace("reservar.html", "cita-%d.%s".formatted(citaId, token));
+    }
+
     /** Solo el nombre de pila, y solo si lo hay: el correo ya va dirigido a su buzón. */
     public String nombreDeCortesia(Usuario usuario) {
         return nombreDeCortesia(usuario != null ? usuario.getNombre() : null);

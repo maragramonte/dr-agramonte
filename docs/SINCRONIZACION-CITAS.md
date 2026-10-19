@@ -105,7 +105,9 @@ acceso a las citas, y la lista ahora se construye con los tokens guardados.
 | `frontend/js/modules/api-client.js` | `postReservaPublica`, `getCitaPublica`, `cancelarReservaPublica` |
 | `backend/.../CitaService.java` | `reservaPublica`, `buscarCitaPublica`, `cancelarCitaPublica` |
 | `backend/.../TokenAccesoCita.java` | Genera el token de acceso, lo hashea (SHA-256) y lo compara en tiempo constante |
-| `backend/.../CorreoAccesoCitaService.java` | Correo con el enlace de la cita; un fallo de envío no tumba la reserva |
+| `backend/.../CorreoAccesoCitaService.java` | Correo con el enlace de la cita al reservar; un fallo de envío no tumba la reserva |
+| `backend/.../CorreoRecordatorioCitaService.java` | Recordatorio de la víspera por correo, con el enlace si la cita no tiene cuenta detrás |
+| `backend/.../CitaReminderScheduler.java` | Barrido de las citas de dentro de ~24 h; emite el token del recordatorio y avisa por todos los canales |
 | `backend/.../CorreoSaliente.java` | Remitente, URL pública y `disponible()`: lo común a los dos correos |
 | `backend/.../SecurityConfig.java` | Rutas públicas de invitado y agenda TFG; entry point 401 |
 
@@ -121,6 +123,7 @@ acceso a las citas, y la lista ahora se construye con los tokens guardados.
 | Reservas legacy solo locales | Id `CITA-...` → se eliminan al sincronizar |
 | Cuenta invitado en BD | Columna `cuenta_invitada` (Flyway V4) |
 | Token de cita en BD | Columna `acceso_token_hash`: SHA-256 del token, nunca el token (Flyway V11) |
+| Segundo token de la misma cita | Columna `recordatorio_token_hash` (Flyway V14): el del correo de recordatorio. Los dos valen a la vez; el de la reserva **no se rota** para no vaciar «Mis citas» en el navegador que reservó |
 | Aviso al panel | `BroadcastChannel('dr-agramonte-citas')` + `localStorage` `dr-agramonte-cita-creada` |
 
 ---
@@ -230,5 +233,9 @@ Limitaciones que siguen en pie:
   `POST /api/auth/registro` con el correo de una cuenta invitada responde **202** y envía
   un enlace de un solo uso (30 min) a ese buzón; `POST /api/auth/activar` fija la
   contraseña y devuelve sesión. Las citas previas y sus tokens de acceso siguen valiendo.
+- ~~El recordatorio de 24 h no llega a quien reserva sin cuenta~~. **Resuelto:** sale también
+  por correo, con el enlace de la cita para cancelarla (token propio, Flyway V14). Antes solo
+  iba por Twilio y Telegram, que son los dos canales que un invitado no tiene; y la tarea
+  entera se saltaba si Twilio estaba apagado, así que tampoco avisaba por Telegram.
 - El panel lista **todas** las reservas del médico. Ya exige rol `MEDICO`/`ADMIN`, pero sigue
   siendo una vista de demostración, no el panel clínico final.

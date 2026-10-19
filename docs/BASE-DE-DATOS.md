@@ -1,6 +1,6 @@
 # Base de datos — referencia para la defensa
 
-> **TFG DAM · Dr. Agramonte.** Esquema real reconstruido de las migraciones **Flyway V1–V13** (`backend/src/main/resources/db/migration/postgresql/`). **PostgreSQL 15.** Hibernate arranca con `ddl-auto: validate`, así que el esquema de esta referencia coincide exactamente con las entidades JPA.
+> **TFG DAM · Dr. Agramonte.** Esquema real reconstruido de las migraciones **Flyway V1–V14** (`backend/src/main/resources/db/migration/postgresql/`). **PostgreSQL 15.** Hibernate arranca con `ddl-auto: validate`, así que el esquema de esta referencia coincide exactamente con las entidades JPA.
 
 ## Resumen en una frase
 6 tablas en **3ª forma normal**, claves `BIGSERIAL`, integridad referencial con **claves foráneas** (unas en `CASCADE`, otras en `SET NULL` según convenga conservar o no el dato), un **índice único** que —junto al bloqueo pesimista— evita las dobles reservas, e **índices** sobre las consultas más frecuentes.
@@ -72,6 +72,7 @@ erDiagram
         varchar  numero_tarjeta_sanitaria "V8 (null)"
         varchar  preferencia_pago "V8 (null)"
         varchar  acceso_token_hash "V11 (null)"
+        varchar  recordatorio_token_hash "V14 (null)"
     }
     NOTIFICACIONES {
         bigint   id PK
@@ -162,7 +163,8 @@ erDiagram
 | `aseguradora` | VARCHAR(100) | **V8** — nullable (si paga por seguro) |
 | `numero_tarjeta_sanitaria` | VARCHAR(100) | **V8** — nullable |
 | `preferencia_pago` | VARCHAR(20) | **V8** — nullable (`en-consulta`) |
-| `acceso_token_hash` | VARCHAR(64) | **V11** — nullable; SHA-256 del token de acceso de la cita |
+| `acceso_token_hash` | VARCHAR(64) | **V11** — nullable, **UNIQUE**; SHA-256 del token entregado al reservar sin cuenta |
+| `recordatorio_token_hash` | VARCHAR(64) | **V14** — nullable, **UNIQUE**; SHA-256 del segundo token de la misma cita, el que viaja en el correo de recordatorio. Son dos porque del primero solo queda el hash: rotarlo invalidaría el enlace del correo de la reserva y el token guardado en el navegador que reservó |
 
 > La cita **hereda el centro de su horario** (no se elige aparte): al reservar, `centro_id` se toma del horario bloqueado.
 
@@ -220,6 +222,7 @@ Está **probado**: `ReservaPublicaIntegrationTest` lanza dos hilos en paralelo c
 | `uk_usuarios_telegram_chat_id` (UNIQUE) | usuarios | un chat de Telegram pertenece como mucho a un paciente — **V9** |
 | `uk_usuarios_telegram_link_token` (UNIQUE) | usuarios | el token de vinculación es irrepetible — **V9** |
 | `uk_usuarios_activacion_token` (UNIQUE) | usuarios | el token de activación es irrepetible — **V13** |
+| `ux_citas_recordatorio_token_hash` (UNIQUE) | citas | el token del recordatorio es irrepetible — **V14** |
 | `ux_medicos_usuario` (UNIQUE) | medicos | una cuenta gobierna como mucho una agenda — **V12** |
 
 ---
@@ -227,7 +230,7 @@ Está **probado**: `ReservaPublicaIntegrationTest` lanza dos hilos en paralelo c
 ## Decisiones de diseño (resumen para responder rápido)
 - **Claves `BIGSERIAL`/`BIGINT`:** autoincremento nativo de PostgreSQL; margen de crecimiento frente a `INT`.
 - **Enums como `VARCHAR` + `@Enumerated(STRING)`:** dominios pequeños y estables (estado, rol, canal); legibles en la BD y sin una tabla-catálogo que sería sobre-ingeniería.
-- **Columnas nuevas siempre `nullable`** (centro_id V5/V6, recordatorio V2, cobertura V8, Telegram V9/V10, token de acceso V11, cuenta del médico V12, activación V13): no rompen las filas existentes al migrar (compatibilidad hacia atrás).
+- **Columnas nuevas siempre `nullable`** (centro_id V5/V6, recordatorio V2, cobertura V8, Telegram V9/V10, token de acceso V11, cuenta del médico V12, activación V13, token del recordatorio V14): no rompen las filas existentes al migrar (compatibilidad hacia atrás).
 - **Flyway forward-only:** cada cambio es una migración numerada; el esquema se reconstruye idéntico en cualquier entorno. No hay *undo* automático (edición community): se corrige con una nueva V.
 - **Normalización 3FN:** sin datos repetidos; cada hecho vive en un único sitio y se referencia por FK.
 

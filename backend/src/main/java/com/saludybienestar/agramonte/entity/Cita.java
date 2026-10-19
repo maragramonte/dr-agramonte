@@ -79,6 +79,23 @@ public class Cita {
     @Column(name = "acceso_token_hash", length = 64)
     private String accesoTokenHash;
 
+    /**
+     * SHA-256 del segundo token de la misma cita: el que viaja en el correo de
+     * recordatorio de la víspera (V14). Abre exactamente lo mismo que
+     * {@link #accesoTokenHash}, y los dos valen a la vez.
+     *
+     * <p>Son dos porque del primero solo queda el hash, así que el día del
+     * recordatorio no se puede reconstruir para reenviarlo. Rotar el único que había
+     * habría invalidado el enlace del correo de la reserva y el token guardado en el
+     * navegador que reservó, que es donde el paciente ve «Mis citas programadas».
+     *
+     * <p>Nullable: solo se emite al mandar el recordatorio, y solo para las citas
+     * reservadas sin cuenta. Quien tiene cuenta gestiona la cita entrando en ella, y
+     * emitirle un token por correo abriría un acceso que hoy no existe.
+     */
+    @Column(name = "recordatorio_token_hash", length = 64)
+    private String recordatorioTokenHash;
+
     // Igualdad por identidad (id): segura para JPA y para usar la entidad en colecciones.
     @Override
     public boolean equals(Object o) {
