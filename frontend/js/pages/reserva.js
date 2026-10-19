@@ -281,15 +281,30 @@ function importarTokenDelEnlace() {
     try {
         const fragmento = decodeURIComponent((window.location.hash || '').replace(/^#/, '')).trim();
         const partes = ENLACE_CITA.exec(fragmento);
-        if (!partes) return;
+        if (!partes) return false;
 
         guardarTokenCita(partes[1], partes[2]);
         history.replaceState(null, '', window.location.pathname + window.location.search);
         showToast(textoCitaRecuperada(), 'success');
+        return true;
     } catch (err) {
         console.error(err);
+        return false;
     }
 }
+
+/**
+ * El mismo enlace, pero pulsado cuando ya se está en esta página: el navegador solo
+ * cambia el fragmento y no recarga el documento, así que `DOMContentLoaded` no vuelve a
+ * dispararse y sin esto no pasaría nada. Ocurre al pegar la URL en la barra estando aquí,
+ * al volver con el historial y al pulsar el enlace desde un correo abierto en esta misma
+ * pestaña.
+ */
+window.addEventListener('hashchange', () => {
+    if (importarTokenDelEnlace()) {
+        syncMisCitas().finally(() => renderAppointments());
+    }
+});
 
 function notificarCitaCreada() {
     try {
