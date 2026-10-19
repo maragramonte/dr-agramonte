@@ -73,6 +73,10 @@ SHOTS = [
     # La del README que ensenya la demo: con su franja amarilla y sin recortarla.
     ("demo-reserva", "reservar", "cap=reserva-huecos&banner=1",
      1280, 1000, "SUP:730", 0, "demo-reserva.png"),
+    # El buzon simulado, con el correo del enlace de la cita abierto. Como la de
+    # Telegram: viewport entero, para que se vea flotando sobre la pagina real.
+    ("demo-buzon", "reservar", "cap=buzon&buzon=1&banner=1",
+     1280, 1000, None, 0, "demo-buzon.png"),
 ]
 
 

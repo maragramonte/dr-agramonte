@@ -245,6 +245,8 @@ navegador y la cita aparece en «Mis citas», que es justo el camino que el corr
 producción. Antes, el único correo representado era el de activación y la demo se limitaba a
 pegar su enlace en un aviso.
 
+![Buzón de demostración abierto sobre la página de reserva: la cabecera «lo que el servidor habría enviado», el correo de la cita con su asunto, el destinatario, el cuerpo en monoespaciada con fecha, médico y centro, y el enlace subrayado que importa el token; abajo, la franja amarilla de la demo](docs/demo-buzon.png)
+
 Entrando como médico se llega al cuadro de mando, que en la demo agrega las citas ficticias
 igual que el backend agrega las reales con `GROUP BY`:
 

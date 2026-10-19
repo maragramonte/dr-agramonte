@@ -48,6 +48,9 @@
     const oculto = [];
     if (!q.get('banner')) oculto.push('#demoBanner{display:none!important}', 'body{padding-bottom:0!important}');
     if (!q.get('tg')) oculto.push('.tg-demo{display:none!important}');
+    // Igual que el chat: el buzón flota sobre todas las páginas, así que fuera de su
+    // propia captura estorbaría en las demás.
+    if (!q.get('buzon')) oculto.push('.mail-demo{display:none!important}');
     oculto.push('*{scroll-behavior:auto!important}');
     const css = document.createElement('style');
     css.textContent = oculto.join('\n');
@@ -129,6 +132,39 @@
             await pausa(600);
             await clic('.tg-demo__panel button[data-tg="recordatorio"]');
             await pausa(600);
+        },
+        // Reserva de invitado completa, para que el buzón tenga el correo con el
+        // enlace de la cita: es el que describe para qué sirve el canal.
+        'buzon': async () => {
+            await elegirHueco();
+            // El médico, ANTES de la hora: cambiarlo después la borra (su agenda es
+            // otra), y el botón de confirmar se queda deshabilitado sin decir por qué.
+            await elegirPrimera('#medicoSelect');
+            await pausa(400);
+            await clic('#slotsGrid button:not([disabled])');
+            await pausa(300);
+            await elegirPrimera('#tipoConsulta');
+            await pausa(200);
+            await escribir('#nombre', 'Lucía Martín Serra');
+            await escribir('#telefono', '600 123 456');
+            await escribir('#email', 'lucia.martin@example.com');
+            const acepto = document.getElementById('acepto');
+            if (acepto && !acepto.checked) acepto.click();
+            await pausa(200);
+            await clic('#btnSubmit');
+            // El modal de «cita reservada» tapa el lanzador del buzón.
+            await esperar('#confirmModal.open');
+            await pausa(500);
+            await clic('#btnModalClose');
+            await pausa(300);
+            // Al confirmar, el flujo se reinicia y el día queda marcado pero ya no
+            // significa nada. Se le quita la marca porque, si la hubiera, el arnés
+            // publicaría CAP-DIA, capturar.py estiraría el viewport a toda la página
+            // y el buzón —que va fijo abajo— se saldría del encuadre.
+            document.querySelectorAll('.cal-day.selected').forEach((d) => d.classList.remove('selected'));
+            await clic('.mail-demo__lanzador');
+            await esperar('.mail-demo__correo');
+            await pausa(500);
         },
         'cuadro-mando': async () => {
             await esperar('#dashContent');
