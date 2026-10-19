@@ -49,6 +49,7 @@ class CitaServiceTest {
     @Mock private PasswordEncoder passwordEncoder;
     @Mock private AuthService authService;
     @Mock private CorreoAccesoCitaService correoAccesoCitaService;
+    @Mock private CorreoCancelacionCitaService correoCancelacionCitaService;
 
     @InjectMocks private CitaService citaService;
 

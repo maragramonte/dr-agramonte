@@ -143,9 +143,26 @@ class AccesoCitaPorCorreoIntegrationTest {
                 .andExpect(jsonPath("$.id").value(citaId));
 
         // 4) Y cancelarla, que es lo que el paciente va a querer hacer desde el correo.
+        int correosAntesDeCancelar = SMTP.getReceivedMessages().length;
         mockMvc.perform(delete("/api/citas/publica/" + citaId)
                         .header(CABECERA_TOKEN, tokenDelCorreo))
                 .andExpect(status().isNoContent());
+
+        // 5) Cancelar deja comprobante en el buzón. Era la única operación del paciente que
+        //    no dejaba rastro por correo, y los otros canales son los que un invitado no
+        //    tiene: sin esto, quien anulaba se quedaba sin saber si había surtido efecto.
+        assertThat(SMTP.getReceivedMessages())
+                .as("la cancelación debe confirmarse por correo")
+                .hasSize(correosAntesDeCancelar + 1);
+        String confirmacion = GreenMailUtil.getBody(
+                        SMTP.getReceivedMessages()[SMTP.getReceivedMessages().length - 1])
+                .replace("\r\n", "\n")
+                .replace("=\n", "");
+        assertThat(confirmacion).contains("Tu cita queda cancelada");
+        // Y no lleva ningún token: la cita cancelada no tiene nada que gestionar.
+        assertThat(ENLACE.matcher(confirmacion).find())
+                .as("el comprobante de cancelación no debe llevar credenciales")
+                .isFalse();
     }
 
     @Test

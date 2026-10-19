@@ -79,7 +79,12 @@ public class CorreoSaliente {
      * cabecera y no en la URL.
      */
     public String enlace(String pagina, String fragmento) {
-        return "%s/%s#%s".formatted(urlPublica.replaceAll("/+$", ""), pagina, fragmento);
+        return "%s#%s".formatted(enlace(pagina), fragmento);
+    }
+
+    /** Enlace a una página de la web, sin secreto detrás: una almohadilla suelta sobra. */
+    public String enlace(String pagina) {
+        return "%s/%s".formatted(urlPublica.replaceAll("/+$", ""), pagina);
     }
 
     /**
