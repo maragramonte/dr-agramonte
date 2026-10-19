@@ -41,7 +41,9 @@ Este proyecto digitaliza esa parte concreta, sin tocar lo que sí requiere trato
 - **Reserva sin registro previo** o con cuenta: centro → fecha → hora → datos.
 - **Disponibilidad real** calculada en el servidor, repartida por centro y día.
 - **Cobertura y pago**: consulta privada con precio visible, o seguro médico con aseguradora.
-- **Avisos automáticos** de confirmación, cancelación y recordatorio 24 h antes.
+- **Avisos automáticos** de confirmación, cancelación y recordatorio 24 h antes, por
+  correo, Telegram y SMS/WhatsApp. Quien reserva sin cuenta recibe en el correo el
+  enlace para consultar o cancelar su cita desde cualquier dispositivo.
 - **Cuadro de mando** para el profesional: carga por médico, demanda por especialidad,
   reparto por centro y tasa de cancelación.
 - **Bilingüe** castellano/catalán, con la preferencia guardada en el navegador.
@@ -387,7 +389,7 @@ producción **no levanta**. En local se dejan sin definir y vale la de demostrac
 ```
 .
 ├── backend/          API Spring Boot (controller · service · repository · DTOs)
-│   └── src/main/resources/db/migration/   Flyway V1–V13 (postgresql/ y mysql/)
+│   └── src/main/resources/db/migration/   Flyway V1–V14 (postgresql/ y mysql/)
 ├── frontend/         Sitio estático, PWA y nginx.conf
 ├── demo/             API simulada para la demo en GitHub Pages
 ├── postman/          Colección de la API
@@ -460,7 +462,8 @@ scripts.
 - [ ] Panel clínico multi-centro con historial
 - [ ] Refresh token
 - [ ] Cobertura medida con JaCoCo y pruebas E2E
-- [ ] Confirmar o cancelar la cita desde el propio aviso
+- [x] Cancelar la cita desde el propio aviso — hecho en el correo (el enlace lleva el
+      token de la cita); queda hacerlo desde Telegram y SMS, y confirmar la asistencia
 
 ---
 
