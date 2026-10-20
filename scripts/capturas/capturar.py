@@ -77,6 +77,13 @@ SHOTS = [
     # Telegram: viewport entero, para que se vea flotando sobre la pagina real.
     ("demo-buzon", "reservar", "cap=buzon&buzon=1&banner=1",
      1280, 1000, None, 0, "demo-buzon.png"),
+    # Estas dos se generaban a mano y se quedaron en septiembre, con el diseno
+    # anterior, mientras el resto se regeneraba con el arnes. Son los mismos
+    # escenarios que 07 y 08, con la franja de la demo encendida.
+    ("demo-telegram", "reservar", "cap=telegram&sesion=paciente&tg=1&banner=1",
+     1280, 1000, None, 0, "demo-telegram.png"),
+    ("demo-cuadro-mando", "estadisticas", "cap=cuadro-mando&sesion=medico&banner=1",
+     1280, 1000, "#dashContent", 20, "demo-cuadro-mando.png"),
 ]
 
 
