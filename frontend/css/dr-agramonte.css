@@ -71,6 +71,12 @@
     /* Fondos y textos (se intercambian en modo oscuro) */
     --bg: var(--off-white);
     --card: var(--white);
+    /* Banda de sección: se intercala entre el fondo de página y las tarjetas,
+       nunca por encima. Ese orden (--bg < --banda < --card) es lo que hace que
+       una tarjeta se lea como tarjeta, y tiene que valer en los dos temas, que
+       es justo lo que no se puede pedirle a un token de la escala plateada:
+       --silver-light vale #E8E8EC en claro pero #4E5D59 en oscuro. */
+    --banda: #EAEFEE;
     --border: #E3E8E7;
     --text: var(--gray-900);
     --text-light: var(--gray-500);
@@ -133,6 +139,10 @@
        la misma marca. */
     --bg: #0E1715;
     --card: #17211F;
+    /* Entre --bg y --card, igual que en claro. La banda de «Sobre mí» valía
+       aquí var(--card), es decir el mismo #17211F que las tarjetas que van
+       encima: 1,00:1, se fundían con ella y solo las salvaba el filete. */
+    --banda: #121C1A;
     --border: rgba(205, 213, 211, 0.12);
     --text: #ECF1EF;
     --text-light: #BBC6C3;
@@ -2734,13 +2744,7 @@ a {
 
 /* ========== 18. SOBRE MÍ – sección personalizada ========== */
 #sobre-mi.section {
-    background: var(--silver-light);
-    position: relative;
-    overflow: hidden;
-}
-
-[data-theme="dark"] #sobre-mi.section {
-    background: var(--card);
+    background: var(--banda);
 }
 
 .sobre-mi-layout {
