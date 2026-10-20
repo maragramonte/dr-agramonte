@@ -141,8 +141,13 @@
     --card: #17211F;
     /* Entre --bg y --card, igual que en claro. La banda de «Sobre mí» valía
        aquí var(--card), es decir el mismo #17211F que las tarjetas que van
-       encima: 1,00:1, se fundían con ella y solo las salvaba el filete. */
-    --banda: #121C1A;
+       encima: 1,00:1, se fundían con ella y solo las salvaba el filete.
+       A #121C1A ya no se fundían, pero el relleno de la tarjeta seguía
+       apoyándose en el borde para leerse (1,055:1). Este valor sube esa
+       separación a 1,087:1. El precio está medido y es el otro lado: contra
+       --bg (#0E1715) la banda baja de 1,048:1 a 1,017:1, así que lo que se
+       nota menos ahora es dónde empieza la banda, no dónde está la tarjeta. */
+    --banda: #0F1917;
     --border: rgba(205, 213, 211, 0.12);
     --text: #ECF1EF;
     --text-light: #BBC6C3;
