@@ -20,6 +20,13 @@ RAIZ="$(cd "$(dirname "$0")/.." && pwd)"
 OUT="${OUT:-$RAIZ/dist-demo}"
 APP="$OUT/app"
 
+# URL pública de la demo, para el sitemap y las URL absolutas. Se puede
+# sobrescribir desde el entorno el día que el producto tenga dominio propio:
+#   BASE_URL=https://ejemplo.com/ ./scripts/build-demo.sh
+# La barra final importa: el sitemap concatena sobre ella.
+BASE_URL="${BASE_URL:-https://maragramonte.github.io/dr-agramonte/}"
+BASE_URL="${BASE_URL%/}/"
+
 rm -rf "$OUT"
 mkdir -p "$OUT"
 
@@ -125,6 +132,32 @@ done
 #
 # Así que aquí se permite todo, y el noindex que el bucle de más arriba inyecta
 # en cada página de app/ es lo que las mantiene fuera del índice.
-printf 'User-agent: *\nAllow: /\n' > "$OUT/robots.txt"
+# Sitemap: solo la landing.
+#
+# Las once páginas de app/ se quedan fuera a propósito: llevan noindex y
+# meterlas aquí sería pedirle al buscador que indexe justo lo que se le acaba
+# de decir que no indexe. Un sitemap es una recomendación de qué rastrear, no
+# un índice del sitio.
+#
+# Sin <priority>: es un valor relativo entre las URL del propio sitemap, así
+# que con una sola URL no dice nada. <lastmod> sí lo usan los buscadores, y se
+# toma de la última modificación real de la landing en git, no de la fecha de
+# construcción: si saliera la fecha de hoy, cada pasada de CI anunciaría un
+# cambio que no ha existido.
+LASTMOD="$(cd "$RAIZ" && git log -1 --format=%cs -- demo/landing 2>/dev/null || true)"
+[ -n "$LASTMOD" ] || LASTMOD="$(date +%F)"
+
+cat > "$OUT/sitemap.xml" <<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${BASE_URL}</loc>
+    <lastmod>${LASTMOD}</lastmod>
+    <changefreq>monthly</changefreq>
+  </url>
+</urlset>
+XML
+
+printf 'User-agent: *\nAllow: /\nSitemap: %ssitemap.xml\n' "$BASE_URL" > "$OUT/robots.txt"
 
 echo "✓ $(basename "$OUT")/ generado · landing en la raíz + $inyectadas páginas de la app en app/"
