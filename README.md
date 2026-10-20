@@ -7,8 +7,9 @@ Los pacientes reservan, consultan y cancelan sus citas por su cuenta, sin depend
 retiró y el despliegue en servidor propio está listo y probado, a la espera de levantar la
 máquina (ver [docs/DESPLIEGUE-VPS.md](docs/DESPLIEGUE-VPS.md)).
 
-**▶ [Probar la demo](https://maragramonte.github.io/dr-agramonte/)** — el frontend real con
-una API simulada en el navegador y datos ficticios. Se puede reservar, cancelar, vincular
+**▶ [Probar la demo](https://maragramonte.github.io/dr-agramonte/)** — una presentación del
+producto y, bajo [`/app/`](https://maragramonte.github.io/dr-agramonte/app/), el frontend real
+con una API simulada en el navegador y datos ficticios. Se puede reservar, cancelar, vincular
 Telegram y entrar como médico para ver el cuadro de mando. No hay servidor detrás ni se envía ningún aviso
 ([cómo funciona](#demo-en-línea)).
 
@@ -220,7 +221,14 @@ docker compose --profile mysql up -d --build
 
 ### Demo en línea
 
-La [demo pública](https://maragramonte.github.io/dr-agramonte/) no es una maqueta aparte:
+La demo pública tiene dos partes, porque se dirige a dos públicos. En la raíz va una
+**landing de producto** ([`demo/landing/`](demo/landing/)), para quien evalúa la aplicación y
+necesita saber qué hace antes de tocarla. Bajo [`/app/`](https://maragramonte.github.io/dr-agramonte/app/)
+va la web del doctor tal cual, que está escrita para sus pacientes y no explica nada de sí
+misma: antes la demo era solo eso, así que quien llegaba a evaluarla aterrizaba en la consulta
+de un internista de Palma sin contexto.
+
+La parte de `/app/` no es una maqueta aparte:
 son las mismas páginas y el mismo `api-client.js` de `frontend/`. Lo único que cambia es
 [`demo/demo-api.js`](demo/demo-api.js), que intercepta `fetch('/api/...')` y responde con los
 mismos contratos JSON que los DTOs del backend. Reproduce sus reglas: la agenda por centro
@@ -255,7 +263,7 @@ igual que el backend agrega las reales con `GROUP BY`:
 ![Cuadro de mando de la demo: los cuatro indicadores (230 citas totales, 53 activas, 152 completadas y 10,9 % de tasa de cancelación) sobre tres gráficos de barras horizontales con la carga por médico, la demanda por especialidad y el reparto de citas entre los dos centros](docs/demo-cuadro-mando.png)
 
 ```bash
-./scripts/build-demo.sh                      # genera dist-demo/
+./scripts/build-demo.sh                      # genera dist-demo/ (landing + app/)
 python3 -m http.server -d dist-demo 8000     # http://localhost:8000
 ```
 
@@ -391,7 +399,7 @@ producción **no levanta**. En local se dejan sin definir y vale la de demostrac
 ├── backend/          API Spring Boot (controller · service · repository · DTOs)
 │   └── src/main/resources/db/migration/   Flyway V1–V14 (postgresql/ y mysql/)
 ├── frontend/         Sitio estático, PWA y nginx.conf
-├── demo/             API simulada para la demo en GitHub Pages
+├── demo/             API simulada y landing de producto para GitHub Pages
 ├── postman/          Colección de la API
 ├── scripts/          deploy.sh, backup-db.sh, build-demo.sh y capturar-pantallas.sh
 ├── docs/             Memoria del proyecto, diagramas y guías
