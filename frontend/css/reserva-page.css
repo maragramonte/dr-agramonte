@@ -15,8 +15,25 @@ body.reserva-page {
         
         .page-wrapper{max-width:1200px;margin:0 auto;padding:2rem 1.5rem 4rem;} .page-header{text-align:center;margin-bottom:2.5rem;} .page-header h1{font-family:var(--font-display);font-size:clamp(1.8rem,4vw,2.5rem);}.page-header p{color:var(--gray-500);}
         .servicio-banner{margin-top:1rem;padding:.75rem 1rem;border-radius:12px;background:var(--teal-pale);color:var(--teal);font-size:.92rem;border:1px solid rgba(20,184,166,.25);}
-        .reserva-grid{display:grid;grid-template-columns:1fr 420px;gap:1.5rem;align-items:start;}@media(max-width:900px){.reserva-grid{grid-template-columns:1fr;}}
+        /* Una sola columna, centrada.
+
+   Antes eran dos: a la izquierda centro + calendario + horas, a la derecha
+   el formulario. La columna izquierda se queda corta en cuanto eliges centro
+   (mide unos 670px) mientras la derecha llega a 1500px, asi que durante todo
+   el formulario habia unos 800px de blanco a la izquierda. Ademas las dos
+   columnas competian: el paciente tenia delante el paso 1 y el paso 4 a la
+   vez, cuando el flujo es estrictamente secuencial y asi lo cuenta el
+   stepper de cuatro pasos que hay arriba.
+
+   En una columna el recorrido baja: centro -> dia -> hora -> datos, que es
+   el orden en que se rellena. 46rem es el ancho al que el calendario sigue
+   comodo sin que las lineas del formulario se hagan ilegibles. */
+.reserva-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:1.5rem;align-items:start;max-width:46rem;margin-inline:auto;}
         .card{background:var(--card);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);border:1px solid var(--gray-200);overflow:hidden;}.card-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:.75rem;}.card-header-icon{width:36px;height:36px;border-radius:9px;background:var(--teal-pale);display:flex;align-items:center;justify-content:center;color:var(--teal);}.card-header h2{font-size:1rem;font-weight:600;}.card-header p{font-size:.8rem;color:var(--gray-500);}.card-body{padding:1.25rem 1.5rem;}.sticky-panel{position:sticky;top:80px;}
+        /* En una sola columna el panel de datos ya no es una barra lateral,
+           asi que fijarlo lo dejaba pegado a la cabecera mientras el resto
+           de la pagina pasaba por detras. */
+        .reserva-grid .sticky-panel{position:static;}
 
         /* ── Stepper (ahora 4 pasos) ── */
         .stepper{display:flex;align-items:center;margin-bottom:1.75rem;}.step{display:flex;align-items:center;gap:.5rem;flex:1;font-size:.78rem;font-weight:500;color:var(--gray-400);}.step:not(:last-child)::after{content:'';flex:1;height:1px;background:var(--gray-200);margin:0 .5rem;}.step.done::after{background:var(--teal-light);}.step-num{width:26px;height:26px;border-radius:50%;border:2px solid var(--gray-200);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;}.step.active .step-num{border-color:var(--teal-fill);background:var(--teal-fill);color:#fff;}.step.done .step-num{border-color:var(--teal-light);background:var(--teal-light);color:#fff;}.step.active{color:var(--teal);font-weight:600;}
