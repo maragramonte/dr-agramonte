@@ -1996,7 +1996,11 @@ a {
    Debajo del hero y antes de los servicios: contesta "que pasa si pulso"
    antes de que el paciente tenga que averiguarlo. */
 .pasos-section {
-    background: var(--card);
+    /* Banda, no tarjeta: lo que va encima son números y texto, no superficies.
+       Con var(--card) esta banda y la de «Sobre mí» hacían el mismo papel con
+       dos colores, y en claro además en direcciones opuestas (esta por encima
+       del fondo de página, la otra por debajo). */
+    background: var(--banda);
     border-bottom: 1px solid var(--border);
     padding: clamp(2rem, 5vw, 3.5rem) 0;
 }
