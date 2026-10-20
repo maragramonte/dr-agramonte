@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Agenda para consultas médicas · el software detrás de dragramonte.com</title>
+    <meta name="description" content="Software de citas para consultas y clínicas pequeñas: reserva sin registro sobre la agenda real, avisos automáticos por correo y Telegram, y cuadro de mando. Demo completa en el navegador.">
+
+
+    <link rel="icon" type="image/svg+xml" href="app/icons/favicon.svg">
+    <link rel="stylesheet" href="landing.css">
+</head>
+<body>
+
+<a class="saltar" href="#contenido">Saltar al contenido</a>
+
+<header class="top">
+    <div class="wrap">
+        <a class="marca" href="./">
+            <span class="marca__sello" aria-hidden="true">DA</span>
+            <span>Agenda médica</span>
+        </a>
+        <nav aria-label="Secciones">
+            <a href="#funciona">Qué hace</a>
+            <a href="#tecnica">Ficha técnica</a>
+            <a href="#honestidad">Qué no enseña la demo</a>
+        </nav>
+        <a class="btn btn--primary" href="app/">Probar la demo</a>
+    </div>
+</header>
+
+<main id="contenido">
+
+    <section class="hero">
+        <div class="wrap">
+            <p class="eyebrow">Software de citas para consultas médicas</p>
+            <h1>La agenda de tu consulta, sin pasar por el teléfono.</h1>
+            <p class="lede">
+                Tus pacientes eligen centro, día y hora sobre tu agenda real, sin registrarse
+                y sin esperar a que alguien descuelgue. Tú ves la carga de cada médico, la
+                demanda por especialidad y cuántas citas se caen.
+            </p>
+            <div class="acciones">
+                <a class="btn btn--primary btn--lg" href="app/">Probar la demo</a>
+                <a class="btn btn--ghost btn--lg" href="https://github.com/maragramonte/dr-agramonte">Ver el código</a>
+            </div>
+            <p class="nota">
+                La demo funciona entera en tu navegador. No hay que registrarse, no se instala
+                nada y no se envía ningún aviso de verdad.
+            </p>
+
+            <figure>
+                <img src="capturas/portada.png" width="1440" height="900"
+                     alt="Portada de la aplicación: el titular «Su cita con el Dr. Agramonte, en un minuto» junto a un panel de reserva que muestra los dos centros de consulta y los huecos libres de un jueves">
+            </figure>
+        </div>
+    </section>
+
+    <section class="banda banda--papel">
+        <div class="wrap">
+            <div class="cabecera">
+                <h2>Para quién es</h2>
+                <p>Pensado para la consulta privada y la clínica pequeña: uno o varios médicos, uno o varios centros, y una agenda que hoy se lleva por teléfono o en papel.</p>
+            </div>
+            <div class="rejilla">
+                <article class="ficha">
+                    <h3>Varios centros</h3>
+                    <p>Cada centro tiene sus días y sus horarios. El paciente solo ve los huecos del centro que ha elegido.</p>
+                </article>
+                <article class="ficha">
+                    <h3>Varios médicos</h3>
+                    <p>Agenda por especialista, con la disponibilidad calculada en el servidor y no en el navegador.</p>
+                </article>
+                <article class="ficha">
+                    <h3>Privado y con seguro</h3>
+                    <p>Consulta privada con precio a la vista, o con aseguradora. El paciente lo elige al reservar.</p>
+                </article>
+                <article class="ficha">
+                    <h3>Autoalojable</h3>
+                    <p>Se despliega con Docker en un servidor propio. Los datos de tus pacientes no salen de ahí.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="banda" id="funciona">
+        <div class="wrap">
+            <div class="cabecera">
+                <h2>Qué hace</h2>
+                <p>Cuatro piezas. Todas están en la demo y se pueden tocar.</p>
+            </div>
+
+            <article class="funcion">
+                <div>
+                    <span class="funcion__num" aria-hidden="true">1</span>
+                    <h3>Reserva sin registro, sobre la agenda real</h3>
+                    <p>El paciente elige centro, día y hora en cuatro pasos. Los huecos que ve son los que quedan libres de verdad: la disponibilidad la calcula el servidor, no el navegador.</p>
+                    <ul>
+                        <li>No hace falta crear cuenta para pedir cita</li>
+                        <li>Puede ponerse contraseña al reservar y gestionar las citas después</li>
+                        <li>El calendario solo deja elegir los días en que ese centro abre</li>
+                    </ul>
+                </div>
+                <div class="funcion__media">
+                    <img src="capturas/reserva.png" width="1100" height="860" loading="lazy"
+                         alt="Pantalla de reserva: los dos centros de consulta, el calendario del mes y la rejilla de horas libres de mañana y tarde">
+                </div>
+            </article>
+
+            <article class="funcion funcion--invertida">
+                <div>
+                    <span class="funcion__num" aria-hidden="true">2</span>
+                    <h3>Avisos automáticos, y la cita en un enlace</h3>
+                    <p>Confirmación al reservar, recordatorio la víspera y comprobante al cancelar. Salen por correo, por Telegram y por SMS o WhatsApp.</p>
+                    <ul>
+                        <li>Quien reserva sin cuenta recibe en el correo el enlace a su cita</li>
+                        <li>Desde ese enlace la consulta o la cancela, en cualquier dispositivo</li>
+                        <li>El recordatorio lleva su propio enlace, independiente del primero</li>
+                    </ul>
+                </div>
+                <div class="funcion__media">
+                    <img src="capturas/buzon.png" width="1100" height="860" loading="lazy"
+                         alt="Buzón de la demo con los correos que el servidor habría enviado: el de la cita confirmada, con su asunto, destinatario y el enlace de acceso">
+                </div>
+            </article>
+
+            <article class="funcion">
+                <div>
+                    <span class="funcion__num" aria-hidden="true">3</span>
+                    <h3>Cuadro de mando</h3>
+                    <p>Lo que la agenda sabe y el teléfono no: cuánta carga lleva cada médico, qué especialidad tiene más demanda, cómo se reparten las citas entre centros y qué porcentaje se cancela.</p>
+                    <ul>
+                        <li>Acceso restringido por rol, con JWT</li>
+                        <li>Citas totales, activas, completadas y tasa de cancelación</li>
+                    </ul>
+                </div>
+                <div class="funcion__media">
+                    <img src="capturas/cuadro-mando.png" width="1100" height="860" loading="lazy"
+                         alt="Cuadro de mando con los indicadores de citas y tres gráficos de barras: carga por médico, demanda por especialidad y reparto entre centros">
+                </div>
+            </article>
+
+            <article class="funcion funcion--invertida">
+                <div>
+                    <span class="funcion__num" aria-hidden="true">4</span>
+                    <h3>En el móvil, en catalán y sin conexión</h3>
+                    <p>La mayoría de los pacientes pide cita desde el teléfono, a veces con mala cobertura. La aplicación se instala como una app y guarda lo último que vio.</p>
+                    <ul>
+                        <li>Bilingüe castellano / catalán, con la preferencia guardada</li>
+                        <li>Modo oscuro y accesibilidad WCAG 2.1 AA</li>
+                        <li>PWA instalable, con modo sin conexión</li>
+                    </ul>
+                </div>
+                <div class="funcion__media funcion__media--movil">
+                    <img src="capturas/movil.png" width="780" height="1200" loading="lazy"
+                         alt="La aplicación en un móvil: el titular, el panel de reserva y los tres pasos para pedir cita, apilados en una columna">
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="banda banda--papel" id="tecnica">
+        <div class="wrap">
+            <div class="cabecera">
+                <h2>Ficha técnica</h2>
+                <p>Por si quien lo evalúa es el informático de la clínica y no el médico.</p>
+            </div>
+            <dl class="tecnica">
+                <div><dt>Backend</dt><dd>Java 21 · Spring Boot 3.5 · API REST</dd></div>
+                <div><dt>Base de datos</dt><dd>PostgreSQL 15 o MySQL, migraciones con Flyway</dd></div>
+                <div><dt>Frontend</dt><dd>JavaScript sin framework, PWA instalable</dd></div>
+                <div><dt>Autenticación</dt><dd>JWT con roles, y reserva de invitado por token de acceso</dd></div>
+                <div><dt>Avisos</dt><dd>Correo · Telegram · SMS y WhatsApp vía Twilio</dd></div>
+                <div><dt>Despliegue</dt><dd>Docker Compose, con Caddy terminando el HTTPS</dd></div>
+                <div><dt>Pruebas</dt><dd>115 pruebas, con las de integración sobre PostgreSQL real</dd></div>
+                <div><dt>Integración continua</dt><dd>Compilación, pruebas y análisis de dependencias en cada push</dd></div>
+            </dl>
+        </div>
+    </section>
+
+    <section class="banda" id="honestidad">
+        <div class="wrap">
+            <div class="aviso">
+                <h2>Qué no puede enseñarte esta demo</h2>
+                <p>
+                    No hay servidor detrás. La API está simulada en el navegador y todo lo que
+                    reserves vive en tu pestaña: si vacías los datos del sitio, desaparece.
+                    Los datos de pacientes y médicos son ficticios.
+                </p>
+                <p>
+                    <strong>Ningún aviso se envía de verdad.</strong> Los correos se ven en un buzón
+                    simulado y los mensajes de Telegram en un chat simulado, para que puedas leer
+                    exactamente lo que recibiría el paciente sin dar tu número ni tu correo.
+                </p>
+                <p>
+                    Tampoco se demuestran aquí la disponibilidad calculada en el servidor ni el
+                    control de acceso por rol, porque las dos cosas ocurren en el backend. Para
+                    verlas funcionando hace falta levantar el proyecto, que son dos comandos de
+                    Docker y están en el repositorio.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="cierre">
+        <div class="wrap">
+            <div class="cierre__caja">
+                <h2>Pruébala y me dices</h2>
+                <p>Entra como paciente y pide una cita, o entra como médico y mira el cuadro de mando. Se tarda menos en probarlo que en leer esta página.</p>
+                <div class="acciones">
+                    <a class="btn btn--blanco btn--lg" href="app/">Probar la demo</a>
+                    <a class="btn btn--blanco btn--lg" href="mailto:agramontemar@gmail.com?subject=Agenda%20m%C3%A9dica">Escribir un correo</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    <div class="wrap">
+        <p>Proyecto de Mar Agramonte · el software que hay detrás de <a href="https://www.dragramonte.com">dragramonte.com</a></p>
+        <p><a href="https://github.com/maragramonte/dr-agramonte">Código en GitHub</a></p>
+    </div>
+</footer>
+
+</body>
+</html>
