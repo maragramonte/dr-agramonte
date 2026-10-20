@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dr-agramonte-v41';
+const CACHE_NAME = 'dr-agramonte-v42';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -51,8 +51,7 @@ const urlsToCache = [
     '/vendor/fontawesome/webfonts/fa-solid-900.woff2',
     '/vendor/fonts/dm-fonts.css',
     '/vendor/fonts/dm-sans-normal-latin.woff2',
-    '/vendor/fonts/dm-sans-italic-latin.woff2',
-    '/vendor/fonts/dm-serif-display-normal-latin.woff2'
+    '/vendor/fonts/dm-sans-italic-latin.woff2'
 ];
 
 self.addEventListener('install', (event) => {
