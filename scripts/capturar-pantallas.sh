@@ -42,18 +42,23 @@ if [ -z "$PY" ] || ! "$PY" -c "import PIL" >/dev/null 2>&1; then
 fi
 
 # ── Compilación de la demo + arnés de capturas ───────────────────────────────
+# build-demo.sh publica la landing en la raiz y la aplicacion bajo app/. Las
+# capturas son de la aplicacion, asi que todo lo de aqui abajo trabaja contra
+# ese subdirectorio y el servidor local lo sirve como si fuese la raiz: asi las
+# URL que arma capturar.py (/__cap-<pagina>.html) siguen valiendo sin tocarlas.
 OUT="$TRABAJO" bash "$RAIZ/scripts/build-demo.sh" >/dev/null
-cp "$AUX/escenarios.js" "$TRABAJO/js/demo/escenarios.js"
+APP="$TRABAJO/app"
+cp "$AUX/escenarios.js" "$APP/js/demo/escenarios.js"
 
 # Una copia de cada página con el arnés inyectado, para no alterar las que genera
 # build-demo.sh (que son, tal cual, las que se publican en Pages).
 for f in index servicios reservar estadisticas contacto offline sobre-mi testimonios panel-pruebas; do
     sed 's#\(<script src="js/demo/demo-api.js"></script>\)#\1\n    <script src="js/demo/escenarios.js"></script>#' \
-        "$TRABAJO/$f.html" > "$TRABAJO/__cap-$f.html"
+        "$APP/$f.html" > "$APP/__cap-$f.html"
 done
 
 # ── Servidor local, solo mientras dure la captura ────────────────────────────
-"$PY" -m http.server -d "$TRABAJO" "$PUERTO" --bind 127.0.0.1 >/dev/null 2>&1 &
+"$PY" -m http.server -d "$APP" "$PUERTO" --bind 127.0.0.1 >/dev/null 2>&1 &
 SERVIDOR=$!
 limpiar() {
     kill "$SERVIDOR" 2>/dev/null || true
