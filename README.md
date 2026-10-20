@@ -1,77 +1,84 @@
 # Dr. Agramonte
 
-Plataforma de gestión de citas médicas para la consulta de un internista real en Palma de Mallorca.
-Los pacientes reservan, consultan y cancelan sus citas por su cuenta, sin depender del teléfono.
-
-**Dominio propio:** `dragramonte.com`, ahora mismo entre alojamientos — el anterior se
-retiró y el despliegue en servidor propio está listo y probado, a la espera de levantar la
-máquina (ver [docs/DESPLIEGUE-VPS.md](docs/DESPLIEGUE-VPS.md)).
-
-**▶ [Probar la demo](https://maragramonte.github.io/dr-agramonte/)** — una presentación del
-producto y, bajo [`/app/`](https://maragramonte.github.io/dr-agramonte/app/), el frontend real
-con una API simulada en el navegador y datos ficticios. Se puede reservar, cancelar, vincular
-Telegram y entrar como médico para ver el cuadro de mando. No hay servidor detrás ni se envía ningún aviso
-([cómo funciona](#demo-en-línea)).
-
-**Para probarla en un minuto:** pulsa «Entrar como paciente» en la franja amarilla y reserva una cita.
-Después pulsa «Entrar como médico» para verla en la agenda y en el cuadro de mando. Los datos se reinician cada día.
-
-**🖼 [Verla sin probar nada](docs/CAPTURAS.md)** — las doce pantallas en imágenes, con lo que
-hay detrás de cada una: la portada, la reserva paso a paso, los avisos de Telegram, el cuadro
-de mando del médico, el móvil, el modo oscuro y el catalán. Y si prefieres leer el proyecto
-entero, la [memoria completa](docs/Memoria-Dr-Agramonte.pdf) (PDF).
+Plataforma de gestión de citas médicas para la consulta de un internista real en Palma de
+Mallorca. Los pacientes reservan, consultan y cancelan sus citas por su cuenta, sin depender
+del teléfono.
 
 `Java 21` · `Spring Boot 3.5` · `PostgreSQL 15` · `JavaScript` · `Docker` · `Caddy`
 
 [![CI](https://github.com/maragramonte/dr-agramonte/actions/workflows/ci.yml/badge.svg)](https://github.com/maragramonte/dr-agramonte/actions/workflows/ci.yml)
 
-![Portada de la web: fotografía del Dr. Agramonte a sangre junto al titular «Atención Médica Integral en Medicina Interna», con sus años de experiencia, la ubicación en Palma de Mallorca y el acceso directo a solicitar cita](docs/capturas/01-portada.jpg)
+![Portada de la aplicación: el titular «Su cita con el Dr. Agramonte, en un minuto» junto a un panel de reserva con los dos centros de consulta y los huecos libres del jueves](docs/capturas/01-portada.jpg)
 
 ---
 
 ## El problema
 
 Buena parte de las llamadas que recibe un médico fuera de su horario no son urgencias
-clínicas: son gestión de agenda. Cambiar una hora, preguntar por un hueco, cancelar.
-Esa carga administrativa se come tiempo que no está pagado ni contabilizado como trabajo.
+clínicas: son gestión de agenda. Cambiar una hora, preguntar por un hueco, cancelar. Esa
+carga administrativa se come tiempo que no está pagado ni contabilizado como trabajo.
 
-Este proyecto digitaliza esa parte concreta, sin tocar lo que sí requiere trato humano.
+Este proyecto digitaliza esa parte concreta, sin tocar lo que sí requiere trato humano. Está
+pensado para **la consulta privada y la clínica pequeña**: uno o varios médicos, uno o varios
+centros, y una agenda que hoy se lleva por teléfono o en papel.
+
+La decisión de producto que lo define es **permitir reservar sin registro**. Si para pedir
+hora hay que crear una cuenta, mucha gente vuelve a llamar y el problema sigue ahí.
+
+---
+
+## Probarlo
+
+**▶ [Demo en línea](https://maragramonte.github.io/dr-agramonte/)** — una presentación del
+producto y, bajo [`/app/`](https://maragramonte.github.io/dr-agramonte/app/), la aplicación
+real con una API simulada en el navegador.
+
+> **Es una simulación, no un servidor.** Los datos son ficticios, viven en tu navegador y no
+> se envía ningún aviso de verdad. Lo que la demo **no** puede demostrar —la concurrencia, la
+> disponibilidad calculada en servidor y el control de acceso por rol— está explicado en
+> [docs/DEMO.md](docs/DEMO.md#qué-no-puede-demostrar).
+
+**Para verlo en un minuto:** en `/app/`, pulsa «Entrar como paciente» y reserva una cita.
+Después, «Entrar como médico» para verla en la agenda y en el cuadro de mando.
+
+**🖼 [Sin pulsar nada](docs/CAPTURAS.md)** — la aplicación pantalla a pantalla, en imágenes.
+Y si prefieres leer el proyecto entero, la
+[memoria completa](docs/Memoria-Dr-Agramonte.pdf) (PDF).
+
+> **Estado del despliegue.** El dominio `dragramonte.com` está registrado pero **hoy no sirve
+> la aplicación**: el alojamiento anterior se retiró y el despliegue en servidor propio está
+> preparado y probado, a la espera de levantar la máquina
+> ([docs/DESPLIEGUE-VPS.md](docs/DESPLIEGUE-VPS.md)).
+
+---
 
 ## Qué hace
+
+Todo lo siguiente está implementado en el backend y funciona contra una base de datos real:
 
 - **Reserva sin registro previo** o con cuenta: centro → fecha → hora → datos.
 - **Disponibilidad real** calculada en el servidor, repartida por centro y día.
 - **Cobertura y pago**: consulta privada con precio visible, o seguro médico con aseguradora.
-- **Avisos automáticos** de confirmación, cancelación y recordatorio 24 h antes, por
-  correo, Telegram y SMS/WhatsApp. Quien reserva sin cuenta recibe en el correo el
-  enlace para consultar o cancelar su cita desde cualquier dispositivo.
+- **Avisos automáticos** de confirmación, cancelación y recordatorio 24 h antes, por correo,
+  Telegram y SMS/WhatsApp. Quien reserva sin cuenta recibe en el correo el enlace para
+  consultar o cancelar su cita desde cualquier dispositivo.
 - **Cuadro de mando** para el profesional: carga por médico, demanda por especialidad,
   reparto por centro y tasa de cancelación.
 - **Bilingüe** castellano/catalán, con la preferencia guardada en el navegador.
 - **PWA instalable**, accesible (WCAG 2.1 AA), con modo oscuro y modo sin conexión.
 
-![Pantalla de reserva: los dos centros de consulta, el calendario del mes con el día elegido, los huecos libres de mañana y tarde, y a la derecha el formulario con especialista, tipo de consulta y cobertura](docs/capturas/04-reserva-huecos.png)
+Los tres canales de aviso son **opcionales**: con sus credenciales sin configurar la
+aplicación funciona igual, simplemente no envía mensajes.
 
-*La reserva, paso a paso: centro, fecha y hora. Los huecos salen de la agenda real del médico,
-calculados en el servidor para el centro y el día elegidos.*
+![Pantalla de reserva: los dos centros de consulta, el calendario del mes con el día elegido y los huecos libres de mañana y tarde](docs/capturas/04-reserva-huecos.png)
+
+---
 
 ## Arquitectura
 
-**En local** (`docker-compose.yml`) — tres contenedores: nginx sirve el frontend y hace de
-proxy hacia la API.
-
-```
-[Navegador]  →  [nginx]  →  HTML/CSS/JS + proxy /api
-                              ↓
-                     [Spring Boot]  →  [PostgreSQL]
-                              ↓
-                   [Twilio]   [Telegram]
-```
-
-**En producción** (`docker-compose.prod.yml`, VPS con Docker) — también tres, pero distintos:
-Caddy termina el HTTPS por delante de un único contenedor donde Spring Boot sirve la API y el
-frontend juntos, sin nginx aparte y sin CORS entre ambos. PostgreSQL no publica ningún puerto
-fuera de la red interna: solo se llega a él desde el contenedor de la aplicación.
+Dos despliegues, la misma aplicación dentro. En producción, Caddy termina el HTTPS por
+delante de un único contenedor donde Spring Boot sirve la API y el frontend juntos;
+PostgreSQL no publica ningún puerto fuera de la red interna.
 
 ```
 [Navegador]  →  [Caddy]  →  HTTPS con Let's Encrypt, apex → www
@@ -81,107 +88,67 @@ fuera de la red interna: solo se llega a él desde el contenedor de la aplicaci�
                    [Twilio]   [Telegram]
 ```
 
-Caddy añade además las cabeceras de seguridad: HSTS, `nosniff`, `X-Frame-Options`,
-`Referrer-Policy` y una **Content-Security-Policy sin `'unsafe-inline'` en los scripts**, que
-se puede aplicar porque nada del sitio carga de un CDN — tipografías, iconos y Chart.js están
-autoalojados. Un tercero colado por descuido deja de cargar en vez de pasar inadvertido.
+El backend va en capas clásicas (controlador · servicio · repositorio) con DTOs separados de
+las entidades. El frontend es estático, sin framework ni paso de compilación, y nada se carga
+de un CDN: tipografías, iconos y Chart.js están autoalojados, lo que permite servir una
+Content-Security-Policy **sin `'unsafe-inline'` en los scripts**.
+
+**→ [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md)** — componentes, flujo de una petición,
+autenticación, concurrencia, notificaciones e infraestructura.
 
 ---
 
 ## Decisiones técnicas
 
-Las seis que más me costaron y mejor explican el proyecto.
+Las cuatro que mejor explican el proyecto. El razonamiento completo —con alternativas,
+limitaciones y evidencia en el código— está en
+**[docs/DECISIONES-TECNICAS.md](docs/DECISIONES-TECNICAS.md)**.
 
-### Dos pacientes, el mismo hueco, el mismo segundo
+**Bloqueo pesimista contra la doble reserva.** La reserva bloquea la fila del horario con
+`SELECT ... FOR UPDATE` sobre un índice `UNIQUE (medico_id, inicio)`. La primera transacción
+gana; la segunda recibe un **409** sin persistir nada. Hay una prueba que lanza dos hilos
+sincronizados con `CyclicBarrier` contra la misma franja, sobre un PostgreSQL real levantado
+con Testcontainers, y comprueba que sale exactamente un 201 y un 409.
+[→](docs/DECISIONES-TECNICAS.md#1-bloqueo-pesimista-contra-la-doble-reserva)
 
-La reserva bloquea la fila del horario con `SELECT ... FOR UPDATE` (bloqueo pesimista)
-dentro de la transacción, sobre un índice `UNIQUE (medico_id, inicio)`. La primera
-transacción gana y marca el hueco como ocupado; la segunda recibe **409 Conflict** sin
-persistir nada.
+**Los avisos salen después del commit.** Se aplazan a la fase `afterCommit`. Así ninguna
+llamada de red ocurre con una fila bloqueada, y si la transacción se revierte nunca se avisa
+de una cita que no llegó a existir.
+[→](docs/DECISIONES-TECNICAS.md#2-las-notificaciones-salen-después-del-commit)
 
-No es teoría: hay un test que lanza dos hilos sincronizados con `CyclicBarrier` contra la
-misma franja, sobre un PostgreSQL real levantado con Testcontainers, y comprueba que sale
-exactamente un 201 y un 409. Un H2 en memoria no reproduce este comportamiento.
+**De quién es una agenda no lo decide la URL.** `/api/citas/agenda/**` recibía el médico por
+parámetro con `defaultValue = "1"`: el rol se comprobaba bien, pero nadie comprobaba *qué*
+médico, así que bastaba cambiar el número para leer la agenda de otro. Es un fallo que
+ninguna prueba de roles detecta, porque el rol era correcto. Ahora el médico sale del JWT.
+[→](docs/DECISIONES-TECNICAS.md#7-de-quién-es-una-agenda-no-lo-decide-la-url)
 
-### El aviso se envía después del commit, no durante
+**El token de la cita, hasheado y en el fragmento.** Quien reserva sin cuenta recibe un token
+opaco entregado una sola vez. En base de datos solo queda su SHA-256, y viaja en el fragmento
+de la URL, que el navegador no manda al servidor.
+[→](docs/DECISIONES-TECNICAS.md#5-token-de-acceso-por-cita-hash-en-base-de-datos-y-fragmento-en-la-url)
 
-Las notificaciones se aplazan a la fase `afterCommit` de la transacción. Así no se mantiene
-la fila bloqueada durante una llamada de red, y si la transacción se revierte nunca se
-avisa de una cita que en realidad no llegó a existir.
+---
 
-### Dos canales de aviso independientes
+## Pruebas y calidad
 
-Twilio (SMS/WhatsApp) y un bot de Telegram. Twilio en cuenta de prueba obliga al paciente a
-darse de alta en un *sandbox*, lo cual no vale para un producto real; Telegram es gratuito y
-no exige alta previa. Ninguno de los dos puede tumbar una reserva: los servicios de
-mensajería no propagan la excepción, solo la registran. Si uno está caído o apagado, el otro
-sigue avisando.
+```bash
+cd backend && mvn test
+```
 
-La vinculación del bot usa un token de un solo uso con 15 minutos de validez, emitido
-siempre para el usuario del JWT en sesión, nunca para un email recibido por parámetro.
+**115 pruebas** en tres niveles: 70 unitarias, 27 de capa REST (`@WebMvcTest` con la
+`SecurityConfig` real) y 18 de integración contra un PostgreSQL levantado con Testcontainers.
+Las de correo usan GreenMail, un SMTP en memoria: el token se extrae del correo realmente
+recibido.
 
-### El recordatorio sale por los tres canales, y cada uno decide
+Las de integración **necesitan Docker**; sin él se marcan como saltadas en lugar de fallar.
+El CI lo compensa: revisa los informes de Surefire y **falla si alguna quedó sin ejecutar**.
+Hay además análisis semanal de vulnerabilidades de dependencias con OWASP dependency-check.
 
-El aviso de la víspera iba solo por Twilio y Telegram, que son justo los dos que un paciente
-sin cuenta no tiene: Telegram se vincula desde una sesión y la cuenta de prueba de Twilio
-obliga a darse de alta en un *sandbox*. Peor: la tarea programada empezaba con un `return` si
-Twilio estaba apagado, así que sin Twilio no salía **ningún** recordatorio, ni por Telegram.
+Lo que **no** está cubierto, dicho sin adornos: la cobertura no está medida (no hay JaCoCo,
+así que no hay porcentaje), el frontend no tiene pruebas automatizadas, no hay E2E y el
+perfil MySQL no se prueba en CI.
 
-Ahora recorre las citas siempre y cada canal comprueba lo suyo. El correo añade el enlace de
-la cita, con un **segundo token** (Flyway V14): del de la reserva solo se guarda el hash, y
-rotarlo habría invalidado el enlace del correo anterior y el token del navegador que reservó.
-Ese token solo se emite para las citas sin cuenta detrás; quien tiene cuenta entra en ella.
-
-### Tres correos de una cita, y dos reglas opuestas a propósito
-
-El enlace de **activación de cuenta** es la prueba de identidad: sin servicio de correo la
-operación se niega con un **503**, porque seguir adelante sería regalar una cuenta a quien
-solo ha demostrado saber escribir un email.
-
-Los otros dos son comodidades: el enlace de **acceso a una cita** reservada sin cuenta y el
-**comprobante de cancelación**. Los dos salen tras el commit y con el fallo capturado, así que
-un SMTP caído no impide reservar ni anular. El de cancelación no lleva credenciales —una cita
-anulada no tiene nada que gestionar— y avisa de que, si no fue el paciente quien canceló,
-llame: la hora liberada puede habérsela quedado otro. Existe porque el token de
-la cita se entrega una sola vez y, sin ese correo, la cita quedaba atada al navegador donde se
-reservó: en base de datos solo está su SHA-256, de modo que nadie puede reenviarlo. El token
-viaja en el fragmento del enlace (`reservar.html#cita-<id>.<token>`), que no se manda al
-servidor, y la página lo borra de la barra de direcciones nada más leerlo.
-
-### Una migración se ejecuta una vez; una agenda hay que seguir creándola
-
-Los huecos de la consulta los sembraban las migraciones V3 y V6: unos 90 días contados
-desde el primer arranque. Pero Flyway ejecuta cada migración **una sola vez**, así que al
-consumirse esa ventana el calendario se quedaba vacío y la web dejaba de admitir citas sin
-dar ningún error: simplemente no había días que ofrecer.
-
-Lo resuelve `GeneradorAgendaScheduler`, que cada madrugada añade el tramo que falta al
-final de la ventana. Solo inserta las franjas que aún no existen —el índice
-`UNIQUE (medico_id, inicio)` lo garantiza—, de modo que ni resucita un hueco ya reservado ni
-vuelve a marcar como libre uno ocupado. El patrón semanal (horas de consulta y qué centro
-atiende cada día) salió del `.sql` y vive ahora en `AgendaProperties`, que es donde se puede
-cambiar sin tocar una migración ya aplicada.
-
-### De quién es una agenda no lo decide la URL
-
-`/api/citas/agenda/**` recibía el médico por parámetro, con `defaultValue = "1"`. El rol
-estaba bien comprobado —hacía falta ser `MEDICO` o `ADMIN`—, pero nadie comprobaba *qué*
-médico: bastaba cambiar el número de la URL para leer la agenda de otro, con los nombres,
-correos, teléfonos y motivos de consulta de sus pacientes. Autenticado no es lo mismo que
-autorizado, y es un fallo que ninguna prueba de roles detecta, porque el rol era correcto.
-
-Ahora el médico sale del JWT a través de `medicos.usuario_id` (V12). El detalle que más
-vueltas me costó es qué contestar cuando un médico pide la agenda de otro: lo natural
-parece un 403, pero un 403 confirma que ese médico existe, y los id son enteros
-correlativos. Así que se le devuelve la suya, con un 200 corriente, y el parámetro se
-ignora en silencio. Un `ADMIN` sí elige, pero tiene que decir cuál: el «médico 1 por
-defecto» era una suposición disfrazada de valor por defecto.
-
-### Frontend sin framework
-
-Al principio valoré React. La aplicación no maneja un estado global que lo justifique, así
-que preferí JavaScript modular: menos dependencias, carga más rápida y código que se lee sin
-aprender antes una librería. Saber cuándo *no* añadir una tecnología también es una decisión.
+**→ [docs/PRUEBAS-Y-CALIDAD.md](docs/PRUEBAS-Y-CALIDAD.md)**
 
 ---
 
@@ -197,198 +164,16 @@ docker compose up -d --build
 - Web: <http://localhost>
 - API: <http://localhost:8080>
 
-Usuario médico de prueba (lo crea la migración V3): `dr.agramonte@example.com` / `Medico123!`
+Usuario médico de prueba, que crea la migración V3: `dr.agramonte@example.com` / `Medico123!`
+Esa cuenta es **pública** (la contraseña está en el repositorio); la aplicación la reescribe
+al arrancar con `MEDICO_EMAIL` y `MEDICO_PASSWORD`, y sin esas variables el compose de
+producción no levanta.
 
-Para **producción** (servidor propio con dominio y HTTPS) hay un compose aparte,
-`docker-compose.prod.yml`, con su propia plantilla de variables
-([`.env.prod.example`](.env.prod.example)). Las actualizaciones posteriores van por
-`scripts/deploy.sh`: hace copia de seguridad antes de tocar nada —por si una migración de
-Flyway sale mal—, reconstruye la imagen, levanta los servicios y consulta el `health` al
-final. Guía completa en [docs/DESPLIEGUE-VPS.md](docs/DESPLIEGUE-VPS.md).
-
-<details>
-<summary>Backend sin Docker · perfil MySQL</summary>
-
-```bash
-cd backend
-mvn spring-boot:run
-
-# Perfil MySQL alternativo (API en :8081)
-docker compose --profile mysql up -d --build
-```
-
-</details>
-
-### Demo en línea
-
-La demo pública tiene dos partes, porque se dirige a dos públicos. En la raíz va una
-**landing de producto** ([`demo/landing/`](demo/landing/)), para quien evalúa la aplicación y
-necesita saber qué hace antes de tocarla. Bajo [`/app/`](https://maragramonte.github.io/dr-agramonte/app/)
-va la web del doctor tal cual, que está escrita para sus pacientes y no explica nada de sí
-misma: antes la demo era solo eso, así que quien llegaba a evaluarla aterrizaba en la consulta
-de un internista de Palma sin contexto.
-
-La parte de `/app/` no es una maqueta aparte:
-son las mismas páginas y el mismo `api-client.js` de `frontend/`. Lo único que cambia es
-[`demo/demo-api.js`](demo/demo-api.js), que intercepta `fetch('/api/...')` y responde con los
-mismos contratos JSON que los DTOs del backend. Reproduce sus reglas: la agenda por centro
-de V6, el 409 por hueco ocupado y el 401/403 por rol. Los datos ficticios viven en el
-`localStorage` del visitante y se regeneran cada día. La franja amarilla de abajo, con los
-accesos directos «Entrar como médico» y «Entrar como paciente», es lo único que la demo
-añade a la interfaz real.
-
-![Reserva en la demo: los dos centros con sus días de consulta (Lun / Mar / Jue y Mie / Vie / Sab), el calendario con los únicos días hábiles seleccionables, los dieciséis huecos libres de mañana y tarde, el formulario a la derecha y abajo la franja amarilla de la demo](docs/demo-reserva.png)
-
-Telegram también funciona, contra un chat simulado en la propia página en vez del bot real.
-La vinculación usa un token de un solo uso con 15 minutos de validez. Al pulsar «Iniciar»
-pasa lo mismo que con `/start <token>` en el webhook. A partir de ahí llegan la
-confirmación, la cancelación y el recordatorio, con los textos exactos de
-`CitaNotificationService`.
-
-![Chat de Telegram simulado sobre la página de reserva: el mensaje /start con el token de un solo uso, la respuesta del bot confirmando la vinculación y el aviso de cita confirmada con fecha, médico, motivo y dirección, más un botón para simular el recordatorio de 24 horas](docs/demo-telegram.png)
-
-El correo tiene su propio buzón simulado, abajo a la izquierda: recoge los cuatro que manda
-el backend —activación de cuenta, enlace de acceso al reservar, recordatorio de la víspera y
-comprobante de cancelación— con sus textos exactos. Sus enlaces **se pueden pulsar**, porque
-apuntan a las páginas de la propia demo: al abrir el de una cita, el token se importa en ese
-navegador y la cita aparece en «Mis citas», que es justo el camino que el correo resuelve en
-producción. Antes, el único correo representado era el de activación y la demo se limitaba a
-pegar su enlace en un aviso.
-
-![Buzón de demostración abierto sobre la página de reserva: la cabecera «lo que el servidor habría enviado», el correo de la cita con su asunto, el destinatario, el cuerpo en monoespaciada con fecha, médico y centro, y el enlace subrayado que importa el token; abajo, la franja amarilla de la demo](docs/demo-buzon.png)
-
-Entrando como médico se llega al cuadro de mando, que en la demo agrega las citas ficticias
-igual que el backend agrega las reales con `GROUP BY`:
-
-![Cuadro de mando de la demo: los cuatro indicadores (230 citas totales, 53 activas, 152 completadas y 10,9 % de tasa de cancelación) sobre tres gráficos de barras horizontales con la carga por médico, la demanda por especialidad y el reparto de citas entre los dos centros](docs/demo-cuadro-mando.png)
-
-```bash
-./scripts/build-demo.sh                      # genera dist-demo/ (landing + app/)
-python3 -m http.server -d dist-demo 8000     # http://localhost:8000
-```
-
-El script copia `frontend/` e inyecta la API simulada. También quita el service worker, que
-precachea rutas absolutas y en Pages el sitio vive bajo `/dr-agramonte/`. Además marca
-todas las páginas `noindex` para no competir con el dominio real. `frontend/` no se toca,
-así que la imagen de producción nunca lleva el modo demo. Cada push a `main` que afecte al
-frontend la publica con [`.github/workflows/demo.yml`](.github/workflows/demo.yml).
-
-Si prefieres no pulsar nada, las mismas pantallas están en el
-[recorrido en imágenes](docs/CAPTURAS.md).
-
-Lo que la demo no puede enseñar es la concurrencia real. El bloqueo pesimista solo existe
-contra PostgreSQL, y para eso están las pruebas de integración.
-
-## Pruebas
-
-```bash
-cd backend && mvn test
-```
-
-**115 pruebas en tres niveles**: unitarias de servicio, de seguridad y roles sobre la capa
-REST (`@WebMvcTest` con la `SecurityConfig` real) y de integración end-to-end contra un
-PostgreSQL levantado con Testcontainers. Cubren las ramas críticas: 409 por doble reserva,
-403 por rol, validez del JWT, cancelación, el secreto del webhook, el límite de peticiones,
-la regeneración de la agenda, el aislamiento entre las agendas de dos médicos, la
-activación de una cuenta invitada, el enlace de acceso a la cita y el recordatorio de la
-víspera (los tres, con un SMTP real en memoria, GreenMail: el token se saca del correo
-recibido y se comprueba que abre la cita contra la API, y que el enlace del recordatorio no
-invalida el de la reserva).
-
-Las 18 de integración necesitan Docker en marcha; si no lo hay se marcan como saltadas en
-lugar de fallar. La cobertura todavía no está medida con JaCoCo.
-
-En cada push y cada pull request a `main` las ejecuta GitHub Actions
-([`.github/workflows/ci.yml`](.github/workflows/ci.yml)). El runner sí tiene Docker, así que
-allí no se salta ninguna: el workflow revisa los informes de Surefire y falla si alguna
-quedó sin ejecutar. Un segundo job construye la imagen de producción y comprueba que el
-frontend viaja dentro del jar.
-
-El frontend no tiene pruebas automatizadas, pero tampoco se revisa a ojo. La maquetación se
-mide con Chrome headless sobre iframes del ancho real —fijar el tamaño de la ventana no sirve
-por debajo de 500 px, porque Chrome impone un mínimo y luego recorta el PNG, lo que simula
-desbordes que no existen—: las diez páginas por una veintena de anchos de 320 a 2560, sin
-scroll horizontal ni textos truncados. Y el contraste se audita aplicando la fórmula de
-luminancia de la WCAG a los colores calculados de cada texto sobre su fondo real, en los dos
-temas; así apareció que en modo oscuro el formulario de reserva escribía en gris casi negro
-sobre gris casi negro.
-
-También hay análisis de vulnerabilidades de dependencias con **OWASP dependency-check**,
-configurado para hacer fallar el build con CVSS ≥ 7. Corre aparte del CI, todos los lunes
-([`.github/workflows/seguridad.yml`](.github/workflows/seguridad.yml)), porque lo que cambia
-no es el código sino la lista de CVE publicados; también puede lanzarse a mano desde Actions.
-Necesita el secreto `NVD_API_KEY` ([clave gratuita de la
-NVD](https://nvd.nist.gov/developers/request-an-api-key)), porque sin ella la descarga pasa
-de minutos a horas; mientras no esté configurado, el workflow se salta el análisis y lo deja
-dicho en el resumen del run en vez de fallar.
-
----
-
-## API
-
-| Método | Ruta | Uso |
-|--------|------|-----|
-| `POST` | `/api/auth/login`, `/api/auth/registro` | Sesión JWT; el registro sobre una cuenta invitada responde 202 y envía un enlace |
-| `POST` | `/api/auth/activar` | Fija la contraseña de una cuenta invitada con el token del correo |
-| `GET` | `/api/medicos`, `/api/centros` | Catálogos |
-| `GET` | `/api/disponibilidad` | Huecos por médico, fecha y centro |
-| `POST` | `/api/citas` | Crear cita (paciente autenticado) |
-| `POST` | `/api/citas/reserva-publica` | Reservar sin cuenta previa |
-| `GET` | `/api/citas/mias` | Citas del paciente autenticado |
-| `GET` | `/api/citas/publica/{id}` | Cita de invitado — cabecera `X-Cita-Token` |
-| `DELETE` | `/api/citas/{id}` · `/api/citas/publica/{id}` | Cancelación (la de invitado, con `X-Cita-Token`) |
-| `GET` | `/api/citas/agenda/reservas`, `/agenda/pacientes` | Agenda del médico — rol `MEDICO`/`ADMIN`; el médico sale del JWT, no de `medicoId` |
-| `GET` | `/api/estadisticas` | Cuadro de mando — rol `MEDICO`/`ADMIN` |
-| `GET`&nbsp;`POST`&nbsp;`DELETE` | `/api/telegram/vinculacion` | Alta y baja del canal Telegram |
-| `POST` | `/api/telegram/webhook` | Lo invoca Telegram; valida el secreto de `setWebhook` |
-| `POST` | `/api/contact` | Formulario de contacto |
-
-Colección de Postman lista para importar en [`postman/`](postman/README.md).
-
-## Configuración
-
-Todo lo sensible vive en `.env` (plantilla en [`.env.example`](.env.example)), nunca en el
-repositorio. El servidor usa un fichero propio, `.env.prod`
-([`.env.prod.example`](.env.prod.example)), que además fija el dominio y el correo del
-certificado.
-
-| Variable | Para qué |
-|----------|----------|
-| `JWT_SECRET` | Firma de los tokens (mínimo 32 caracteres) |
-| `MEDICO_EMAIL`, `MEDICO_PASSWORD` | Cuenta real del médico; **obligatorias en producción** |
-| `TWILIO_*` | Credenciales, canal (`whatsapp`/`sms`) y horas del recordatorio |
-| `TELEGRAM_*` | Token del bot, usuario del bot y secreto del webhook |
-| `MAIL_*`, `CONTACT_INBOX` | Correo del formulario de contacto, del enlace de activación, del acceso a la cita y del recordatorio |
-| `APP_URL_PUBLICA` | Base de los enlaces que viajan por correo (por defecto, el dominio www) |
-| `AGENDA_DIAS_FUTURO`, `AGENDA_CRON` | Ventana de huecos que se mantiene abierta (90 días) y cuándo se amplía |
-| `RECORDATORIO_HORAS`, `RECORDATORIO_CRON` | Cuánto antes se avisa (24 h) y cada cuánto se barre. Siguen valiendo las antiguas `TWILIO_REMINDER_*` |
-| `RATE_LIMIT_*` | Peticiones por IP permitidas en las rutas públicas de escritura |
-
-Con los canales desactivados la aplicación funciona igual; simplemente no envía mensajes.
-
-La cuenta de médico es el caso aparte: la migración V3 siembra una de demostración cuya
-contraseña está escrita en el propio repositorio, así que es pública. Al arrancar, la
-aplicación la reescribe con `MEDICO_EMAIL` y `MEDICO_PASSWORD`; si faltan, el compose de
-producción **no levanta**. En local se dejan sin definir y vale la de demostración.
-
-<details>
-<summary>Activar el bot de Telegram</summary>
-
-1. Crear el bot con **@BotFather** y guardar el token en `TELEGRAM_BOT_TOKEN`.
-2. Registrar el webhook con el mismo secreto que lleve `TELEGRAM_WEBHOOK_SECRET`:
-
-   ```bash
-   curl -X POST "https://api.telegram.org/bot<BOT_TOKEN>/setWebhook" \
-     -d "url=https://<tu-dominio>/api/telegram/webhook" \
-     -d "secret_token=<TELEGRAM_WEBHOOK_SECRET>"
-   ```
-
-3. El paciente, con sesión iniciada, pulsa **Recibir avisos por Telegram** en «Mis citas
-   programadas». El backend emite el token y el enlace `https://t.me/<bot>?start=<token>`.
-4. Al abrirlo, Telegram envía `/start <token>` al webhook, que asocia el `chat_id` a la
-   cuenta. Desde ahí el botón pasa a **Dejar de recibir avisos**.
-
-</details>
+| Para | Documento |
+|------|-----------|
+| Variables de entorno, canales de aviso y alta del bot de Telegram | [docs/CONFIGURACION.md](docs/CONFIGURACION.md) |
+| Producción en un VPS propio: HTTPS, dominio, copias y actualizaciones | [docs/DESPLIEGUE-VPS.md](docs/DESPLIEGUE-VPS.md) |
+| Cuando el arranque falla, 502 o healthchecks | [docs/DOCKER-TROUBLESHOOTING.md](docs/DOCKER-TROUBLESHOOTING.md) |
 
 ---
 
@@ -402,67 +187,34 @@ producción **no levanta**. En local se dejan sin definir y vale la de demostrac
 ├── demo/             API simulada y landing de producto para GitHub Pages
 ├── postman/          Colección de la API
 ├── scripts/          deploy.sh, backup-db.sh, build-demo.sh y capturar-pantallas.sh
-├── docs/             Memoria del proyecto, diagramas y guías
+├── docs/             Documentación, memoria del proyecto y diagramas
 ├── Caddyfile         HTTPS, apex → www y cabeceras de seguridad
 ├── docker-compose.yml        Local:  nginx · Spring Boot · PostgreSQL
 └── docker-compose.prod.yml   VPS:    Caddy · Spring Boot (API y web) · PostgreSQL
 ```
 
-<details>
-<summary>Mapa del frontend</summary>
-
-| Página | Función |
-|--------|---------|
-| `index.html` | Inicio, hero y resumen de servicios |
-| `servicios.html` | Catálogo, con enlace directo a la reserva de cada servicio |
-| `reservar.html` | Flujo de cita: centro, calendario, hora, datos y «Mis citas» |
-| `estadisticas.html` | Cuadro de mando (rol `MEDICO`/`ADMIN`) |
-| `contacto.html` · `sobre-mi.html` · `testimonios.html` | Contenido informativo |
-| `activar.html` | Elegir contraseña desde el enlace del correo (cuenta invitada) |
-| `privacidad.html` | Política de privacidad (RGPD) |
-| `offline.html` | Página que sirve la PWA cuando no hay conexión |
-| `panel-pruebas.html` | Panel de reservas y vista del médico |
-
-| Módulo JavaScript | Rol |
-|-------------------|-----|
-| `js/modules/api-client.js` | Cliente REST y gestión del JWT |
-| `js/modules/api-config.js` | URL base de la API |
-| `js/modules/auth-ui.js` | Login y registro desde el menú |
-| `js/modules/html.js` | Plantillas etiquetadas que escapan lo interpolado: datos del paciente en la pantalla del médico |
-| `js/modules/i18n.js` | Traducción al catalán por `data-i18n`, sin dependencias |
-| `js/modules/theme-init.js` | Fija el tema antes de pintar, para que no parpadee |
-| `js/pages/reserva.js` | Reserva, `syncMisCitas()`, «Mis citas» y vinculación con Telegram |
-| `js/pages/estadisticas.js` | Gráficos del cuadro de mando (Chart.js vendorizado) |
-| `js/pages/panel-pruebas.js` | Tabla de reservas y refresco entre pestañas |
-| `js/pages/dr-agramonte.js` | Navegación, tema, accesibilidad y registro de la PWA |
-| `js/pages/contacto.js` | Formulario de contacto: validación en tiempo real |
-| `js/pages/servicios.js` | Catálogo de servicios y enlace a la reserva de cada uno |
-| `js/pages/index-preload.js` | Precarga de la imagen del hero (LCP) |
-| `js/pages/activar.js` | Lee el token del fragmento de la URL y activa la cuenta |
-| `js/pages/privacidad.js` | Índice navegable de la política de privacidad |
-| `js/pages/offline-menu.js` | El panel «Menú» en la página sin conexión, cuando el anterior no está en caché |
-| `js/pages/offline-reconexion.js` | Reintento y vuelta al inicio al recuperar la conexión |
-| `service-worker.js` | Caché y modo sin conexión |
-
-Los cuatro últimos —`index-preload`, `privacidad`, `offline-menu` y `offline-reconexion`—
-existen por un motivo concreto: **son JavaScript que antes estaba dentro del HTML** y se sacó
-a ficheros propios para poder servir una Content-Security-Policy sin `'unsafe-inline'` en los
-scripts.
-
-</details>
+---
 
 ## Documentación
 
 | Documento | Contenido |
 |-----------|-----------|
-| [docs/CAPTURAS.md](docs/CAPTURAS.md) | La aplicación pantalla a pantalla, en imágenes |
-| [docs/EVOLUCION.md](docs/EVOLUCION.md) | Cómo creció el proyecto, fase a fase |
-| [docs/BASE-DE-DATOS.md](docs/BASE-DE-DATOS.md) | Esquema, diagrama relacional, integridad y concurrencia |
-| [docs/SINCRONIZACION-CITAS.md](docs/SINCRONIZACION-CITAS.md) | Una sola fuente de verdad entre las tres vistas de citas |
-| [docs/Memoria-Dr-Agramonte.pdf](docs/Memoria-Dr-Agramonte.pdf) | Memoria completa del proyecto (LaTeX) |
-| [docs/DESPLIEGUE-VPS.md](docs/DESPLIEGUE-VPS.md) | Puesta en producción en un VPS propio: HTTPS, dominio, copias y actualizaciones |
-| [docs/DOCKER-TROUBLESHOOTING.md](docs/DOCKER-TROUBLESHOOTING.md) | Arranque, 502 y healthchecks |
-| [docs/README.md](docs/README.md) | Índice del resto de documentación |
+| [ARQUITECTURA.md](docs/ARQUITECTURA.md) | Cómo está construido: componentes, flujos y responsabilidades |
+| [DECISIONES-TECNICAS.md](docs/DECISIONES-TECNICAS.md) | Por qué se eligió cada solución, con alternativas y limitaciones |
+| [PRUEBAS-Y-CALIDAD.md](docs/PRUEBAS-Y-CALIDAD.md) | Qué se comprueba, cómo, y qué no queda cubierto |
+| [API.md](docs/API.md) | Catálogo de endpoints, autenticación y códigos de estado |
+| [CONFIGURACION.md](docs/CONFIGURACION.md) | Variables de entorno, canales y bot de Telegram |
+| [BASE-DE-DATOS.md](docs/BASE-DE-DATOS.md) | Esquema, diagrama relacional, integridad y concurrencia |
+| [SINCRONIZACION-CITAS.md](docs/SINCRONIZACION-CITAS.md) | Una sola fuente de verdad entre las tres vistas de citas |
+| [DEMO.md](docs/DEMO.md) | Cómo está hecha la demo y qué no puede demostrar |
+| [CAPTURAS.md](docs/CAPTURAS.md) | La aplicación pantalla a pantalla, en imágenes |
+| [DESPLIEGUE-VPS.md](docs/DESPLIEGUE-VPS.md) | Puesta en producción en un servidor propio |
+| [DOCKER-TROUBLESHOOTING.md](docs/DOCKER-TROUBLESHOOTING.md) | Arranque, 502 y healthchecks |
+| [EVOLUCION.md](docs/EVOLUCION.md) | Cómo creció el proyecto, fase a fase |
+| [DEFENSA-TECNICA.md](docs/DEFENSA-TECNICA.md) | Guía para explicar y defender el proyecto en una entrevista |
+| [Memoria-Dr-Agramonte.pdf](docs/Memoria-Dr-Agramonte.pdf) | Memoria completa del proyecto (LaTeX) |
+
+---
 
 ## Hacia dónde va
 
@@ -470,8 +222,8 @@ scripts.
 - [ ] Panel clínico multi-centro con historial
 - [ ] Refresh token
 - [ ] Cobertura medida con JaCoCo y pruebas E2E
-- [x] Cancelar la cita desde el propio aviso — hecho en el correo (el enlace lleva el
-      token de la cita); queda hacerlo desde Telegram y SMS, y confirmar la asistencia
+- [x] Cancelar la cita desde el propio aviso — hecho en el correo (el enlace lleva el token
+      de la cita); queda hacerlo desde Telegram y SMS, y confirmar la asistencia
 
 ---
 
@@ -486,26 +238,26 @@ creciendo porque hay una consulta de verdad detrás. Ahora mismo estoy desarroll
 una web para un negocio real.
 
 Trabajo con **Java, JavaScript, HTML y CSS**. Sé consumir y probar APIs e integrar servicios
-externos en una aplicación: aquí están Twilio, la Bot API de Telegram y el despliegue en
-un VPS propio con Docker, dominio propio y HTTPS automático con Caddy.
+externos en una aplicación: aquí están Twilio, la Bot API de Telegram y el despliegue en un
+VPS propio con Docker, dominio propio y HTTPS automático con Caddy.
 
 Uso herramientas de IA como apoyo activo —para aprender más rápido, depurar y desatascarme—
-igual que cualquier desarrolladora junior hoy. Las decisiones técnicas de este repositorio,
-y el saber explicarlas, son mías.
+igual que cualquier desarrolladora junior hoy. Las decisiones técnicas de este repositorio, y
+el saber explicarlas, son mías.
 
 Busco mi **primera oportunidad como desarrolladora junior**, en Mallorca o en remoto, en un
 equipo donde seguir creciendo y aportar desde el primer día.
 
 ---
 
-Proyecto propio de **Mar Agramonte**. Desarrollado como Trabajo de Fin de Ciclo (DAM, CESUR)
-y en evolución desde entonces.
-
 ## Licencia
 
 © 2026 Mar Agramonte. Todos los derechos reservados.
 
-Software propietario: el código puede leerse y citarse, pero no reutilizarse ni
-adaptarse sin permiso escrito. Las condiciones completas están en [LICENSE](LICENSE),
-y las licencias de los componentes de terceros que incorpora, en
-[THIRD-PARTY.md](THIRD-PARTY.md). Para una licencia de uso, escríbeme.
+Software propietario: el código puede leerse y citarse, pero no reutilizarse ni adaptarse sin
+permiso escrito. Las condiciones completas están en [LICENSE](LICENSE), y las licencias de
+los componentes de terceros que incorpora, en [THIRD-PARTY.md](THIRD-PARTY.md). Para una
+licencia de uso, escríbeme.
+
+Proyecto propio desarrollado como Trabajo de Fin de Ciclo (DAM, CESUR) y en evolución desde
+entonces.

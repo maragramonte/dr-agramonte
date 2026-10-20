@@ -15,14 +15,16 @@ del producto.
 
 ## 1. Portada
 
-![Portada: fotografía del Dr. Agramonte a sangre junto al titular «Atención Médica Integral en Medicina Interna», sus años de experiencia, la ubicación en Palma de Mallorca y una tarjeta con el acceso directo a solicitar cita](capturas/01-portada.jpg)
+![Portada: el titular «Su cita con el Dr. Agramonte, en un minuto», las tres razones para reservar aquí y los años de ejercicio, junto a un panel de reserva con los dos centros de consulta y los huecos libres del jueves](capturas/01-portada.jpg)
 
-Lo primero que ve un paciente. El camino corto a lo que viene a hacer —pedir cita— está en
-la tarjeta inferior, sin obligarle a bajar ni a buscar un teléfono.
+Lo primero que ve un paciente es el propio selector de cita, con los huecos reales que
+devuelve `GET /api/disponibilidad`. Elegir centro y hora ocurre aquí; `reservar.html` solo
+recoge los datos. Si el backend no contesta, el panel se repliega al botón de siempre y la
+portada nunca se queda sin vía para pedir cita.
 
 ## 2. Servicios
 
-![Catálogo de servicios en tarjetas escalonadas: consulta general, control de enfermedades crónicas, chequeos preventivos, interpretación de analíticas y asesoramiento en estilo de vida, con el proceso de atención en cuatro pasos debajo](capturas/02-servicios.png)
+![Catálogo de servicios en tarjetas alineadas: consulta general, control de enfermedades crónicas, chequeos preventivos, interpretación de analíticas y asesoramiento en estilo de vida, con el proceso de atención en cuatro pasos debajo](capturas/02-servicios.png)
 
 Cada tarjeta lleva a la reserva con el servicio ya elegido (`reservar.html?servicio=…`), de
 modo que el paciente no tiene que volver a decidir lo que ya decidió aquí.
@@ -38,12 +40,15 @@ datos desde la migración V6 (ver [BASE-DE-DATOS.md](BASE-DE-DATOS.md)).
 
 ## 4. Reservar: huecos y formulario, a la vez
 
-![Pantalla completa de reserva: a la izquierda el centro, el calendario con el día 8 seleccionado y los dieciséis huecos de mañana y tarde; a la derecha el formulario con especialista, tipo de consulta y cobertura](capturas/04-reserva-huecos.png)
+![Pantalla completa de reserva en una sola columna: el centro elegido, el calendario con el día 22 seleccionado, los dieciséis huecos de mañana y tarde y, debajo, el formulario con especialista, tipo de consulta y cobertura](capturas/04-reserva-huecos.png)
 
 Los huecos libres salen de la agenda del médico para ese centro y ese día. En producción los
 calcula el servidor (`GET /api/disponibilidad`), no el navegador: es lo que impide que dos
-pacientes vean libre la misma franja. El formulario se rellena en paralelo, sin pasos
-intermedios ni recargas.
+pacientes vean libre la misma franja.
+
+El recorrido baja en una sola columna —centro, día, hora, datos—, que es el orden en que se
+rellena. Antes iba en dos columnas y el paso 1 competía con el paso 4 en un flujo que es
+estrictamente secuencial.
 
 ## 5. Los datos de la cita
 
@@ -84,20 +89,22 @@ navegador. El acceso exige rol `MEDICO` o `ADMIN`: un paciente con sesión inici
 ![La misma pantalla de reserva en una ventana de 390 píxeles: los centros apilados, el calendario completo sin recortes y los huecos en tres columnas](capturas/09-movil.png)
 
 El mismo HTML en 390 px de ancho: los centros se apilan, el calendario entra entero y los
-huecos pasan a tres columnas. La maquetación se comprueba de 320 a 2560 px buscando scroll
-horizontal y textos cortados.
+huecos pasan a tres columnas. La maquetación se auditó a mano de 320 a 2560 px buscando
+scroll horizontal y textos cortados ([PRUEBAS-Y-CALIDAD.md](PRUEBAS-Y-CALIDAD.md#frontend)).
 
 ## 10. Modo oscuro
 
-![La pantalla de reserva en modo oscuro: fondo azul muy oscuro, tarjetas en gris azulado y los acentos en verde azulado, con el mismo calendario y los mismos huecos](capturas/10-modo-oscuro.png)
+![La pantalla de reserva en modo oscuro: fondo verde muy oscuro, tarjetas algo más claras del mismo matiz y los acentos en verde azulado, con el mismo calendario y los mismos huecos](capturas/10-modo-oscuro.png)
 
 El tema se fija antes de pintar para que no haya parpadeo. El contraste de los dos temas se
-audita sobre los colores calculados de cada texto contra su fondo real, aplicando la fórmula
-de luminancia de la WCAG.
+auditó aplicando la fórmula de luminancia de la WCAG a los colores calculados de cada texto
+sobre su fondo real; los ratios resultantes están anotados en los comentarios de
+`frontend/css/dr-agramonte.css`. Fue una comprobación puntual, no automatizada
+([PRUEBAS-Y-CALIDAD.md](PRUEBAS-Y-CALIDAD.md#frontend)).
 
 ## 11. En catalán
 
-![La portada en catalán: «Atenció Mèdica Integral en Medicina Interna», «Demani cita sense trucar» y el botón «Demanar cita»](capturas/11-catalan.jpg)
+![La portada en catalán: «La seva cita amb el Dr. Agramonte, en un minut» y el panel de reserva con el rótulo «Demanar cita»](capturas/11-catalan.jpg)
 
 Traducción por atributos `data-i18n`, sin librería ni dependencias, con la preferencia
 guardada en el navegador.
