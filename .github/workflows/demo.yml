@@ -1,4 +1,5 @@
-# Publica la demo (frontend real + API simulada en el navegador) en GitHub Pages.
+# Publica la demo en GitHub Pages: la landing de producto en la raíz y, bajo app/,
+# el frontend real con la API simulada en el navegador.
 # Requisito único: Settings → Pages → Source: "GitHub Actions".
 #
 # En los pull request solo se construye: así un fallo de build-demo.sh se ve antes

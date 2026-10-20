@@ -1,0 +1,430 @@
+/**
+ * Landing de producto · hoja propia.
+ *
+ * No reutiliza css/dr-agramonte.css a propósito: esa hoja son 3.000 líneas de
+ * componentes de la web del doctor (hero de consulta, calendario, stepper,
+ * testimonios) que aquí no se usan ninguno, y vive bajo app/, no en la raíz.
+ * Lo que sí se comparte son los valores de los tokens, para que la landing y
+ * el producto se lean como la misma marca.
+ *
+ * La tipografía se toma de app/vendor/fonts/: está vendorizada ahí y no tiene
+ * sentido duplicar los .woff2 en la raíz solo por esta página.
+ */
+
+@import url('app/vendor/fonts/dm-fonts.css');
+
+:root {
+    --teal: #0F766E;
+    --teal-dark: #0B544E;
+    --teal-light: #14B8A6;
+    --teal-pale: rgba(15, 118, 110, 0.08);
+
+    --bg: #F6F8F8;
+    --card: #FFFFFF;
+    --line: #E3E8E7;
+    --line-soft: #EFF3F2;
+
+    --ink: #0F1A18;
+    --ink-soft: #5B6764;
+    --ink-faint: #68736F;
+
+    --radius-sm: 6px;
+    --radius: 10px;
+    --radius-lg: 16px;
+
+    --shadow: 0 1px 2px rgba(15, 26, 24, 0.04), 0 8px 24px rgba(15, 26, 24, 0.06);
+
+    --maxw: 1140px;
+    --tracking-title: -0.022em;
+
+    --s1: 0.5rem;
+    --s2: 1rem;
+    --s3: 1.5rem;
+    --s4: 2rem;
+    --s5: 2.5rem;
+    --s6: 3rem;
+    --s8: 4.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #0E1715;
+        --card: #17211F;
+        --line: rgba(205, 213, 211, 0.12);
+        --line-soft: rgba(205, 213, 211, 0.08);
+        --ink: #ECF1EF;
+        --ink-soft: #BBC6C3;
+        --ink-faint: #93A09C;
+        --teal: #14B8A6;
+        --teal-pale: rgba(20, 184, 166, 0.1);
+        --shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.22);
+    }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body, h1, h2, h3, p, ul, figure, blockquote { margin: 0; padding: 0; }
+ul { list-style: none; }
+
+body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+    line-height: 1.18;
+    letter-spacing: var(--tracking-title);
+    font-weight: 600;
+}
+
+a { color: inherit; }
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.wrap {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 var(--s3);
+}
+
+/* Salto al contenido: la landing también se navega con teclado. */
+.saltar {
+    position: absolute;
+    left: -9999px;
+}
+
+.saltar:focus {
+    left: var(--s3);
+    top: var(--s2);
+    z-index: 50;
+    background: var(--card);
+    padding: var(--s2);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+:focus-visible {
+    outline: 2px solid var(--teal);
+    outline-offset: 2px;
+}
+
+/* ---------- botones ---------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: var(--radius);
+    padding: 0.8rem 1.4rem;
+    border: 1px solid transparent;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn--primary { background: #0F766E; color: #fff; }
+.btn--ghost { border-color: var(--line); background: var(--card); color: var(--ink); }
+.btn--lg { font-size: 1.02rem; padding: 0.95rem 1.7rem; }
+.btn--blanco { background: #fff; color: var(--teal-dark); }
+
+/* ---------- cabecera ---------- */
+.top {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+}
+
+.top .wrap {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    height: 68px;
+}
+
+.marca {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 700;
+    letter-spacing: var(--tracking-title);
+    text-decoration: none;
+}
+
+.marca__sello {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #0F766E;
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.top nav {
+    margin-left: auto;
+    display: flex;
+    gap: var(--s3);
+    font-size: 0.93rem;
+    color: var(--ink-soft);
+}
+
+@media (max-width: 760px) {
+    .top nav { display: none; }
+}
+
+/* ---------- hero ---------- */
+.hero { padding: clamp(3rem, 8vw, 5.5rem) 0 clamp(2rem, 5vw, 3rem); }
+
+.eyebrow {
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--teal);
+    background: var(--teal-pale);
+    border-radius: 999px;
+    padding: 0.35rem 0.8rem;
+    margin-bottom: var(--s3);
+}
+
+.hero h1 {
+    font-size: clamp(2rem, 5.2vw, 3.1rem);
+    max-width: 17ch;
+    margin-bottom: var(--s3);
+}
+
+.hero .lede {
+    font-size: clamp(1rem, 2.4vw, 1.18rem);
+    color: var(--ink-soft);
+    max-width: 52ch;
+    margin-bottom: var(--s4);
+}
+
+.acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2);
+    margin-bottom: var(--s2);
+}
+
+.hero .nota {
+    font-size: 0.87rem;
+    color: var(--ink-faint);
+}
+
+/* La captura grande bajo el titular, recortada por abajo: lo que vende es la
+   parte de arriba de la pantalla, y a altura completa empujaba el resto de la
+   página fuera del primer vistazo. */
+.hero figure {
+    margin-top: var(--s6);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    max-height: 30rem;
+}
+
+.hero figure img { width: 100%; }
+
+/* ---------- secciones ---------- */
+.banda { padding: clamp(2.5rem, 6vw, 4rem) 0; }
+.banda--papel {
+    background: var(--card);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+}
+
+.cabecera { max-width: 46ch; margin-bottom: var(--s5); }
+.cabecera h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); margin-bottom: var(--s2); }
+.cabecera p { color: var(--ink-soft); }
+
+/* ---------- bloques de funcionalidad ---------- */
+.funcion {
+    display: grid;
+    gap: var(--s4);
+    align-items: center;
+    padding: var(--s5) 0;
+    border-top: 1px solid var(--line);
+}
+
+.funcion:first-of-type { border-top: 0; padding-top: 0; }
+
+@media (min-width: 900px) {
+    .funcion { grid-template-columns: 0.85fr 1.15fr; gap: var(--s6); }
+    /* Alterna el lado de la captura para que la lectura no caiga en columna. */
+    .funcion--invertida .funcion__media { order: -1; }
+}
+
+.funcion__num {
+    display: inline-grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    background: var(--teal-pale);
+    color: var(--teal);
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: var(--s2);
+}
+
+.funcion h3 { font-size: 1.3rem; margin-bottom: var(--s2); }
+.funcion p { color: var(--ink-soft); margin-bottom: var(--s2); }
+
+.funcion ul {
+    display: grid;
+    gap: 0.55rem;
+    margin-top: var(--s3);
+}
+
+.funcion li {
+    display: flex;
+    gap: 0.6rem;
+    font-size: 0.94rem;
+    color: var(--ink-soft);
+}
+
+.funcion li::before {
+    content: '✓';
+    color: var(--teal);
+    font-weight: 700;
+    flex: none;
+}
+
+.funcion__media img {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+/* La captura de móvil es vertical: a ancho completo de columna se come el
+   bloque entero y descompensa la alternancia. Se centra y se limita. */
+.funcion__media--movil img {
+    max-width: 19rem;
+    margin: 0 auto;
+}
+
+/* ---------- rejilla de apoyo ---------- */
+.rejilla {
+    display: grid;
+    gap: var(--s3);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+}
+
+.ficha {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: var(--s3);
+}
+
+.banda--papel .ficha { background: var(--bg); }
+
+.ficha h3 { font-size: 1.02rem; margin-bottom: 0.3rem; }
+.ficha p { font-size: 0.92rem; color: var(--ink-soft); }
+
+/* ---------- ficha técnica ---------- */
+.tecnica {
+    display: grid;
+    gap: 0;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--card);
+}
+
+@media (min-width: 700px) {
+    .tecnica { grid-template-columns: repeat(2, 1fr); }
+}
+
+.tecnica div {
+    padding: var(--s3);
+    border-bottom: 1px solid var(--line-soft);
+}
+
+.tecnica dt {
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 0.3rem;
+}
+
+.tecnica dd {
+    margin: 0;
+    font-size: 0.96rem;
+}
+
+/* ---------- aviso de honestidad ---------- */
+.aviso {
+    background: var(--teal-pale);
+    border: 1px solid color-mix(in srgb, var(--teal) 25%, transparent);
+    border-radius: var(--radius-lg);
+    padding: var(--s4);
+}
+
+.aviso h2 { font-size: 1.2rem; margin-bottom: var(--s2); }
+.aviso p { color: var(--ink-soft); margin-bottom: var(--s2); max-width: 70ch; }
+.aviso p:last-child { margin-bottom: 0; }
+
+/* ---------- cierre ---------- */
+.cierre { padding: clamp(2.5rem, 6vw, 4rem) 0; }
+
+.cierre__caja {
+    background: var(--teal-dark);
+    color: #fff;
+    border-radius: var(--radius-lg);
+    padding: clamp(2rem, 5vw, 3rem);
+    text-align: center;
+}
+
+.cierre h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); margin-bottom: var(--s2); }
+
+.cierre p {
+    color: rgba(255, 255, 255, 0.88);
+    max-width: 48ch;
+    margin: 0 auto var(--s4);
+}
+
+.cierre .acciones { justify-content: center; margin-bottom: 0; }
+
+/* ---------- pie ---------- */
+footer {
+    border-top: 1px solid var(--line);
+    padding: var(--s5) 0;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+}
+
+footer .wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s3);
+    align-items: center;
+    justify-content: space-between;
+}
+
+footer a { text-decoration: underline; text-underline-offset: 2px; }
+
+/* A 390 px la cabecera lleva marca + botón y el rótulo se partía en dos
+   líneas, lo que descuadraba la altura de la barra. */
+@media (max-width: 480px) {
+    .marca { font-size: 0.95rem; }
+    .marca span:not(.marca__sello) { white-space: nowrap; }
+    .top .wrap { gap: var(--s2); }
+    .top .btn { padding: 0.7rem 1rem; font-size: 0.88rem; }
+}
