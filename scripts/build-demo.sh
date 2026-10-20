@@ -113,8 +113,18 @@ for captura in portada reserva buzon cuadro-mando movil; do
         { echo "✗ falta demo/landing/capturas/$captura.png" >&2; exit 1; }
 done
 
-# La demo no debe competir en buscadores con dragramonte.com. Cubre la raíz
-# (la landing) y todo lo que cuelga de app/.
-printf 'User-agent: *\nDisallow: /\n' > "$OUT/robots.txt"
+# La landing sí se quiere encontrable: es la cara de venta del producto.
+#
+# Lo que NO se quiere indexado es la aplicación de app/, que son las páginas del
+# doctor con datos ficticios y no debe competir en buscadores con
+# dragramonte.com. Y la forma de conseguirlo NO es prohibirla aquí: una página
+# bloqueada en robots.txt no llega a rastrearse, así que su
+# <meta name="robots" content="noindex"> nunca se lee, y el buscador puede
+# acabar listando la URL igualmente si alguien la enlaza. Para que un noindex
+# surta efecto hay que dejar entrar al rastreador a leerlo.
+#
+# Así que aquí se permite todo, y el noindex que el bucle de más arriba inyecta
+# en cada página de app/ es lo que las mantiene fuera del índice.
+printf 'User-agent: *\nAllow: /\n' > "$OUT/robots.txt"
 
 echo "✓ $(basename "$OUT")/ generado · landing en la raíz + $inyectadas páginas de la app en app/"
