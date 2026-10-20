@@ -34,6 +34,7 @@ Thumbs.db
 
 # Config local de servidores MCP (apunta a puertos de la maquina, no es del proyecto)
 .mcp.json
+.codex/
 
 # OS / editor extra
 *.swp
