@@ -1,5 +1,6 @@
 import apiClient from '../modules/api-client.js';
 import { html, crudo } from '../modules/html.js';
+import { CENTROS } from '../modules/centros.js';
 
 'use strict';
 
@@ -49,13 +50,6 @@ const SERVICIOS_RESERVA = {
     }
 };
 
-const CENTROS = [
-    // El 'id' es el código interno que se envía al backend (coincide con centros.codigo en BD); se mantiene aunque el nombre visible cambie.
-    // 'diasSemana' tiene que cuadrar con el reparto de horarios de V6__horarios_por_centro.sql: si no, el calendario
-    // deja elegir un día para el que el backend no tiene ningún hueco.
-    { id: 'madrid', nombre: 'Consulta General Riera', direccion: 'Carrer del General Riera', ciudad: 'Palma de Mallorca', icono: 'fa-clinic-medical', diasSemana: [1, 2, 4], diasHint: 'Lun / Mar / Jue' },
-    { id: 'palma', nombre: 'Consulta Avenidas', direccion: 'Zona de las Avenidas', ciudad: 'Palma de Mallorca', icono: 'fa-clinic-medical', diasSemana: [3, 5, 6], diasHint: 'Mie / Vie / Sab' }
-];
 
 const state = {
     year: new Date().getFullYear(),
@@ -553,6 +547,7 @@ function renderCalendar() {
         const iso = toISO(date);
         const btn = document.createElement('button');
         btn.className = 'cal-day';
+        btn.dataset.iso = iso;
         btn.textContent = d;
         if (date.getTime() === hoy.getTime()) btn.classList.add('today');
         if (iso === state.dateISO) btn.classList.add('selected');
@@ -936,6 +931,48 @@ function applyServicioFromUrl() {
     showToast(`Servicio: ${cfg.label}`, 'info');
 }
 
+/**
+ * Recoge la elección hecha en el selector del hero de la portada.
+ *
+ * Llega como ?centro=&fecha=&hora=. En vez de duplicar el estado a mano, se
+ * pulsan los mismos botones que pulsaría el paciente: así los cuatro pasos,
+ * el resumen, los campos ocultos del formulario y la carga de huecos reales
+ * se disparan exactamente igual que en el flujo normal.
+ *
+ * Cualquier pieza que no cuadre (centro desconocido, día que el backend ya no
+ * ofrece, hora que acaba de ocuparse) se ignora en silencio y el paciente se
+ * queda en el paso anterior, con el calendario a la vista. Es deliberado: el
+ * hueco pudo ocuparse entre que miró la portada y pulsó, y lo correcto ahí es
+ * dejarle elegir otro, no dar un error.
+ */
+async function applySeleccionDelHero() {
+    const q = new URLSearchParams(window.location.search);
+    const centroId = q.get('centro');
+    const fecha = q.get('fecha');
+    const hora = q.get('hora');
+    if (!centroId || !/^\d{4}-\d{2}-\d{2}$/.test(fecha || '')) return;
+
+    const btnCentro = document.querySelector(`.centro-opt[data-id="${CSS.escape(centroId)}"]`);
+    if (!btnCentro) return;
+    selectCentro(btnCentro);
+
+    // El día puede caer en el mes siguiente: hay que mover el calendario antes
+    // de buscar su botón, porque solo se pinta el mes en curso.
+    const [anio, mes] = fecha.split('-').map(Number);
+    state.year = anio;
+    state.month = mes - 1;
+    renderCalendar();
+
+    const btnDia = document.querySelector(`.cal-day[data-iso="${fecha}"]`);
+    if (!btnDia || btnDia.disabled) return;
+    await selectDate(fecha, btnDia);
+
+    if (!hora) return;
+    const btnHora = [...document.querySelectorAll('#slotsGrid .slot')]
+        .find((b) => b.textContent.trim() === hora && !b.disabled);
+    if (btnHora) selectHour(hora, btnHora);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Antes que nada: si se llega desde el enlace del correo, el token tiene que estar
     // guardado cuando syncMisCitas() pregunte por las citas de este dispositivo.
@@ -958,6 +995,9 @@ document.addEventListener('DOMContentLoaded', () => {
             renderAppointments();
             renderCalendar();
             updateSubmitState();
+            // Al final: necesita los centros pintados y el médico ya cargado,
+            // porque renderSlotsFromBackend() pregunta por state.medicoId.
+            applySeleccionDelHero();
         });
     });
 });

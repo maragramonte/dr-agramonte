@@ -138,28 +138,57 @@
     <section class="hero-section" aria-labelledby="hero-title">
         <div class="hero-content">
             <div class="hero-text">
-                <p class="hero-eyebrow"><i class="fas fa-stethoscope" aria-hidden="true"></i> <span data-i18n="home.eyebrow">Medicina Interna</span></p>
-                <h2 id="hero-title" class="hero-title" data-i18n="home.hero.title">Atención Médica Integral en Medicina Interna</h2>
-                <p class="hero-subtitle" data-i18n="home.hero.subtitle">El Dr. Agramonte cuida de su salud con profesionalidad, cercanía y seguimiento personalizado en Mallorca.</p>
-                <ul class="hero-facts" aria-label="Datos de la consulta">
-                    <li><i class="fas fa-award" aria-hidden="true"></i> <span data-i18n="home.fact.anios">35 años de experiencia</span></li>
-                    <li><i class="fas fa-location-dot" aria-hidden="true"></i> <span data-i18n="home.fact.lugar">Palma de Mallorca</span></li>
+                <p class="hero-eyebrow"><i class="fas fa-stethoscope" aria-hidden="true"></i> <span data-i18n="home.eyebrow">Medicina Interna · Palma de Mallorca</span></p>
+                <h2 id="hero-title" class="hero-title" data-i18n="home.hero.title">Su cita con el Dr. Agramonte, en un minuto.</h2>
+                <p class="hero-subtitle" data-i18n="home.hero.subtitle">Elija centro, día y hora sobre la agenda real del doctor. Sin llamar, sin registrarse y sin esperar confirmación.</p>
+                <ul class="hero-ticks" aria-label="Qué incluye reservar aquí">
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span data-i18n="home.tick.1">Recibe por correo el enlace para consultar o cancelar su cita</span></li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span data-i18n="home.tick.2">Consulta privada 80 €, se abona después de la visita</span></li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span data-i18n="home.tick.3">También con su seguro médico</span></li>
                 </ul>
-                <div class="hero-features" role="list" aria-label="Características del servicio">
-                    <div class="feature-item" role="listitem"><i class="fas fa-check-circle" aria-hidden="true"></i><span data-i18n="home.feature.1">Especialista certificado con más de 35 años de experiencia</span></div>
-                    <div class="feature-item" role="listitem"><i class="fas fa-check-circle" aria-hidden="true"></i><span data-i18n="home.feature.2">Diagnóstico preciso y tratamiento personalizado</span></div>
-                    <div class="feature-item" role="listitem"><i class="fas fa-check-circle" aria-hidden="true"></i><span data-i18n="home.feature.3">Seguimiento continuo y comunicación accesible</span></div>
-                </div>
-                <div class="hero-card">
-                    <div class="hero-card-text">
-                        <p class="hero-card-title" data-i18n="home.card.title">Reserve su cita sin llamar</p>
-                        <p class="hero-card-note" data-i18n="home.card.note">Centro, día y hora sobre la agenda real del doctor.</p>
-                    </div>
-                    <a href="reservar.html" class="btn btn--primary btn--reserva btn--large hero-action"><i class="fas fa-calendar-plus" aria-hidden="true"></i> <span data-i18n="btn.solicitar">Solicitar cita</span></a>
-                </div>
+                <ul class="hero-facts" aria-label="Datos de la consulta">
+                    <li><b>35+</b><span data-i18n="home.fact.anios">años ejerciendo</span></li>
+                    <li><b id="heroNumCentros">2</b><span data-i18n="home.fact.centros">centros en Palma</span></li>
+                    <li><b>6</b><span data-i18n="home.fact.dias">días de agenda a la semana</span></li>
+                </ul>
             </div>
-            <div class="hero-media">
-                <img src="pictures/Profesional.png" alt="El Dr. Juan Manuel Agramonte, especialista en Medicina Interna, con bata blanca y fonendoscopio" width="959" height="750" loading="eager" decoding="async" fetchpriority="high">
+
+            <!-- Selector de cita. El contenido lo rellena js/pages/hero-reserva.js
+                 con los centros y los huecos reales; lo que va escrito aquí es el
+                 estado de carga y el repliegue para cuando no hay backend. -->
+            <aside class="hero-widget" id="heroReserva" aria-labelledby="heroReservaTitulo">
+                <div class="hero-widget__head">
+                    <h3 id="heroReservaTitulo" data-i18n="home.widget.title">Reservar cita</h3>
+                    <p data-i18n="home.widget.subtitle">Huecos reales de los próximos días</p>
+                </div>
+                <div class="hero-widget__body" id="heroReservaCuerpo">
+                    <p class="hw-estado" data-i18n="home.widget.cargando">Consultando la agenda…</p>
+                </div>
+                <div class="hero-widget__foot" id="heroReservaPie" hidden>
+                    <a href="reservar.html" class="btn btn--primary btn--reserva btn--large" id="heroReservaContinuar"><span data-i18n="home.widget.continuar">Continuar</span></a>
+                    <p class="hero-widget__nota" data-i18n="home.widget.nota">Si no acude, no se cobra nada.</p>
+                </div>
+            </aside>
+        </div>
+    </section>
+
+    <!-- Los tres pasos: contestan "¿y qué pasa si pulso?" antes de pulsar. -->
+    <section class="pasos-section" aria-labelledby="pasos-title">
+        <div class="container">
+            <h2 id="pasos-title" class="visually-hidden" data-i18n="home.pasos.title">Cómo se pide cita</h2>
+            <div class="pasos-grid">
+                <div class="paso-reserva">
+                    <h3 data-i18n="home.paso.1.t">Elija hueco</h3>
+                    <p data-i18n="home.paso.1.d">Los que ve son los que quedan libres de verdad en la agenda del doctor.</p>
+                </div>
+                <div class="paso-reserva">
+                    <h3 data-i18n="home.paso.2.t">Deje sus datos</h3>
+                    <p data-i18n="home.paso.2.d">Nombre, teléfono y correo. Puede crear cuenta o no hacerlo, como prefiera.</p>
+                </div>
+                <div class="paso-reserva">
+                    <h3 data-i18n="home.paso.3.t">Reciba el enlace</h3>
+                    <p data-i18n="home.paso.3.d">Le llega al correo con su cita. Desde ahí la consulta o la cancela cuando quiera.</p>
+                </div>
             </div>
         </div>
     </section>
@@ -189,12 +218,16 @@
                     </div>
                     <div class="sobre-mi-actions"><a href="sobre-mi.html" class="btn btn--secondary"><i class="fas fa-user"></i> Conocer más sobre mí</a></div>
                 </div>
-                <div class="sobre-mi-stats" role="region" aria-label="Estadísticas profesionales">
-                    <div class="stat-card" role="listitem"><div class="stat-number">35+</div><div class="stat-label">Años de experiencia</div></div>
-                    <div class="stat-card" role="listitem"><div class="stat-number">500+</div><div class="stat-label">Pacientes atendidos</div></div>
-                    <div class="stat-card" role="listitem"><div class="stat-number">4.9</div><div class="stat-label">Valoración media</div></div>
-                    <div class="stat-card" role="listitem"><div class="stat-number">100%</div><div class="stat-label">Compromiso con la salud</div></div>
-                </div>
+                <!-- Aquí había cuatro cifras: «500+ pacientes atendidos», «4.9
+                     valoración media» y «100% compromiso con la salud». Las tres
+                     eran inventadas y estaban publicadas con el nombre real del
+                     doctor; una valoración media sin reseñas detrás es un reclamo
+                     falso en la web de un profesional sanitario. La única real,
+                     los 35+ años, ya figura en el hero. En su lugar va el retrato,
+                     que es lo que esta sección necesitaba. -->
+                <figure class="sobre-mi-retrato">
+                    <img src="pictures/Profesional.png" alt="El Dr. Juan Manuel Agramonte, especialista en Medicina Interna, con bata blanca y fonendoscopio" width="959" height="750" loading="lazy" decoding="async">
+                </figure>
             </div>
         </div>
     </section>
@@ -227,5 +260,6 @@
 <script src="js/modules/auth-ui.js" defer></script>
 <script src="js/pages/dr-agramonte.js" defer></script>
 <script src="js/pages/index-preload.js"></script>
+<script type="module" src="./js/pages/hero-reserva.js"></script>
 </body>
 </html>

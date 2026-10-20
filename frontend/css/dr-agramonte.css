@@ -40,33 +40,41 @@
     --teal-glow: rgba(15, 118, 110, 0.2);
     --teal-pale: rgba(15, 118, 110, 0.08);
 
-    /* Color de títulos. En claro = teal oscuro; en modo oscuro se aclara
-       (ver bloque [data-theme="dark"]) para que sean legibles sobre fondos
-       oscuros sin tocar el teal-dark usado en footer y banners. */
-    --heading: var(--teal-dark);
+    /* Color de títulos: tinta, no teal. Cuando los titulares iban en verde,
+       el color de marca estaba en todas partes y no significaba nada; ahora
+       el teal queda reservado para lo que se puede pulsar, que es lo que
+       guía al paciente hasta el botón de reservar. En modo oscuro se aclara
+       (ver bloque [data-theme="dark"]). */
+    --heading: var(--gray-900);
 
     --silver: #D4D4D8;
     --silver-light: #E8E8EC;
     --silver-dark: #A1A1AA;
 
     --white: #FFFFFF;
-    --off-white: #F9FAFB;
-    --gray-50: #F9FAFB;
-    --gray-100: #F3F4F6;
-    --gray-200: #E5E7EB;
-    --gray-300: #D1D5DB;
-    --gray-400: #6E7682; /* WCAG AA: 4.59:1 sobre blanco (antes #9CA3AF=2.54:1 fallaba). Solo se usa como texto. */
-    --gray-500: #6B7280;
-    --gray-700: #374151;
-    --gray-900: #1F2937;
+    --off-white: #F6F8F8;
+
+    /* Escala de grises templada hacia el verde del teal, en vez de la gris
+       azulada de Tailwind que traía antes. El fondo y los filetes comparten
+       ahora el matiz de la marca, que es lo que hace que la página se lea
+       como un conjunto y no como componentes sueltos sobre gris genérico.
+       Los ratios WCAG de los tonos de texto se mantienen o mejoran. */
+    --gray-50: #F6F8F8;
+    --gray-100: #EFF3F2;
+    --gray-200: #E3E8E7;
+    --gray-300: #CDD5D3;
+    --gray-400: #68736F; /* 5.07:1 sobre --bg. Solo se usa como texto. */
+    --gray-500: #5B6764; /* 5.86:1 sobre --bg */
+    --gray-700: #333C39;
+    --gray-900: #0F1A18;
 
     /* Fondos y textos (se intercambian en modo oscuro) */
     --bg: var(--off-white);
     --card: var(--white);
-    --border: #E5E7EB;
+    --border: #E3E8E7;
     --text: var(--gray-900);
     --text-light: var(--gray-500);
-    --muted: #6E7682; /* WCAG AA sobre blanco (antes #9CA3AF fallaba) */
+    --muted: #68736F; /* WCAG AA sobre --bg y sobre --card */
 
     /* Efectos visuales */
     --glass-bg: rgba(255, 255, 255, 0.85);
@@ -83,57 +91,78 @@
     /* Layout */
     --maxw: 1200px;
 
-    /* Bordes – redondeados pero profesionales */
-    --radius-sm: 8px;
-    --radius: 12px;
+    /* Bordes – algo menos redondeados que antes: a 12-24px las tarjetas
+       parecían pastillas, y con el filete fino de ahora el radio pequeño
+       se lee más preciso. */
+    --radius-sm: 6px;
+    --radius: 10px;
     --radius-lg: 16px;
-    --radius-xl: 24px;
+    --radius-xl: 20px;
     --radius-full: 9999px;
 
-    /* Sombras – suaves, que elevan sin exagerar */
-    --shadow-sm: 0 2px 8px rgba(15, 118, 110, 0.08);
-    --shadow: 0 4px 16px rgba(15, 118, 110, 0.1);
-    --shadow-lg: 0 12px 32px rgba(15, 118, 110, 0.12);
-    --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.08);
+    /* Sombras – dos capas y en tinta neutra, no en teal. El halo verdoso
+       teñía cada tarjeta y era buena parte del aire amateur: una sombra
+       de color solo se justifica si el objeto que la proyecta es de ese
+       color. Capa 1 define el canto, capa 2 da la distancia. */
+    --shadow-sm: 0 1px 2px rgba(15, 26, 24, 0.04);
+    --shadow: 0 1px 2px rgba(15, 26, 24, 0.04), 0 8px 24px rgba(15, 26, 24, 0.06);
+    --shadow-lg: 0 2px 4px rgba(15, 26, 24, 0.05), 0 16px 40px rgba(15, 26, 24, 0.09);
+    --shadow-glass: 0 8px 32px rgba(15, 26, 24, 0.08);
 
     /* Transiciones – curvas suaves para no parecer amateur */
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-fast: all 0.2s ease;
 
-    /* Fuentes – combinación serif + sans para jerarquía */
-    --font-display: 'DM Serif Display', Georgia, serif;
-    --font-body: 'DM Sans', sans-serif;
+    /* Fuentes – una sola familia. DM Sans es variable (300–700), así que la
+       jerarquía la dan el peso y el tamaño, no un cambio de tipo. Se retiró
+       DM Serif Display: el serif de titular daba un aire de folleto que no
+       encaja con una web cuyo trabajo principal es que el paciente pida hora.
+       --font-display se mantiene como token para no tocar sus ~10 usos. */
+    --font-display: 'DM Sans', system-ui, sans-serif;
+    --font-body: 'DM Sans', system-ui, sans-serif;
+
+    /* Interletraje de los titulares: a cuerpo grande, la DM Sans pide
+       negativo para no parecer suelta. */
+    --tracking-title: -0.022em;
 }
 
 /* Modo oscuro – activado con atributo data-theme */
 [data-theme="dark"] {
-    --bg: #0F172A;
-    --card: #1E293B;
-    --border: rgba(148, 163, 184, 0.1);
-    --text: #F1F5F9;
-    --text-light: #CBD5E1;
-    --muted: #94A3B8;
+    /* Mismo giro que en claro: los neutros se templan hacia el verde en vez
+       de la pizarra azulada de antes, para que los dos temas se lean como
+       la misma marca. */
+    --bg: #0E1715;
+    --card: #17211F;
+    --border: rgba(205, 213, 211, 0.12);
+    --text: #ECF1EF;
+    --text-light: #BBC6C3;
+    --muted: #93A09C;
     /* La escala de grises se invierte entera. Los componentes la usan para las dos
        cosas —superficies (--gray-50/100/200) y texto (--gray-500/700/900)—, así que
        dejarla con los valores claros mientras --card y --text sí cambiaban partía el
        tema por la mitad: el formulario de reserva escribía en #1F2937 sobre #1E293B y
        la cabecera de la tabla del panel salía blanca sobre blanca. */
-    --gray-50: #1E293B;
-    --gray-100: #273449;
-    --gray-200: #334155;
-    --gray-300: #475569;
-    --gray-400: #9CA3AF; /* en oscuro vuelve al tono claro: 7:1 sobre fondo oscuro */
-    --gray-500: #94A3B8;
-    --gray-700: #CBD5E1;
-    --gray-900: #F1F5F9;
+    --gray-50: #17211F;
+    --gray-100: #1E2A27;
+    --gray-200: #2A3734;
+    --gray-300: #3D4B47;
+    --gray-400: #9CABA7; /* en oscuro vuelve al tono claro: 7.2:1 sobre --bg */
+    --gray-500: #93A09C;
+    --gray-700: #BBC6C3;
+    --gray-900: #ECF1EF;
     --teal: #14B8A6;
     --teal-dark: #0F766E;
-    --heading: var(--teal-light); /* títulos legibles sobre superficies oscuras (~6.5:1) */
-    --silver: #3F3F46;
-    --silver-light: #52525B;
-    --glass-bg: rgba(30, 41, 59, 0.85);
-    --shadow-sm: 0 2px 8px rgba(20, 184, 166, 0.1);
-    --shadow: 0 4px 16px rgba(20, 184, 166, 0.12);
+    /* En oscuro los títulos sí se aclaran a tinta clara, igual que en claro
+       van a tinta oscura: el token cambia de extremo, no de papel. */
+    --heading: var(--gray-900);
+    --silver: #3D4B47;
+    --silver-light: #4E5D59;
+    --glass-bg: rgba(23, 33, 31, 0.85);
+    /* En oscuro una sombra no se ve; lo que separa superficies es el filete.
+       Se dejan casi a cero para no ensuciar los cantos. */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.22);
+    --shadow-lg: 0 2px 4px rgba(0, 0, 0, 0.35), 0 16px 40px rgba(0, 0, 0, 0.3);
 }
 
 /* ========== 2. RESET Y BASE (sin romper nada) ========== */
@@ -380,6 +409,7 @@ a {
     font-weight: 700;
     color: var(--teal);
     font-family: var(--font-display);
+    letter-spacing: var(--tracking-title);
 }
 .stat-label {
     font-size: 0.75rem;
@@ -398,6 +428,8 @@ a {
 }
 .cta-title {
     font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: var(--tracking-title);
     font-size: 1.8rem;
     color: var(--heading);
 }
@@ -587,8 +619,12 @@ a {
     }
 }
 
+/* 10vw hacia la mitad del rango daba saltos de mas de 100px entre seccion
+   y seccion en escritorio, que es de donde venian los huecos muertos de la
+   portada. Con 6vw la respiracion se nota igual y el recorrido no se parte
+   en bloques aislados. */
 .section {
-    padding: clamp(3rem, 10vw, 5rem) 0;
+    padding: clamp(2.5rem, 6vw, 4rem) 0;
 }
 
 .section-header,
@@ -603,22 +639,24 @@ a {
     color: var(--heading);
     margin-bottom: var(--space-2);
     font-family: var(--font-display);
-    font-weight: 500;
+    letter-spacing: var(--tracking-title);
+    font-weight: 600;
     position: relative;
     display: inline-block;
 }
 
+/* El filete teal bajo cada titulo de seccion se retira.
+
+   Marcaba la jerarquia cuando los titulares iban en serif y en verde; ahora
+   que van en tinta y con peso 600, el subrayado solo anade una linea de color
+   por seccion y obliga a reservarle 12px de aire debajo, que es parte de lo
+   que separaba tanto el titulo de su subtitulo. La jerarquia la da el cuerpo
+   de letra. Se deja la regla vacia a proposito: .page-hero h1::after sigue
+   usando el mismo patron en las bandas de titulo, donde sobre fondo teal si
+   funciona. */
 .section-title::after,
 .section__title::after {
-    content: '';
-    position: absolute;
-    bottom: -12px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 3px;
-    background: linear-gradient(90deg, var(--teal), var(--teal-light));
-    border-radius: 2px;
+    content: none;
 }
 
 .section-subtitle,
@@ -696,8 +734,9 @@ a {
 
 .page-hero h1 {
     font-family: var(--font-display);
+    letter-spacing: var(--tracking-title);
     font-size: clamp(1.75rem, 5vw, 2.45rem);
-    font-weight: 500;
+    font-weight: 600;
     margin-bottom: var(--space-2);
     line-height: 1.2;
 }
@@ -859,9 +898,10 @@ a {
 
 .logo-text h1 {
     font-family: var(--font-display);
+    letter-spacing: var(--tracking-title);
     font-size: clamp(1rem, 3.4vw, 1.25rem);
     color: var(--heading);
-    font-weight: 500;
+    font-weight: 600;
     line-height: 1.2;
     white-space: nowrap;
     overflow: hidden;
@@ -1636,7 +1676,8 @@ a {
     color: var(--heading);
     margin-bottom: var(--space-2);
     font-family: var(--font-display);
-    font-weight: 500;
+    letter-spacing: var(--tracking-title);
+    font-weight: 600;
 }
 
 .card__text {
@@ -1645,206 +1686,349 @@ a {
 }
 
 /* ========== 9. HERO – el gancho visual ========== */
-/* ========== HERO — composicion asimetrica ==========
-   El texto se ancla al margen izquierdo y la foto del doctor sangra por la
-   derecha hasta el borde de la ventana, sin marco. La tarjeta de cita cabalga
-   sobre la union de las dos. El degradado va de teal a un slate oscuro por la
-   derecha para que el fondo negro de la foto se funda con la seccion en vez de
-   recortarse contra ella. */
+/* ========== HERO — el calendario dentro del hero ==========
+   Antes el hero era una banda de degradado teal con la foto del doctor
+   sangrando por la derecha y un boton que llevaba a reservar.html. Era
+   bonito y costaba un clic de mas: el paciente entraba, leia un titular
+   generico y tenia que irse a otra pagina para hacer lo unico que habia
+   venido a hacer.
+
+   Ahora la columna derecha es el propio selector de cita, con los huecos
+   reales que devuelve /api/disponibilidad. Elegir centro y hora ocurre en
+   la portada; reservar.html solo recoge los datos. La foto del doctor baja
+   a la seccion "El Dr. Agramonte", que es donde aporta.
+
+   El hero pasa a fondo claro: el texto blanco sobre teal obligaba a que
+   todo lo de dentro fuese blanco, y la tarjeta del selector pedia papel. */
 .hero-section {
-    background: linear-gradient(105deg, var(--teal-dark) 0%, var(--teal-fill) 38%, #123240 72%, #0e1f2a 100%);
-    color: white;
+    background: var(--bg);
+    color: var(--text);
     position: relative;
-    overflow: hidden;
+    border-bottom: 1px solid var(--border);
 }
 
 .hero-content {
     position: relative;
     z-index: 1;
     display: grid;
-    align-items: stretch;
+    gap: clamp(var(--space-4), 5vw, var(--space-6));
+    align-items: start;
     grid-template-columns: minmax(0, 1fr);
-    /* Sin padding a la derecha: es lo que deja que la foto llegue al borde. */
-    padding-left: max(var(--space-3), (100% - var(--maxw)) / 2);
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: clamp(2.5rem, 6vw, 4.5rem) var(--space-3);
 }
 
 @media (min-width: 992px) {
     .hero-content {
-        grid-template-columns: minmax(0, 1fr) clamp(320px, 38vw, 520px);
+        /* 420px es el ancho al que caben cuatro huecos por fila sin apretar. */
+        grid-template-columns: minmax(0, 1fr) 420px;
     }
 }
 
 .hero-text {
-    padding: clamp(2.5rem, 7vw, 4.5rem) var(--space-3) clamp(2.5rem, 7vw, 4rem) 0;
     align-self: center;
     max-width: 46rem;
 }
 
+/* Antetitulo: pastilla en vez del filete lateral que llevaba sobre el
+   degradado. Sobre papel claro el filete se perdia. */
 .hero-eyebrow {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.92);
-    border-left: 3px solid var(--teal-light);
-    padding-left: 0.7rem;
-    margin-bottom: var(--space-2);
-    animation: fadeInUp 0.7s ease-out;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--teal-dark);
+    background: var(--teal-pale);
+    border-radius: var(--radius-full);
+    padding: 0.35rem 0.8rem;
+    margin-bottom: var(--space-3);
 }
 
 .hero-title {
-    font-size: clamp(1.9rem, 5.4vw, 3.1rem);
-    line-height: 1.12;
+    font-size: clamp(1.9rem, 5.4vw, 3rem);
+    line-height: 1.14;
+    color: var(--heading);
     margin-bottom: var(--space-3);
     font-family: var(--font-display);
-    animation: fadeInUp 0.7s ease-out 0.05s both;
+    font-weight: 600;
+    letter-spacing: var(--tracking-title);
 }
 
 .hero-subtitle {
-    font-size: clamp(0.95rem, 2.5vw, 1.15rem);
-    color: rgba(255, 255, 255, 0.95);
+    font-size: clamp(0.98rem, 2.5vw, 1.1rem);
+    color: var(--text-light);
     margin-bottom: var(--space-3);
     line-height: 1.6;
-    max-width: 34rem;
-    animation: fadeInUp 0.7s ease-out 0.1s both;
+    max-width: 38rem;
 }
 
-/* Los tres datos que identifican una consulta de un vistazo. */
+/* Las tres razones para fiarse de reservar aqui. Contestan, por orden, a
+   las tres dudas que frenan a quien no ha reservado nunca en esta web:
+   "si no me registro, como vuelvo a mi cita", "cuanto cuesta" y "y si
+   tengo seguro". */
+.hero-ticks {
+    list-style: none;
+    display: grid;
+    gap: 0.7rem;
+    margin: 0 0 var(--space-4);
+    padding: 0;
+}
+
+.hero-ticks li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    font-size: 0.95rem;
+    color: var(--text-light);
+    line-height: 1.5;
+}
+
+.hero-ticks i {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin-top: 0.15rem;
+    border-radius: var(--radius-full);
+    background: var(--teal-pale);
+    color: var(--teal-dark);
+    display: grid;
+    place-items: center;
+    font-size: 0.6rem;
+}
+
+/* Los datos que identifican la consulta de un vistazo. */
 .hero-facts {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-2) var(--space-3);
+    gap: var(--space-3) var(--space-4);
     list-style: none;
-    padding: var(--space-2) 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.18);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
-    font-size: 0.85rem;
-    animation: fadeInUp 0.7s ease-out 0.15s both;
+    margin: 0;
+    padding: var(--space-3) 0 0;
+    border-top: 1px solid var(--border);
 }
 
 .hero-facts li {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
+    font-size: 0.85rem;
+    color: var(--muted);
 }
 
-.hero-facts i {
-    /* Blancos, no teal: el fondo de la seccion ya es teal y el icono desaparecia. */
-    color: rgba(255, 255, 255, 0.92);
+.hero-facts b {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--heading);
+    letter-spacing: var(--tracking-title);
+    line-height: 1.2;
 }
 
-.hero-features {
-    margin: var(--space-3) 0 var(--space-4);
+/* ========== El selector de cita del hero ==========
+   Replica el paso 1 y 2 de reservar.html (centro y hora) y, al continuar,
+   pasa la eleccion por la URL. No duplica la logica de reserva: solo lee
+   /api/centros y /api/disponibilidad. Si cualquiera de las dos falla, el
+   bloque .hero-widget__fallback toma el relevo con el boton de siempre,
+   asi que la portada nunca se queda sin via para pedir cita. */
+.hero-widget {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.hero-widget__head {
+    padding: var(--space-3);
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.hero-widget__head h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--heading);
+    letter-spacing: var(--tracking-title);
+}
+
+.hero-widget__head p {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-top: 0.1rem;
+}
+
+.hero-widget__body {
+    padding: var(--space-3);
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
-    gap: var(--space-2) var(--space-3);
-    animation: fadeInUp 0.7s ease-out 0.2s both;
-}
-
-.feature-item {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    font-size: 0.9rem;
-}
-
-.feature-item i {
-    color: rgba(255, 255, 255, 0.9);
-}
-
-/* La tarjeta de cita: sale del bloque de texto y se monta sobre la foto. */
-.hero-card {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
     gap: var(--space-3);
+}
+
+.hw-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+}
+
+.hw-options {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.hw-option {
+    text-align: left;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.7rem 0.8rem;
+    font: inherit;
+    font-size: 0.92rem;
+    color: var(--text);
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.hw-option:hover {
+    border-color: var(--gray-300);
+}
+
+.hw-option[aria-pressed="true"] {
+    border-color: var(--teal-fill);
+    background: var(--teal-pale);
+    box-shadow: inset 0 0 0 1px var(--teal-fill);
+}
+
+.hw-option small {
+    display: block;
+    color: var(--text-light);
+    font-size: 0.8rem;
+    margin-top: 0.1rem;
+}
+
+.hw-slots {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+}
+
+.hw-slot {
+    text-align: center;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.5rem 0;
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 500;
     background: var(--card);
     color: var(--text);
-    border-radius: var(--radius-lg);
-    padding: var(--space-3);
-    box-shadow: 0 22px 45px rgba(8, 20, 30, 0.45);
-    animation: fadeInUp 0.7s ease-out 0.25s both;
+    cursor: pointer;
+    transition: var(--transition-fast);
 }
 
-@media (min-width: 992px) {
-    .hero-card {
-        /* Negativo: se sale de su columna y pisa la foto, que es lo que rompe
-           la simetria. El limite lo pone la propia foto, que empieza despues. */
-        margin-right: clamp(-12rem, -11vw, -5rem);
-    }
+.hw-slot:hover:not(:disabled) {
+    border-color: var(--gray-300);
 }
 
-.hero-card-title {
-    font-family: var(--font-display);
-    font-size: 1.15rem;
-    color: var(--heading);
-    margin-bottom: 0.15rem;
-}
-
-.hero-card-note {
-    font-size: 0.82rem;
-    color: var(--text-light);
-    max-width: 22rem;
-}
-
-.hero-card .btn--primary {
+.hw-slot[aria-pressed="true"] {
+    border-color: var(--teal-fill);
     background: var(--teal-fill);
     color: #fff;
-    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.18);
 }
 
-.hero-card .btn--primary:hover,
-.hero-card .btn--primary:focus-visible {
-    background: var(--teal-dark);
-    color: #fff;
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.28);
+.hw-slot:disabled {
+    color: var(--muted);
+    background: var(--gray-100);
+    border-color: transparent;
+    cursor: not-allowed;
 }
 
-/* La foto, a sangre y sin marco. La mascara deshace el borde izquierdo para que
-   no quede un corte recto contra el degradado. */
-.hero-media {
-    position: relative;
-    min-height: 22rem;
-    animation: fadeInRight 0.7s ease-out;
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 26%);
-    mask-image: linear-gradient(to right, transparent 0%, #000 26%);
+.hw-estado {
+    font-size: 0.88rem;
+    color: var(--text-light);
+    text-align: center;
+    padding: var(--space-2) 0;
 }
 
-.hero-media img {
-    display: block;
+.hero-widget__foot {
+    padding: 0 var(--space-3) var(--space-3);
+}
+
+.hero-widget__foot .btn {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: 50% 12%;
 }
 
-/* En movil la foto va arriba, como una banda: al abrir la web lo primero que se
-   ve sigue siendo la consulta, no un bloque de texto. */
-@media (max-width: 991px) {
-    .hero-media {
-        order: -1;
-        min-height: 15rem;
-        max-height: 20rem;
-        margin-right: 0;
-        -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
-        mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
-    }
+.hero-widget__nota {
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 0.6rem;
+}
 
-    /* El hueco lo pone el texto, no el contenedor: asi la foto tambien sangra
-       de lado a lado en movil en vez de quedarse con un margen a la izquierda. */
-    .hero-content {
-        padding-left: 0;
-    }
+/* Repliegue: lo que se ve si el backend no contesta. */
+.hero-widget__fallback {
+    padding: var(--space-3);
+    text-align: center;
+}
 
-    .hero-text {
-        padding: var(--space-3) var(--space-3) clamp(2rem, 8vw, 3rem);
+.hero-widget__fallback p {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: var(--space-2);
+}
+
+/* ========== Los tres pasos ==========
+   Debajo del hero y antes de los servicios: contesta "que pasa si pulso"
+   antes de que el paciente tenga que averiguarlo. */
+.pasos-section {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: clamp(2rem, 5vw, 3.5rem) 0;
+}
+
+.pasos-grid {
+    display: grid;
+    gap: var(--space-4);
+    counter-reset: paso;
+}
+
+@media (min-width: 768px) {
+    .pasos-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-5);
     }
+}
+
+.paso-reserva {
+    counter-increment: paso;
+}
+
+.paso-reserva::before {
+    content: counter(paso);
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: var(--teal-fill);
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+}
+
+.paso-reserva h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--heading);
+    letter-spacing: var(--tracking-title);
+    margin-bottom: 0.3rem;
+}
+
+.paso-reserva p {
+    font-size: 0.92rem;
+    color: var(--text-light);
+    line-height: 1.6;
 }
 
 .image-badge {
@@ -2149,6 +2333,8 @@ a {
 
 .calendar-title {
     font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: var(--tracking-title);
     font-size: 1.1rem;
 }
 
@@ -2624,6 +2810,8 @@ a {
 
 .sobre-mi-heading {
     font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: var(--tracking-title);
     font-size: clamp(1.7rem, 3.5vw, 2.3rem);
     color: var(--heading);
     margin-bottom: var(--space-3);
@@ -2642,6 +2830,8 @@ a {
     align-items: center;
     gap: 0.6rem;
     font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: var(--tracking-title);
     font-size: 1.2rem;
     color: var(--heading);
     margin-top: var(--space-5);
@@ -2760,14 +2950,11 @@ a {
 .section-header,
 .section__header {
     text-align: left;
-    margin-bottom: var(--space-5);
+    margin-bottom: var(--space-4);
 }
 
-.section-title::after,
-.section__title::after {
-    left: 0;
-    transform: none;
-}
+/* (El filete bajo los titulos de seccion ya no existe; antes aqui se movia
+   a la izquierda para las paginas interiores.) */
 
 .section-subtitle,
 .section__subtitle {
@@ -2776,20 +2963,19 @@ a {
     max-width: 34rem;
 }
 
-/* Servicios: tres columnas de anchos distintos y escalonadas en vertical, de
-   modo que ninguna tarjeta empieza a la misma altura que su vecina. */
+/* Servicios: tres columnas IGUALES y alineadas.
+
+   Antes iban a 1.15fr / 1fr / 0.9fr y cada tarjeta bajaba un escalon
+   (+2rem la segunda, +4rem la tercera). La idea era un ritmo editorial,
+   pero el escalonado solo funciona cuando los elementos son distintos
+   entre si: aqui las tres tarjetas son gemelas —mismo icono, mismo largo
+   de texto, mismo boton— y el desnivel no se leia como ritmo sino como
+   rejilla rota, con el borde inferior del bloque en diagonal. Ademas la
+   tercera salia mas estrecha sin ninguna razon de contenido. */
 @media (min-width: 900px) {
     .home .grid--services {
-        grid-template-columns: 1.15fr 1fr 0.9fr;
-        align-items: start;
-    }
-
-    .home .grid--services > :nth-child(2) {
-        margin-top: var(--space-4);
-    }
-
-    .home .grid--services > :nth-child(3) {
-        margin-top: calc(var(--space-4) * 2);
+        grid-template-columns: repeat(3, 1fr);
+        align-items: stretch;
     }
 
     /* El enlace de "ver todos" cae al lado contrario del titulo. */
@@ -2798,54 +2984,81 @@ a {
     }
 }
 
-/* Sobre el doctor: manda la columna de texto y las cifras bajan un escalon;
-   dentro de las cifras, las de la derecha bajan otro. */
+/* Sobre el doctor: manda la columna de texto y las cifras van al lado,
+   arrancando a la misma altura (antes las pares bajaban otro escalon). */
 @media (min-width: 900px) {
     .home .sobre-mi-resumen .sobre-mi-content {
-        grid-template-columns: 1.45fr 0.85fr;
+        grid-template-columns: 1.4fr 0.9fr;
         align-items: start;
     }
 
     .home .sobre-mi-stats {
-        margin-top: var(--space-5);
         align-content: start;
-    }
-
-    .home .sobre-mi-stats > :nth-child(even) {
-        margin-top: var(--space-4);
     }
 }
 
-/* Llamada final: el titular a un lado, las dos opciones al otro y desplazadas
-   entre si. Ademas deshace el display:flex que le cae encima de la segunda
-   regla .cta-section del fichero (ver L2324), pensada para otro componente. */
+/* Llamada final: un bloque compacto en teal oscuro, centrado.
+
+   Antes era el titular a un lado y las dos opciones apiladas al otro sobre
+   una banda de degradado verde palido. A ancho completo dejaba media
+   pantalla vacia a la izquierda —las tarjetas solo llenaban la columna
+   derecha— y el degradado palido no llegaba a leerse como un cierre: la
+   pagina se desvanecia en vez de terminar.
+
+   Ahora el bloque es una pieza oscura con aire alrededor, las dos opciones
+   van en fila y el contraste marca el final del recorrido. Ademas deshace
+   el display:flex que le cae encima de la segunda regla .cta-section del
+   fichero (ver L2324), pensada para otro componente. */
 .home .cta-section {
     display: block;
+    background: none;
     margin-top: 0;
-    padding: var(--space-5) 0;
+    padding: clamp(2rem, 5vw, 3.5rem) 0;
     border-top: 0;
 }
 
 .home .cta-content {
-    text-align: left;
+    background: var(--teal-dark);
+    color: #fff;
+    border-radius: var(--radius-lg);
+    padding: clamp(2rem, 5vw, 3rem);
+    text-align: center;
 }
 
-@media (min-width: 900px) {
-    .home .cta-content {
-        display: grid;
-        grid-template-columns: 0.95fr 1.05fr;
-        gap: var(--space-5);
-        align-items: center;
-    }
+.home .cta-title {
+    color: #fff;
+}
 
+.home .cta-text {
+    /* Sobre el teal oscuro, --text-light se iba a 2:1. */
+    color: rgba(255, 255, 255, 0.88);
+    max-width: 46ch;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (min-width: 700px) {
     .home .grid--cta {
-        margin-top: 0;
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 42rem;
+        margin-left: auto;
+        margin-right: auto;
     }
+}
 
-    .home .grid--cta > :nth-child(2) {
-        margin-left: var(--space-5);
-    }
+/* Las dos tarjetas siguen siendo de papel blanco dentro del bloque oscuro,
+   asi que tienen que recuperar la tinta: el color: #fff de .cta-content se
+   heredaba hasta el texto de dentro y lo dejaba blanco sobre blanco. */
+.home .cta-option {
+    color: var(--text);
+}
+
+.home .cta-option__title {
+    color: var(--heading);
+}
+
+.home .cta-option__text {
+    color: var(--text-light);
 }
 
 
@@ -2886,45 +3099,29 @@ a {
 }
 
 @media (min-width: 900px) {
-    /* Servicios: mismos anchos desiguales y mismo escalonado que la portada. */
+    /* Servicios: columnas iguales y alineadas, igual que en la portada.
+       Aqui habia el mismo escalonado (anchos 1.15/1/0.9 y margenes
+       crecientes) y fallaba por lo mismo. */
     .servicios-grid {
-        grid-template-columns: 1.15fr 1fr 0.9fr;
-        align-items: start;
+        grid-template-columns: repeat(3, 1fr);
+        align-items: stretch;
     }
 
-    .servicios-grid > :nth-child(2) {
-        margin-top: var(--space-4);
-    }
+    /* Testimonios: una sola columna, sin sangrar los pares un 8% por la
+       izquierda. El zigzag rompia el eje de lectura y dejaba el bloque
+       con el margen derecho dentado. */
 
-    .servicios-grid > :nth-child(3) {
-        margin-top: calc(var(--space-4) * 2);
-    }
+    /* La banda de cifras, alineada (antes las pares bajaban 2rem). */
 
-    /* Testimonios: van en una sola columna, asi que escalonarlos en vertical
-       solo parecia un hueco mal puesto. Se sangran los pares por la izquierda:
-       la lectura baja en zigzag y ninguna tarjeta empieza donde la anterior. */
-    .grid--testimonials > :nth-child(even) {
-        margin-left: 8%;
-    }
-
-    /* La banda de cifras, en dientes de sierra. */
-    .stats-band > :nth-child(even) {
-        margin-top: var(--space-4);
-    }
-
-    /* Sobre el doctor y contacto ya eran asimetricas; se acentua la diferencia
-       y la columna secundaria arranca mas abajo. */
+    /* Sobre el doctor y contacto: asimetricas, que eso si funciona —una
+       columna manda y la otra acompana—, pero las dos arrancan arriba. */
     .sobre-mi-layout {
-        grid-template-columns: 0.85fr 1.35fr;
+        grid-template-columns: 0.9fr 1.3fr;
     }
 
     .contacto-container {
-        grid-template-columns: 1.35fr 0.95fr;
+        grid-template-columns: 1.3fr 1fr;
         align-items: start;
-    }
-
-    .formulario-contacto {
-        margin-top: var(--space-5);
     }
 
     /* Privacidad: el indice se queda estrecho a un lado en vez de ocupar todo
@@ -2932,4 +3129,27 @@ a {
     .toc-grid {
         grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
     }
+}
+
+
+/* ============================================================
+   RETRATO DEL DOCTOR (portada)
+
+   Sustituye a la rejilla de cuatro cifras que ocupaba esta columna. La foto
+   se recorta por arriba: es un retrato de medio cuerpo y, encuadrado al
+   centro, la cara quedaba en el tercio superior con medio metro de bata
+   debajo.
+   ============================================================ */
+.sobre-mi-retrato {
+    margin: 0;
+}
+
+.sobre-mi-retrato img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    object-position: top center;
+    border-radius: var(--radius-lg);
+    display: block;
 }
