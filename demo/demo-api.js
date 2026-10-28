@@ -276,6 +276,8 @@
 
     // ── Lógica de negocio ────────────────────────────────────────────────
     function crearCita(db, usuario, req) {
+        // Como el @AssertTrue de los DTO: sin aceptar la política no hay reserva.
+        if (req.aceptaPrivacidad !== true) throw new ApiError(400, 'Debes aceptar la política de privacidad');
         obligatorio(req.medicoId, 'medicoId');
         obligatorio(req.fechaHora, 'fechaHora');
         if (!medicoPorId(Number(req.medicoId))) throw new ApiError(404, 'Medico no encontrado');
@@ -342,7 +344,7 @@
     function mensajeConfirmacion(db, c) {
         return `✅ Cita confirmada – Dr. Agramonte\nHola ${pacienteDe(db, c).nombre}, su cita está reservada:\n`
             + `Fecha: ${fechaAviso(c.fechaHora)}\nMédico: ${medicoPorId(c.medicoId).nombre}\n`
-            + `Motivo: ${c.motivo || 'Consulta médica'}\nDirección: ${direccionCita(c)}\n`
+            + `Dirección: ${direccionCita(c)}\n`
             + 'Para cambios o cancelación, use la web de reservas.';
     }
     function mensajeCancelacion(db, c) {
@@ -643,6 +645,8 @@
         }
         if (method === 'POST' && path === '/citas/reserva-publica') {
             obligatorio(body.nombre, 'nombre'); obligatorio(body.email, 'email'); obligatorio(body.telefono, 'telefono');
+            // Antes de tocar cuentas: aquí no hay transacción que deshacer si falla después.
+            if (body.aceptaPrivacidad !== true) throw new ApiError(400, 'Debes aceptar la política de privacidad');
             const email = String(body.email).trim().toLowerCase();
             const conPassword = !!(body.password && String(body.password).trim());
             let u = usuarioPorEmail(email);

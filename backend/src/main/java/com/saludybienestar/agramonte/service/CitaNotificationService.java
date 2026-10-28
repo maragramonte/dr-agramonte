@@ -84,10 +84,15 @@ public class CitaNotificationService {
         return paciente.getTelefono().trim();
     }
 
+    /*
+     * Ningún mensaje de este servicio lleva el motivo de la cita. El motivo es un dato
+     * de salud (art. 9 RGPD), y estos avisos salen por Twilio (EE. UU.) y Telegram,
+     * quedan en el móvil de quien los recibe y además se guardan en la tabla de
+     * notificaciones. El médico lo consulta en su agenda, detrás del login.
+     */
     private String buildNuevaCitaMedicoMessage(Cita cita) {
         Usuario p = cita.getUsuario();
         String tel = p.getTelefono() != null && !p.getTelefono().isBlank() ? p.getTelefono() : "—";
-        String motivo = cita.getMotivo() != null && !cita.getMotivo().isBlank() ? cita.getMotivo() : "—";
         return """
                 🩺 Nueva cita – Dr. Agramonte
                 Paciente: %s
@@ -95,15 +100,14 @@ public class CitaNotificationService {
                 Tel: %s
                 Médico: %s
                 Fecha: %s
-                Motivo: %s
                 ID cita: %d
+                El motivo está en la agenda.
                 """.formatted(
                 p.getNombre(),
                 p.getEmail(),
                 tel,
                 cita.getMedico().getNombre(),
                 cita.getFechaHora().format(FECHA),
-                motivo,
                 cita.getId()
         ).trim();
     }
@@ -127,21 +131,17 @@ public class CitaNotificationService {
     }
 
     private String buildConfirmacionPacienteMessage(Cita cita) {
-        String motivo = cita.getMotivo() != null && !cita.getMotivo().isBlank()
-                ? cita.getMotivo() : "Consulta médica";
         return """
                 ✅ Cita confirmada – Dr. Agramonte
                 Hola %s, su cita está reservada:
                 Fecha: %s
                 Médico: %s
-                Motivo: %s
                 Dirección: %s
                 Para cambios o cancelación, use la web de reservas.
                 """.formatted(
                 cita.getUsuario().getNombre(),
                 cita.getFechaHora().format(FECHA),
                 cita.getMedico().getNombre(),
-                motivo,
                 direccionCita(cita)
         ).trim();
     }

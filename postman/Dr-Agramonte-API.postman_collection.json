@@ -210,7 +210,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Paciente Invitado\",\n  \"email\": \"{{invitado_email}}\",\n  \"telefono\": \"+34600000099\",\n  \"medicoId\": {{medico_id}},\n  \"fechaHora\": \"{{fecha_disponibilidad}}T11:00:00\",\n  \"motivo\": \"Reserva pública TFG\"\n}"
+              "raw": "{\n  \"nombre\": \"Paciente Invitado\",\n  \"email\": \"{{invitado_email}}\",\n  \"telefono\": \"+34600000099\",\n  \"medicoId\": {{medico_id}},\n  \"fechaHora\": \"{{fecha_disponibilidad}}T11:00:00\",\n  \"motivo\": \"Reserva pública TFG\",\n  \"aceptaPrivacidad\": true\n}"
             },
             "url": "{{base_url}}/api/citas/reserva-publica"
           }
@@ -236,7 +236,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"medicoId\": {{medico_id}},\n  \"fechaHora\": \"{{fecha_disponibilidad}}T10:00:00\",\n  \"motivo\": \"Consulta de prueba Postman\",\n  \"telefono\": \"+34600000001\"\n}"
+              "raw": "{\n  \"medicoId\": {{medico_id}},\n  \"fechaHora\": \"{{fecha_disponibilidad}}T10:00:00\",\n  \"motivo\": \"Consulta de prueba Postman\",\n  \"telefono\": \"+34600000001\",\n  \"aceptaPrivacidad\": true\n}"
             },
             "url": "{{base_url}}/api/citas"
           }

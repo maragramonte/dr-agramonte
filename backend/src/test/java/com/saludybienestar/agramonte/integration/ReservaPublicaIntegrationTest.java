@@ -128,6 +128,7 @@ class ReservaPublicaIntegrationTest {
         body.put("telefono", "+34600111222");
         body.put("medicoId", 1);
         body.put("fechaHora", fechaHora);
+        body.put("aceptaPrivacidad", true);
         try {
             return objectMapper.writeValueAsString(body);
         } catch (Exception e) {
@@ -247,6 +248,7 @@ class ReservaPublicaIntegrationTest {
         intruso.put("password", "contrasenaDelIntruso");
         intruso.put("medicoId", 1);
         intruso.put("fechaHora", franjaIntruso);
+        intruso.put("aceptaPrivacidad", true);
 
         // Antes esto era un 409 seco. Ahora el camino correcto es mandar un enlace de
         // activación a ese buzón, pero esta clase no tiene SMTP configurado, así que la
@@ -295,6 +297,7 @@ class ReservaPublicaIntegrationTest {
         segundaReserva.put("telefono", "+34688888888");
         segundaReserva.put("medicoId", 1);
         segundaReserva.put("fechaHora", primeraFranjaLibre());
+        segundaReserva.put("aceptaPrivacidad", true);
 
         JsonNode segunda = reservaPublicaOk(objectMapper.writeValueAsString(segundaReserva));
 
@@ -431,6 +434,7 @@ class ReservaPublicaIntegrationTest {
             CrearCitaRequest req = new CrearCitaRequest();
             req.setMedicoId(1L);
             req.setFechaHora(franja);
+            req.setAceptaPrivacidad(true);
             req.setMotivo("Reserva concurrente");
             salida.await(10, TimeUnit.SECONDS);   // ambos hilos arrancan a la vez
             try {

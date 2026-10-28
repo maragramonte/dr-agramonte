@@ -164,6 +164,7 @@ class ActivacionCuentaIntegrationTest {
         reserva.put("telefono", "+34600111222");
         reserva.put("medicoId", 1);
         reserva.put("fechaHora", franja);
+        reserva.put("aceptaPrivacidad", true);
         reserva.put("motivo", "Primera visita");
 
         JsonNode creada = postOk("/api/citas/reserva-publica", reserva, 201);
@@ -258,6 +259,7 @@ class ActivacionCuentaIntegrationTest {
         primera.put("telefono", "+34600222333");
         primera.put("medicoId", 1);
         primera.put("fechaHora", primeraFranjaLibre());
+        primera.put("aceptaPrivacidad", true);
         postOk("/api/citas/reserva-publica", primera, 201);
 
         Usuario antes = usuarioRepository.findByEmail(email).orElseThrow();
@@ -272,6 +274,7 @@ class ActivacionCuentaIntegrationTest {
         segunda.put("telefono", "+34600222333");
         segunda.put("medicoId", 1);
         segunda.put("fechaHora", primeraFranjaLibre());
+        segunda.put("aceptaPrivacidad", true);
         segunda.put("password", "MeQuedoLaCuenta1");
 
         JsonNode respuesta = postOk("/api/citas/reserva-publica", segunda, 201);
