@@ -1,5 +1,6 @@
 package com.saludybienestar.agramonte.dto.request;
 
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -47,4 +48,11 @@ public class CrearCitaRequest {
     /** Preferencia de pago si es privada: 'en-consulta' (el pago online se retiró). */
     @Size(max = 20)
     private String preferenciaPago;
+
+    /**
+     * El paciente marcó «Acepto la Política de Privacidad». Obligatorio: sin él no
+     * hay reserva. La fecha y la versión aceptada las fija el servidor.
+     */
+    @AssertTrue(message = "Debes aceptar la política de privacidad")
+    private boolean aceptaPrivacidad;
 }

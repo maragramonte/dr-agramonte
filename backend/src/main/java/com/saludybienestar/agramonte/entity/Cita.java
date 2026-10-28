@@ -96,6 +96,17 @@ public class Cita {
     @Column(name = "recordatorio_token_hash", length = 64)
     private String recordatorioTokenHash;
 
+    /**
+     * Cuándo aceptó el paciente la política de privacidad al reservar (V15). Lo fija
+     * el servidor, nunca el navegador. Nullable: las citas anteriores no lo guardaron.
+     */
+    @Column(name = "privacidad_aceptada_en")
+    private LocalDateTime privacidadAceptadaEn;
+
+    /** Versión de la política aceptada; ver {@link com.saludybienestar.agramonte.config.PoliticaPrivacidad}. */
+    @Column(name = "privacidad_version", length = 20)
+    private String privacidadVersion;
+
     // Igualdad por identidad (id): segura para JPA y para usar la entidad en colecciones.
     @Override
     public boolean equals(Object o) {

@@ -1,5 +1,6 @@
 package com.saludybienestar.agramonte.dto.request;
 
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Future;
@@ -63,4 +64,11 @@ public class ReservaPublicaRequest {
     /** Preferencia de pago si es privada: 'en-consulta' (el pago online se retiró). */
     @Size(max = 20)
     private String preferenciaPago;
+
+    /**
+     * El paciente marcó «Acepto la Política de Privacidad». Obligatorio: sin él no
+     * hay reserva. La fecha y la versión aceptada las fija el servidor.
+     */
+    @AssertTrue(message = "Debes aceptar la política de privacidad")
+    private boolean aceptaPrivacidad;
 }

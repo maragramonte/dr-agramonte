@@ -255,6 +255,7 @@ class AccesoCitaPorCorreoIntegrationTest {
         body.put("telefono", "+34600111222");
         body.put("medicoId", 1);
         body.put("fechaHora", fechaHora);
+        body.put("aceptaPrivacidad", true);
         body.put("motivo", "Revisión general");
 
         String json = mockMvc.perform(post("/api/citas/reserva-publica")

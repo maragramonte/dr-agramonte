@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,6 +38,7 @@ class CitaNotificationServiceTest {
 
     private static final String CHAT_ID = "123456789";
     private static final String TELEFONO = "+34600000000";
+    private static final String MOTIVO = "Dolor torácico al hacer esfuerzo";
 
     @BeforeEach
     void setUp() {
@@ -61,7 +64,7 @@ class CitaNotificationServiceTest {
         cita.setUsuario(paciente);
         cita.setMedico(medico);
         cita.setFechaHora(LocalDateTime.of(2026, 6, 10, 9, 0));
-        cita.setMotivo("Revisión");
+        cita.setMotivo(MOTIVO);
         return cita;
     }
 
@@ -136,5 +139,24 @@ class CitaNotificationServiceTest {
 
         verify(telegramMessageService).send(eq(CHAT_ID), anyString());
         verify(twilioMessageService, never()).send(eq(TELEFONO), anyString());
+    }
+
+    @Test
+    @DisplayName("Ningún aviso por Twilio ni Telegram incluye el motivo de la cita (dato de salud)")
+    void ningunAviso_incluyeElMotivo() {
+        twilio.setNotifyPatients(true);
+        Cita cita = cita(TELEFONO, CHAT_ID);
+
+        service.notifyNuevaCita(cita);
+        service.notifyCancelacion(cita);
+        service.sendRecordatorio24h(cita);
+
+        ArgumentCaptor<String> twilioTextos = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> telegramTextos = ArgumentCaptor.forClass(String.class);
+        verify(twilioMessageService, atLeastOnce()).send(anyString(), twilioTextos.capture());
+        verify(telegramMessageService, atLeastOnce()).send(anyString(), telegramTextos.capture());
+
+        assertThat(twilioTextos.getAllValues()).isNotEmpty().noneMatch(texto -> texto.contains(MOTIVO));
+        assertThat(telegramTextos.getAllValues()).isNotEmpty().noneMatch(texto -> texto.contains(MOTIVO));
     }
 }

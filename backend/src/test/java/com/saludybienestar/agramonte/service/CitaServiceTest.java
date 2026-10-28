@@ -1,5 +1,6 @@
 package com.saludybienestar.agramonte.service;
 
+import com.saludybienestar.agramonte.config.PoliticaPrivacidad;
 import com.saludybienestar.agramonte.dto.request.CrearCitaRequest;
 import com.saludybienestar.agramonte.dto.request.ReservaPublicaRequest;
 import com.saludybienestar.agramonte.dto.response.CitaResponse;
@@ -16,6 +17,7 @@ import com.saludybienestar.agramonte.repository.UsuarioRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -85,6 +87,7 @@ class CitaServiceTest {
         CrearCitaRequest req = new CrearCitaRequest();
         req.setMedicoId(1L);
         req.setFechaHora(FRANJA);
+        req.setAceptaPrivacidad(true);
         req.setMotivo("Revisión");
         return req;
     }
@@ -112,6 +115,42 @@ class CitaServiceTest {
         assertThat(horario.isDisponible()).isFalse();
         verify(horarioRepository).save(horario);
         verify(citaNotificationService).notifyNuevaCita(any(Cita.class));
+    }
+
+    @Test
+    @DisplayName("crearCita: guarda cuándo se aceptó la política de privacidad y qué versión")
+    void crearCita_guardaAceptacionDePrivacidad() {
+        Horario horario = new Horario();
+        horario.setDisponible(true);
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(paciente(1L)));
+        when(medicoRepository.findById(1L)).thenReturn(Optional.of(medico(1L)));
+        when(horarioRepository.findByMedicoIdAndInicioAndDisponibleTrueForUpdate(1L, FRANJA))
+                .thenReturn(Optional.of(horario));
+        when(citaRepository.save(any(Cita.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        LocalDateTime antes = LocalDateTime.now();
+        citaService.crearCita(1L, crearCitaRequest());
+
+        ArgumentCaptor<Cita> guardada = ArgumentCaptor.forClass(Cita.class);
+        verify(citaRepository).save(guardada.capture());
+        assertThat(guardada.getValue().getPrivacidadVersion()).isEqualTo(PoliticaPrivacidad.VERSION_VIGENTE);
+        assertThat(guardada.getValue().getPrivacidadAceptadaEn()).isAfterOrEqualTo(antes);
+    }
+
+    @Test
+    @DisplayName("crearCita: sin aceptar la política de privacidad lanza 400 y no toca la agenda")
+    void crearCita_sinAceptarPrivacidad_lanza400() {
+        CrearCitaRequest req = crearCitaRequest();
+        req.setAceptaPrivacidad(false);
+
+        assertThatThrownBy(() -> citaService.crearCita(1L, req))
+                .isInstanceOf(ResponseStatusException.class)
+                .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
+                        .isEqualTo(HttpStatus.BAD_REQUEST));
+
+        verify(horarioRepository, never()).findByMedicoIdAndInicioAndDisponibleTrueForUpdate(any(), any());
+        verify(citaRepository, never()).save(any());
     }
 
     @Test
@@ -151,6 +190,7 @@ class CitaServiceTest {
         // corta antes de buscar paciente, médico u horario: nada de la agenda se consulta.
         CrearCitaRequest req = crearCitaRequest();
         req.setFechaHora(FRANJA_PASADA);
+        req.setAceptaPrivacidad(true);
 
         assertThatThrownBy(() -> citaService.crearCita(1L, req))
                 .isInstanceOf(ResponseStatusException.class)
@@ -209,6 +249,7 @@ class CitaServiceTest {
         req.setTelefono("+34600000000");
         req.setMedicoId(1L);
         req.setFechaHora(FRANJA);
+        req.setAceptaPrivacidad(true);
 
         when(usuarioRepository.findByEmail("paciente@example.com")).thenReturn(Optional.of(existente));
 

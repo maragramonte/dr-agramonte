@@ -1,5 +1,6 @@
 package com.saludybienestar.agramonte.service;
 
+import com.saludybienestar.agramonte.config.PoliticaPrivacidad;
 import com.saludybienestar.agramonte.dto.request.CrearCitaRequest;
 import com.saludybienestar.agramonte.dto.request.ReservaPublicaRequest;
 import com.saludybienestar.agramonte.dto.response.AuthResponse;
@@ -104,6 +105,7 @@ public class CitaService {
         citaRequest.setAseguradora(request.getAseguradora());
         citaRequest.setNumeroTarjetaSanitaria(request.getNumeroTarjetaSanitaria());
         citaRequest.setPreferenciaPago(request.getPreferenciaPago());
+        citaRequest.setAceptaPrivacidad(request.isAceptaPrivacidad());
 
         // Token de acceso a ESTA cita: se entrega una sola vez, aquí, y es lo que permite
         // al invitado consultarla y cancelarla sin cuenta. En la BD solo queda su hash.
@@ -166,6 +168,13 @@ public class CitaService {
                     "No se puede reservar una cita en una fecha ya pasada");
         }
 
+        // Igual que la fecha: el @AssertTrue de los DTO cubre la API, pero la regla se
+        // repite aquí para que ningún camino interno cree una cita sin la aceptación.
+        if (!request.isAceptaPrivacidad()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Debes aceptar la política de privacidad");
+        }
+
         Usuario paciente = usuarioRepository.findById(pacienteId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente no encontrado"));
         Medico medico = medicoRepository.findById(request.getMedicoId())
@@ -204,6 +213,8 @@ public class CitaService {
         cita.setNumeroTarjetaSanitaria(request.getNumeroTarjetaSanitaria());
         cita.setPreferenciaPago(request.getPreferenciaPago());
         cita.setAccesoTokenHash(accesoTokenHash);
+        cita.setPrivacidadAceptadaEn(LocalDateTime.now());
+        cita.setPrivacidadVersion(PoliticaPrivacidad.VERSION_VIGENTE);
         cita.setEstado(EstadoCita.CONFIRMADA);
 
         horario.setDisponible(false);

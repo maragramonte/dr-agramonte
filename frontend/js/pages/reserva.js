@@ -812,7 +812,8 @@ async function onSubmit(e) {
                 cobertura,
                 aseguradora,
                 numeroTarjetaSanitaria,
-                preferenciaPago
+                preferenciaPago,
+                aceptaPrivacidad: $('acepto').checked
             });
         } else {
             const pwd = $('passwordInvitado')?.value?.trim();
@@ -827,7 +828,8 @@ async function onSubmit(e) {
                 cobertura,
                 aseguradora,
                 numeroTarjetaSanitaria,
-                preferenciaPago
+                preferenciaPago,
+                aceptaPrivacidad: $('acepto').checked
             };
             if (pwd) body.password = pwd;
             const resp = await apiClient.postReservaPublica(body);

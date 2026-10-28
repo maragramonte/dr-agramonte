@@ -118,6 +118,7 @@ class CitaControllerWebMvcTest {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("medicoId", 1);
         body.put("fechaHora", LocalDateTime.now().plusDays(1));
+        body.put("aceptaPrivacidad", true);
         body.put("motivo", "Revisión");
 
         mockMvc.perform(post("/api/citas")
@@ -274,6 +275,24 @@ class CitaControllerWebMvcTest {
     // ── Rutas públicas (reserva sin cuenta) ─────────────────────────────────
 
     @Test
+    @DisplayName("POST /api/citas/reserva-publica sin aceptar la privacidad devuelve 400 y no llega al servicio")
+    void reservaPublica_sinAceptarPrivacidad_400() throws Exception {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("nombre", "Paciente Invitado");
+        body.put("email", "invitado@example.com");
+        body.put("telefono", "+34600111222");
+        body.put("medicoId", 1);
+        body.put("fechaHora", LocalDateTime.now().plusDays(1));
+
+        mockMvc.perform(post("/api/citas/reserva-publica")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(body)))
+                .andExpect(status().isBadRequest());
+
+        verify(citaService, never()).reservaPublica(any());
+    }
+
+    @Test
     @DisplayName("POST /api/citas/reserva-publica es público y crea la cita (201)")
     void reservaPublica_anonimo_creada() throws Exception {
         when(citaService.reservaPublica(any()))
@@ -285,6 +304,7 @@ class CitaControllerWebMvcTest {
         body.put("telefono", "+34600111222");
         body.put("medicoId", 1);
         body.put("fechaHora", LocalDateTime.now().plusDays(1));
+        body.put("aceptaPrivacidad", true);
 
         mockMvc.perform(post("/api/citas/reserva-publica")
                         .contentType(MediaType.APPLICATION_JSON)
