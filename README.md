@@ -12,38 +12,37 @@ del teléfono.
 
 ---
 
-## El problema
+## Por qué lo hice
 
-Buena parte de las llamadas que recibe un médico fuera de su horario no son urgencias
-clínicas: son gestión de agenda. Cambiar una hora, preguntar por un hueco, cancelar. Esa
-carga administrativa se come tiempo que no está pagado ni contabilizado como trabajo.
+Muchas de las llamadas que recibe un médico fuera de horario no son urgencias. Son cambios
+de hora, preguntas por un hueco o cancelaciones, y ese tiempo no lo paga nadie.
 
-Este proyecto digitaliza esa parte concreta, sin tocar lo que sí requiere trato humano. Está
-pensado para **la consulta privada y la clínica pequeña**: uno o varios médicos, uno o varios
-centros, y una agenda que hoy se lleva por teléfono o en papel.
+La aplicación se ocupa solo de esa parte. Está pensada para una consulta privada o una
+clínica pequeña, con uno o varios médicos y centros, que hoy lleva la agenda por teléfono o
+en papel.
 
-La decisión de producto que lo define es **permitir reservar sin registro**. Si para pedir
-hora hay que crear una cuenta, mucha gente vuelve a llamar y el problema sigue ahí.
+Decidí que se pudiera reservar sin crear cuenta. Si para pedir hora hay que registrarse,
+mucha gente acaba llamando igual.
 
 ---
 
 ## Probarlo
 
-**▶ [Demo en línea](https://maragramonte.github.io/dr-agramonte/)** — una presentación del
+[Demo en línea](https://maragramonte.github.io/dr-agramonte/): una presentación del
 producto y, bajo [`/app/`](https://maragramonte.github.io/dr-agramonte/app/), la aplicación
 real con una API simulada en el navegador.
 
 > **Es una simulación, no un servidor.** Los datos son ficticios, viven en tu navegador y no
-> se envía ningún aviso de verdad. Lo que la demo **no** puede demostrar —la concurrencia, la
-> disponibilidad calculada en servidor y el control de acceso por rol— está explicado en
+> se envía ningún aviso de verdad. Lo que la demo **no** puede demostrar (la concurrencia, la
+> disponibilidad calculada en servidor y el control de acceso por rol) está explicado en
 > [docs/DEMO.md](docs/DEMO.md#qué-no-puede-demostrar).
 
 **Para verlo en un minuto:** en `/app/`, pulsa «Entrar como paciente» y reserva una cita.
 Después, «Entrar como médico» para verla en la agenda y en el cuadro de mando.
 
-**🖼 [Sin pulsar nada](docs/CAPTURAS.md)** — la aplicación pantalla a pantalla, en imágenes.
-Y si prefieres leer el proyecto entero, la
-[memoria completa](docs/Memoria-Dr-Agramonte.pdf) (PDF).
+Si prefieres no pulsar nada, en [docs/CAPTURAS.md](docs/CAPTURAS.md) está la aplicación
+pantalla a pantalla. La [memoria completa](docs/Memoria-Dr-Agramonte.pdf) (PDF) cuenta el
+proyecto entero.
 
 > **Estado del despliegue.** El dominio `dragramonte.com` está registrado pero **hoy no sirve
 > la aplicación**: el alojamiento anterior se retiró y el despliegue en servidor propio está
@@ -93,15 +92,15 @@ las entidades. El frontend es estático, sin framework ni paso de compilación, 
 de un CDN: tipografías, iconos y Chart.js están autoalojados, lo que permite servir una
 Content-Security-Policy **sin `'unsafe-inline'` en los scripts**.
 
-**→ [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md)** — componentes, flujo de una petición,
+**→ [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md)**: componentes, flujo de una petición,
 autenticación, concurrencia, notificaciones e infraestructura.
 
 ---
 
 ## Decisiones técnicas
 
-Las cuatro que mejor explican el proyecto. El razonamiento completo —con alternativas,
-limitaciones y evidencia en el código— está en
+Las cuatro que mejor explican el proyecto. El razonamiento completo (con alternativas,
+limitaciones y evidencia en el código) está en
 **[docs/DECISIONES-TECNICAS.md](docs/DECISIONES-TECNICAS.md)**.
 
 **Bloqueo pesimista contra la doble reserva.** La reserva bloquea la fila del horario con
@@ -211,7 +210,6 @@ producción no levanta.
 | [DESPLIEGUE-VPS.md](docs/DESPLIEGUE-VPS.md) | Puesta en producción en un servidor propio |
 | [DOCKER-TROUBLESHOOTING.md](docs/DOCKER-TROUBLESHOOTING.md) | Arranque, 502 y healthchecks |
 | [EVOLUCION.md](docs/EVOLUCION.md) | Cómo creció el proyecto, fase a fase |
-| [DEFENSA-TECNICA.md](docs/DEFENSA-TECNICA.md) | Guía para explicar y defender el proyecto en una entrevista |
 | [Memoria-Dr-Agramonte.pdf](docs/Memoria-Dr-Agramonte.pdf) | Memoria completa del proyecto (LaTeX) |
 
 ---
@@ -222,7 +220,7 @@ producción no levanta.
 - [ ] Panel clínico multi-centro con historial
 - [ ] Refresh token
 - [ ] Cobertura medida con JaCoCo y pruebas E2E
-- [x] Cancelar la cita desde el propio aviso — hecho en el correo (el enlace lleva el token
+- [x] Cancelar la cita desde el propio aviso: hecho en el correo (el enlace lleva el token
       de la cita); queda hacerlo desde Telegram y SMS, y confirmar la asistencia
 
 ---
@@ -241,7 +239,7 @@ Trabajo con **Java, JavaScript, HTML y CSS**. Sé consumir y probar APIs e integ
 externos en una aplicación: aquí están Twilio, la Bot API de Telegram y el despliegue en un
 VPS propio con Docker, dominio propio y HTTPS automático con Caddy.
 
-Uso herramientas de IA como apoyo activo —para aprender más rápido, depurar y desatascarme—
+Uso herramientas de IA como apoyo activo (para aprender más rápido, depurar y desatascarme)
 igual que cualquier desarrolladora junior hoy. Las decisiones técnicas de este repositorio, y
 el saber explicarlas, son mías.
 

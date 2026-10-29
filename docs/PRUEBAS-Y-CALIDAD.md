@@ -1,6 +1,6 @@
 # Pruebas y calidad
 
-Qué se comprueba, cómo, y —sobre todo— qué **no** queda cubierto.
+Qué se comprueba, cómo, y (sobre todo) qué **no** queda cubierto.
 
 ---
 
@@ -53,8 +53,8 @@ reproduce el `SELECT ... FOR UPDATE` de PostgreSQL, así que la misma prueba pas
 demostrar nada.
 
 **El aislamiento entre médicos.** Un médico que pide la agenda de otro recibe la suya. Esta
-prueba existe porque el fallo que cubre —un `medicoId` por parámetro con
-`defaultValue = "1"`— pasaba todas las comprobaciones de rol: el rol era correcto
+prueba existe porque el fallo que cubre (un `medicoId` por parámetro con
+`defaultValue = "1"`) pasaba todas las comprobaciones de rol: el rol era correcto
 ([decisión 7](DECISIONES-TECNICAS.md#7-de-quién-es-una-agenda-no-lo-decide-la-url)).
 
 **Los tokens de acceso por correo.** Que el enlace abre la cita, y que emitir el token del
@@ -116,7 +116,7 @@ con Chrome headless:
 Lo que sí está automatizado del frontend es la **generación de capturas**
 ([`scripts/capturar-pantallas.sh`](../scripts/capturar-pantallas.sh)), que levanta la demo,
 la recorre con Chrome headless y regenera las dieciséis imágenes de la documentación. No es
-una prueba —no afirma nada—, pero evita que las capturas se queden viejas en silencio.
+una prueba (no afirma nada), pero evita que las capturas se queden viejas en silencio.
 
 ---
 
@@ -154,7 +154,7 @@ Por orden de lo que más valor daría:
 
 ## Documentación relacionada
 
-- [DECISIONES-TECNICAS.md](DECISIONES-TECNICAS.md) — por qué Testcontainers y no H2
-- [ARQUITECTURA.md](ARQUITECTURA.md) — el flujo que las pruebas recorren
-- [BASE-DE-DATOS.md](BASE-DE-DATOS.md) — índices y restricciones en que se apoya la concurrencia
-- [DOCKER-TROUBLESHOOTING.md](DOCKER-TROUBLESHOOTING.md) — pruebas de integración que se omiten o dan 400
+- [DECISIONES-TECNICAS.md](DECISIONES-TECNICAS.md): por qué Testcontainers y no H2
+- [ARQUITECTURA.md](ARQUITECTURA.md): el flujo que las pruebas recorren
+- [BASE-DE-DATOS.md](BASE-DE-DATOS.md): índices y restricciones en que se apoya la concurrencia
+- [DOCKER-TROUBLESHOOTING.md](DOCKER-TROUBLESHOOTING.md): pruebas de integración que se omiten o dan 400

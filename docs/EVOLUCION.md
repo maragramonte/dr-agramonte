@@ -8,14 +8,14 @@ Para el estado actual del sistema, ver el [README principal](../README.md).
 
 ---
 
-## Fase 0 — Web estática (inicio)
+## Fase 0: Web estática (inicio)
 
 - Páginas HTML: inicio, sobre mí, servicios, contacto, testimonios, reservar.  
 - Estilos en `frontend/css/dr-agramonte.css` (paleta **teal** `#0F766E` / `#14B8A6`, modo claro/oscuro).  
 - Reserva solo en **localStorage** (sin backend real). *Sustituido en fases posteriores.*  
 - `panel-pruebas.html` (enlace pie de página): historial de reservas de prueba + vista del acceso médico.
 
-## Fase 1 — Backend y base de datos
+## Fase 1: Backend y base de datos
 
 - Proyecto **Spring Boot 3.5** + **Java 21** + **Maven**.  
 - Modelo: usuarios, médicos, horarios, citas, notificaciones.  
@@ -23,7 +23,7 @@ Para el estado actual del sistema, ver el [README principal](../README.md).
 - Autenticación **JWT** y roles `PACIENTE`, `MEDICO`, `ADMIN`.  
 - **Dockerfile** multi-stage y **docker-compose** (postgres + backend + nginx).
 
-## Fase 2 — Integración frontend ↔ backend (citas)
+## Fase 2: Integración frontend ↔ backend (citas)
 
 **Problema detectado:** el front llamaba a rutas antiguas (`/api/reservas`, parámetros distintos) y el backend exponía `/api/citas`.
 
@@ -37,7 +37,7 @@ Para el estado actual del sistema, ver el [README principal](../README.md).
 - `GlobalExceptionHandler` y `ResponseStatusException`  
 - Bloqueo pesimista: `SELECT FOR UPDATE` en horarios  
 
-## Fase 3 — Robustez para demo y seguridad
+## Fase 3: Robustez para demo y seguridad
 
 - Banner de conexión con el servidor (reserva y sincronización)  
 - Autocompletado de paciente desde sesión (`auth-ui.js`)  
@@ -48,7 +48,7 @@ Para el estado actual del sistema, ver el [README principal](../README.md).
 - Service Worker y `offline.html`  
 - Health mail desactivado en Actuator (evitar 503 en `/actuator/health`)
 
-## Fase 4 — Notificaciones Twilio
+## Fase 4: Notificaciones Twilio
 
 - SDK Twilio en backend (`TwilioMessageService`, `CitaNotificationService`)  
 - Aviso al **médico** al crear/cancelar cita  
@@ -56,20 +56,20 @@ Para el estado actual del sistema, ver el [README principal](../README.md).
 - Job programado `CitaReminderScheduler` + campo `recordatorio_enviado` (Flyway V2)  
 - Variables en `.env.example` y `docker-compose.yml`
 
-## Fase 5 — UX y coherencia visual (última iteración UI)
+## Fase 5: UX y coherencia visual (última iteración UI)
 
 - Imagen hero: `frontend/pictures/hero-doctor.svg` (antes faltaban ficheros en `pictures/`)  
 - Botón **Reservar cita** unificado: clase `btn--reserva` + `nav-link--reserva` en todas las páginas  
 - **Servicios → reserva:** `reservar.html?servicio=consulta-general` (etc.) preselecciona tipo y motivo  
 - Toggle tema claro/oscuro en cabecera (`ThemeToggle` en `dr-agramonte.js`)
 
-## Fase 6 — Documentación académica
+## Fase 6: Documentación académica
 
 - Memoria LaTeX alineada con el código real: `docs/Memoria-Dr-Agramonte.tex`  
 - Diagramas TikZ con la misma paleta teal del CSS  
 - Checklist de rúbricas del módulo de proyecto  
 
-## Fase 7 — Reserva invitado y sincronización unificada
+## Fase 7: Reserva invitado y sincronización unificada
 
 - **`POST /api/citas/reserva-publica`**: reserva sin JWT; cuenta invitada (`cuenta_invitada` en BD, Flyway **V4**); contraseña opcional.  
 - **`GET /api/citas/por-email`** y **`DELETE /api/citas/publica/{id}`**: el invitado consulta y cancela citas con su email (prototipo TFG). *Retirado en la Fase 9: el email no prueba identidad.*  
@@ -81,7 +81,7 @@ Para el estado actual del sistema, ver el [README principal](../README.md).
 
 ---
 
-## Fase 8 — Segundo canal de avisos: Telegram
+## Fase 8: Segundo canal de avisos: Telegram
 
 - Twilio en cuenta de prueba obliga al paciente a darse de alta en el *sandbox*: poco realista para un producto.
 - Bot de Telegram como canal alternativo: gratuito y sin alta previa.
@@ -91,7 +91,7 @@ Para el estado actual del sistema, ver el [README principal](../README.md).
 
 ---
 
-## Fase 9 — Acceso de invitado con token por cita (dos fallos de seguridad)
+## Fase 9: Acceso de invitado con token por cita (dos fallos de seguridad)
 
 **Problema detectado.** Una revisión de QA encontró dos fallos en el flujo de reserva sin
 cuenta, los dos con la misma raíz: el **email se usaba como prueba de identidad**, y un
@@ -144,7 +144,7 @@ correo (**V13**); el enlace con el token, en la fase siguiente.
 
 ---
 
-## Fase 10 — El enlace de la cita, por correo
+## Fase 10: El enlace de la cita, por correo
 
 **Problema detectado.** El token de acceso se entregaba una sola vez, en la respuesta de la
 reserva, y el navegador lo guardaba en `localStorage`. Eso ataba la cita al dispositivo donde
@@ -181,14 +181,14 @@ llamando por teléfono.
 
 ---
 
-## Fase 11 — El recordatorio de la víspera, también por correo
+## Fase 11: El recordatorio de la víspera, también por correo
 
 **Problema detectado.** Dos cosas, y la segunda solo se vio al mirar la primera.
 
 El recordatorio de 24 h salía por Twilio y Telegram, que son justo los dos canales que un
 invitado no suele tener: Telegram hay que vincularlo desde una sesión y la cuenta de prueba de
-Twilio obliga al paciente a darse de alta en su *sandbox*. Quien reservaba sin cuenta —el caso
-que toda la Fase 9 vino a sostener— no recibía ningún aviso.
+Twilio obliga al paciente a darse de alta en su *sandbox*. Quien reservaba sin cuenta (el caso
+que toda la Fase 9 vino a sostener) no recibía ningún aviso.
 
 Y la tarea programada empezaba con un `return` si Twilio estaba apagado, de modo que sin Twilio
 **no se mandaba ningún recordatorio, ni siquiera por Telegram**, que no tiene nada que ver con
@@ -211,20 +211,20 @@ delante los avisos de Telegram, y aun así la tarea lo hacía un nivel más arri
   cuenta gestiona la cita entrando en ella, y mandarle un token por correo le abriría un acceso
   que hoy no existe: bastaría con entrar en su buzón para cancelarle la cita.
 - El hash se guarda **solo si el correo salió**, para no dejar vivo en la base un token que
-  nadie ha recibido. El riesgo que queda es el inverso —correo enviado y transacción revertida—
+  nadie ha recibido. El riesgo que queda es el inverso (correo enviado y transacción revertida)
   y ahí el enlace simplemente no abre nada, que es el lado seguro del fallo.
 - La ventana y el cron pasan a `app.recordatorio.*`, porque esto ya no es cosa de Twilio, pero
   siguen aceptando las claves `app.twilio.reminder-*` para no romper los `.env` que las tengan.
 
 ---
 
-## Fase 12 — Comprobante de cancelación
+## Fase 12: Comprobante de cancelación
 
 **Problema detectado.** Cancelar era la única operación del paciente que no dejaba ningún
 rastro en su buzón. La reserva manda su enlace y la víspera manda el recordatorio, pero al
 anular solo salían los avisos de Twilio y Telegram, que son justo los que un invitado no
 tiene. Quien cancelaba se quedaba sin comprobante, y una cita médica que uno cree anulada y no
-lo está —o al contrario— es el tipo de duda que acaba en una llamada a la consulta.
+lo está (o al contrario) es el tipo de duda que acaba en una llamada a la consulta.
 
 **Solución.**
 
@@ -241,7 +241,7 @@ lo está —o al contrario— es el tipo de duda que acaba en una llamada a la c
 
 ---
 
-## Fase 13 — El buzón de la demo, y un enlace que no se abría
+## Fase 13: El buzón de la demo, y un enlace que no se abría
 
 **Problema detectado.** Con cuatro correos en juego, la demo de GitHub Pages había dejado de
 describir el producto. El único que representaba era el de activación, y lo hacía pegando el
@@ -256,7 +256,7 @@ veía la pieza que sostiene todo el flujo de invitado: que el enlace llega a un 
 - La demo emite también el **segundo token del recordatorio** (V14) y acepta los dos al
   comprobar una cita, de modo que replica la regla y no solo el texto.
 - Muestra todos los correos, no los de un usuario con sesión: el flujo que más importa
-  —reservar sin cuenta— no tiene sesión ninguna. De ahí el nombre, «buzón de demostración».
+  (reservar sin cuenta) no tiene sesión ninguna. De ahí el nombre, «buzón de demostración».
 
 **Lo que apareció al probarlo en un navegador de verdad.** Pulsar el enlace del correo
 estando ya en `reservar.html` no hacía nada. El navegador solo cambia el fragmento y **no

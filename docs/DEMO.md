@@ -1,6 +1,6 @@
 # La demo pública
 
-**▶ <https://maragramonte.github.io/dr-agramonte/>**
+<https://maragramonte.github.io/dr-agramonte/>
 
 Qué es, qué puede demostrar y qué no, y cómo construirla en local.
 
@@ -48,8 +48,8 @@ el recordatorio, con los textos exactos de `CitaNotificationService`.
 
 ### El buzón de correo
 
-Abajo a la izquierda. Recoge los cuatro correos que manda el backend —activación de cuenta,
-enlace de acceso al reservar, recordatorio de la víspera y comprobante de cancelación— con
+Abajo a la izquierda. Recoge los cuatro correos que manda el backend (activación de cuenta,
+enlace de acceso al reservar, recordatorio de la víspera y comprobante de cancelación) con
 sus textos exactos.
 
 Sus enlaces **se pueden pulsar**, porque apuntan a las páginas de la propia demo: al abrir el
@@ -139,7 +139,7 @@ Pendiente de grabar. Escenas, duración y texto en pantalla:
 
 | # | Dur. | Qué se ve | Texto en pantalla |
 |---|------|-----------|-------------------|
-| 1 | 0–8 s | Portada de `/app/`, con el selector de cita a la vista | «Dr. Agramonte — agenda médica» |
+| 1 | 0–8 s | Portada de `/app/`, con el selector de cita a la vista | «Dr. Agramonte: agenda médica» |
 | 2 | 8–20 s | Elegir centro y hora en el selector del hero; saltar a la reserva | «Huecos reales, calculados en el servidor» |
 | 3 | 20–35 s | Rellenar datos sin crear cuenta y confirmar | «Reserva sin registro» |
 | 4 | 35–47 s | Abrir el buzón simulado y pulsar el enlace del correo | «El enlace de la cita llega al correo» |
@@ -159,6 +159,6 @@ Pendiente de grabar. Escenas, duración y texto en pantalla:
 
 ## Documentación relacionada
 
-- [CAPTURAS.md](CAPTURAS.md) — la aplicación pantalla a pantalla
-- [ARQUITECTURA.md](ARQUITECTURA.md) — lo que la demo simula, hecho de verdad
-- [PRUEBAS-Y-CALIDAD.md](PRUEBAS-Y-CALIDAD.md) — lo que la demo no puede demostrar
+- [CAPTURAS.md](CAPTURAS.md): la aplicación pantalla a pantalla
+- [ARQUITECTURA.md](ARQUITECTURA.md): lo que la demo simula, hecho de verdad
+- [PRUEBAS-Y-CALIDAD.md](PRUEBAS-Y-CALIDAD.md): lo que la demo no puede demostrar

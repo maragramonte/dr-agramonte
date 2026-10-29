@@ -1,4 +1,4 @@
-# Sincronización de citas — Guía de control (TFG)
+# Sincronización de citas: Guía de control (TFG)
 
 Documento operativo para comprobar que **Mis citas programadas** (`reservar.html`), el **panel TFG** (`panel-pruebas.html`) y **PostgreSQL** muestran el mismo dato.
 
@@ -141,7 +141,7 @@ docker compose ps   # postgres, backend, frontend → Up (healthy)
 
 ### 2. Reserva invitado
 
-1. http://localhost/reservar.html — **Ctrl+Shift+R** (evitar HTML cacheado por service worker).  
+1. http://localhost/reservar.html: **Ctrl+Shift+R** (evitar HTML cacheado por service worker).  
 2. Sin «Iniciar sesión».  
 3. Centro → calendario (**mes con días activos**, p. ej. junio) → especialista → hora.  
 4. Datos: nombre, teléfono `612345678`, email `test.sync@example.com`.  
@@ -184,7 +184,7 @@ Ambas listas deben contener la misma cita (mismo `id` / `citaId`).
 
 Importar `postman/` y seguir el orden de [postman/README.md](../postman/README.md):
 
-1. **Reserva pública (sin JWT)** — guarda `ultima_cita_id` y `cita_acceso_token`  
+1. **Reserva pública (sin JWT)**: guarda `ultima_cita_id` y `cita_acceso_token`  
 2. **Cita de invitado (token de acceso)**  
 3. **Historial reservas prueba** (panel)  
 4. **Cancelar cita pública (invitado)** → repetir paso 3
@@ -210,8 +210,8 @@ Importar `postman/` y seguir el orden de [postman/README.md](../postman/README.m
 
 El acceso de invitado **por email** se retiró (ver [Fase 9](EVOLUCION.md)). Un correo no es
 un secreto, así que no prueba identidad: mientras existió, cualquiera que conociera el email
-de un paciente podía leer su historial de citas —con el motivo de consulta, dato de salud del
-art. 9 del RGPD— y cancelárselas.
+de un paciente podía leer su historial de citas (con el motivo de consulta, dato de salud del
+art. 9 del RGPD) y cancelárselas.
 
 Ahora cada cita reservada sin cuenta lleva su propio **token de acceso**: 32 bytes de
 `SecureRandom` que se entregan una sola vez, en el campo `accesoToken` de la reserva, y de los

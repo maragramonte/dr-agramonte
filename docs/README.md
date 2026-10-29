@@ -1,4 +1,4 @@
-# Documentación — Dr. Agramonte
+# Documentación: Dr. Agramonte
 
 El **README principal** ([../README.md](../README.md)) presenta el proyecto y enlaza lo
 esencial. Aquí está el detalle, organizado por para qué sirve cada documento.
@@ -36,7 +36,6 @@ esencial. Aquí está el detalle, organizado por para qué sirve cada documento.
 |-----------|-----------|
 | [DEMO.md](DEMO.md) | Cómo está hecha la demo pública, qué no puede demostrar y el guion del vídeo pendiente |
 | [CAPTURAS.md](CAPTURAS.md) | La aplicación pantalla a pantalla, en imágenes |
-| [DEFENSA-TECNICA.md](DEFENSA-TECNICA.md) | Guía para explicar y defender el proyecto en una entrevista, con repreguntas |
 
 ---
 

@@ -1,9 +1,9 @@
-# Base de datos — referencia para la defensa
+# Base de datos
 
 > **TFG DAM · Dr. Agramonte.** Esquema real reconstruido de las migraciones **Flyway V1–V14** (`backend/src/main/resources/db/migration/postgresql/`). **PostgreSQL 15.** Hibernate arranca con `ddl-auto: validate`, así que el esquema de esta referencia coincide exactamente con las entidades JPA.
 
 ## Resumen en una frase
-6 tablas en **3ª forma normal**, claves `BIGSERIAL`, integridad referencial con **claves foráneas** (unas en `CASCADE`, otras en `SET NULL` según convenga conservar o no el dato), un **índice único** que —junto al bloqueo pesimista— evita las dobles reservas, e **índices** sobre las consultas más frecuentes.
+6 tablas en **3ª forma normal**, claves `BIGSERIAL`, integridad referencial con **claves foráneas** (unas en `CASCADE`, otras en `SET NULL` según convenga conservar o no el dato), un **índice único** que (junto al bloqueo pesimista) evita las dobles reservas, e **índices** sobre las consultas más frecuentes.
 
 ---
 
@@ -88,35 +88,35 @@ erDiagram
     }
 ```
 
-> En GitHub este bloque se dibuja solo. Para el PowerPoint tienes el diagrama **ya exportado**: [`diagrama-er.svg`](diagrama-er.svg) (vectorial, escala sin pixelarse) y [`diagrama-er.png`](diagrama-er.png) (alta resolución) — incrústalos directamente sin depender del render de GitHub. El mismo modelo está, en versión TikZ, en la memoria (figura «Modelo entidad-relación», `docs/tikz-diagrama-er.tex`).
+> En GitHub este bloque se dibuja solo. Para el PowerPoint tienes el diagrama **ya exportado**: [`diagrama-er.svg`](diagrama-er.svg) (vectorial, escala sin pixelarse) y [`diagrama-er.png`](diagrama-er.png) (alta resolución): incrústalos directamente sin depender del render de GitHub. El mismo modelo está, en versión TikZ, en la memoria (figura «Modelo entidad-relación», `docs/tikz-diagrama-er.tex`).
 
 ---
 
 ## Esquema tabla a tabla
 
-### `usuarios` — pacientes, médicos y administradores (todos)
+### `usuarios`: pacientes, médicos y administradores (todos)
 | Columna | Tipo | Restricción / nota |
 |---|---|---|
 | `id` | BIGSERIAL | **PK** |
 | `email` | VARCHAR(255) | **NOT NULL, UNIQUE** (login) |
-| `password` | VARCHAR(255) | NOT NULL — hash **BCrypt(12)**, nunca texto plano |
+| `password` | VARCHAR(255) | NOT NULL: hash **BCrypt(12)**, nunca texto plano |
 | `nombre` | VARCHAR(255) | NOT NULL |
 | `telefono` | VARCHAR(255) | nullable (para avisos Twilio) |
-| `rol` | VARCHAR(50) | NOT NULL, default `PACIENTE` — enum `Rol` |
+| `rol` | VARCHAR(50) | NOT NULL, default `PACIENTE`: enum `Rol` |
 | `enabled` | BOOLEAN | NOT NULL, default TRUE |
-| `cuenta_invitada` | BOOLEAN | NOT NULL, default FALSE — **V4** (reserva sin registro) |
-| `telegram_chat_id` | VARCHAR(64) | **V9** — nullable, **UNIQUE**; chat vinculado al que se envían los avisos |
-| `telegram_link_token` | VARCHAR(64) | **V9** — nullable, **UNIQUE**; token de un solo uso para vincular el chat |
-| `telegram_link_token_expira_en` | TIMESTAMP | **V10** — nullable; caducidad del token (15 min) |
-| `activacion_token` | VARCHAR(64) | **V13** — nullable, **UNIQUE**; SHA-256 del token con el que el dueño del buzón convierte su cuenta invitada en una cuenta con contraseña |
-| `activacion_token_expira_en` | TIMESTAMP | **V13** — nullable; caducidad del enlace (30 min) |
+| `cuenta_invitada` | BOOLEAN | NOT NULL, default FALSE: **V4** (reserva sin registro) |
+| `telegram_chat_id` | VARCHAR(64) | **V9**: nullable, **UNIQUE**; chat vinculado al que se envían los avisos |
+| `telegram_link_token` | VARCHAR(64) | **V9**: nullable, **UNIQUE**; token de un solo uso para vincular el chat |
+| `telegram_link_token_expira_en` | TIMESTAMP | **V10**: nullable; caducidad del token (15 min) |
+| `activacion_token` | VARCHAR(64) | **V13**: nullable, **UNIQUE**; SHA-256 del token con el que el dueño del buzón convierte su cuenta invitada en una cuenta con contraseña |
+| `activacion_token_expira_en` | TIMESTAMP | **V13**: nullable; caducidad del enlace (30 min) |
 | `created_at`, `updated_at` | TIMESTAMP | auditoría básica |
 
-### `medicos` — catálogo de especialistas
+### `medicos`: catálogo de especialistas
 | Columna | Tipo | Restricción |
 |---|---|---|
 | `id` | BIGSERIAL | **PK** |
-| `usuario_id` | BIGINT | **V12** — **FK → usuarios**, nullable, **UNIQUE**, `ON DELETE SET NULL` |
+| `usuario_id` | BIGINT | **V12**: **FK → usuarios**, nullable, **UNIQUE**, `ON DELETE SET NULL` |
 | `nombre` | VARCHAR(255) | NOT NULL |
 | `especialidad` | VARCHAR(255) | nullable |
 | `email` | VARCHAR(255) | nullable |
@@ -127,48 +127,48 @@ erDiagram
 > otro cambiando un número en la URL. El `email` de la ficha no sirve para eso:
 > `MedicoCuentaInicializador` puede renombrar el correo de la cuenta sin tocar el de la ficha.
 
-### `centros` — ubicaciones de consulta (**V5**)
+### `centros`: ubicaciones de consulta (**V5**)
 | Columna | Tipo | Restricción |
 |---|---|---|
 | `id` | BIGSERIAL | **PK** |
-| `codigo` | VARCHAR(50) | **NOT NULL, UNIQUE** — identificador interno (`madrid`, `palma`) |
+| `codigo` | VARCHAR(50) | **NOT NULL, UNIQUE**: identificador interno (`madrid`, `palma`) |
 | `nombre` | VARCHAR(255) | NOT NULL |
 | `direccion`, `ciudad` | VARCHAR(255) | nullable |
 
-> ⚠️ **Ojo defensa:** los códigos `madrid`/`palma` son **identificadores internos heredados**; los dos centros reales están en **Palma de Mallorca** (V7 renombró: `madrid`→«Consulta General Riera», `palma`→«Consulta Avenidas»). No se cambió el código para no romper las citas/horarios ya enlazados.
+> **Nota:** los códigos `madrid`/`palma` son **identificadores internos heredados**; los dos centros reales están en **Palma de Mallorca** (V7 renombró: `madrid`→«Consulta General Riera», `palma`→«Consulta Avenidas»). No se cambió el código para no romper las citas/horarios ya enlazados.
 
-### `horarios` — agenda real (franjas de 30 min)
+### `horarios`: agenda real (franjas de 30 min)
 | Columna | Tipo | Restricción |
 |---|---|---|
 | `id` | BIGSERIAL | **PK** |
 | `medico_id` | BIGINT | **FK → medicos**, NOT NULL, `ON DELETE CASCADE` |
-| `centro_id` | BIGINT | **FK → centros**, nullable, `ON DELETE SET NULL` — **V6** |
+| `centro_id` | BIGINT | **FK → centros**, nullable, `ON DELETE SET NULL`: **V6** |
 | `inicio`, `fin` | TIMESTAMP | franja horaria |
-| `disponible` | BOOLEAN | NOT NULL, default TRUE — pasa a FALSE al reservar |
+| `disponible` | BOOLEAN | NOT NULL, default TRUE: pasa a FALSE al reservar |
 
 Índice **UNIQUE `(medico_id, inicio)`** → no puede haber dos franjas idénticas para el mismo médico. **Es la pieza clave de la integridad de reservas.**
 
-### `citas` — la reserva en sí
+### `citas`: la reserva en sí
 | Columna | Tipo | Restricción / nota |
 |---|---|---|
 | `id` | BIGSERIAL | **PK** |
 | `usuario_id` | BIGINT | **FK → usuarios**, NOT NULL, `ON DELETE CASCADE` |
 | `medico_id` | BIGINT | **FK → medicos**, NOT NULL, `ON DELETE CASCADE` |
-| `centro_id` | BIGINT | **FK → centros**, nullable, `ON DELETE SET NULL` — **V5** |
+| `centro_id` | BIGINT | **FK → centros**, nullable, `ON DELETE SET NULL`: **V5** |
 | `fecha_hora` | TIMESTAMP | momento de la cita |
 | `motivo` | VARCHAR(500) | nullable |
 | `estado` | VARCHAR(50) | enum `EstadoCita`: PENDIENTE / CONFIRMADA / CANCELADA / COMPLETADA |
-| `recordatorio_enviado` | BOOLEAN | NOT NULL, default FALSE — **V2** (evita reenviar el aviso 24 h) |
-| `cobertura` | VARCHAR(20) | **V8** — `privada` o `seguro` |
-| `aseguradora` | VARCHAR(100) | **V8** — nullable (si paga por seguro) |
-| `numero_tarjeta_sanitaria` | VARCHAR(100) | **V8** — nullable |
-| `preferencia_pago` | VARCHAR(20) | **V8** — nullable (`en-consulta`) |
-| `acceso_token_hash` | VARCHAR(64) | **V11** — nullable, **UNIQUE**; SHA-256 del token entregado al reservar sin cuenta |
-| `recordatorio_token_hash` | VARCHAR(64) | **V14** — nullable, **UNIQUE**; SHA-256 del segundo token de la misma cita, el que viaja en el correo de recordatorio. Son dos porque del primero solo queda el hash: rotarlo invalidaría el enlace del correo de la reserva y el token guardado en el navegador que reservó |
+| `recordatorio_enviado` | BOOLEAN | NOT NULL, default FALSE: **V2** (evita reenviar el aviso 24 h) |
+| `cobertura` | VARCHAR(20) | **V8**: `privada` o `seguro` |
+| `aseguradora` | VARCHAR(100) | **V8**: nullable (si paga por seguro) |
+| `numero_tarjeta_sanitaria` | VARCHAR(100) | **V8**: nullable |
+| `preferencia_pago` | VARCHAR(20) | **V8**: nullable (`en-consulta`) |
+| `acceso_token_hash` | VARCHAR(64) | **V11**: nullable, **UNIQUE**; SHA-256 del token entregado al reservar sin cuenta |
+| `recordatorio_token_hash` | VARCHAR(64) | **V14**: nullable, **UNIQUE**; SHA-256 del segundo token de la misma cita, el que viaja en el correo de recordatorio. Son dos porque del primero solo queda el hash: rotarlo invalidaría el enlace del correo de la reserva y el token guardado en el navegador que reservó |
 
 > La cita **hereda el centro de su horario** (no se elige aparte): al reservar, `centro_id` se toma del horario bloqueado.
 
-### `notificaciones` — avisos (Twilio / Telegram / email)
+### `notificaciones`: avisos (Twilio / Telegram / email)
 | Columna | Tipo | Restricción |
 |---|---|---|
 | `id` | BIGSERIAL | **PK** |
@@ -186,7 +186,7 @@ erDiagram
 
 | Relación | Cardinalidad | `ON DELETE` | Por qué |
 |---|---|---|---|
-| usuarios → medicos | 1:1 (opc.) | **SET NULL** | borrar la cuenta no debe arrastrar la ficha ni su historial de citas — **V12** |
+| usuarios → medicos | 1:1 (opc.) | **SET NULL** | borrar la cuenta no debe arrastrar la ficha ni su historial de citas: **V12** |
 | usuarios → citas | 1:N | **CASCADE** | si se borra un paciente, sus citas no tienen sentido |
 | medicos → citas | 1:N | **CASCADE** | ídem para el médico |
 | medicos → horarios | 1:N | **CASCADE** | la agenda pertenece al médico |
@@ -199,7 +199,7 @@ erDiagram
 
 ---
 
-## Concurrencia: cómo se evita la doble reserva ⭐
+## Concurrencia: cómo se evita la doble reserva
 Es el punto técnico estrella y se apoya en la BD:
 1. **`UNIQUE (medico_id, inicio)`** en `horarios`: a nivel de esquema, dos franjas iguales son imposibles.
 2. **Bloqueo pesimista** al reservar: `findByMedicoIdAndInicioAndDisponibleTrueForUpdate` ejecuta un `SELECT … FOR UPDATE` que **bloquea la fila del horario** dentro de la transacción.
@@ -219,15 +219,15 @@ Está **probado**: `ReservaPublicaIntegrationTest` lanza dos hilos en paralelo c
 | `idx_citas_usuario_fecha` | citas | «mis citas» del paciente |
 | `idx_citas_centro` | citas | citas por centro |
 | `idx_citas_recordatorio` (estado, recordatorio_enviado, fecha_hora) | citas | barrido del recordatorio 24 h |
-| `uk_usuarios_telegram_chat_id` (UNIQUE) | usuarios | un chat de Telegram pertenece como mucho a un paciente — **V9** |
-| `uk_usuarios_telegram_link_token` (UNIQUE) | usuarios | el token de vinculación es irrepetible — **V9** |
-| `uk_usuarios_activacion_token` (UNIQUE) | usuarios | el token de activación es irrepetible — **V13** |
-| `ux_citas_recordatorio_token_hash` (UNIQUE) | citas | el token del recordatorio es irrepetible — **V14** |
-| `ux_medicos_usuario` (UNIQUE) | medicos | una cuenta gobierna como mucho una agenda — **V12** |
+| `uk_usuarios_telegram_chat_id` (UNIQUE) | usuarios | un chat de Telegram pertenece como mucho a un paciente: **V9** |
+| `uk_usuarios_telegram_link_token` (UNIQUE) | usuarios | el token de vinculación es irrepetible: **V9** |
+| `uk_usuarios_activacion_token` (UNIQUE) | usuarios | el token de activación es irrepetible: **V13** |
+| `ux_citas_recordatorio_token_hash` (UNIQUE) | citas | el token del recordatorio es irrepetible: **V14** |
+| `ux_medicos_usuario` (UNIQUE) | medicos | una cuenta gobierna como mucho una agenda: **V12** |
 
 ---
 
-## Decisiones de diseño (resumen para responder rápido)
+## Decisiones de diseño
 - **Claves `BIGSERIAL`/`BIGINT`:** autoincremento nativo de PostgreSQL; margen de crecimiento frente a `INT`.
 - **Enums como `VARCHAR` + `@Enumerated(STRING)`:** dominios pequeños y estables (estado, rol, canal); legibles en la BD y sin una tabla-catálogo que sería sobre-ingeniería.
 - **Columnas nuevas siempre `nullable`** (centro_id V5/V6, recordatorio V2, cobertura V8, Telegram V9/V10, token de acceso V11, cuenta del médico V12, activación V13, token del recordatorio V14): no rompen las filas existentes al migrar (compatibilidad hacia atrás).
@@ -236,16 +236,16 @@ Está **probado**: `ReservaPublicaIntegrationTest` lanza dos hilos en paralelo c
 
 ---
 
-## Preguntas típicas de defensa (con respuesta)
+## Preguntas frecuentes
 - **¿Por qué relacional y no NoSQL?** → Datos fuertemente interrelacionados (usuario–médico–horario–centro–cita) e invariante crítica (no doble reserva) que exige transacciones ACID y bloqueo de fila. NoSQL documental se reserva para el historial clínico (línea futura, persistencia políglota).
 - **¿Cómo garantizas que no se reserve dos veces el mismo hueco?** → `UNIQUE(medico_id, inicio)` + `SELECT FOR UPDATE`; la 2ª transacción recibe 409. Hay test de integración que lo demuestra.
 - **¿Qué pasa si borras un centro?** → Las citas/horarios de ese centro **no se borran**: su `centro_id` queda a `NULL` (se conserva el histórico). En cambio, borrar un usuario o un médico **sí** arrastra (CASCADE) sus citas/horarios.
 - **¿Qué es `cuenta_invitada`?** → Permite reservar sin registrarse: se crea un usuario marcado como invitado, con contraseña aleatoria; puede «ascender» a cuenta completa más tarde sin perder sus citas.
 - **¿Por qué un centro tiene código `madrid` si está en Palma?** → Es un identificador interno heredado; V7 actualizó los nombres reales (ambos en Palma) sin tocar el código, para no romper las citas ya enlazadas. Es una decisión consciente de compatibilidad.
 - **¿La cita guarda en qué centro es?** → Sí, en `centro_id`, que **hereda del horario** reservado (la agenda está repartida por centro y día).
-- **¿Guardas datos sensibles (tarjeta sanitaria)?** → Sí, desde V8, para que el profesional gestione la cobertura; en un despliegue real convendría cifrarlo/minimizarlo (RGPD: dato de salud) — recogido como mejora.
+- **¿Guardas datos sensibles (tarjeta sanitaria)?** → Sí, desde V8, para que el profesional gestione la cobertura; en un despliegue real convendría cifrarlo/minimizarlo (RGPD: dato de salud): recogido como mejora.
 - **¿Por qué no una tabla de «pagos»?** → De momento solo se **captura** la cobertura/preferencia en la propia cita; no hay cobro. Cuando se integre la pasarela (Stripe, línea futura) tendría sentido una tabla `pagos` con su ciclo de estados.
-- **¿Migraciones reversibles?** → Forward-only con Flyway; cada cambio es una nueva versión. Reproducible y trazable, que es lo que importa para la defensa.
+- **¿Migraciones reversibles?** → Forward-only con Flyway; cada cambio es una nueva versión. Reproducible y trazable.
 - **¿Por qué el chat de Telegram se guarda en `usuarios` y no en una tabla aparte?** → Es una relación **1:1** (un paciente, un chat) y siempre se consulta junto al usuario al enviar el aviso. Una tabla `usuario_telegram` añadiría un `JOIN` en cada notificación sin ganar nada; si algún día un paciente pudiera vincular varios canales, entonces sí tocaría normalizarlo.
 - **¿Cómo evitas que alguien secuestre los avisos de otro paciente?** → El token de vinculación (V9) es de **un solo uso**, se genera con `SecureRandom` (32 bytes en Base64 URL-safe), **caduca a los 15 minutos** (V10) y solo se emite para el usuario del JWT en sesión, nunca para un email pasado por parámetro. Al consumirse se pone a `NULL`, y el índice `UNIQUE` sobre `telegram_chat_id` impide que un mismo chat quede asociado a dos cuentas.
 - **¿Y si el paciente quiere dejar de recibir avisos?** → `DELETE /api/telegram/vinculacion` pone a `NULL` el chat y el token. Es idempotente y funciona aunque el canal esté desactivado, precisamente para que siempre se puedan retirar esos datos (RGPD, derecho de supresión).

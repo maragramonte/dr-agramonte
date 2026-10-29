@@ -13,8 +13,8 @@ hora estás en marcha otra vez.
 
 > **¿Solo quieres ver cómo funciona?** La [demo pública](https://maragramonte.github.io/dr-agramonte/)
 > enseña la aplicación entera sin montar nada: son las mismas páginas, con una API
-> simulada en el navegador y datos ficticios. No sustituye a esta guía —no hay servidor,
-> ni base de datos, ni avisos de verdad—, pero sirve para enseñar el proyecto sin gastar
+> simulada en el navegador y datos ficticios. No sustituye a esta guía (no hay servidor,
+> ni base de datos, ni avisos de verdad), pero sirve para enseñar el proyecto sin gastar
 > un euro. Cómo está hecha, en [DEMO.md](DEMO.md).
 
 ---
@@ -73,7 +73,7 @@ abstracto, este es el que usa el proyecto:
 | | |
 |---|---|
 | **Proveedor** | Hetzner Cloud |
-| **Plan** | **CX23** — 2 vCPU (x86), 4 GB RAM, 40 GB NVMe, 20 TB de tráfico |
+| **Plan** | **CX23**: 2 vCPU (x86), 4 GB RAM, 40 GB NVMe, 20 TB de tráfico |
 | **Ubicación** | Falkenstein o Núremberg (Alemania, UE) |
 | **Sistema** | Ubuntu 24.04 LTS |
 | **Precio** | ~5,49 €/mes + 0,50 € de la IPv4, IVA aparte (agosto 2026) |
@@ -81,7 +81,7 @@ abstracto, este es el que usa el proyecto:
 | **IP pública** | _(anotar aquí al contratar)_ |
 
 **Por qué 4 GB y no 2.** `scripts/deploy.sh` compila Maven **en el propio
-servidor**. El build se come cerca de 1 GB y coincide con la JVM anterior aún
+servidor**. El build usa cerca de 1 GB y coincide con la JVM anterior aún
 en marcha, Postgres y Caddy. Con 2 GB el despliegue puede morir por falta de
 memoria justo mientras actualizas. Con 4 GB sobra y el `mem_limit: 1g` del
 compose se queda como está.
@@ -355,7 +355,7 @@ pusiste en `.env.prod`. **No uses las credenciales de demostración**
 (`dr.agramonte@example.com` / `Medico123!`, publicadas en el README y en la
 migración V3): al arrancar, `MedicoCuentaInicializador` reescribe esa cuenta con
 las tuyas, de modo que en producción ya no sirven. Si por lo que sea entrases con
-ellas, es que `MEDICO_PASSWORD` no llegó al contenedor — revísalo antes de abrir
+ellas, es que `MEDICO_PASSWORD` no llegó al contenedor: revísalo antes de abrir
 la web a nadie.
 
 ---
