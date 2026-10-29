@@ -53,8 +53,8 @@ comentario de dónde salió el fichero.
 No se redistribuye nada de ellos; se llaman por API y solo si se activan por
 configuración.
 
-- **Twilio** — avisos por WhatsApp/SMS (`TWILIO_ENABLED`).
-- **Telegram Bot API** — avisos por Telegram (`TELEGRAM_ENABLED`).
-- **Let's Encrypt** — certificado TLS, gestionado por Caddy.
-- **Google Maps** — solo como enlace «Cómo llegar» en `contacto.html`. No se
+- **Twilio**: avisos por WhatsApp/SMS (`TWILIO_ENABLED`).
+- **Telegram Bot API**: avisos por Telegram (`TELEGRAM_ENABLED`).
+- **Let's Encrypt**: certificado TLS, gestionado por Caddy.
+- **Google Maps**: solo como enlace «Cómo llegar» en `contacto.html`. No se
   embebe: visitar la web no carga nada de Google.

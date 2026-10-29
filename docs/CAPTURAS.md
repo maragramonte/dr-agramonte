@@ -4,8 +4,8 @@ Un recorrido por la aplicación para quien prefiera verla sin tocar nada. Si qui
 tú, la [demo pública](https://maragramonte.github.io/dr-agramonte/) es el mismo frontend con
 una API simulada en el navegador.
 
-Las capturas salen de esa misma compilación de la demo, así que la interfaz es la real —
-las mismas páginas, el mismo CSS y el mismo `api-client.js` que la imagen de producción— y
+Las capturas salen de esa misma compilación de la demo, así que la interfaz es la real
+(las mismas páginas, el mismo CSS y el mismo `api-client.js` que la imagen de producción) y
 los datos son ficticios. Solo se ha ocultado la franja «DEMO» del pie, que no forma parte
 del producto.
 
@@ -31,7 +31,7 @@ modo que el paciente no tiene que volver a decidir lo que ya decidió aquí.
 
 ## 3. Reservar: el centro manda sobre el calendario
 
-![Tarjeta de selección de cita con los dos centros —Consulta General Riera (Lun / Mar / Jue) y Consulta Avenidas (Mie / Vie / Sab)— y el calendario de octubre, donde solo están activos los días en que el centro elegido pasa consulta](capturas/03-reserva-centros.png)
+![Tarjeta de selección de cita con los dos centros (Consulta General Riera (Lun / Mar / Jue) y Consulta Avenidas (Mie / Vie / Sab)) y el calendario de octubre, donde solo están activos los días en que el centro elegido pasa consulta](capturas/03-reserva-centros.png)
 
 El doctor pasa consulta en dos centros y en días distintos. Al elegir uno, el calendario
 apaga los días en que ese centro no abre: en la captura, el centro de General Riera solo
@@ -46,7 +46,7 @@ Los huecos libres salen de la agenda del médico para ese centro y ese día. En 
 calcula el servidor (`GET /api/disponibilidad`), no el navegador: es lo que impide que dos
 pacientes vean libre la misma franja.
 
-El recorrido baja en una sola columna —centro, día, hora, datos—, que es el orden en que se
+El recorrido baja en una sola columna (centro, día, hora, datos), que es el orden en que se
 rellena. Antes iba en dos columnas y el paso 1 competía con el paso 4 en un flujo que es
 estrictamente secuencial.
 
@@ -78,7 +78,7 @@ textos exactos de `CitaNotificationService`; en producción es un bot de verdad.
 
 ## 8. Cuadro de mando del médico
 
-![Cuadro de mando: 223 citas totales, 50 activas, 149 completadas y 10,8 % de tasa de cancelación, sobre cinco gráficos — carga por médico, demanda por especialidad, citas por centro, reparto por estado y evolución temporal](capturas/08-cuadro-mando.png)
+![Cuadro de mando: 223 citas totales, 50 activas, 149 completadas y 10,8 % de tasa de cancelación, sobre cinco gráficos: carga por médico, demanda por especialidad, citas por centro, reparto por estado y evolución temporal](capturas/08-cuadro-mando.png)
 
 Detrás de cada gráfico hay una consulta agregada con `GROUP BY`, no un cálculo en el
 navegador. El acceso exige rol `MEDICO` o `ADMIN`: un paciente con sesión iniciada recibe un
@@ -123,8 +123,8 @@ y deja a mano lo que ya estaba en caché, en vez del error del navegador.
 Con Chrome contra la compilación de la demo servida en local, no a mano:
 [`scripts/capturar-pantallas.sh`](../scripts/capturar-pantallas.sh) las regenera todas (o una
 suelta, pasándole su nombre), sin necesidad de Docker ni base de datos. Prepara cada
-escenario —elegir centro y día, entrar como paciente o como médico, cambiar de idioma o de
-tema—, espera a que la pantalla esté montada y recorta por el rectángulo del elemento.
+escenario (elegir centro y día, entrar como paciente o como médico, cambiar de idioma o de
+tema), espera a que la pantalla esté montada y recorta por el rectángulo del elemento.
 
 Va por el protocolo de DevTools y no por `chrome --screenshot`, por dos motivos. El primero
 es el ancho de móvil: por línea de órdenes Chrome no baja de unos 500 px de ventana, se le
@@ -135,7 +135,7 @@ tiempo virtual.
 
 Queda una rareza del modo *headless*: con la página más alta que el viewport, el día elegido
 del calendario se pinta sin su relleno. Antes de capturar esas pantallas el viewport se
-estira a la altura de la página —lo mismo que hace DevTools al capturar a tamaño completo— y
+estira a la altura de la página (lo mismo que hace DevTools al capturar a tamaño completo) y
 el guion comprueba el color en el PNG, para no publicar una captura que engañe.
 
 Lo que ninguna captura puede enseñar es la concurrencia: el bloqueo pesimista que impide que

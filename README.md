@@ -29,19 +29,19 @@ hora hay que crear una cuenta, mucha gente vuelve a llamar y el problema sigue a
 
 ## Probarlo
 
-**▶ [Demo en línea](https://maragramonte.github.io/dr-agramonte/)** — una presentación del
+**▶ [Demo en línea](https://maragramonte.github.io/dr-agramonte/)**: una presentación del
 producto y, bajo [`/app/`](https://maragramonte.github.io/dr-agramonte/app/), la aplicación
 real con una API simulada en el navegador.
 
 > **Es una simulación, no un servidor.** Los datos son ficticios, viven en tu navegador y no
-> se envía ningún aviso de verdad. Lo que la demo **no** puede demostrar —la concurrencia, la
-> disponibilidad calculada en servidor y el control de acceso por rol— está explicado en
+> se envía ningún aviso de verdad. Lo que la demo **no** puede demostrar (la concurrencia, la
+> disponibilidad calculada en servidor y el control de acceso por rol) está explicado en
 > [docs/DEMO.md](docs/DEMO.md#qué-no-puede-demostrar).
 
 **Para verlo en un minuto:** en `/app/`, pulsa «Entrar como paciente» y reserva una cita.
 Después, «Entrar como médico» para verla en la agenda y en el cuadro de mando.
 
-**🖼 [Sin pulsar nada](docs/CAPTURAS.md)** — la aplicación pantalla a pantalla, en imágenes.
+**🖼 [Sin pulsar nada](docs/CAPTURAS.md)**: la aplicación pantalla a pantalla, en imágenes.
 Y si prefieres leer el proyecto entero, la
 [memoria completa](docs/Memoria-Dr-Agramonte.pdf) (PDF).
 
@@ -93,15 +93,15 @@ las entidades. El frontend es estático, sin framework ni paso de compilación, 
 de un CDN: tipografías, iconos y Chart.js están autoalojados, lo que permite servir una
 Content-Security-Policy **sin `'unsafe-inline'` en los scripts**.
 
-**→ [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md)** — componentes, flujo de una petición,
+**→ [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md)**: componentes, flujo de una petición,
 autenticación, concurrencia, notificaciones e infraestructura.
 
 ---
 
 ## Decisiones técnicas
 
-Las cuatro que mejor explican el proyecto. El razonamiento completo —con alternativas,
-limitaciones y evidencia en el código— está en
+Las cuatro que mejor explican el proyecto. El razonamiento completo (con alternativas,
+limitaciones y evidencia en el código) está en
 **[docs/DECISIONES-TECNICAS.md](docs/DECISIONES-TECNICAS.md)**.
 
 **Bloqueo pesimista contra la doble reserva.** La reserva bloquea la fila del horario con
@@ -222,7 +222,7 @@ producción no levanta.
 - [ ] Panel clínico multi-centro con historial
 - [ ] Refresh token
 - [ ] Cobertura medida con JaCoCo y pruebas E2E
-- [x] Cancelar la cita desde el propio aviso — hecho en el correo (el enlace lleva el token
+- [x] Cancelar la cita desde el propio aviso: hecho en el correo (el enlace lleva el token
       de la cita); queda hacerlo desde Telegram y SMS, y confirmar la asistencia
 
 ---
@@ -241,7 +241,7 @@ Trabajo con **Java, JavaScript, HTML y CSS**. Sé consumir y probar APIs e integ
 externos en una aplicación: aquí están Twilio, la Bot API de Telegram y el despliegue en un
 VPS propio con Docker, dominio propio y HTTPS automático con Caddy.
 
-Uso herramientas de IA como apoyo activo —para aprender más rápido, depurar y desatascarme—
+Uso herramientas de IA como apoyo activo (para aprender más rápido, depurar y desatascarme)
 igual que cualquier desarrolladora junior hoy. Las decisiones técnicas de este repositorio, y
 el saber explicarlas, son mías.
 

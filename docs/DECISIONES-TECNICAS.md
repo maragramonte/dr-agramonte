@@ -61,11 +61,11 @@ consulta no se nota; con miles de usuarios simultáneos habría que medirlo. Ade
 solo existe contra PostgreSQL: en la demo del navegador no hay nada de esto.
 
 **Evidencia.**
-- `backend/src/main/java/com/saludybienestar/agramonte/repository/HorarioRepository.java:37`
-  — `@Lock(LockModeType.PESSIMISTIC_WRITE)`
-- `backend/src/main/resources/db/migration/postgresql/V1__init.sql:50`
-  — `CREATE UNIQUE INDEX ... ON horarios(medico_id, inicio)`
-- `backend/src/test/.../ReservaPublicaIntegrationTest.java` — dos hilos con `CyclicBarrier`;
+- `backend/src/main/java/com/saludybienestar/agramonte/repository/HorarioRepository.java:37`:
+  `@Lock(LockModeType.PESSIMISTIC_WRITE)`
+- `backend/src/main/resources/db/migration/postgresql/V1__init.sql:50`:
+  `CREATE UNIQUE INDEX ... ON horarios(medico_id, inicio)`
+- `backend/src/test/.../ReservaPublicaIntegrationTest.java`: dos hilos con `CyclicBarrier`;
   se espera exactamente un 201 y un 409
 
 ---
@@ -92,7 +92,7 @@ si la transacción se revierte nunca se avisa de una cita que no llegó a existi
 ese aviso se pierde y nadie lo reintenta: no existe una tabla de salida ni reintentos. Es
 aceptable para avisos de cortesía y no lo sería para algo transaccional como un cobro.
 
-**Evidencia.** `service/CitaService.java:372` — `afterCommit()`
+**Evidencia.** `service/CitaService.java:372`: `afterCommit()`
 
 ---
 
@@ -122,9 +122,9 @@ perder lo segundo.
 de que los correos llevan días sin salir.
 
 **Evidencia.**
-- `service/TelegramMessageService.java:48` y `service/TwilioMessageService.java:39` — el
+- `service/TelegramMessageService.java:48` y `service/TwilioMessageService.java:39`: el
   `catch` que registra sin propagar
-- `service/CitaNotificationService.java` — coordinación de los tres canales
+- `service/CitaNotificationService.java`: coordinación de los tres canales
 
 ---
 
@@ -148,7 +148,7 @@ cuenta a quien solo ha demostrado saber escribir una dirección.
 **Limitaciones.** Un paciente que intente crear cuenta mientras el correo está caído recibe
 un error y no puede completarlo, aunque sí puede reservar sin cuenta.
 
-**Evidencia.** `service/ActivacionCuentaService.java:71` —
+**Evidencia.** `service/ActivacionCuentaService.java:71`:
 `throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, ...)`
 
 ---
@@ -184,10 +184,10 @@ acceso: no hay forma de reenviar un token del que solo se guarda el hash. Está 
 pendiente un «recuperar acceso» en [EVOLUCION.md](EVOLUCION.md).
 
 **Evidencia.**
-- `security/TokenOpaco.java:35` — el SHA-256 es «lo único que se persiste»
+- `security/TokenOpaco.java:35`: el SHA-256 es «lo único que se persiste»
 - `security/TokenAccesoCita.java`
 - `db/migration/postgresql/V11__cita_acceso_token.sql` y `V14__cita_recordatorio_token.sql`
-- `frontend/js/pages/reserva.js` — `importarTokenDelEnlace()`
+- `frontend/js/pages/reserva.js`: `importarTokenDelEnlace()`
 
 ---
 
@@ -199,7 +199,7 @@ que al consumirse esa ventana el calendario se quedaba vacío y la web dejaba de
 citas sin dar ningún error: simplemente no había días que ofrecer.
 
 **Decisión.** `GeneradorAgendaScheduler` añade cada madrugada el tramo que falta al final de
-la ventana. El patrón semanal —horas de consulta y qué centro atiende cada día— salió del
+la ventana. El patrón semanal (horas de consulta y qué centro atiende cada día) salió del
 `.sql` y vive en `config/AgendaProperties.java`.
 
 **Alternativas.**
@@ -226,7 +226,7 @@ semanas apagado, al volver habrá que esperar a la siguiente ejecución o lanzar
 ## 7. De quién es una agenda no lo decide la URL
 
 **Contexto.** `/api/citas/agenda/**` recibía el médico por parámetro, con
-`defaultValue = "1"`. El rol estaba bien comprobado —hacía falta ser `MEDICO` o `ADMIN`—,
+`defaultValue = "1"`. El rol estaba bien comprobado (hacía falta ser `MEDICO` o `ADMIN`),
 pero nadie comprobaba *qué* médico: bastaba cambiar el número de la URL para leer la agenda
 de otro, con los nombres, correos, teléfonos y motivos de consulta de sus pacientes.
 
@@ -252,7 +252,7 @@ la API esperando que `medicoId` haga algo. Está documentado en [API.md](API.md)
 **Evidencia.**
 - `db/migration/postgresql/V12__medico_usuario.sql`
 - `controller/CitaController.java`, rutas `/agenda/**`
-- `backend/src/test/` — prueba de aislamiento entre las agendas de dos médicos
+- `backend/src/test/`: prueba de aislamiento entre las agendas de dos médicos
 
 ---
 
@@ -305,7 +305,7 @@ compensa revisando los informes de Surefire y fallando si alguna quedó sin ejec
 **Evidencia.**
 - `backend/src/test/.../ReservaPublicaIntegrationTest.java`,
   `AccesoCitaPorCorreoIntegrationTest.java`, `ActivacionCuentaIntegrationTest.java`
-- `.github/workflows/ci.yml` — la comprobación de pruebas omitidas
+- `.github/workflows/ci.yml`: la comprobación de pruebas omitidas
 
 ---
 
@@ -321,8 +321,8 @@ Cualquiera habría resuelto el caso de uso.
 
 **Motivos.** *Justificación inferida del diseño, no una motivación documentada por la
 autora*: el proyecto se apoya en piezas que Spring da hechas y que aquí se usan de verdad
-—gestión declarativa de transacciones con `@Transactional`, bloqueos JPA, Spring Security
-con filtros propios, tareas programadas, validación de DTOs—. Reimplementar eso sobre un
+(gestión declarativa de transacciones con `@Transactional`, bloqueos JPA, Spring Security
+con filtros propios, tareas programadas, validación de DTOs). Reimplementar eso sobre un
 framework minimalista habría sido trabajo accesorio. Java 21 es LTS, lo que importa en algo
 pensado para quedarse desplegado.
 
@@ -380,9 +380,9 @@ compartida entre sitios de un CDN. La CSP conserva `'unsafe-inline'` en `style-s
 una concesión documentada en el propio `Caddyfile`.
 
 **Evidencia.**
-- `Caddyfile:39` — la cabecera `Content-Security-Policy`
+- `Caddyfile:39`: la cabecera `Content-Security-Policy`
 - `frontend/vendor/`
-- `THIRD-PARTY.md` — licencias de lo incorporado
+- `THIRD-PARTY.md`: licencias de lo incorporado
 
 ---
 

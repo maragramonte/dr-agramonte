@@ -4,7 +4,7 @@
 
 Este archivo solo documenta variables de integración (sin secretos).
 
-## Twilio — aviso al móvil
+## Twilio: aviso al móvil
 
 Al crear o cancelar una cita, el backend notifica al médico y (opcional) al paciente. Recordatorio ~24 h antes vía job programado.
 

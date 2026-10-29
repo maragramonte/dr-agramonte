@@ -86,7 +86,7 @@ un requisito de seguridad (acceso sin credenciales que no se pueda suplantar).
 
 ---
 
-### ✍️ COMPLETAR — ¿Por qué lo desarrollaste?
+### ✍️ COMPLETAR: ¿Por qué lo desarrollaste?
 
 El repositorio no contiene tu motivación personal, y no conviene inventarla.
 
@@ -331,7 +331,7 @@ médico, así que bastaba cambiar el número de la URL para leer la agenda de ot
 correos, teléfonos y motivos de consulta de sus pacientes.
 
 Lo importante: **ninguna prueba de roles lo detecta**, porque el rol era correcto. Es el
-ejemplo de manual de que autenticado no es lo mismo que autorizado — lo que OWASP llama
+ejemplo de manual de que autenticado no es lo mismo que autorizado: lo que OWASP llama
 *Broken Object Level Authorization*.
 
 Ahora el médico sale del JWT a través de `medicos.usuario_id` (V12).
@@ -581,7 +581,7 @@ daba error, simplemente dejaba de haber huecos que ofrecer.
 
 ---
 
-### ✍️ COMPLETAR — ¿Qué aprendiste?
+### ✍️ COMPLETAR: ¿Qué aprendiste?
 
 El repositorio registra **qué** aprendiste (concurrencia, autorización a nivel de objeto,
 transacciones, CSP, despliegue con Docker y HTTPS). No registra cómo lo viviste.

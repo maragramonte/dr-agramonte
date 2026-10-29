@@ -110,7 +110,7 @@ docker compose --profile mysql up -d --build   # API en :8081
 
 ## Documentación relacionada
 
-- [DESPLIEGUE-VPS.md](DESPLIEGUE-VPS.md) — producción paso a paso, secretos y copias
-- [API.md](API.md) — los endpoints que esta configuración habilita
-- [ARQUITECTURA.md](ARQUITECTURA.md) — dónde encaja cada canal
-- [DOCKER-TROUBLESHOOTING.md](DOCKER-TROUBLESHOOTING.md) — cuando el arranque falla
+- [DESPLIEGUE-VPS.md](DESPLIEGUE-VPS.md): producción paso a paso, secretos y copias
+- [API.md](API.md): los endpoints que esta configuración habilita
+- [ARQUITECTURA.md](ARQUITECTURA.md): dónde encaja cada canal
+- [DOCKER-TROUBLESHOOTING.md](DOCKER-TROUBLESHOOTING.md): cuando el arranque falla

@@ -1,7 +1,7 @@
 # API REST
 
-Catálogo de endpoints. El contexto de cada uno —cómo se calcula la disponibilidad, cómo
-funciona el token de acceso, por qué `medicoId` se ignora— está en
+Catálogo de endpoints. El contexto de cada uno (cómo se calcula la disponibilidad, cómo
+funciona el token de acceso, por qué `medicoId` se ignora) está en
 [ARQUITECTURA.md](ARQUITECTURA.md) y [DECISIONES-TECNICAS.md](DECISIONES-TECNICAS.md).
 
 Base: `/api`. En local, `http://localhost:8080/api`.

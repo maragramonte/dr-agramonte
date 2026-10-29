@@ -1,4 +1,4 @@
-# Documentación — Dr. Agramonte
+# Documentación: Dr. Agramonte
 
 El **README principal** ([../README.md](../README.md)) presenta el proyecto y enlaza lo
 esencial. Aquí está el detalle, organizado por para qué sirve cada documento.

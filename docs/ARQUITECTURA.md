@@ -13,7 +13,7 @@ Este documento describe **la estructura**. El porqué de cada elección está en
 
 Dos despliegues distintos, con la misma aplicación dentro.
 
-**En local** (`docker-compose.yml`) — tres contenedores. nginx sirve el frontend estático y
+**En local** (`docker-compose.yml`): tres contenedores. nginx sirve el frontend estático y
 hace de proxy hacia la API, así el navegador ve un único origen y no hay CORS.
 
 ```
@@ -24,7 +24,7 @@ hace de proxy hacia la API, así el navegador ve un único origen y no hay CORS.
                    [Twilio]   [Telegram]
 ```
 
-**En producción** (`docker-compose.prod.yml`) — también tres, pero distintos. Caddy termina
+**En producción** (`docker-compose.prod.yml`): también tres, pero distintos. Caddy termina
 el HTTPS por delante de un único contenedor donde Spring Boot sirve la API y el frontend
 juntos, sin nginx aparte. PostgreSQL no publica ningún puerto fuera de la red interna.
 
@@ -57,14 +57,14 @@ que el navegador carga directamente. Vive en `frontend/`.
 
 Los módulos compartidos que más peso tienen:
 
-- **`modules/api-client.js`** — cliente REST y gestión del JWT. Es el único sitio que habla
+- **`modules/api-client.js`**: cliente REST y gestión del JWT. Es el único sitio que habla
   con el backend; la demo lo aprovecha interceptando `fetch` por debajo.
-- **`modules/html.js`** — plantillas etiquetadas que escapan lo interpolado. Se usa donde se
+- **`modules/html.js`**: plantillas etiquetadas que escapan lo interpolado. Se usa donde se
   pintan datos de pacientes en la pantalla del médico.
-- **`modules/centros.js`** — los centros de consulta y sus días, en un solo sitio, porque los
+- **`modules/centros.js`**: los centros de consulta y sus días, en un solo sitio, porque los
   consumen tanto `pages/reserva.js` como el selector de la portada.
-- **`modules/i18n.js`** — traducción al catalán por atributos `data-i18n`, sin dependencias.
-- **`modules/theme-init.js`** — fija el tema antes de pintar, para que no parpadee.
+- **`modules/i18n.js`**: traducción al catalán por atributos `data-i18n`, sin dependencias.
+- **`modules/theme-init.js`**: fija el tema antes de pintar, para que no parpadee.
 
 ### Nada se carga de un CDN
 
@@ -119,9 +119,9 @@ en [BASE-DE-DATOS.md](BASE-DE-DATOS.md).
 
 Dos restricciones sostienen la integridad del dominio:
 
-- `UNIQUE (medico_id, inicio)` sobre `horarios` — un médico no puede tener dos franjas que
+- `UNIQUE (medico_id, inicio)` sobre `horarios`: un médico no puede tener dos franjas que
   empiecen a la misma hora. Es lo que hace idempotente la regeneración de la agenda.
-- `medicos.usuario_id` (migración V12) — ata cada médico a su cuenta, que es lo que permite
+- `medicos.usuario_id` (migración V12): ata cada médico a su cuenta, que es lo que permite
   resolver «de quién es esta agenda» desde el JWT en vez de desde la URL.
 
 ---
@@ -174,23 +174,23 @@ cita que la transacción acabó revirtiendo.
 
 Son dos cosas distintas y el proyecto las trata por separado.
 
-**Autenticación** — JWT firmado con `JWT_SECRET`, emitido por `JwtProvider` y validado en
+**Autenticación**: JWT firmado con `JWT_SECRET`, emitido por `JwtProvider` y validado en
 cada petición por `JwtAuthFilter`. `CustomUserDetailsService` resuelve el usuario y sus
 roles (`PACIENTE`, `MEDICO`, `ADMIN`, en `entity/Rol.java`).
 
-**Autorización** — las reglas viven en `config/SecurityConfig.java`. El rol decide a qué
+**Autorización**: las reglas viven en `config/SecurityConfig.java`. El rol decide a qué
 rutas se entra; **qué datos se devuelven dentro de esas rutas no lo decide la URL**. En
 `/api/citas/agenda/**` el médico sale del JWT a través de `medicos.usuario_id`: un médico
 que pida la agenda de otro recibe la suya, con un 200 corriente. El porqué de esa respuesta
 y no un 403 está en [DECISIONES-TECNICAS.md](DECISIONES-TECNICAS.md#7-de-quién-es-una-agenda-no-lo-decide-la-url).
 
-**Acceso sin cuenta** — quien reserva sin registrarse recibe un token opaco por cita
+**Acceso sin cuenta**: quien reserva sin registrarse recibe un token opaco por cita
 (`security/TokenAccesoCita.java`, `security/TokenOpaco.java`). En base de datos solo se
 guarda su SHA-256, así que no puede reenviarse desde el servidor. Viaja en la cabecera
 `X-Cita-Token`, y en los enlaces por correo va en el fragmento de la URL
 (`reservar.html#cita-<id>.<token>`), que el navegador no envía al servidor.
 
-**Límite de peticiones** — `RateLimitFilter` acota las rutas públicas de escritura por IP,
+**Límite de peticiones**: `RateLimitFilter` acota las rutas públicas de escritura por IP,
 configurable con las variables `RATE_LIMIT_*`.
 
 ---
