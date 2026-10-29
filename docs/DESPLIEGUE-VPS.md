@@ -81,7 +81,7 @@ abstracto, este es el que usa el proyecto:
 | **IP pública** | _(anotar aquí al contratar)_ |
 
 **Por qué 4 GB y no 2.** `scripts/deploy.sh` compila Maven **en el propio
-servidor**. El build se come cerca de 1 GB y coincide con la JVM anterior aún
+servidor**. El build usa cerca de 1 GB y coincide con la JVM anterior aún
 en marcha, Postgres y Caddy. Con 2 GB el despliegue puede morir por falta de
 memoria justo mientras actualizas. Con 4 GB sobra y el `mem_limit: 1g` del
 compose se queda como está.

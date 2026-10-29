@@ -12,24 +12,23 @@ del teléfono.
 
 ---
 
-## El problema
+## Por qué lo hice
 
-Buena parte de las llamadas que recibe un médico fuera de su horario no son urgencias
-clínicas: son gestión de agenda. Cambiar una hora, preguntar por un hueco, cancelar. Esa
-carga administrativa se come tiempo que no está pagado ni contabilizado como trabajo.
+Muchas de las llamadas que recibe un médico fuera de horario no son urgencias. Son cambios
+de hora, preguntas por un hueco o cancelaciones, y ese tiempo no lo paga nadie.
 
-Este proyecto digitaliza esa parte concreta, sin tocar lo que sí requiere trato humano. Está
-pensado para **la consulta privada y la clínica pequeña**: uno o varios médicos, uno o varios
-centros, y una agenda que hoy se lleva por teléfono o en papel.
+La aplicación se ocupa solo de esa parte. Está pensada para una consulta privada o una
+clínica pequeña, con uno o varios médicos y centros, que hoy lleva la agenda por teléfono o
+en papel.
 
-La decisión de producto que lo define es **permitir reservar sin registro**. Si para pedir
-hora hay que crear una cuenta, mucha gente vuelve a llamar y el problema sigue ahí.
+Decidí que se pudiera reservar sin crear cuenta. Si para pedir hora hay que registrarse,
+mucha gente acaba llamando igual.
 
 ---
 
 ## Probarlo
 
-**▶ [Demo en línea](https://maragramonte.github.io/dr-agramonte/)**: una presentación del
+[Demo en línea](https://maragramonte.github.io/dr-agramonte/): una presentación del
 producto y, bajo [`/app/`](https://maragramonte.github.io/dr-agramonte/app/), la aplicación
 real con una API simulada en el navegador.
 
@@ -41,9 +40,9 @@ real con una API simulada en el navegador.
 **Para verlo en un minuto:** en `/app/`, pulsa «Entrar como paciente» y reserva una cita.
 Después, «Entrar como médico» para verla en la agenda y en el cuadro de mando.
 
-**🖼 [Sin pulsar nada](docs/CAPTURAS.md)**: la aplicación pantalla a pantalla, en imágenes.
-Y si prefieres leer el proyecto entero, la
-[memoria completa](docs/Memoria-Dr-Agramonte.pdf) (PDF).
+Si prefieres no pulsar nada, en [docs/CAPTURAS.md](docs/CAPTURAS.md) está la aplicación
+pantalla a pantalla. La [memoria completa](docs/Memoria-Dr-Agramonte.pdf) (PDF) cuenta el
+proyecto entero.
 
 > **Estado del despliegue.** El dominio `dragramonte.com` está registrado pero **hoy no sirve
 > la aplicación**: el alojamiento anterior se retiró y el despliegue en servidor propio está
