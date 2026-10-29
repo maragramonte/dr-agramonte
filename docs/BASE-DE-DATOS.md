@@ -1,4 +1,4 @@
-# Base de datos: referencia para la defensa
+# Base de datos
 
 > **TFG DAM · Dr. Agramonte.** Esquema real reconstruido de las migraciones **Flyway V1–V14** (`backend/src/main/resources/db/migration/postgresql/`). **PostgreSQL 15.** Hibernate arranca con `ddl-auto: validate`, así que el esquema de esta referencia coincide exactamente con las entidades JPA.
 
@@ -135,7 +135,7 @@ erDiagram
 | `nombre` | VARCHAR(255) | NOT NULL |
 | `direccion`, `ciudad` | VARCHAR(255) | nullable |
 
-> ⚠️ **Ojo defensa:** los códigos `madrid`/`palma` son **identificadores internos heredados**; los dos centros reales están en **Palma de Mallorca** (V7 renombró: `madrid`→«Consulta General Riera», `palma`→«Consulta Avenidas»). No se cambió el código para no romper las citas/horarios ya enlazados.
+> **Nota:** los códigos `madrid`/`palma` son **identificadores internos heredados**; los dos centros reales están en **Palma de Mallorca** (V7 renombró: `madrid`→«Consulta General Riera», `palma`→«Consulta Avenidas»). No se cambió el código para no romper las citas/horarios ya enlazados.
 
 ### `horarios`: agenda real (franjas de 30 min)
 | Columna | Tipo | Restricción |
@@ -199,7 +199,7 @@ erDiagram
 
 ---
 
-## Concurrencia: cómo se evita la doble reserva ⭐
+## Concurrencia: cómo se evita la doble reserva
 Es el punto técnico estrella y se apoya en la BD:
 1. **`UNIQUE (medico_id, inicio)`** en `horarios`: a nivel de esquema, dos franjas iguales son imposibles.
 2. **Bloqueo pesimista** al reservar: `findByMedicoIdAndInicioAndDisponibleTrueForUpdate` ejecuta un `SELECT … FOR UPDATE` que **bloquea la fila del horario** dentro de la transacción.
@@ -227,7 +227,7 @@ Está **probado**: `ReservaPublicaIntegrationTest` lanza dos hilos en paralelo c
 
 ---
 
-## Decisiones de diseño (resumen para responder rápido)
+## Decisiones de diseño
 - **Claves `BIGSERIAL`/`BIGINT`:** autoincremento nativo de PostgreSQL; margen de crecimiento frente a `INT`.
 - **Enums como `VARCHAR` + `@Enumerated(STRING)`:** dominios pequeños y estables (estado, rol, canal); legibles en la BD y sin una tabla-catálogo que sería sobre-ingeniería.
 - **Columnas nuevas siempre `nullable`** (centro_id V5/V6, recordatorio V2, cobertura V8, Telegram V9/V10, token de acceso V11, cuenta del médico V12, activación V13, token del recordatorio V14): no rompen las filas existentes al migrar (compatibilidad hacia atrás).
@@ -236,7 +236,7 @@ Está **probado**: `ReservaPublicaIntegrationTest` lanza dos hilos en paralelo c
 
 ---
 
-## Preguntas típicas de defensa (con respuesta)
+## Preguntas frecuentes
 - **¿Por qué relacional y no NoSQL?** → Datos fuertemente interrelacionados (usuario–médico–horario–centro–cita) e invariante crítica (no doble reserva) que exige transacciones ACID y bloqueo de fila. NoSQL documental se reserva para el historial clínico (línea futura, persistencia políglota).
 - **¿Cómo garantizas que no se reserve dos veces el mismo hueco?** → `UNIQUE(medico_id, inicio)` + `SELECT FOR UPDATE`; la 2ª transacción recibe 409. Hay test de integración que lo demuestra.
 - **¿Qué pasa si borras un centro?** → Las citas/horarios de ese centro **no se borran**: su `centro_id` queda a `NULL` (se conserva el histórico). En cambio, borrar un usuario o un médico **sí** arrastra (CASCADE) sus citas/horarios.
@@ -245,7 +245,7 @@ Está **probado**: `ReservaPublicaIntegrationTest` lanza dos hilos en paralelo c
 - **¿La cita guarda en qué centro es?** → Sí, en `centro_id`, que **hereda del horario** reservado (la agenda está repartida por centro y día).
 - **¿Guardas datos sensibles (tarjeta sanitaria)?** → Sí, desde V8, para que el profesional gestione la cobertura; en un despliegue real convendría cifrarlo/minimizarlo (RGPD: dato de salud): recogido como mejora.
 - **¿Por qué no una tabla de «pagos»?** → De momento solo se **captura** la cobertura/preferencia en la propia cita; no hay cobro. Cuando se integre la pasarela (Stripe, línea futura) tendría sentido una tabla `pagos` con su ciclo de estados.
-- **¿Migraciones reversibles?** → Forward-only con Flyway; cada cambio es una nueva versión. Reproducible y trazable, que es lo que importa para la defensa.
+- **¿Migraciones reversibles?** → Forward-only con Flyway; cada cambio es una nueva versión. Reproducible y trazable.
 - **¿Por qué el chat de Telegram se guarda en `usuarios` y no en una tabla aparte?** → Es una relación **1:1** (un paciente, un chat) y siempre se consulta junto al usuario al enviar el aviso. Una tabla `usuario_telegram` añadiría un `JOIN` en cada notificación sin ganar nada; si algún día un paciente pudiera vincular varios canales, entonces sí tocaría normalizarlo.
 - **¿Cómo evitas que alguien secuestre los avisos de otro paciente?** → El token de vinculación (V9) es de **un solo uso**, se genera con `SecureRandom` (32 bytes en Base64 URL-safe), **caduca a los 15 minutos** (V10) y solo se emite para el usuario del JWT en sesión, nunca para un email pasado por parámetro. Al consumirse se pone a `NULL`, y el índice `UNIQUE` sobre `telegram_chat_id` impide que un mismo chat quede asociado a dos cuentas.
 - **¿Y si el paciente quiere dejar de recibir avisos?** → `DELETE /api/telegram/vinculacion` pone a `NULL` el chat y el token. Es idempotente y funciona aunque el canal esté desactivado, precisamente para que siempre se puedan retirar esos datos (RGPD, derecho de supresión).

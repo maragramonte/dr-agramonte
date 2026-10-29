@@ -211,7 +211,6 @@ producción no levanta.
 | [DESPLIEGUE-VPS.md](docs/DESPLIEGUE-VPS.md) | Puesta en producción en un servidor propio |
 | [DOCKER-TROUBLESHOOTING.md](docs/DOCKER-TROUBLESHOOTING.md) | Arranque, 502 y healthchecks |
 | [EVOLUCION.md](docs/EVOLUCION.md) | Cómo creció el proyecto, fase a fase |
-| [DEFENSA-TECNICA.md](docs/DEFENSA-TECNICA.md) | Guía para explicar y defender el proyecto en una entrevista |
 | [Memoria-Dr-Agramonte.pdf](docs/Memoria-Dr-Agramonte.pdf) | Memoria completa del proyecto (LaTeX) |
 
 ---
