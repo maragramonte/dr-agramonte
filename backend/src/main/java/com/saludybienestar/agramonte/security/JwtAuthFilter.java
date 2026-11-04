@@ -55,6 +55,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             logger.debug("Token válido de una cuenta que ya no existe; se trata como anónima");
             return;
         }
+        // El login ya rechaza una cuenta desactivada, pero un JWT emitido antes seguiría
+        // valiendo hasta caducar: 24 horas de acceso a una cuenta que se ha querido cerrar.
+        if (!userDetails.isEnabled()) {
+            logger.debug("Token válido de una cuenta desactivada; se trata como anónima");
+            return;
+        }
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
