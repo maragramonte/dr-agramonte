@@ -6,4 +6,4 @@ Disallow: /panel-pruebas.html
 Disallow: /estadisticas.html
 Disallow: /offline.html
 
-Sitemap: https://www.dragramonte.com/sitemap.xml
+Sitemap: https://maragramonte.github.io/dr-agramonte/app/sitemap.xml
