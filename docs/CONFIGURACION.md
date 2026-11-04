@@ -88,7 +88,7 @@ Dar de alta el bot, una vez:
    cuenta. Desde ahí el botón pasa a **Dejar de recibir avisos**.
 
 El webhook rechaza las llamadas que no traigan el secreto, así que no acepta peticiones de
-cualquiera. El token de vinculación es de un solo uso, caduca a los quince minutos y se
+cualquiera, y sin `TELEGRAM_WEBHOOK_SECRET` las rechaza todas. El token de vinculación es de un solo uso, caduca a los quince minutos y se
 emite **siempre para el usuario del JWT en sesión**, nunca para un correo recibido por
 parámetro.
 
