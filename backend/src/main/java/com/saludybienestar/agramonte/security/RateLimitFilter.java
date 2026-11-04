@@ -92,11 +92,12 @@ public class RateLimitFilter extends OncePerRequestFilter {
         if (ruta == null) {
             return null;
         }
-        // Mismo cubo para las tres: todas son intentos contra credenciales. En
+        // Mismo cubo para las cuatro: todas son intentos contra credenciales. En
         // /api/auth/activar lo que se probaría a ciegas es el token del correo, y aunque
         // son 32 bytes de SecureRandom, no hay motivo para dejar barrer sin freno.
         if (ruta.endsWith("/api/auth/login")
                 || ruta.endsWith("/api/auth/registro")
+                || ruta.endsWith("/api/auth/recuperar")
                 || ruta.endsWith("/api/auth/activar")) {
             return "auth";
         }

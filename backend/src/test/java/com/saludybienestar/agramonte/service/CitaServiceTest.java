@@ -22,7 +22,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -48,8 +47,6 @@ class CitaServiceTest {
     @Mock private UsuarioRepository usuarioRepository;
     @Mock private HorarioRepository horarioRepository;
     @Mock private CitaNotificationService citaNotificationService;
-    @Mock private PasswordEncoder passwordEncoder;
-    @Mock private AuthService authService;
     @Mock private CorreoAccesoCitaService correoAccesoCitaService;
     @Mock private CorreoCancelacionCitaService correoCancelacionCitaService;
 

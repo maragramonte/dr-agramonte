@@ -6,7 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
- * Envía el correo con el enlace de activación de una cuenta invitada.
+ * Envía los correos con el enlace para elegir contraseña: el de activar una cuenta nueva
+ * o invitada y el de recuperar una cuenta que ya tiene dueño.
  *
  * <p>Aquí no se puede seguir adelante sin correo, porque el correo <em>es</em> la
  * comprobación de identidad; quien pregunta es
@@ -35,9 +36,8 @@ public class CorreoActivacionService {
                 """
                 Hola%s:
 
-                Has pedido crear una cuenta con este correo, que ya tenía citas reservadas
-                como invitado. Para poner una contraseña y conservar esas citas, abre este
-                enlace:
+                Para terminar de crear tu cuenta, elige una contraseña en este enlace. Si ya
+                tenías citas reservadas con este correo, las conservarás:
 
                 %s
 
@@ -45,6 +45,28 @@ public class CorreoActivacionService {
 
                 Si no has sido tú, no hagas nada: sin abrir el enlace no cambia nada en la
                 cuenta ni en tus citas.
+
+                Consulta del Dr. Juan Manuel Agramonte
+                """.formatted(
+                        correoSaliente.nombreDeCortesia(destinatario),
+                        correoSaliente.enlace("activar.html", token)));
+    }
+
+    public void enviarRecuperacion(Usuario destinatario, String token) {
+        correoSaliente.enviar(
+                destinatario.getEmail(),
+                "Elige una contraseña nueva — Dr. Agramonte",
+                """
+                Hola%s:
+
+                Se ha pedido acceder a tu cuenta con este correo, que ya está registrado. Si
+                has olvidado la contraseña, elige una nueva en este enlace:
+
+                %s
+
+                El enlace caduca en 30 minutos y solo puede usarse una vez.
+
+                Si no has sido tú, no hagas nada: tu contraseña sigue siendo la misma.
 
                 Consulta del Dr. Juan Manuel Agramonte
                 """.formatted(

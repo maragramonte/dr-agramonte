@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,9 +15,11 @@ import com.saludybienestar.agramonte.repository.UsuarioRepository;
 import com.saludybienestar.agramonte.security.TokenOpaco;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import com.saludybienestar.agramonte.dto.request.RegistroRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -223,5 +226,105 @@ class ActivacionCuentaServiceTest {
                 .isFalse();
 
         assertThat(service.esCuentaInvitada(null)).isFalse();
+    }
+
+    // ── Alta y recuperación: siempre un enlace, nunca una contraseña ────────
+
+    private RegistroRequest alta(String email) {
+        RegistroRequest r = new RegistroRequest();
+        r.setEmail(email);
+        r.setNombre("  Nombre Del Formulario ");
+        r.setTelefono("+34699999999");
+        return r;
+    }
+
+    private Usuario cuentaNormal() {
+        Usuario u = invitado();
+        u.setCuentaInvitada(false);
+        return u;
+    }
+
+    @Test
+    @DisplayName("Alta con un correo libre: crea una cuenta invitada y manda la activación")
+    void alta_correoLibre_creaInvitada() {
+        when(correoActivacionService.disponible()).thenReturn(true);
+        when(usuarioRepository.findByEmail("nuevo@example.com")).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(anyString())).thenReturn("$2a$12$clave-aleatoria");
+        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        service.solicitarAlta(alta("  Nuevo@Example.COM "));
+
+        ArgumentCaptor<Usuario> creada = ArgumentCaptor.forClass(Usuario.class);
+        verify(correoActivacionService).enviar(creada.capture(), anyString());
+        assertThat(creada.getValue().getEmail()).isEqualTo("nuevo@example.com");
+        assertThat(creada.getValue().getNombre()).isEqualTo("Nombre Del Formulario");
+        assertThat(creada.getValue().isCuentaInvitada()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Alta con una cuenta invitada: manda la activación y no cambia los datos")
+    void alta_cuentaInvitada_noModificaLaCuenta() {
+        Usuario invitada = invitado();
+        when(correoActivacionService.disponible()).thenReturn(true);
+        when(usuarioRepository.findByEmail("invitado@example.com")).thenReturn(Optional.of(invitada));
+
+        service.solicitarAlta(alta("invitado@example.com"));
+
+        verify(correoActivacionService).enviar(eq(invitada), anyString());
+        assertThat(invitada.getPassword()).isEqualTo(PASSWORD_VIEJA);
+        assertThat(invitada.getNombre()).isEqualTo("Paciente Invitado");
+        assertThat(invitada.getTelefono()).isEqualTo("+34600111222");
+    }
+
+    @Test
+    @DisplayName("Alta con una cuenta normal: manda la recuperación y mantiene la contraseña")
+    void alta_cuentaNormal_mandaRecuperacion() {
+        Usuario normal = cuentaNormal();
+        when(correoActivacionService.disponible()).thenReturn(true);
+        when(usuarioRepository.findByEmail("invitado@example.com")).thenReturn(Optional.of(normal));
+
+        service.solicitarAlta(alta("invitado@example.com"));
+
+        verify(correoActivacionService).enviarRecuperacion(eq(normal), anyString());
+        verify(correoActivacionService, never()).enviar(any(), anyString());
+        assertThat(normal.getPassword()).isEqualTo(PASSWORD_VIEJA);
+    }
+
+    @Test
+    @DisplayName("Recuperación de un correo sin cuenta: no falla y no manda nada")
+    void recuperar_sinCuenta_noMandaNada() {
+        when(correoActivacionService.disponible()).thenReturn(true);
+        when(usuarioRepository.findByEmail("nadie@example.com")).thenReturn(Optional.empty());
+
+        service.solicitarRecuperacion("nadie@example.com");
+
+        verify(correoActivacionService, never()).enviarRecuperacion(any(), anyString());
+    }
+
+    @Test
+    @DisplayName("Recuperación de la cuenta del médico: no se manda, la contraseña la fija el entorno")
+    void recuperar_medico_noMandaNada() {
+        Usuario medico = cuentaNormal();
+        medico.setRol(Rol.MEDICO);
+        when(correoActivacionService.disponible()).thenReturn(true);
+        when(usuarioRepository.findByEmail("invitado@example.com")).thenReturn(Optional.of(medico));
+
+        service.solicitarRecuperacion("invitado@example.com");
+
+        verify(correoActivacionService, never()).enviarRecuperacion(any(), anyString());
+        assertThat(medico.getActivacionToken()).isNull();
+    }
+
+    @Test
+    @DisplayName("Recuperación sin SMTP: 503 antes de mirar si la cuenta existe")
+    void recuperar_sinCorreo_devuelve503() {
+        when(correoActivacionService.disponible()).thenReturn(false);
+
+        assertThatThrownBy(() -> service.solicitarRecuperacion("invitado@example.com"))
+                .isInstanceOf(ResponseStatusException.class)
+                .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
+                        .isEqualTo(HttpStatus.SERVICE_UNAVAILABLE));
+
+        verify(usuarioRepository, never()).findByEmail(anyString());
     }
 }
