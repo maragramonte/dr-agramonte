@@ -30,7 +30,7 @@
         <tomcat.version>10.1.61</tomcat.version>
         <jackson-bom.version>2.21.8</jackson-bom.version>
         <mysql.version>9.0.0</mysql.version>
-        <lombok.version>1.18.36</lombok.version>
+        <lombok.version>1.18.48</lombok.version>
         <flyway.version>11.8.0</flyway.version>
         <testcontainers.version>1.21.4</testcontainers.version>
         <!-- docker-java más reciente que el que trae Testcontainers 1.21.x (3.4.2):
