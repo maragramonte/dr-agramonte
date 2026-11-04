@@ -2,6 +2,7 @@ package com.saludybienestar.agramonte.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -21,5 +22,6 @@ public class RegistroRequest {
     private String password;
 
     @Size(max = 20)
+    @Pattern(regexp = FormatoTelefono.PATRON, message = FormatoTelefono.MENSAJE)
     private String telefono;
 }

@@ -293,6 +293,45 @@ class CitaControllerWebMvcTest {
     }
 
     @Test
+    @DisplayName("POST /api/citas/reserva-publica con un teléfono extranjero devuelve 400 y no llega al servicio")
+    void reservaPublica_telefonoExtranjero_400() throws Exception {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("nombre", "Paciente Invitado");
+        body.put("email", "invitado@example.com");
+        body.put("telefono", "+882123456789");
+        body.put("medicoId", 1);
+        body.put("fechaHora", LocalDateTime.now().plusDays(1));
+        body.put("aceptaPrivacidad", true);
+
+        mockMvc.perform(post("/api/citas/reserva-publica")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(body)))
+                .andExpect(status().isBadRequest());
+
+        verify(citaService, never()).reservaPublica(any());
+    }
+
+    @Test
+    @DisplayName("POST /api/citas/reserva-publica acepta el teléfono escrito con espacios")
+    void reservaPublica_telefonoConEspacios_creada() throws Exception {
+        when(citaService.reservaPublica(any()))
+                .thenReturn(new ReservaPublicaResponse(citaConfirmada(), null, "token-de-acceso-de-prueba", false));
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("nombre", "Paciente Invitado");
+        body.put("email", "invitado@example.com");
+        body.put("telefono", "+34 600 111 222");
+        body.put("medicoId", 1);
+        body.put("fechaHora", LocalDateTime.now().plusDays(1));
+        body.put("aceptaPrivacidad", true);
+
+        mockMvc.perform(post("/api/citas/reserva-publica")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(body)))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
     @DisplayName("POST /api/citas/reserva-publica es público y crea la cita (201)")
     void reservaPublica_anonimo_creada() throws Exception {
         when(citaService.reservaPublica(any()))

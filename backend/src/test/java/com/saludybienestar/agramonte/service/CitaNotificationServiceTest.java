@@ -159,4 +159,21 @@ class CitaNotificationServiceTest {
         assertThat(twilioTextos.getAllValues()).isNotEmpty().noneMatch(texto -> texto.contains(MOTIVO));
         assertThat(telegramTextos.getAllValues()).isNotEmpty().noneMatch(texto -> texto.contains(MOTIVO));
     }
+
+    @Test
+    @DisplayName("Los avisos al paciente no repiten el nombre: lo escribe quien reserva, sin verificar")
+    void avisosAlPaciente_noLlevanElNombre() {
+        twilio.setNotifyPatients(true);
+        Cita cita = cita(TELEFONO, CHAT_ID);
+
+        service.notifyNuevaCita(cita);
+        service.notifyCancelacion(cita);
+        service.sendRecordatorio24h(cita);
+
+        ArgumentCaptor<String> textos = ArgumentCaptor.forClass(String.class);
+        verify(twilioMessageService, atLeastOnce()).send(eq(TELEFONO), textos.capture());
+
+        assertThat(textos.getAllValues()).isNotEmpty()
+                .noneMatch(texto -> texto.contains(cita.getUsuario().getNombre()));
+    }
 }

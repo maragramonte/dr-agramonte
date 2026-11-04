@@ -3,6 +3,7 @@ package com.saludybienestar.agramonte.dto.request;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -31,6 +32,7 @@ public class CrearCitaRequest {
 
     /** Actualiza el teléfono del paciente para avisos Twilio (formato +34...). */
     @Size(max = 20)
+    @Pattern(regexp = FormatoTelefono.PATRON, message = FormatoTelefono.MENSAJE)
     private String telefono;
 
     /** Cobertura: 'privada' o 'seguro'. */
