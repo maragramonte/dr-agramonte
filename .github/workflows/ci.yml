@@ -28,7 +28,7 @@ jobs:
     name: Backend (JDK 21 + Testcontainers)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Preparar JDK 21
         uses: actions/setup-java@v4
@@ -72,7 +72,7 @@ jobs:
     name: Imagen de producción
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # El Dockerfile de la raíz es el que usa el VPS (docker-compose.prod.yml):
       # empaqueta el frontend como recursos estáticos dentro del jar del backend.

@@ -34,7 +34,7 @@ jobs:
     # (ver el paso «Guardar la base de datos de la NVD»).
     timeout-minutes: 120
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Sin clave de la NVD el plugin queda limitado a una petición cada ~6 s y la
       # descarga pasa de minutos a horas, así que no se intenta siquiera: el resto
