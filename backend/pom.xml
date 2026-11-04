@@ -24,7 +24,7 @@
 
         <!-- Versionado centralizado -->
         <jjwt.version>0.12.6</jjwt.version>
-        <postgresql.version>42.7.5</postgresql.version>
+        <postgresql.version>42.7.12</postgresql.version>
         <mysql.version>9.0.0</mysql.version>
         <lombok.version>1.18.36</lombok.version>
         <flyway.version>11.8.0</flyway.version>
