@@ -688,7 +688,7 @@ function exportICS(cita) {
     const end = new Date(start.getTime() + 30 * 60000);
     const ics = [
         'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Dr.Agramonte//ES', 'BEGIN:VEVENT',
-        `UID:${cita.id}@dragramonte.com`, `DTSTAMP:${fmt(new Date())}`, `DTSTART:${fmt(start)}`, `DTEND:${fmt(end)}`,
+        `UID:${cita.id}@maragramonte.github.io`, `DTSTAMP:${fmt(new Date())}`, `DTSTART:${fmt(start)}`, `DTEND:${fmt(end)}`,
         'SUMMARY:Cita medica - Dr. Agramonte', `DESCRIPTION:${cita.motivo || 'Consulta medica'}`,
         `LOCATION:${cita.centroDireccion || 'Consulta'}`,
         'END:VEVENT', 'END:VCALENDAR'

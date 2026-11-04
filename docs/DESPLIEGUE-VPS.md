@@ -62,7 +62,7 @@ trabajar en local con nginx + backend + Postgres por separado.
 - Un **VPS** con Ubuntu 24.04 LTS (o Debian 12). Mínimo **2 GB de RAM** y 20 GB
   de disco; con 4 GB vas holgada. La JVM es lo que más memoria pide.
 - La **IP pública** del servidor y acceso SSH.
-- El dominio `dragramonte.com` con acceso al **editor de zona DNS** (IONOS).
+- Un dominio propio con acceso al **editor de zona DNS**.
 - El repositorio en GitHub (`maragramonte/dr-agramonte`), ya lo tienes.
 
 ### El servidor elegido
@@ -250,13 +250,13 @@ el volumen de datos ya existe, el contenedor no podrá abrirlo.
 
 ## 5. Apuntar el dominio
 
-Con una IP fija, los DNS son dos registros `A` y se acabó. **Nada de CNAME y nada del asistente de "Redirección" de IONOS**,
+Con una IP fija, los DNS son dos registros `A` y se acabó. **Nada de CNAME y nada del asistente de "Redirección" del proveedor**,
 que es justo lo que sobrescribía el registro `www` una y otra vez.
 
-En IONOS, en *Dominios* -> `dragramonte.com` -> **Editar zona DNS**:
+En el panel del proveedor, abre el **editor de zona DNS** del dominio:
 
 1. **Quita la Redirección** si sigue activa: en *Ajustar destino*, elige el modo
-   DNS normal, no "Redirección". Mientras haya un reenvío, IONOS reescribirá los
+   DNS normal, no "Redirección". Mientras haya un reenvío, el proveedor reescribirá los
    registros por su cuenta.
 2. Borra los registros `A`, `AAAA` y `CNAME` que existan para `@` y para `www`
    (incluido cualquier `CNAME` de `www` que apuntara al alojamiento anterior).
@@ -274,14 +274,14 @@ En IONOS, en *Dominios* -> `dragramonte.com` -> **Editar zona DNS**:
 Comprueba la propagación (de minutos a un par de horas):
 
 ```bash
-dig +short www.dragramonte.com @1.1.1.1
-dig +short dragramonte.com @1.1.1.1
+dig +short www.example.com @1.1.1.1
+dig +short example.com @1.1.1.1
 ```
 
 Las dos tienen que devolver la IP del servidor y nada más.
 
 > **Ojo con tu red local:** tu ISP intercepta las consultas DNS y a veces devuelve
-> IPs de IONOS aunque el registro esté bien. Si dudas, comprueba desde el propio
+> IPs del proveedor aunque el registro esté bien. Si dudas, comprueba desde el propio
 > VPS o en <https://dnschecker.org>.
 
 **No sigas al paso 6 hasta que el DNS resuelva a la IP nueva:** Caddy pide el
@@ -328,10 +328,10 @@ source ~/.bashrc
 ## 7. Comprobar que está todo bien
 
 ```bash
-curl -I https://www.dragramonte.com/
-curl -s https://www.dragramonte.com/actuator/health
-curl -I http://dragramonte.com/
-curl -I http://www.dragramonte.com/
+curl -I https://www.example.com/
+curl -s https://www.example.com/actuator/health
+curl -I http://example.com/
+curl -I http://www.example.com/
 ```
 
 Esperado, y conviene saberlo antes para no pensar que algo falla: los dos
@@ -340,9 +340,9 @@ primeros dan `200` con certificado válido y `{"status":"UP"}`. Los redirectos s
 
 | Petición | Código | Destino |
 |---|---|---|
-| `http://www.dragramonte.com/` | `308` | `https://www.dragramonte.com/` |
-| `http://dragramonte.com/` | `308` | `https://dragramonte.com/` |
-| `https://dragramonte.com/` | `301` | `https://www.dragramonte.com/` |
+| `http://www.example.com/` | `308` | `https://www.example.com/` |
+| `http://example.com/` | `308` | `https://example.com/` |
+| `https://example.com/` | `301` | `https://www.example.com/` |
 
 El `308` es el salto a HTTPS, que Caddy añade solo; el `301` es el del apex al www,
 el que pone el `Caddyfile`. Quien teclee el dominio pelado pasa por los dos.
@@ -439,7 +439,7 @@ borres o habrá que pedirlos otra vez.
 
 | Síntoma | Causa habitual | Solución |
 |---|---|---|
-| Caddy no consigue el certificado | El DNS aún no apunta a la IP, o el 80/443 está cerrado | `dig +short www.dragramonte.com`, `sudo ufw status`; espera y `dc restart caddy` |
+| Caddy no consigue el certificado | El DNS aún no apunta a la IP, o el 80/443 está cerrado | `dig +short www.example.com`, `sudo ufw status`; espera y `dc restart caddy` |
 | `502 Bad Gateway` | La app no ha arrancado o se está cayendo | `dc logs app`. Casi siempre es la base de datos o una variable que falta |
 | La app arranca y se muere sola | Sin memoria (OOM) en un VPS de 2 GB | Baja `mem_limit` de `app` a `768m` en `docker-compose.prod.yml` |
 | `403` al reservar o al guardar | Origen no permitido en CORS | El dominio debe estar en `setAllowedOrigins` de `SecurityConfig.java` |
@@ -465,5 +465,5 @@ Lo que un alojamiento gestionado te daba hecho y aquí es tuyo:
   privada es perfectamente razonable; si algún día hace falta más, un segundo
   servidor y un balanceador delante.
 - **Vigila que sigue en pie.** Un aviso gratuito de <https://uptimerobot.com>
-  apuntando a `https://www.dragramonte.com/actuator/health` te escribe si se cae,
+  apuntando a `https://www.example.com/actuator/health` te escribe si se cae,
   en vez de enterarte por un paciente.

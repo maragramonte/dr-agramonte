@@ -89,6 +89,10 @@ public class CitaNotificationService {
      * de salud (art. 9 RGPD), y estos avisos salen por Twilio (EE. UU.) y Telegram,
      * quedan en el móvil de quien los recibe y además se guardan en la tabla de
      * notificaciones. El médico lo consulta en su agenda, detrás del login.
+     *
+     * Los mensajes al paciente tampoco llevan su nombre. Lo escribe quien reserva, sin
+     * cuenta y sin verificar el teléfono, así que repetirlo convertía el aviso en un SMS
+     * con texto libre, enviado desde el número de la consulta a un teléfono ajeno.
      */
     private String buildNuevaCitaMedicoMessage(Cita cita) {
         Usuario p = cita.getUsuario();
@@ -133,13 +137,12 @@ public class CitaNotificationService {
     private String buildConfirmacionPacienteMessage(Cita cita) {
         return """
                 ✅ Cita confirmada – Dr. Agramonte
-                Hola %s, su cita está reservada:
+                Su cita está reservada:
                 Fecha: %s
                 Médico: %s
                 Dirección: %s
                 Para cambios o cancelación, use la web de reservas.
                 """.formatted(
-                cita.getUsuario().getNombre(),
                 cita.getFechaHora().format(FECHA),
                 cita.getMedico().getNombre(),
                 direccionCita(cita)
@@ -149,10 +152,9 @@ public class CitaNotificationService {
     private String buildCancelacionPacienteMessage(Cita cita) {
         return """
                 ❌ Cita cancelada – Dr. Agramonte
-                Hola %s, su cita del %s con %s ha sido cancelada.
+                Su cita del %s con %s ha sido cancelada.
                 Puede reservar otra cita en la web cuando lo desee.
                 """.formatted(
-                cita.getUsuario().getNombre(),
                 cita.getFechaHora().format(FECHA),
                 cita.getMedico().getNombre()
         ).trim();
@@ -161,13 +163,12 @@ public class CitaNotificationService {
     private String buildRecordatorioPacienteMessage(Cita cita) {
         return """
                 ⏰ Recordatorio – Dr. Agramonte
-                Hola %s, le recordamos su cita:
+                Le recordamos su cita:
                 %s
                 Médico: %s
                 %s
                 Si no puede acudir, cancele desde la web.
                 """.formatted(
-                cita.getUsuario().getNombre(),
                 cita.getFechaHora().format(FECHA),
                 cita.getMedico().getNombre(),
                 direccionCita(cita)

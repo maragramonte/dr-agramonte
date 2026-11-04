@@ -49,11 +49,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
         // El límite por IP cortaría esta prueba, que encadena varias llamadas a
         // /api/auth/* desde la misma dirección. Se prueba aparte, en RateLimitFilterTest.
         "app.rate-limit.enabled=false",
-        "app.url-publica=https://www.dragramonte.com",
+        "app.url-publica=https://www.example.com",
         // GreenMail habla SMTP a secas: sin autenticación ni STARTTLS.
         "spring.mail.properties.mail.smtp.auth=false",
         "spring.mail.properties.mail.smtp.starttls.enable=false",
-        "spring.mail.from=consulta@dragramonte.com"
+        "spring.mail.from=consulta@example.com"
 })
 @AutoConfigureMockMvc
 @Testcontainers(disabledWithoutDocker = true)
@@ -87,7 +87,7 @@ class ActivacionCuentaIntegrationTest {
 
     /** El token viaja en el fragmento del enlace, detrás de la almohadilla. */
     private static final Pattern ENLACE =
-            Pattern.compile("https://www\\.dragramonte\\.com/activar\\.html#(\\S+)");
+            Pattern.compile("https://www\\.example\\.com/activar\\.html#(\\S+)");
 
     private LocalDateTime primeraFranjaLibre() {
         LocalDateTime ahora = LocalDateTime.now();

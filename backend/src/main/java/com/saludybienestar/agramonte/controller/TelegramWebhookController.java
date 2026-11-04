@@ -67,12 +67,14 @@ public class TelegramWebhookController {
 
     /**
      * Compara en tiempo constante el secreto recibido con el configurado. Sin secreto
-     * configurado se acepta la llamada (el webhook queda abierto) y se avisa por log.
+     * configurado se rechaza todo: dejarlo abierto permitiría a cualquiera escribir con
+     * el bot a un chat cualquiera. Un webhook sin secreto es un error de configuración,
+     * no un modo de funcionamiento.
      */
     private boolean secretoValido(String recibido) {
         if (!telegram.hasSecretToken()) {
-            log.warn("Webhook de Telegram sin secret-token configurado: cualquiera puede invocarlo");
-            return true;
+            log.warn("Webhook de Telegram sin secret-token configurado: se rechaza la llamada");
+            return false;
         }
         if (recibido == null) {
             return false;

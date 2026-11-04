@@ -1,0 +1,19 @@
+# Pull requests de actualización. Complementa al análisis semanal de seguridad.yml,
+# que depende de que la NVD responda.
+version: 2
+updates:
+  - package-ecosystem: maven
+    directory: /backend
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+  - package-ecosystem: docker
+    directories:
+      - /
+      - /backend
+    schedule:
+      interval: monthly

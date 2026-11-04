@@ -22,6 +22,9 @@ FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 COPY --from=build /workspace/target/*.jar app.jar
 EXPOSE 8080
+# Sin privilegios: un fallo en la aplicación no debe dar root dentro del contenedor.
+RUN useradd --system --uid 10001 --no-create-home agramonte
+USER agramonte
 # La RAM del contenedor la fija mem_limit en docker-compose.prod.yml (1 GB).
 # Limitamos el heap de la JVM a un % de esa memoria para que el sistema no mate
 # el proceso por falta de memoria (OOM, exit 137).

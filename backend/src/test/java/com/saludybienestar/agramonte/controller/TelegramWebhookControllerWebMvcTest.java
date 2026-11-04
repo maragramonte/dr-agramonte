@@ -123,16 +123,16 @@ class TelegramWebhookControllerWebMvcTest {
     }
 
     @Test
-    @DisplayName("Sin secreto configurado el webhook queda abierto (compatibilidad)")
-    void sinSecretoConfigurado_seAcepta() throws Exception {
+    @DisplayName("Sin secreto configurado el webhook rechaza la llamada con 401 y no escribe a nadie")
+    void sinSecretoConfigurado_rechazado() throws Exception {
         when(telegramProperties.hasSecretToken()).thenReturn(false);
-        when(usuarioRepository.findByTelegramLinkToken("tok-123")).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/api/telegram/webhook")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(UPDATE_START))
-                .andExpect(status().isOk());
+                .andExpect(status().isUnauthorized());
 
-        verify(telegramMessageService).send(any(), anyString());
+        verify(usuarioRepository, never()).findByTelegramLinkToken(anyString());
+        verify(telegramMessageService, never()).send(any(), anyString());
     }
 }

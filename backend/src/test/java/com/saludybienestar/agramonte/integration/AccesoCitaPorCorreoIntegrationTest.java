@@ -55,11 +55,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
         // Esta clase encadena varias reservas desde la misma IP, que es justo lo que corta
         // RateLimitFilter. Su comportamiento se prueba aparte, en RateLimitFilterTest.
         "app.rate-limit.enabled=false",
-        "app.url-publica=https://www.dragramonte.com",
+        "app.url-publica=https://www.example.com",
         // GreenMail habla SMTP a secas: sin autenticación ni STARTTLS.
         "spring.mail.properties.mail.smtp.auth=false",
         "spring.mail.properties.mail.smtp.starttls.enable=false",
-        "spring.mail.from=consulta@dragramonte.com"
+        "spring.mail.from=consulta@example.com"
 })
 @AutoConfigureMockMvc
 @Testcontainers(disabledWithoutDocker = true)
@@ -100,7 +100,7 @@ class AccesoCitaPorCorreoIntegrationTest {
      * acentos del cuerpo obligan a esa codificación.
      */
     private static final Pattern ENLACE = Pattern.compile(
-            "https://www\\.dragramonte\\.com/reservar\\.html#cita-(\\d+)\\.([A-Za-z0-9_-]+)");
+            "https://www\\.example\\.com/reservar\\.html#cita-(\\d+)\\.([A-Za-z0-9_-]+)");
 
     @Test
     @DisplayName("Reserva sin cuenta: llega un correo cuyo enlace abre la cita en otro dispositivo y la cancela")
