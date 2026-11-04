@@ -170,9 +170,9 @@ class ActivacionCuentaIntegrationTest {
         JsonNode creada = postOk("/api/citas/reserva-publica", reserva, 201);
         long citaId = creada.path("cita").path("id").asLong();
         String accesoToken = creada.path("accesoToken").asText();
-        assertThat(creada.path("sesion").isNull())
-                .as("sin contraseña no se abre sesión")
-                .isTrue();
+        assertThat(creada.has("sesion"))
+                .as("reservar no abre sesión")
+                .isFalse();
 
         Usuario antes = usuarioRepository.findByEmail(email).orElseThrow();
         String passwordAntes = antes.getPassword();
@@ -183,7 +183,6 @@ class ActivacionCuentaIntegrationTest {
         Map<String, Object> registro = new LinkedHashMap<>();
         registro.put("email", email);
         registro.put("nombre", "Nombre Escrito En El Formulario");
-        registro.put("password", "ClaveNueva123");
         registro.put("telefono", "+34699999999");
 
         JsonNode aviso = postOk("/api/auth/registro", registro, 202);
@@ -197,7 +196,7 @@ class ActivacionCuentaIntegrationTest {
         assertThat(pendiente.getTelefono()).isEqualTo("+34600111222");
         assertThat(pendiente.isCuentaInvitada()).isTrue();
 
-        // Y con la contraseña del formulario todavía no se entra.
+        // Y con la contraseña que acabará eligiendo todavía no se entra.
         Map<String, Object> login = new LinkedHashMap<>();
         login.put("email", email);
         login.put("password", "ClaveNueva123");
@@ -248,64 +247,127 @@ class ActivacionCuentaIntegrationTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
-    @DisplayName("Reservar con contraseña sobre una cuenta invitada no la toma: manda el enlace")
-    void reservaConPassword_sobreInvitado_mandaEnlaceYNoCambiaLaCuenta() throws Exception {
-        String email = "activacion.reserva@example.com";
+    private Map<String, Object> alta(String email) {
+        Map<String, Object> alta = new LinkedHashMap<>();
+        alta.put("email", email);
+        alta.put("nombre", "Paciente Nuevo");
+        alta.put("telefono", "+34600333444");
+        return alta;
+    }
 
-        Map<String, Object> primera = new LinkedHashMap<>();
-        primera.put("nombre", "Dueño Del Buzón");
-        primera.put("email", email);
-        primera.put("telefono", "+34600222333");
-        primera.put("medicoId", 1);
-        primera.put("fechaHora", primeraFranjaLibre());
-        primera.put("aceptaPrivacidad", true);
-        postOk("/api/citas/reserva-publica", primera, 201);
-
-        Usuario antes = usuarioRepository.findByEmail(email).orElseThrow();
-        String passwordAntes = antes.getPassword();
-        int correosAntes = SMTP.getReceivedMessages().length;
-
-        // Alguien reserva otra vez con ese correo, esta vez poniendo contraseña. La cita
-        // se crea, pero la cuenta NO se toma: solo sale un enlace hacia ese buzón.
-        Map<String, Object> segunda = new LinkedHashMap<>();
-        segunda.put("nombre", "Quien Sea");
-        segunda.put("email", email);
-        segunda.put("telefono", "+34600222333");
-        segunda.put("medicoId", 1);
-        segunda.put("fechaHora", primeraFranjaLibre());
-        segunda.put("aceptaPrivacidad", true);
-        segunda.put("password", "MeQuedoLaCuenta1");
-
-        JsonNode respuesta = postOk("/api/citas/reserva-publica", segunda, 201);
-        assertThat(respuesta.path("activacionPendiente").asBoolean()).isTrue();
-        assertThat(respuesta.path("sesion").isNull())
-                .as("no se entrega sesión de una cuenta ajena")
-                .isTrue();
-
-        Usuario despues = usuarioRepository.findByEmail(email).orElseThrow();
-        assertThat(despues.getPassword()).isEqualTo(passwordAntes);
-        assertThat(despues.getNombre()).isEqualTo("Dueño Del Buzón");
-        assertThat(despues.isCuentaInvitada()).isTrue();
-
-        // Dos correos, no uno, y son dos cosas distintas: el de activación, que va al dueño
-        // del buzón y es la única forma de poner contraseña, y el de acceso a la cita, que
-        // lleva el token de la cita recién creada. Esta reserva crea una cita de verdad, así
-        // que su enlace de acceso tiene que salir igual que en cualquier otra.
-        assertThat(SMTP.getReceivedMessages().length)
-                .as("salen los dos correos: activación de la cuenta y acceso a la cita")
-                .isEqualTo(correosAntes + 2);
-        assertThat(cuerposRecibidosDesde(correosAntes))
-                .as("uno de ellos es el enlace de activación hacia el dueño del buzón")
-                .anyMatch(cuerpo -> cuerpo.contains("activar.html"));
-
-        // Y con esa contraseña no se entra.
+    private Map<String, Object> credenciales(String email, String password) {
         Map<String, Object> login = new LinkedHashMap<>();
         login.put("email", email);
-        login.put("password", "MeQuedoLaCuenta1");
+        login.put("password", password);
+        return login;
+    }
+
+    private Map<String, Object> eligePassword(String token, String password) {
+        Map<String, Object> activacion = new LinkedHashMap<>();
+        activacion.put("token", token);
+        activacion.put("password", password);
+        return activacion;
+    }
+
+    private void loginRechazado(String email, String password) throws Exception {
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(json(login)))
+                        .content(json(credenciales(email, password))))
                 .andExpect(status().isUnauthorized());
+    }
+
+    private String crearCuentaConPassword(String email, String password) throws Exception {
+        postOk("/api/auth/registro", alta(email), 202);
+        String token = tokenDelUltimoCorreo();
+        postOk("/api/auth/activar", eligePassword(token, password), 200);
+        return token;
+    }
+
+    @Test
+    @DisplayName("Alta: el correo libre recibe el enlace y no se entra hasta elegir la contraseña")
+    void alta_correoLibre_exigeAbrirElBuzon() throws Exception {
+        String email = "alta.nueva@example.com";
+
+        JsonNode aviso = postOk("/api/auth/registro", alta(email), 202);
+        assertThat(aviso.path("message").asText()).contains("Revisa tu correo");
+        assertThat(aviso.has("token")).as("el alta no abre sesión").isFalse();
+        assertThat(usuarioRepository.findByEmail(email).orElseThrow().isCuentaInvitada()).isTrue();
+
+        loginRechazado(email, "ClaveElegida1");
+
+        postOk("/api/auth/activar", eligePassword(tokenDelUltimoCorreo(), "ClaveElegida1"), 200);
+        postOk("/api/auth/login", credenciales(email, "ClaveElegida1"), 200);
+    }
+
+    @Test
+    @DisplayName("Alta con un correo ajeno: la contraseña del intruso no llega a existir")
+    void alta_correoAjeno_noDejaEntrarAlIntruso() throws Exception {
+        String email = "alta.victima@example.com";
+
+        // El intruso rellena el alta con el correo de otra persona y una contraseña suya.
+        Map<String, Object> intruso = alta(email);
+        intruso.put("password", "ClaveDelIntruso1");
+        postOk("/api/auth/registro", intruso, 202);
+
+        // La víctima abre el enlace que le ha llegado y elige la suya.
+        postOk("/api/auth/activar", eligePassword(tokenDelUltimoCorreo(), "ClaveDeLaVictima1"), 200);
+
+        loginRechazado(email, "ClaveDelIntruso1");
+        postOk("/api/auth/login", credenciales(email, "ClaveDeLaVictima1"), 200);
+    }
+
+    @Test
+    @DisplayName("Alta con un correo ya registrado: misma respuesta, sin tocar la contraseña")
+    void alta_correoRegistrado_noSeDistingueDeUnoLibre() throws Exception {
+        String email = "alta.repetida@example.com";
+        crearCuentaConPassword(email, "ClaveOriginal1");
+        String hashAntes = usuarioRepository.findByEmail(email).orElseThrow().getPassword();
+
+        JsonNode libre = postOk("/api/auth/registro", alta("alta.libre@example.com"), 202);
+        JsonNode ocupado = postOk("/api/auth/registro", alta(email), 202);
+
+        assertThat(ocupado).isEqualTo(libre);
+        assertThat(usuarioRepository.findByEmail(email).orElseThrow().getPassword()).isEqualTo(hashAntes);
+        postOk("/api/auth/login", credenciales(email, "ClaveOriginal1"), 200);
+    }
+
+    @Test
+    @DisplayName("Recuperación: el enlace del correo cambia la contraseña y solo sirve una vez")
+    void recuperar_cuentaNormal_cambiaLaContrasena() throws Exception {
+        String email = "recuperar.normal@example.com";
+        crearCuentaConPassword(email, "ClaveOlvidada1");
+
+        Map<String, Object> peticion = new LinkedHashMap<>();
+        peticion.put("email", "Recuperar.Normal@Example.COM");
+        postOk("/api/auth/recuperar", peticion, 202);
+
+        String token = tokenDelUltimoCorreo();
+        postOk("/api/auth/login", credenciales(email, "ClaveOlvidada1"), 200);
+
+        postOk("/api/auth/activar", eligePassword(token, "ClaveRecuperada1"), 200);
+
+        loginRechazado(email, "ClaveOlvidada1");
+        postOk("/api/auth/login", credenciales(email, "ClaveRecuperada1"), 200);
+        mockMvc.perform(post("/api/auth/activar")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(eligePassword(token, "OtraClaveMas1"))))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Recuperación: un correo sin cuenta y el del médico responden igual y no reciben nada")
+    void recuperar_sinCuentaOMedico_noMandaCorreo() throws Exception {
+        int correosAntes = SMTP.getReceivedMessages().length;
+
+        Map<String, Object> sinCuenta = new LinkedHashMap<>();
+        sinCuenta.put("email", "nadie@example.com");
+        Map<String, Object> medico = new LinkedHashMap<>();
+        medico.put("email", "dr.agramonte@example.com");
+
+        JsonNode respuestaSinCuenta = postOk("/api/auth/recuperar", sinCuenta, 202);
+        JsonNode respuestaMedico = postOk("/api/auth/recuperar", medico, 202);
+
+        assertThat(respuestaMedico).isEqualTo(respuestaSinCuenta);
+        assertThat(SMTP.getReceivedMessages()).hasSize(correosAntes);
     }
 }

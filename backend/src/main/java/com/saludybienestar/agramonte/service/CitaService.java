@@ -3,7 +3,6 @@ package com.saludybienestar.agramonte.service;
 import com.saludybienestar.agramonte.config.PoliticaPrivacidad;
 import com.saludybienestar.agramonte.dto.request.CrearCitaRequest;
 import com.saludybienestar.agramonte.dto.request.ReservaPublicaRequest;
-import com.saludybienestar.agramonte.dto.response.AuthResponse;
 import com.saludybienestar.agramonte.dto.response.CitaResponse;
 import com.saludybienestar.agramonte.dto.response.ReservaPublicaResponse;
 import com.saludybienestar.agramonte.entity.*;
@@ -26,8 +25,6 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 @RequiredArgsConstructor
@@ -39,8 +36,6 @@ public class CitaService {
     private final HorarioRepository horarioRepository;
     private final CentroRepository centroRepository;
     private final CitaNotificationService citaNotificationService;
-    private final PasswordEncoder passwordEncoder;
-    private final AuthService authService;
     private final ActivacionCuentaService activacionCuentaService;
     private final CorreoAccesoCitaService correoAccesoCitaService;
     private final CorreoCancelacionCitaService correoCancelacionCitaService;
@@ -48,33 +43,17 @@ public class CitaService {
     @Transactional
     public ReservaPublicaResponse reservaPublica(ReservaPublicaRequest request) {
         String email = request.getEmail().trim().toLowerCase();
-        String passwordPlano = request.getPassword();
-        boolean conPassword = passwordPlano != null && !passwordPlano.isBlank();
 
         Usuario paciente = usuarioRepository.findByEmail(email).orElse(null);
-        boolean cuentaNueva = paciente == null;
-        boolean activacionPendiente = false;
 
-        if (cuentaNueva) {
-            paciente = new Usuario();
-            paciente.setEmail(email);
-            paciente.setNombre(request.getNombre().trim());
-            paciente.setTelefono(request.getTelefono().trim());
-            paciente.setRol(Rol.PACIENTE);
-            paciente.setEnabled(true);
-            if (conPassword) {
-                paciente.setPassword(passwordEncoder.encode(passwordPlano));
-                paciente.setCuentaInvitada(false);
-            } else {
-                paciente.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
-                paciente.setCuentaInvitada(true);
-            }
-            paciente = usuarioRepository.save(paciente);
+        if (paciente == null) {
+            // Siempre invitada: una cuenta con contraseña solo nace de un enlace abierto
+            // desde el propio buzón (ActivacionCuentaService).
+            paciente = activacionCuentaService.crearInvitada(
+                    email, request.getNombre(), request.getTelefono());
         } else {
             // Una cuenta que YA existe no se modifica nunca desde esta ruta pública: quien
-            // llama solo ha demostrado conocer un email, y un email no es un secreto. Antes
-            // este camino sobrescribía el nombre, el teléfono y hasta la contraseña de la
-            // cuenta ajena, y devolvía una sesión a nombre de su dueño.
+            // llama solo ha demostrado conocer un email, y un email no es un secreto.
             if (paciente.getRol() != Rol.PACIENTE) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         "Este email no puede usarse para reservas de paciente");
@@ -82,14 +61,6 @@ public class CitaService {
             if (!paciente.isCuentaInvitada()) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         "Este email ya tiene cuenta. Inicia sesión para reservar.");
-            }
-            if (conPassword) {
-                // Poner contraseña es tomar el control de la cuenta, y eso solo puede
-                // hacerlo quien abra ese buzón: aquí quien llama únicamente ha demostrado
-                // conocer un correo. Antes esto era un 409 que dejaba al invitado sin
-                // ninguna salida; ahora la reserva sigue adelante como invitada y se
-                // manda un enlace de activación. La contraseña NO se guarda.
-                activacionPendiente = true;
             }
         }
 
@@ -109,24 +80,8 @@ public class CitaService {
 
         // Token de acceso a ESTA cita: se entrega una sola vez, aquí, y es lo que permite
         // al invitado consultarla y cancelarla sin cuenta. En la BD solo queda su hash.
-        // Se emite siempre, también cuando además se abre sesión, para que el acceso a la
-        // cita siga funcionando si esa sesión se cierra.
         String tokenAcceso = TokenAccesoCita.generar();
         CitaResponse cita = crearCita(paciente.getId(), citaRequest, TokenAccesoCita.hash(tokenAcceso));
-
-        // Solo se devuelve sesión si la cuenta se acaba de crear con contraseña: para una
-        // cuenta preexistente sería entregar un JWT de otra persona.
-        AuthResponse sesion = null;
-        if (cuentaNueva && conPassword) {
-            sesion = authService.tokenTrasAutenticacion(email, passwordPlano);
-        }
-
-        // El correo va al final, con la cita ya creada: si el envío falla, la reserva se
-        // deshace entera y el paciente lo ve, en vez de quedarse con una cita y sin saber
-        // que el enlace nunca salió.
-        if (activacionPendiente) {
-            activacionCuentaService.solicitarActivacion(paciente);
-        }
 
         // El enlace con el token también va por correo, porque hasta ahora el token solo
         // vivía en el navegador que reservó: quien reservaba desde un móvil prestado o en
@@ -137,8 +92,6 @@ public class CitaService {
         // viaja en la respuesta, así que un SMTP caído no debe convertirse en un error para
         // quien acaba de reservar. Mismo trato que los avisos de Twilio y Telegram.
         //
-        // Se manda siempre que se emite token, también cuando la reserva abre sesión: el
-        // token sigue valiendo si esa sesión se cierra, y el correo hace de confirmación.
         // Los datos se copian a variables locales porque el envío corre fuera de la
         // transacción, cuando la entidad ya está desligada.
         String buzonPaciente = paciente.getEmail();
@@ -146,7 +99,7 @@ public class CitaService {
         notificarTrasCommit(() ->
                 correoAccesoCitaService.enviar(buzonPaciente, nombrePaciente, cita, tokenAcceso));
 
-        return new ReservaPublicaResponse(cita, sesion, tokenAcceso, activacionPendiente);
+        return new ReservaPublicaResponse(cita, tokenAcceso);
     }
 
     @Transactional

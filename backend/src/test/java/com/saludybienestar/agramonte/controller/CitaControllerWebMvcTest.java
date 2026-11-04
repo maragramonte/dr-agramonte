@@ -315,7 +315,7 @@ class CitaControllerWebMvcTest {
     @DisplayName("POST /api/citas/reserva-publica acepta el teléfono escrito con espacios")
     void reservaPublica_telefonoConEspacios_creada() throws Exception {
         when(citaService.reservaPublica(any()))
-                .thenReturn(new ReservaPublicaResponse(citaConfirmada(), null, "token-de-acceso-de-prueba", false));
+                .thenReturn(new ReservaPublicaResponse(citaConfirmada(), "token-de-acceso-de-prueba"));
 
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("nombre", "Paciente Invitado");
@@ -335,7 +335,7 @@ class CitaControllerWebMvcTest {
     @DisplayName("POST /api/citas/reserva-publica es público y crea la cita (201)")
     void reservaPublica_anonimo_creada() throws Exception {
         when(citaService.reservaPublica(any()))
-                .thenReturn(new ReservaPublicaResponse(citaConfirmada(), null, "token-de-acceso-de-prueba", false));
+                .thenReturn(new ReservaPublicaResponse(citaConfirmada(), "token-de-acceso-de-prueba"));
 
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("nombre", "Paciente Invitado");

@@ -52,12 +52,12 @@
         'footer.privacidad': 'Política de Privacitat',
 
         // ---- Activar cuenta (enlace del correo) ----
-        'activar.titulo': 'Acaba de crear el teu compte',
-        'activar.intro': 'Tria una contrasenya per a aquest correu. Les teves cites anteriors hi seguiran.',
+        'activar.titulo': 'Tria la teva contrasenya',
+        'activar.intro': 'Tria una contrasenya per a aquest correu. Les teves cites hi seguiran.',
         'activar.password': 'Contrasenya nova',
         'activar.password.ph': 'Com a mínim 6 caràcters',
         'activar.repetir': 'Repeteix la contrasenya',
-        'activar.enviar': 'Activa el meu compte',
+        'activar.enviar': 'Desa la contrasenya',
         'activar.volver': 'Torna a les meves cites',
         'footer.offline': 'Mode Fora de línia',
         'footer.cuadro': 'Quadre de comandament',

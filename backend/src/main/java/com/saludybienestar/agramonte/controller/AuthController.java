@@ -2,10 +2,10 @@ package com.saludybienestar.agramonte.controller;
 
 import com.saludybienestar.agramonte.dto.request.ActivacionRequest;
 import com.saludybienestar.agramonte.dto.request.LoginRequest;
+import com.saludybienestar.agramonte.dto.request.RecuperarRequest;
 import com.saludybienestar.agramonte.dto.request.RegistroRequest;
 import com.saludybienestar.agramonte.dto.response.AuthResponse;
 import com.saludybienestar.agramonte.dto.response.MensajeResponse;
-import com.saludybienestar.agramonte.dto.response.ResultadoRegistro;
 import com.saludybienestar.agramonte.entity.Usuario;
 import com.saludybienestar.agramonte.service.ActivacionCuentaService;
 import com.saludybienestar.agramonte.service.AuthService;
@@ -20,13 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    /**
-     * Lo que se contesta cuando el correo ya tenía cuenta invitada. Es deliberadamente
-     * vago sobre el estado de la cuenta: quien pide el alta solo ha demostrado conocer un
-     * email, y no tiene por qué ser su dueño.
-     */
+    /** La misma respuesta para un correo libre y para uno con cuenta: no se distinguen. */
     private static final String REVISA_TU_CORREO =
             "Revisa tu correo: te hemos enviado un enlace para terminar de crear la cuenta.";
+
+    private static final String SI_HAY_CUENTA =
+            "Si ese correo tiene cuenta, te hemos enviado un enlace para elegir una contraseña.";
 
     private final AuthService authService;
     private final ActivacionCuentaService activacionCuentaService;
@@ -41,22 +40,22 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(request));
     }
 
-    /**
-     * Alta de paciente. Devuelve 200 con la sesión si la cuenta se acaba de crear, y 202
-     * si el correo ya tenía una cuenta invitada: ahí no se ha creado ni modificado nada,
-     * solo se ha enviado un enlace de activación a ese buzón.
-     */
+    /** Alta de paciente: siempre 202, porque lo que sigue es abrir el enlace del correo. */
     @PostMapping("/registro")
-    public ResponseEntity<?> registro(@Valid @RequestBody RegistroRequest request) {
-        ResultadoRegistro resultado = authService.registro(request);
-        if (resultado.activacionPendiente()) {
-            return ResponseEntity.accepted().body(new MensajeResponse(REVISA_TU_CORREO));
-        }
-        return ResponseEntity.ok(resultado.sesion());
+    public ResponseEntity<MensajeResponse> registro(@Valid @RequestBody RegistroRequest request) {
+        activacionCuentaService.solicitarAlta(request);
+        return ResponseEntity.accepted().body(new MensajeResponse(REVISA_TU_CORREO));
+    }
+
+    /** Contraseña olvidada: siempre 202, exista o no la cuenta. */
+    @PostMapping("/recuperar")
+    public ResponseEntity<MensajeResponse> recuperar(@Valid @RequestBody RecuperarRequest request) {
+        activacionCuentaService.solicitarRecuperacion(request.getEmail());
+        return ResponseEntity.accepted().body(new MensajeResponse(SI_HAY_CUENTA));
     }
 
     /**
-     * Segundo paso del alta de una cuenta invitada: el token que llegó por correo más la
+     * Segundo paso del alta y de la recuperación: el token que llegó por correo más la
      * contraseña nueva. Es público porque quien lo usa todavía no tiene sesión; la
      * credencial es el propio token.
      */

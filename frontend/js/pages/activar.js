@@ -1,5 +1,5 @@
 /**
- * Segundo paso del alta de una cuenta invitada: la página que abre el enlace del correo.
+ * Segundo paso del alta y de la recuperación: la página que abre el enlace del correo.
  *
  * El token viaja en el fragmento de la URL (detrás de `#`) y no en la query. El fragmento
  * no se manda al servidor, así que la credencial no acaba en los registros de acceso de
@@ -26,14 +26,14 @@ const TEXTOS = {
         ca: 'La contrasenya ha de tenir com a mínim 6 caràcters.'
     },
     hecho: {
-        es: 'Cuenta activada. Ya puedes ver tus citas.',
-        ca: 'Compte activat. Ja pots veure les teves cites.'
+        es: 'Contraseña guardada. Ya puedes ver tus citas.',
+        ca: 'Contrasenya desada. Ja pots veure les teves cites.'
     },
     fallo: {
-        es: 'No se pudo activar la cuenta.',
-        ca: "No s'ha pogut activar el compte."
+        es: 'No se pudo guardar la contraseña.',
+        ca: "No s'ha pogut desar la contrasenya."
     },
-    enviando: { es: 'Activando…', ca: 'Activant…' }
+    enviando: { es: 'Guardando…', ca: 'Desant…' }
 };
 
 const t = (clave) => TEXTOS[clave][esCatalan() ? 'ca' : 'es'];

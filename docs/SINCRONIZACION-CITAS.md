@@ -82,7 +82,7 @@ acceso a las citas, y la lista ahora se construye con los tokens guardados.
 
 1. `POST /api/citas/reserva-publica` (nombre, email, teléfono, médico, fecha/hora; contraseña opcional).  
 2. Backend: crea la cuenta `PACIENTE` (`cuenta_invitada=true`) o **reutiliza sin modificar** la que ya hubiera con ese email.  
-3. Si el email ya tiene cuenta **con contraseña** → HTTP **409** («Inicia sesión»). Si ya tiene reservas **como invitado** y se envía contraseña, la cita **sí** se crea, pero la contraseña **no** se guarda: sale un enlace de activación hacia ese buzón y la respuesta trae `activacionPendiente: true`. Poner contraseña es tomar el control de la cuenta, y eso solo puede hacerlo quien abre el correo.  
+3. Si el email ya tiene cuenta **con contraseña** → HTTP **409** («Inicia sesión»). Si ya tiene reservas **como invitado**, la cita **sí** se crea y la cuenta no se toca. Reservar no pide contraseña: elegirla es tomar el control de la cuenta, y eso solo puede hacerlo quien abre el correo.  
 4. La respuesta trae `accesoToken`, el token de esa cita. Solo se entrega aquí; el cliente lo guarda en `citas_tokens_dr_agramonte_v1`.  
 5. Además sale un correo con el enlace `reservar.html#cita-<id>.<token>`, para que la cita no quede atada a ese navegador. Al abrirlo, `importarTokenDelEnlace()` guarda el token en el dispositivo y borra el fragmento de la barra de direcciones. El envío es **prescindible**: sin SMTP, o si el servidor de correo falla, la reserva no se entera (`CorreoAccesoCitaService` lo registra y devuelve `false`).  
 6. `syncMisCitas()` recorre los tokens guardados: `GET /api/citas/publica/{id}` con `X-Cita-Token`.  
@@ -199,7 +199,6 @@ Importar `postman/` y seguir el orden de [postman/README.md](../postman/README.m
 | Panel vacío pero Mis citas llena | Backend caído al reservar o panel sin refrescar | `docker compose logs backend`; **Actualizar tabla** |
 | No aparece bloque «Cuenta (opcional)» | Service worker con HTML viejo | Ctrl+Shift+R; Application → Unregister service worker |
 | 409 al reservar invitado | Email ya registrado con contraseña | Iniciar sesión o usar otro email |
-| 201 con `activacionPendiente` al reservar enviando contraseña | Ese email ya tenía cuenta invitada; la cita se crea pero la cuenta no se toma | Abrir el enlace del correo (`activar.html`) |
 | 503 al reservar o registrarse con un email de cuenta invitada | No hay SMTP configurado, así que no se puede probar quién es el dueño del buzón | Configurar `MAIL_*`; nunca se activa la cuenta sin enviar el correo |
 | «No tenemos su clave de acceso» al cancelar | La cita se reservó en otro navegador: aquí no está su token | Cancelar desde el navegador original o por teléfono |
 | 404 al consultar o cancelar una cita de invitado | Token ausente, de otra cita, o enviado en la URL en vez de en `X-Cita-Token` | Enviar la cabecera con el token de esa cita |
@@ -231,9 +230,10 @@ Limitaciones que siguen en pie:
   que **no se puede reenviar**. Si el SMTP no está configurado o falla, la reserva sigue
   adelante sin él: el token viaja en la respuesta y el navegador que reservó lo guarda.
 - ~~Un invitado con reservas previas no puede ponerse contraseña~~. **Resuelto (V13):**
-  `POST /api/auth/registro` con el correo de una cuenta invitada responde **202** y envía
-  un enlace de un solo uso (30 min) a ese buzón; `POST /api/auth/activar` fija la
-  contraseña y devuelve sesión. Las citas previas y sus tokens de acceso siguen valiendo.
+  `POST /api/auth/registro` responde siempre **202** y envía un enlace de un solo uso
+  (30 min) a ese buzón; `POST /api/auth/activar` fija la contraseña y devuelve sesión. Las
+  citas previas y sus tokens de acceso siguen valiendo. Ninguna contraseña se guarda antes
+  de abrir el enlace, y `POST /api/auth/recuperar` usa el mismo camino para quien la olvida.
 - ~~El recordatorio de 24 h no llega a quien reserva sin cuenta~~. **Resuelto:** sale también
   por correo, con el enlace de la cita para cancelarla (token propio, Flyway V14). Antes solo
   iba por Twilio y Telegram, que son los dos canales que un invitado no tiene; y la tarea

@@ -214,72 +214,10 @@ class ReservaPublicaIntegrationTest {
     }
 
     @Test
-    @DisplayName("Reserva pública con el email de una cuenta invitada existente: nadie se apropia de la cuenta")
-    void reservaPublica_emailDeCuentaInvitadaExistente_noSeApropiaDeLaCuenta() throws Exception {
-        // 1. La víctima reserva sin contraseña: queda una cuenta invitada con SUS datos.
-        String email = "invitado.victima@example.com";
-        LocalDateTime franjaVictima = primeraFranjaLibre();
-
-        mockMvc.perform(post("/api/citas/reserva-publica")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(cuerpoReserva(email, franjaVictima)))
-                .andExpect(status().isCreated());
-
-        Usuario antes = usuarioRepository.findByEmail(email).orElseThrow();
-        String nombreOriginal = antes.getNombre();
-        String telefonoOriginal = antes.getTelefono();
-        String passwordOriginal = antes.getPassword();
-        assertThat(antes.isCuentaInvitada())
-                .as("reservar sin contraseña deja la cuenta marcada como invitada")
-                .isTrue();
-
-        // 2. Un tercero que SOLO conoce ese email reserva OTRA franja, con sus propios datos
-        //    y una contraseña. La franja distinta es deliberada: si se reusara la de la víctima
-        //    el 409 vendría del bloqueo del horario y la prueba pasaría por el motivo equivocado.
-        LocalDateTime franjaIntruso = primeraFranjaLibre();
-        assertThat(franjaIntruso)
-                .as("el intruso debe pelear por una franja libre distinta, no por la ya reservada")
-                .isNotEqualTo(franjaVictima);
-
-        Map<String, Object> intruso = new LinkedHashMap<>();
-        intruso.put("nombre", "Tercero No Autorizado");
-        intruso.put("email", email);
-        intruso.put("telefono", "+34699999999");
-        intruso.put("password", "contrasenaDelIntruso");
-        intruso.put("medicoId", 1);
-        intruso.put("fechaHora", franjaIntruso);
-        intruso.put("aceptaPrivacidad", true);
-
-        // Antes esto era un 409 seco. Ahora el camino correcto es mandar un enlace de
-        // activación a ese buzón, pero esta clase no tiene SMTP configurado, así que la
-        // petición muere con 503: sin correo no hay forma de probar quién es el dueño, y
-        // seguir adelante sería justamente regalar la cuenta. Que el enlace se envía
-        // cuando sí hay correo lo cubre ActivacionCuentaIntegrationTest.
-        mockMvc.perform(post("/api/citas/reserva-publica")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(intruso)))
-                .andExpect(status().isServiceUnavailable());
-
-        // 3. La cuenta de la víctima sigue siendo suya: ni nombre, ni teléfono, ni contraseña,
-        //    ni la marca de invitada han cambiado. Si cuentaInvitada pasara a false, la víctima
-        //    quedaría fuera de su propio email al intentar reservar de nuevo.
-        Usuario despues = usuarioRepository.findByEmail(email).orElseThrow();
-        assertThat(despues.getNombre()).isEqualTo(nombreOriginal);
-        assertThat(despues.getTelefono()).isEqualTo(telefonoOriginal);
-        assertThat(despues.getPassword()).isEqualTo(passwordOriginal);
-        assertThat(despues.isCuentaInvitada()).isTrue();
-
-        // 4. Y el intruso no ha dejado ninguna cita colgando de la cuenta ajena.
-        assertThat(citaRepository.findByUsuarioId(despues.getId()))
-                .as("la petición rechazada no debe crear una segunda cita")
-                .hasSize(1);
-    }
-
-    @Test
-    @DisplayName("Reserva pública sin contraseña sobre una cuenta invitada existente: crea la cita, no toca la cuenta y no abre sesión")
-    void reservaPublica_cuentaInvitadaExistenteSinPassword_creaCitaSinModificarLaCuenta() throws Exception {
-        // El caso legítimo: el mismo invitado vuelve a reservar con su email. Debe poder,
-        // y la cuenta que ya existe no se toca (es el otro lado del 409 con contraseña).
+    @DisplayName("Reserva pública sobre una cuenta invitada existente: crea la cita, no toca la cuenta y no abre sesión")
+    void reservaPublica_cuentaInvitadaExistente_creaCitaSinModificarLaCuenta() throws Exception {
+        // Puede ser el mismo invitado que vuelve o un tercero que solo conoce el correo:
+        // la ruta no distingue, así que la cita se crea y la cuenta no se toca nunca.
         String email = "invitado.repite@example.com";
         JsonNode primera = reservaPublicaOk(cuerpoReserva(email, primeraFranjaLibre()));
         String tokenPrimera = primera.path("accesoToken").asText();
@@ -289,12 +227,13 @@ class ReservaPublicaIntegrationTest {
         String telefonoOriginal = antes.getTelefono();
         String passwordOriginal = antes.getPassword();
 
-        // Segunda reserva, otra franja, SIN contraseña y con nombre y teléfono distintos:
-        // los datos nuevos no deben pisar los de la cuenta.
+        // Segunda reserva, otra franja, con nombre y teléfono distintos y una contraseña
+        // que la API ya no admite: nada de eso debe pisar los datos de la cuenta.
         Map<String, Object> segundaReserva = new LinkedHashMap<>();
         segundaReserva.put("nombre", "Nombre Que No Debe Pisar");
         segundaReserva.put("email", email);
         segundaReserva.put("telefono", "+34688888888");
+        segundaReserva.put("password", "contrasenaDelIntruso");
         segundaReserva.put("medicoId", 1);
         segundaReserva.put("fechaHora", primeraFranjaLibre());
         segundaReserva.put("aceptaPrivacidad", true);
@@ -302,9 +241,9 @@ class ReservaPublicaIntegrationTest {
         JsonNode segunda = reservaPublicaOk(objectMapper.writeValueAsString(segundaReserva));
 
         // No hay sesión: la cuenta no es de quien llama, solo coincide el email.
-        assertThat(segunda.path("sesion").isNull())
-                .as("una cuenta preexistente nunca devuelve sesión desde la ruta pública")
-                .isTrue();
+        assertThat(segunda.has("sesion"))
+                .as("la ruta pública nunca devuelve sesión")
+                .isFalse();
 
         // Sí hay token de acceso, y es propio de esta cita: es lo único que da acceso a ella.
         String tokenSegunda = segunda.path("accesoToken").asText();

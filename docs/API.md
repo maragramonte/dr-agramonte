@@ -30,8 +30,9 @@ así que el servidor no puede volver a entregarlo.
 | Método | Ruta | Acceso | Notas |
 |--------|------|--------|-------|
 | `POST` | `/api/auth/login` | Público | Devuelve el JWT |
-| `POST` | `/api/auth/registro` | Público | Sobre una cuenta invitada responde **202** y manda un enlace de activación en vez de crear la cuenta |
-| `POST` | `/api/auth/activar` | Público | Fija la contraseña con el token del correo. **503** si no hay servicio de correo configurado |
+| `POST` | `/api/auth/registro` | Público | Responde siempre **202** y manda un enlace para elegir la contraseña. No crea sesión ni dice si el correo tenía cuenta. **503** sin servicio de correo |
+| `POST` | `/api/auth/recuperar` | Público | Responde siempre **202** y, si hay una cuenta de paciente, manda el enlace. **503** sin servicio de correo |
+| `POST` | `/api/auth/activar` | Público | Fija la contraseña con el token del correo y devuelve sesión |
 
 ---
 

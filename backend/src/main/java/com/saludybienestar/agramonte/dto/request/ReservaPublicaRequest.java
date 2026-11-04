@@ -28,9 +28,6 @@ public class ReservaPublicaRequest {
     @Pattern(regexp = FormatoTelefono.PATRON, message = FormatoTelefono.MENSAJE)
     private String telefono;
 
-    @Size(min = 6, max = 100)
-    private String password;
-
     @NotNull
     private Long medicoId;
 

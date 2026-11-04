@@ -26,18 +26,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (pm.response.code === 200) {",
-                  "    const body = pm.response.json();",
-                  "    if (body.token) pm.environment.set('jwt_token', body.token);",
-                  "    pm.test('Token recibido', () => pm.expect(body.token).to.be.a('string').and.not.empty);",
-                  "}",
-                  "// 202 = ese correo ya tenia cuenta invitada. No se ha creado ni tocado nada:",
-                  "// ha salido un enlace de activacion a ese buzon, que es la unica prueba de",
-                  "// identidad que vale. El token NO viaja en esta respuesta; sale por correo.",
-                  "if (pm.response.code === 202) {",
-                  "    pm.test('Avisa de que hay que revisar el correo', () =>",
-                  "        pm.expect(pm.response.json().message).to.include('correo'));",
-                  "}"
+                  "// El alta no abre sesión: el enlace para elegir la contraseña va por correo.",
+                  "pm.test('Alta aceptada', () => pm.response.to.have.status(202));"
                 ],
                 "type": "text/javascript"
               }
@@ -49,7 +39,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"{{paciente_email}}\",\n  \"nombre\": \"Paciente Prueba Postman\",\n  \"password\": \"{{paciente_password}}\",\n  \"telefono\": \"+34600000001\"\n}"
+              "raw": "{\n  \"email\": \"{{paciente_email}}\",\n  \"nombre\": \"Paciente Prueba Postman\",\n  \"telefono\": \"+34600000001\"\n}"
             },
             "url": "{{base_url}}/api/auth/registro"
           }

@@ -56,7 +56,7 @@ estrictamente secuencial.
 
 Tipo de consulta y cobertura. Si el paciente elige seguro médico, el formulario pide la
 aseguradora; si elige privada, enseña el importe y cuándo se abona. La cuenta es
-opcional: se puede reservar sin registrarse y poner contraseña después.
+opcional: se puede reservar sin registrarse y crear la cuenta después.
 
 ## 6. Mis citas
 

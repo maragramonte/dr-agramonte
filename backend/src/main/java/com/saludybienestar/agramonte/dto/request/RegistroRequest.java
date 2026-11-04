@@ -17,10 +17,6 @@ public class RegistroRequest {
     @Size(min = 3, max = 255)
     private String nombre;
 
-    @NotBlank
-    @Size(min = 6, max = 100)
-    private String password;
-
     @Size(max = 20)
     @Pattern(regexp = FormatoTelefono.PATRON, message = FormatoTelefono.MENSAJE)
     private String telefono;
