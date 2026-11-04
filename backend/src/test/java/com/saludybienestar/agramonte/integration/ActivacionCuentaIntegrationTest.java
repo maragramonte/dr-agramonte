@@ -87,7 +87,7 @@ class ActivacionCuentaIntegrationTest {
 
     /** El token viaja en el fragmento del enlace, detrás de la almohadilla. */
     private static final Pattern ENLACE =
-            Pattern.compile("https://www\\.dragramonte\\.com/activar\\.html#(\\S+)");
+            Pattern.compile("https://www\\.example\\.com/activar\\.html#(\\S+)");
 
     private LocalDateTime primeraFranjaLibre() {
         LocalDateTime ahora = LocalDateTime.now();

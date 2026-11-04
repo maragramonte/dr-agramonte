@@ -100,7 +100,7 @@ class AccesoCitaPorCorreoIntegrationTest {
      * acentos del cuerpo obligan a esa codificación.
      */
     private static final Pattern ENLACE = Pattern.compile(
-            "https://www\\.dragramonte\\.com/reservar\\.html#cita-(\\d+)\\.([A-Za-z0-9_-]+)");
+            "https://www\\.example\\.com/reservar\\.html#cita-(\\d+)\\.([A-Za-z0-9_-]+)");
 
     @Test
     @DisplayName("Reserva sin cuenta: llega un correo cuyo enlace abre la cita en otro dispositivo y la cancela")
