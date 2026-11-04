@@ -312,10 +312,6 @@ Señales de que ha ido bien:
 - `app`: Flyway aplica las migraciones y aparece `Tomcat started on port 8080`
 - `caddy`: `certificate obtained successfully`
 
-> El log de `app` puede mostrar un aviso de que no encuentra `DATABASE_URL`. Es
-> **esperado**: esa variable es cosa de los PaaS; aquí la conexión llega por
-> `SPRING_DATASOURCE_URL` y el aviso no afecta a nada.
-
 Para no repetir `--env-file ... -f ...` en cada comando, deja un alias:
 
 ```bash

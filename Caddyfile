@@ -11,9 +11,7 @@
 	email {$ACME_EMAIL}
 }
 
-# El apex redirige al www con un 301 permanente. Esto es lo que en Railway había
-# que resolver desde el panel de IONOS (y lo que rompía el registro de www):
-# aquí es una línea y no toca el DNS.
+# El apex redirige al www con un 301 permanente: es una línea y no toca el DNS.
 {$DOMAIN_APEX} {
 	redir https://{$DOMAIN_WWW}{uri} permanent
 }
