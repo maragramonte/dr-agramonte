@@ -39,7 +39,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Generar dist-demo/
         run: ./scripts/build-demo.sh
       - uses: actions/upload-pages-artifact@v3
