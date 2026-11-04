@@ -10,7 +10,7 @@
 # existe DATABASE_URL (el formato URI de un solo campo que usan los PaaS), la adapta
 # DatabaseUrlEnvironmentPostProcessor; que no esté solo deja un aviso en el log.
 
-FROM maven:3.9.9-eclipse-temurin-21 AS build
+FROM maven:3.9-eclipse-temurin-26 AS build
 WORKDIR /workspace
 COPY backend/pom.xml .
 COPY backend/src ./src
