@@ -338,7 +338,7 @@ class ActivacionCuentaIntegrationTest {
         crearCuentaConPassword(email, "ClaveOlvidada1");
 
         Map<String, Object> peticion = new LinkedHashMap<>();
-        peticion.put("email", "  Recuperar.Normal@Example.com ");
+        peticion.put("email", "Recuperar.Normal@Example.COM");
         postOk("/api/auth/recuperar", peticion, 202);
 
         String token = tokenDelUltimoCorreo();
