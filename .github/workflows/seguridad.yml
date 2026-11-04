@@ -84,7 +84,7 @@ jobs:
       # el run siguiente arranca desde ahí en vez de desde cero.
       - name: Reutilizar la base de datos de la NVD
         if: steps.clave.outputs.hay_clave == 'true'
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: ~/.dependency-check-data
           key: nvd-${{ github.run_id }}
@@ -115,7 +115,7 @@ jobs:
       # continúa; cuando ya lo esté, esto pasa a costar segundos.
       - name: Guardar la base de datos de la NVD
         if: always() && steps.clave.outputs.hay_clave == 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: ~/.dependency-check-data
           key: nvd-${{ github.run_id }}
