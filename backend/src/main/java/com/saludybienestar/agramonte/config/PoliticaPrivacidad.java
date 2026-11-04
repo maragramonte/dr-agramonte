@@ -13,7 +13,7 @@ package com.saludybienestar.agramonte.config;
  */
 public final class PoliticaPrivacidad {
 
-    public static final String VERSION_VIGENTE = "2026-10";
+    public static final String VERSION_VIGENTE = "2026-11";
 
     private PoliticaPrivacidad() {
     }
