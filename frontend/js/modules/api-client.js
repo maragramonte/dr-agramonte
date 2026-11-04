@@ -147,7 +147,7 @@ class ApiClient {
     }
 
     /**
-     * Activa una cuenta invitada con el token que llegó por correo. Devuelve sesión.
+     * Fija la contraseña con el token que llegó por correo. Devuelve sesión.
      * POST /api/auth/activar
      */
     activarCuenta(token, password) {

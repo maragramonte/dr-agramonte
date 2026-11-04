@@ -209,7 +209,6 @@ class AuthUI {
         const payload = {
             nombre: form.nombre.value.trim(),
             email: form.email.value.trim(),
-            password: form.password.value,
             telefono: form.telefono.value.trim() || null
         };
         const base = window.API_BASE_URL || '/api';
@@ -222,14 +221,22 @@ class AuthUI {
             const err = await res.json().catch(() => ({}));
             throw new Error(err.message || 'No se pudo registrar');
         }
+        // No hay sesión todavía: elegir la contraseña es tomar el control de la cuenta, y
+        // eso solo puede hacerlo quien abra el enlace que ha salido hacia ese buzón.
         const cuerpo = await res.json().catch(() => ({}));
-        // 202 = ese correo ya tenía citas reservadas como invitado. No se ha creado ni
-        // tocado nada: ha salido un enlace hacia ese buzón, porque poner la contraseña es
-        // tomar el control de la cuenta y eso solo puede hacerlo quien lo abra.
-        if (res.status === 202) {
-            return { activacionPendiente: true, mensaje: cuerpo.message };
-        }
-        return { data: cuerpo, telefono: payload.telefono };
+        return cuerpo.message;
+    }
+
+    async #submitRecuperar(email) {
+        const base = window.API_BASE_URL || '/api';
+        const res = await fetch(`${base}/auth/recuperar`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+        const cuerpo = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(cuerpo.message || 'No se pudo enviar el enlace');
+        return cuerpo.message;
     }
 
     #renderModal() {
@@ -255,12 +262,12 @@ class AuthUI {
                     <label>Email<input type="email" name="email" required autocomplete="email"></label>
                     <label>Contraseña<input type="password" name="password" required minlength="6" autocomplete="current-password"></label>
                     <button type="submit" class="auth-submit">Entrar</button>
+                    <button type="button" class="auth-link" data-auth-recuperar>¿Has olvidado la contraseña?</button>
                 </form>
                 <form id="authRegistroForm" class="auth-form hidden" role="tabpanel" aria-labelledby="auth-tab-registro" hidden>
                     <label>Nombre y apellidos<input type="text" name="nombre" required minlength="3" autocomplete="name"></label>
                     <label>Email<input type="email" name="email" required autocomplete="email"></label>
                     <label>Teléfono (opcional)<input type="tel" name="telefono" placeholder="+34 612 345 678" autocomplete="tel"></label>
-                    <label>Contraseña (mín. 6 caracteres)<input type="password" name="password" required minlength="6" autocomplete="new-password"></label>
                     <button type="submit" class="auth-submit">Crear cuenta</button>
                 </form>
                 <p class="auth-modal__error" id="authError" role="alert" hidden></p>
@@ -492,21 +499,32 @@ class AuthUI {
             }
         });
 
+        dialog.querySelector('[data-auth-recuperar]').addEventListener('click', async () => {
+            const email = loginForm.email.value.trim();
+            if (!loginForm.email.checkValidity() || !email) {
+                errEl.textContent = 'Escribe tu email y vuelve a pulsar.';
+                errEl.hidden = false;
+                return;
+            }
+            errEl.hidden = true;
+            try {
+                const mensaje = await this.#submitRecuperar(email);
+                this.close();
+                window.DrAgramonte?.notify?.(mensaje, 'success');
+            } catch (err) {
+                errEl.textContent = err.message;
+                errEl.hidden = false;
+            }
+        });
+
         regForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             errEl.hidden = true;
             this.#setFormLoading(regForm, true);
             try {
-                const resultado = await this.#submitRegistro(regForm);
-                if (resultado.activacionPendiente) {
-                    this.close();
-                    window.DrAgramonte?.notify?.(
-                        resultado.mensaje || AuthUI.textoRevisaTuCorreo(), 'success');
-                    return;
-                }
-                this.#saveSession(resultado.data, resultado.telefono);
+                const mensaje = await this.#submitRegistro(regForm);
                 this.close();
-                window.DrAgramonte?.notify?.('Cuenta creada correctamente', 'success');
+                window.DrAgramonte?.notify?.(mensaje || AuthUI.textoRevisaTuCorreo(), 'success');
             } catch (err) {
                 errEl.textContent = err.message;
                 errEl.hidden = false;

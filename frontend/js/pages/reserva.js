@@ -221,24 +221,6 @@ async function eliminarVinculacionTelegram() {
     }
 }
 
-function guardarSesionDesdeReserva(sesion, telefono) {
-    if (!sesion?.token) return;
-    localStorage.setItem('token', sesion.token);
-    localStorage.setItem('email', sesion.email);
-    localStorage.setItem('nombre', sesion.nombre);
-    localStorage.setItem('userId', String(sesion.id));
-    localStorage.setItem('rol', sesion.rol || 'PACIENTE');
-    if (telefono) localStorage.setItem('telefono', telefono);
-    window.dispatchEvent(new CustomEvent('auth-changed'));
-}
-
-/** Aviso de «revisa tu correo» en el idioma activo (ES/CA). */
-function textoRevisaTuCorreo() {
-    return document.documentElement.lang === 'ca'
-        ? "Revisa el teu correu: t'hem enviat un enllaç per acabar de crear el compte."
-        : 'Revisa tu correo: te hemos enviado un enlace para terminar de crear la cuenta.';
-}
-
 function textoCitaRecuperada() {
     return document.documentElement.lang === 'ca'
         ? 'Hem recuperat la teva cita en aquest dispositiu.'
@@ -677,8 +659,6 @@ function validarCampos() {
     if (!/^(\+34|34)?[6789]\d{8}$/.test(telefono)) return showToast('Telefono invalido', 'error'), false;
     if (!$('tipoConsulta').value) return showToast('Selecciona un tipo de consulta', 'error'), false;
     if (!$('acepto').checked) return showToast('Acepta la politica de privacidad', 'error'), false;
-    const pwd = $('passwordInvitado')?.value?.trim();
-    if (pwd && pwd.length < 6) return showToast('La contraseña debe tener al menos 6 caracteres', 'error'), false;
     return true;
 }
 
@@ -816,7 +796,6 @@ async function onSubmit(e) {
                 aceptaPrivacidad: $('acepto').checked
             });
         } else {
-            const pwd = $('passwordInvitado')?.value?.trim();
             const body = {
                 nombre: cita.paciente.nombre,
                 email: cita.paciente.email,
@@ -831,19 +810,11 @@ async function onSubmit(e) {
                 preferenciaPago,
                 aceptaPrivacidad: $('acepto').checked
             };
-            if (pwd) body.password = pwd;
             const resp = await apiClient.postReservaPublica(body);
             // El token de acceso solo se entrega aquí: si no se guarda, la cita queda
             // inaccesible desde este navegador (el email ya no la recupera).
             if (resp?.cita?.id && resp.accesoToken) {
                 guardarTokenCita(resp.cita.id, resp.accesoToken);
-            }
-            guardarSesionDesdeReserva(resp.sesion, cita.paciente.telefono);
-            // Puso contraseña sobre un correo que YA tenía cuenta invitada: la cita se ha
-            // creado, pero la cuenta no se toma por escribir un email en un formulario.
-            // Ha salido un enlace hacia ese buzón, que es la única prueba que vale.
-            if (resp?.activacionPendiente) {
-                showToast(resp.mensajeActivacion || textoRevisaTuCorreo(), 'success');
             }
             localStorage.setItem('email', cita.paciente.email);
             if (cita.paciente.telefono) localStorage.setItem('telefono', cita.paciente.telefono);
