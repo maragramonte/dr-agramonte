@@ -25,6 +25,10 @@
         <!-- Versionado centralizado -->
         <jjwt.version>0.12.6</jjwt.version>
         <postgresql.version>42.7.14</postgresql.version>
+        <!-- Por delante de lo que trae Spring Boot 3.5.16: corrigen avisos de seguridad
+             publicados después. Quitarlas cuando el parent las alcance. -->
+        <tomcat.version>10.1.61</tomcat.version>
+        <jackson-bom.version>2.21.8</jackson-bom.version>
         <mysql.version>9.0.0</mysql.version>
         <lombok.version>1.18.36</lombok.version>
         <flyway.version>11.8.0</flyway.version>
