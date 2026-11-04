@@ -34,5 +34,5 @@ $COMPOSE ps
 docker image prune -f >/dev/null
 
 echo "==> Listo. Salud de la aplicación:"
-curl -fsS "https://${DOMAIN_WWW:-www.dragramonte.com}/actuator/health" || \
+curl -fsS "https://${DOMAIN_WWW}/actuator/health" || \
   echo "    (aún no responde; mirar: $COMPOSE logs -f app)"

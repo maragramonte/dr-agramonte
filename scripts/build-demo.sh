@@ -79,7 +79,7 @@ for f in "$APP"/*.html; do
 done
 
 # Volver a la landing desde la aplicación. Se inyecta aquí y no en frontend/
-# porque en producción (dragramonte.com) esa landing no existe: allí la web del
+# porque en un despliegue real esa landing no existe: allí la web del
 # doctor es el sitio entero, no una demo dentro de otra cosa.
 for f in "$APP"/*.html; do
     sed -i 's#<body\([^>]*\)>#<body\1>\n<a class="volver-landing" href="../">← Volver a la presentación</a>#' "$f"
@@ -123,8 +123,7 @@ done
 # La landing sí se quiere encontrable: es la cara de venta del producto.
 #
 # Lo que NO se quiere indexado es la aplicación de app/, que son las páginas del
-# doctor con datos ficticios y no debe competir en buscadores con
-# dragramonte.com. Y la forma de conseguirlo NO es prohibirla aquí: una página
+# doctor con datos ficticios y no debe aparecer en buscadores. Y la forma de conseguirlo NO es prohibirla aquí: una página
 # bloqueada en robots.txt no llega a rastrearse, así que su
 # <meta name="robots" content="noindex"> nunca se lee, y el buscador puede
 # acabar listando la URL igualmente si alguien la enlaza. Para que un noindex

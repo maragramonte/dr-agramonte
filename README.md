@@ -44,10 +44,9 @@ Si prefieres no pulsar nada, en [docs/CAPTURAS.md](docs/CAPTURAS.md) está la ap
 pantalla a pantalla. La [memoria completa](docs/Memoria-Dr-Agramonte.pdf) (PDF) cuenta el
 proyecto entero.
 
-> **Estado del despliegue.** El dominio `dragramonte.com` está registrado pero **hoy no sirve
-> la aplicación**: el alojamiento anterior se retiró y el despliegue en servidor propio está
-> preparado y probado, a la espera de levantar la máquina
-> ([docs/DESPLIEGUE-VPS.md](docs/DESPLIEGUE-VPS.md)).
+> **Estado del despliegue.** La versión pública es la demo. El proyecto no tiene dominio propio
+> y el despliegue en servidor propio está preparado y probado, a la espera de levantar la
+> máquina ([docs/DESPLIEGUE-VPS.md](docs/DESPLIEGUE-VPS.md)).
 
 ---
 

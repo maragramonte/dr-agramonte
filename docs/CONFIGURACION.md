@@ -21,7 +21,7 @@ del fichero: [DESPLIEGUE-VPS.md](DESPLIEGUE-VPS.md).
 | `TWILIO_*` | Credenciales, canal (`whatsapp` / `sms`) y horas del recordatorio |
 | `TELEGRAM_*` | Token del bot, usuario del bot y secreto del webhook |
 | `MAIL_*`, `CONTACT_INBOX` | Servidor de correo y buzón del formulario de contacto |
-| `APP_URL_PUBLICA` | Base de los enlaces que viajan por correo. Por defecto, el dominio www |
+| `APP_URL_PUBLICA` | Base de los enlaces que viajan por correo. En el VPS, el dominio www; sin definir, la demo de GitHub Pages |
 | `AGENDA_DIAS_FUTURO`, `AGENDA_CRON` | Ventana de huecos que se mantiene abierta (90 días) y cuándo se amplía |
 | `RECORDATORIO_HORAS`, `RECORDATORIO_CRON` | Cuánto antes se avisa (24 h) y cada cuánto se barre. Siguen valiendo las antiguas `TWILIO_REMINDER_*` |
 | `RATE_LIMIT_*` | Peticiones por IP permitidas en las rutas públicas de escritura |
