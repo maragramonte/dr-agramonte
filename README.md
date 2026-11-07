@@ -1,5 +1,7 @@
 # Dr. Agramonte
 
+**Español** · [English](README.en.md)
+
 Plataforma de gestión de citas médicas para la consulta de un internista real en Palma de
 Mallorca. Los pacientes reservan, consultan y cancelan sus citas por su cuenta, sin depender
 del teléfono.
@@ -227,7 +229,8 @@ producción no levanta.
 - [ ] Pasarela de pago en línea (la cobertura y la preferencia ya se capturan)
 - [ ] Panel clínico multi-centro con historial
 - [ ] Refresh token
-- [ ] Cobertura medida con JaCoCo y pruebas E2E
+- [ ] Cobertura medida con JaCoCo
+- [ ] Una pasada E2E contra el backend real, no solo contra la demo
 - [x] Cancelar la cita desde el propio aviso: hecho en el correo (el enlace lleva el token
       de la cita); queda hacerlo desde Telegram y SMS, y confirmar la asistencia
 
