@@ -1131,7 +1131,9 @@
                 display:inline-flex;align-items:center}
             .demo-banner button:hover,.demo-banner a:hover{filter:brightness(.95)}
             .demo-banner button:focus-visible,.demo-banner a:focus-visible{outline:2px solid var(--db-fg);outline-offset:2px}
-            @media (max-width:640px){.demo-banner__largo{display:none}}`;
+            @media (max-width:640px){.demo-banner__largo{display:none}}
+            /* En el móvil el menú llega hasta abajo y la barra tapaba el selector de idioma. */
+            .mega-menu{max-height:calc(100vh - 100% - var(--demo-barra,0px))}`;
         document.head.appendChild(style);
 
         const bar = document.createElement('div');
@@ -1154,7 +1156,13 @@
         });
         document.body.appendChild(bar);
         // Reservar el hueco del banner para que no tape el pie de página.
-        const ajustar = () => { document.body.style.paddingBottom = `${bar.offsetHeight}px`; };
+        // El scroll-padding evita que el foco del teclado (o un scrollIntoView) deje un botón
+        // escondido debajo de la barra: pasaba con «Confirmar cita» en el móvil.
+        const ajustar = () => {
+            document.body.style.paddingBottom = `${bar.offsetHeight}px`;
+            document.documentElement.style.scrollPaddingBottom = `${bar.offsetHeight + 8}px`;
+            document.documentElement.style.setProperty('--demo-barra', `${bar.offsetHeight}px`);
+        };
         ajustar();
         window.addEventListener('resize', ajustar);
     }

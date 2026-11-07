@@ -192,6 +192,9 @@
 html {
     scroll-behavior: smooth;
     font-size: 16px;
+    /* La cabecera es sticky: sin este margen, el foco del teclado y los enlaces a #ancla
+       dejan el elemento tapado por ella (WCAG 2.4.11). */
+    scroll-padding-top: 6rem;
 }
 
 body {

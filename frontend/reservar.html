@@ -30,7 +30,7 @@
     <div class="container">
         <div class="header-content">
             <div class="logo-section">
-                <a href="index.html" class="logo-link" aria-label="Inicio - Dr. Agramonte">
+                <a href="index.html" class="logo-link">
                     <div class="logo-icon" aria-hidden="true"><i class="fas fa-user-md"></i></div>
                     <div class="logo-text">
                         <h1 class="logo-title">Dr. Agramonte</h1>
@@ -186,9 +186,9 @@
 
                         <!-- Especialista -->
                         <div class="form-section">
-                            <p class="form-section-title">Especialista</p>
+                            <p class="form-section-title" id="medicoTitulo">Especialista</p>
                             <div class="field">
-                                <select id="medicoSelect" required aria-describedby="medicoHelp">
+                                <select id="medicoSelect" required aria-labelledby="medicoTitulo" aria-describedby="medicoHelp">
                                     <option value="">Cargando especialistas...</option>
                                 </select>
                                 <small id="medicoHelp" class="field-hint">Selecciona el especialista para consultar su agenda real.</small>
@@ -197,9 +197,9 @@
 
                         <!-- Tipo de consulta -->
                         <div class="form-section">
-                            <p class="form-section-title">Tipo de consulta</p>
+                            <p class="form-section-title" id="tipoTitulo">Tipo de consulta</p>
                             <div class="field">
-                                <select id="tipoConsulta" required>
+                                <select id="tipoConsulta" required aria-labelledby="tipoTitulo">
                                     <option value="">Seleccione...</option>
                                     <option value="primera-visita">Primera visita</option>
                                     <option value="revision">Revisión</option>
@@ -295,7 +295,7 @@
                     </form>
 
                     <div class="appointments-panel">
-                        <button class="appointments-toggle" id="aptsToggle" type="button">
+                        <button class="appointments-toggle" id="aptsToggle" type="button" aria-expanded="false" aria-controls="aptsList">
                             <i class="fas fa-list-alt"></i> Mis citas programadas
                             <span class="apts-badge zero" id="aptsBadge">0</span>
                             <i class="fas fa-chevron-down chevron-icon"></i>

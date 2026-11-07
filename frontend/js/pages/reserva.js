@@ -707,7 +707,9 @@ function renderAppointments() {
     }
     list.innerHTML = pending.map((c) => {
         const d = parseDate(c.fecha);
-        return html`<div class="apt-item"><div class="apt-date"><span class="day">${d.getDate()}</span><span class="month">${CFG.mesesCorto[d.getMonth()]}</span></div><div class="apt-info"><div class="apt-time">${c.hora}</div><div class="apt-centro"><i class="fas fa-map-marker-alt"></i> ${c.centroNombre || 'Consulta'}</div></div><div class="apt-actions"><button class="apt-btn" data-action="export" data-id="${c.id}"><i class="fas fa-calendar-plus"></i></button><button class="apt-btn danger" data-action="cancel" data-id="${c.id}"><i class="fas fa-times"></i></button></div></div>`;
+        // Los botones son solo un icono: sin esta etiqueta, el lector de pantalla dice «botón».
+        const cuando = `${d.getDate()} de ${CFG.meses[d.getMonth()].toLowerCase()} a las ${c.hora}`;
+        return html`<div class="apt-item"><div class="apt-date"><span class="day">${d.getDate()}</span><span class="month">${CFG.mesesCorto[d.getMonth()]}</span></div><div class="apt-info"><div class="apt-time">${c.hora}</div><div class="apt-centro"><i class="fas fa-map-marker-alt"></i> ${c.centroNombre || 'Consulta'}</div></div><div class="apt-actions"><button type="button" class="apt-btn" data-action="export" data-id="${c.id}" aria-label="Añadir al calendario la cita del ${cuando}"><i class="fas fa-calendar-plus" aria-hidden="true"></i></button><button type="button" class="apt-btn danger" data-action="cancel" data-id="${c.id}" aria-label="Cancelar la cita del ${cuando}"><i class="fas fa-times" aria-hidden="true"></i></button></div></div>`;
     }).join('');
     list.querySelectorAll('[data-action]').forEach((btn) => btn.addEventListener('click', async () => {
         const cita = pending.find((c) => c.id === btn.dataset.id);
@@ -725,6 +727,9 @@ function renderAppointments() {
                 }
                 await apiClient.cancelarReservaPublica(cita.id, token);
                 olvidarTokenCita(cita.id);
+                // Sin su token, syncMisCitas ya no la vuelve a pedir y se quedaba la copia
+                // local como «confirmada»: si era la única, seguía en la lista tras cancelarla.
+                saveCitas(loadCitas().map((c) => (c.id === cita.id ? { ...c, estado: 'cancelada' } : c)));
                 notificarCitaCreada();
             } else {
                 const allCitas = loadCitas();
@@ -856,16 +861,23 @@ function bindEvents() {
     $('medicoSelect').addEventListener('change', async (e) => {
         state.medicoId = e.target.value ? Number(e.target.value) : null;
         state.medicoNombre = e.target.options[e.target.selectedIndex]?.text || null;
+        // La hora elegida se conserva si el especialista también la tiene libre. Antes se
+        // borraba sin avisar: el resumen seguía diciendo «09:00» y el botón no respondía.
+        const horaElegida = state.hour;
         state.hour = null;
         $('hiddenHora').value = '';
         if (state.dateISO) {
             const loaded = await renderSlotsFromBackend();
             if (!loaded) renderSlots();
+            const btnHora = horaElegida && [...document.querySelectorAll('#slotsGrid .slot')]
+                .find((b) => b.textContent.trim() === horaElegida && !b.disabled);
+            if (btnHora) selectHour(horaElegida, btnHora);
         }
+        updateSummaryChip();
         updateSubmitState();
     });
     $('chipEditBtn').addEventListener('click', () => { state.dateISO = null; state.hour = null; $('timePanel').style.display = 'none'; updateSummaryChip(); });
-    $('aptsToggle').addEventListener('click', function () { const open = $('aptsList').style.display !== 'flex'; $('aptsList').style.display = open ? 'flex' : 'none'; this.classList.toggle('open', open); });
+    $('aptsToggle').addEventListener('click', function () { const open = $('aptsList').style.display !== 'flex'; $('aptsList').style.display = open ? 'flex' : 'none'; this.classList.toggle('open', open); this.setAttribute('aria-expanded', String(open)); });
     $('btnTelegramVincular')?.addEventListener('click', solicitarVinculacionTelegram);
     $('btnTelegramDesvincular')?.addEventListener('click', eliminarVinculacionTelegram);
     $('btnModalClose').addEventListener('click', () => $('confirmModal').classList.remove('open'));

@@ -46,7 +46,7 @@ body.reserva-page {
         .centro-opt.selected{border-color:var(--teal);background:var(--teal-pale);}
         .centro-opt i{color:var(--teal);font-size:1rem;margin-bottom:.2rem;}
         .centro-nombre{font-size:.85rem;font-weight:600;color:var(--gray-900);}
-        .centro-opt.selected .centro-nombre{color:var(--teal);}
+        .centro-opt.selected .centro-nombre{color:var(--teal);}.centro-opt.selected .centro-dias-hint{color:var(--gray-500);}
         .centro-dir{font-size:.72rem;color:var(--gray-500);}
         .centro-ciudad{font-size:.7rem;color:var(--teal);font-weight:500;margin-top:.1rem;}
         .centro-dias-hint{font-size:.67rem;color:var(--gray-400);margin-top:.2rem;}
@@ -63,7 +63,7 @@ body.reserva-page {
         .form-section{margin-bottom:1.5rem;}.form-section-title{font-size:.75rem;font-weight:600;color:var(--gray-400);text-transform:uppercase;margin-bottom:.75rem;}.modality-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1rem;}.modality-opt input{position:absolute;opacity:0;width:0;height:0;}.modality-opt label{display:flex;flex-direction:column;align-items:center;gap:.35rem;padding:.875rem .5rem;border-radius:10px;border:2px solid var(--gray-200);cursor:pointer;text-align:center;transition:var(--transition);}.modality-opt input:checked~label{border-color:var(--teal);background:var(--teal-pale);color:var(--teal);}.field{margin-bottom:.875rem;}.field input,.field select,.field textarea{width:100%;padding:.6rem .85rem;border:1.5px solid var(--gray-200);border-radius:9px;font-family:var(--font-body);font-size:.875rem;background:var(--card);outline:none;color:var(--gray-900);transition:border-color .18s;}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--teal);}.field-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}.char-counter{font-size:.7rem;color:var(--gray-400);text-align:right;margin-top:.2rem;}
 
         /* ── Summary chip (ahora incluye centro) ── */
-        .summary-chip{display:flex;align-items:center;gap:.6rem;padding:.6rem .875rem;border-radius:10px;background:var(--teal-pale);border:1px solid var(--teal-border);margin-bottom:1.25rem;flex-wrap:wrap;}.summary-chip.empty{background:var(--gray-50);border-color:var(--gray-200);}.chip-item{display:flex;align-items:center;gap:.35rem;font-size:.8rem;color:var(--teal);}.chip-item.empty{color:var(--gray-400);}.chip-divider{width:1px;height:16px;background:var(--teal-border);}.chip-edit{margin-left:auto;font-size:.7rem;color:var(--teal);background:none;border:none;cursor:pointer;font-weight:600;padding:.1rem .4rem;border-radius:4px;}
+        .summary-chip{display:flex;align-items:center;gap:.6rem;padding:.6rem .875rem;border-radius:10px;background:var(--teal-pale);border:1px solid var(--teal-border);margin-bottom:1.25rem;flex-wrap:wrap;}.summary-chip.empty{background:var(--gray-50);border-color:var(--gray-200);}.chip-item{display:flex;align-items:center;gap:.35rem;font-size:.8rem;color:var(--teal);}/* gray-500 y no gray-400: sobre el fondo verde claro, el 400 se quedaba en 4,4:1. */.chip-item.empty{color:var(--gray-500);}.chip-divider{width:1px;height:16px;background:var(--teal-border);}.chip-edit{margin-left:auto;font-size:.7rem;color:var(--teal);background:none;border:none;cursor:pointer;font-weight:600;padding:.1rem .4rem;border-radius:4px;}
 
         /* ── Pago extra y privacidad ── */
         .privacy-check{display:flex;gap:.65rem;align-items:flex-start;margin-bottom:1.25rem;}.privacy-check input{width:17px;height:17px;margin-top:2px;accent-color:var(--teal);}
