@@ -46,6 +46,11 @@ public class SecurityConfig {
                 // Los archivos estáticos del frontend (/, *.html, css, js...) quedan
                 // fuera y se sirven públicamente, necesario al servir web + API juntos.
                 .securityMatcher("/api/**", "/actuator/**")
+                // Sin CSRF a propósito: la API se autentica con un JWT en la cabecera
+                // Authorization, que el navegador no añade solo a una petición que venga de
+                // otra web, y no hay cookies ni sesión (STATELESS, allowCredentials=false).
+                // CodeQL lo marca igualmente (java/spring-disabled-csrf-protection). Si el
+                // token pasara algún día a una cookie, habría que volver a activarlo.
                 .csrf(AbstractHttpConfigurer::disable)
                 // Usamos el método local unificado
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
