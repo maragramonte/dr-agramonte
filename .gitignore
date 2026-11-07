@@ -51,3 +51,7 @@ __pycache__/
 # Build de la demo (scripts/build-demo.sh) y el de las capturas
 dist-demo/
 dist-capturas/
+
+# Instrucciones de mis herramientas locales
+CLAUDE.md
+.claude/
