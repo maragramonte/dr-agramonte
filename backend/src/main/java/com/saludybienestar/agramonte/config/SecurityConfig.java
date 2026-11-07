@@ -78,7 +78,8 @@ public class SecurityConfig {
                 // Authorization, que el navegador no añade solo a una petición de otra
                 // web, y no hay cookies ni sesión. CodeQL lo marca igual
                 // (java/spring-disabled-csrf-protection): la alerta está revisada.
-                // Si el token pasara algún día a una cookie, hay que reactivarlo.
+                // Si el token pasara algún día a una cookie, hay que reactivarlo; la
+                // prueba apiSinCookiesNiSesion de ReservaPublicaIntegrationTest avisa.
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
