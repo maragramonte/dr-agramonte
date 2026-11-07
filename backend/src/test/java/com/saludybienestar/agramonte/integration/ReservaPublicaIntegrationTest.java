@@ -23,11 +23,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.server.ResponseStatusException;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -51,6 +53,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -604,5 +607,35 @@ class ReservaPublicaIntegrationTest {
                 .get()
                 .extracting(Medico::getId)
                 .isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("La API no deja cookies ni sesión: es la condición para tener CSRF desactivado")
+    void apiSinCookiesNiSesion_premisaDelCsrfDesactivado() throws Exception {
+        // SecurityConfig desactiva CSRF porque el JWT va en la cabecera Authorization y no
+        // hay cookie que el navegador mande solo. La alerta de CodeQL se descartó por eso.
+        // Si un cambio hace que el login deje una cookie o abra sesión, esta prueba falla
+        // y hay que volver a activar CSRF.
+        medicoConCuenta("Dra. Sin Cookies", "sin.cookies@example.com", "ClaveC123!");
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("email", "sin.cookies@example.com");
+        body.put("password", "ClaveC123!");
+
+        MvcResult login = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(body)))
+                .andExpect(status().isOk())
+                .andExpect(header().doesNotExist(HttpHeaders.SET_COOKIE))
+                .andReturn();
+        assertThat(login.getRequest().getSession(false)).isNull();
+
+        String token = objectMapper.readTree(login.getResponse().getContentAsString())
+                .path("token").asText();
+        MvcResult conToken = mockMvc.perform(get("/api/citas/agenda/pacientes")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(header().doesNotExist(HttpHeaders.SET_COOKIE))
+                .andReturn();
+        assertThat(conToken.getRequest().getSession(false)).isNull();
     }
 }

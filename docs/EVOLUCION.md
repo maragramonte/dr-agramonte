@@ -269,3 +269,23 @@ real, no de la demo.
 **Queda pendiente**: la demo sigue sin poder demostrar la concurrencia real (el bloqueo
 pesimista solo existe contra PostgreSQL) ni el envío de correo de verdad: son límites de no
 tener servidor, no cosas por hacer.
+
+## Fase 14: `SecurityConfig` cerrada por defecto
+
+Repaso de la configuración de seguridad a raíz de la alerta de CodeQL sobre CSRF.
+
+- **La alerta se queda revisada, no arreglada.** CSRF sigue desactivado: el JWT va en la
+  cabecera `Authorization`, no hay cookies ni sesión. Se descarta en GitHub como «Won't fix».
+- **Lo que no está declarado se deniega** (`anyRequest().denyAll()`). Antes bastaba con tener
+  sesión: un endpoint nuevo que nadie añadiera a la lista quedaba abierto a cualquier paciente.
+- **Fuera las reglas sin endpoint detrás** (`/api/historial/**`, `/api/alertas/**`,
+  `/api/admin/**`, `DELETE /api/citas` sin id). Las rutas públicas pasan a nombrarse una a
+  una en lugar de con comodines.
+- **`JwtAuthFilter` y `RateLimitFilter` corrían también fuera de la cadena.** Son
+  `@Component` y Spring Boot los registraba además en el contenedor de servlets. No rompía
+  nada porque los dos son `OncePerRequestFilter`, pero era un error esperando su momento. Ese
+  segundo registro se desactiva con un `FilterRegistrationBean`.
+- CORS acepta solo las cabeceras y métodos que usa el frontend. `DaoAuthenticationProvider`
+  deja el constructor y el setter obsoletos. `AuthService` deja de duplicar la respuesta del
+  login y lee el rol de `getRol()` en vez de recortar el prefijo `ROLE_`.
+

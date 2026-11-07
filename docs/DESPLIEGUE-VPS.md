@@ -438,7 +438,7 @@ borres o habrá que pedirlos otra vez.
 | Caddy no consigue el certificado | El DNS aún no apunta a la IP, o el 80/443 está cerrado | `dig +short www.example.com`, `sudo ufw status`; espera y `dc restart caddy` |
 | `502 Bad Gateway` | La app no ha arrancado o se está cayendo | `dc logs app`. Casi siempre es la base de datos o una variable que falta |
 | La app arranca y se muere sola | Sin memoria (OOM) en un VPS de 2 GB | Baja `mem_limit` de `app` a `768m` en `docker-compose.prod.yml` |
-| `403` al reservar o al guardar | Origen no permitido en CORS | El dominio debe estar en `setAllowedOrigins` de `SecurityConfig.java` |
+| `403` al reservar o al guardar | Spring cree que la petición viene de otro origen (CORS) porque no ve el HTTPS de Caddy | Comprueba que el compose tiene `SERVER_FORWARD_HEADERS_STRATEGY: framework` y que el Caddyfile manda `X-Forwarded-Proto`. En producción web y API comparten origen: no hace falta añadir el dominio a CORS |
 | Flyway falla al arrancar | Migración incompatible con los datos existentes | `dc logs app`, y restaura el último volcado antes de investigar |
 | `password authentication failed` | Cambiaste `POSTGRES_PASSWORD` con el volumen ya creado | Vuelve a la contraseña original, o restaura un volcado en un volumen nuevo |
 
