@@ -142,9 +142,18 @@ Las de integración **necesitan Docker**; sin él se marcan como saltadas en lug
 El CI lo compensa: revisa los informes de Surefire y **falla si alguna quedó sin ejecutar**.
 Hay además análisis semanal de vulnerabilidades de dependencias con OWASP dependency-check.
 
+El frontend tiene **22 pruebas de navegador** con Playwright, en escritorio y en móvil:
+reserva sin cuenta, cancelación, el enlace del correo, el acceso al cuadro de mando, el
+cambio de idioma y axe-core en las nueve páginas. Corren contra la demo, con la API
+simulada, así que prueban el frontend y no su integración con el backend.
+
+```bash
+cd e2e && npm ci && npx playwright test
+```
+
 Lo que **no** está cubierto, dicho sin adornos: la cobertura no está medida (no hay JaCoCo,
-así que no hay porcentaje), el frontend no tiene pruebas automatizadas, no hay E2E y el
-perfil MySQL no se prueba en CI.
+así que no hay porcentaje), ninguna prueba recorre navegador y backend real a la vez, el
+tema oscuro no se comprueba solo y el perfil MySQL no se prueba en CI.
 
 **→ [docs/PRUEBAS-Y-CALIDAD.md](docs/PRUEBAS-Y-CALIDAD.md)**
 

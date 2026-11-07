@@ -51,3 +51,8 @@ __pycache__/
 # Build de la demo (scripts/build-demo.sh) y el de las capturas
 dist-demo/
 dist-capturas/
+
+# Pruebas de navegador (e2e/)
+e2e/node_modules/
+e2e/test-results/
+e2e/playwright-report/

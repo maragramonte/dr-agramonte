@@ -1,0 +1,57 @@
+# Pruebas de navegador: Chromium recorre la demo (el frontend real con la API simulada de
+# demo/demo-api.js) en escritorio y en un móvil emulado. No necesitan backend ni base de
+# datos, así que solo corren cuando cambia algo que las afecta.
+name: E2E
+
+on:
+  push:
+    branches: [main]
+    paths: ['frontend/**', 'demo/**', 'e2e/**', 'scripts/build-demo.sh', '.github/workflows/e2e.yml']
+  pull_request:
+    branches: [main]
+    paths: ['frontend/**', 'demo/**', 'e2e/**', 'scripts/build-demo.sh', '.github/workflows/e2e.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  navegador:
+    name: Playwright (escritorio + móvil)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: e2e
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: e2e/package-lock.json
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Instalar Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Pasar las pruebas
+        run: npx playwright test
+
+      # Con el informe HTML y las trazas se ve qué pantalla había en el momento del fallo.
+      - name: Guardar el informe si algo falla
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: informe-playwright
+          path: |
+            e2e/playwright-report/
+            e2e/test-results/
+          retention-days: 7

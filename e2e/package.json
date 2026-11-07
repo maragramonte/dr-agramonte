@@ -1,0 +1,13 @@
+{
+  "name": "dr-agramonte-e2e",
+  "private": true,
+  "description": "Pruebas de navegador de Dr. Agramonte, contra la demo con la API simulada",
+  "scripts": {
+    "test": "playwright test",
+    "informe": "playwright show-report"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.63.0"
+  }
+}
