@@ -178,7 +178,8 @@ Son dos cosas distintas y el proyecto las trata por separado.
 cada petición por `JwtAuthFilter`. `CustomUserDetailsService` resuelve el usuario y sus
 roles (`PACIENTE`, `MEDICO`, `ADMIN`, en `entity/Rol.java`).
 
-**Autorización**: las reglas viven en `config/SecurityConfig.java`. El rol decide a qué
+**Autorización**: las reglas viven en `config/SecurityConfig.java`, una por ruta. Lo que no
+está declarado se deniega, así que un endpoint nuevo no queda abierto por olvido. El rol decide a qué
 rutas se entra; **qué datos se devuelven dentro de esas rutas no lo decide la URL**. En
 `/api/citas/agenda/**` el médico sale del JWT a través de `medicos.usuario_id`: un médico
 que pida la agenda de otro recibe la suya, con un 200 corriente. El porqué de esa respuesta
