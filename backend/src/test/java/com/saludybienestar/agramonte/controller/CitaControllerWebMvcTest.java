@@ -267,9 +267,20 @@ class CitaControllerWebMvcTest {
         // consulta en texto libre, es decir datos de salud (RGPD art. 9), y un correo no
         // es un secreto, así que no servía como prueba de identidad. Esta prueba fija que
         // la ruta tampoco vuelva a quedar abierta si alguien la reintroduce: la cubre la
-        // regla anyRequest().authenticated() de SecurityConfig.
+        // regla anyRequest().denyAll() de SecurityConfig.
         mockMvc.perform(get("/api/citas/por-email").param("email", "invitado@example.com"))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("Una ruta que SecurityConfig no declara se deniega aunque haya sesión (403)")
+    void rutaNoDeclarada_conSesion_403() throws Exception {
+        // Antes bastaba con estar autenticado: un endpoint nuevo que nadie añadiera a
+        // SecurityConfig quedaba abierto a cualquier paciente. Ahora se deniega.
+        mockMvc.perform(get("/api/citas/por-email")
+                        .param("email", "invitado@example.com")
+                        .with(user(userDetails(10L, Rol.PACIENTE))))
+                .andExpect(status().isForbidden());
     }
 
     // ── Rutas públicas (reserva sin cuenta) ─────────────────────────────────
