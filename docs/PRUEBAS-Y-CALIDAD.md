@@ -9,6 +9,9 @@ Qué se comprueba, cómo, y (sobre todo) qué **no** queda cubierto.
 ```bash
 cd backend && mvn test        # las pruebas
 cd backend && mvn verify      # pruebas + empaquetado del jar (lo que corre el CI)
+
+cd e2e && npm ci && npx playwright install chromium   # la primera vez
+cd e2e && npm test            # pruebas E2E del frontend
 ```
 
 Las de integración necesitan **Docker en marcha**. Si no lo hay, se marcan como saltadas en
@@ -74,6 +77,7 @@ En cada push y cada pull request a `main`
 | Job | Qué hace |
 |-----|----------|
 | **Backend (JDK 21 + Testcontainers)** | `mvn -B verify`, y después **revisa los informes de Surefire y falla si alguna prueba quedó sin ejecutar** |
+| **Frontend E2E (Playwright)** | Recorre la reserva sin cuenta en Chromium, en escritorio y en móvil |
 | **Imagen de producción** | Construye la imagen y comprueba que el frontend viaja dentro del jar |
 
 Ese segundo paso del primer job es el que cierra el agujero del `disabledWithoutDocker`: el
@@ -93,8 +97,37 @@ deja dicho en el resumen del run en vez de fallar.
 
 ## Frontend
 
-**No hay pruebas automatizadas de frontend.** Ni unitarias, ni de componentes, ni de
-extremo a extremo.
+### Pruebas E2E con Playwright
+
+Viven en [`e2e/`](../e2e), fuera de `frontend/`. No es un capricho: `frontend/` se publica
+tal cual (nginx lo monta y el `Dockerfile` lo copia dentro del jar), así que un
+`node_modules` o un informe de pruebas ahí dentro acabaría servido en la web.
+
+Hoy cubren **un solo flujo**, la reserva sin cuenta de `reservar.html`, con cinco pruebas:
+
+| Prueba | Qué comprueba |
+|--------|---------------|
+| De principio a fin | Centro, fecha, hora y datos. Que el cuerpo del `POST` es el que espera la API, que sale el aviso de confirmación y que el token queda guardado para «Mis citas» |
+| Horas libres | Solo se pueden pulsar las horas que devuelve `/disponibilidad` |
+| Privacidad | El botón no se activa hasta marcar la casilla |
+| Teléfono | Un número no español se rechaza sin llegar a llamar a la API |
+| Hueco ocupado | Un 409 del servidor se enseña al usuario y el formulario sigue usable |
+
+Cada una corre dos veces, en un Chrome de escritorio y en un Pixel 7 emulado.
+
+**La API está simulada** ([`e2e/tests/api-simulada.js`](../e2e/tests/api-simulada.js)). Se
+sirve `frontend/` como estático y las llamadas a `/api` se responden dentro del navegador.
+Lo bueno es que no hace falta levantar backend ni base de datos, y el resultado no depende
+de qué huecos queden libres ese día. Lo malo es que si el backend cambia la forma de una
+respuesta, estas pruebas no se enteran: eso lo vigilan las de integración del backend. Si
+la web llama a una ruta que la simulación no contempla, la prueba principal falla, para que
+no pase desapercibido.
+
+Para lanzarlas contra la pila de verdad, se pasa la URL: con `docker compose up` en marcha,
+`E2E_BASE_URL=http://localhost npm test`. Ojo: así se crean citas reales en la base de
+datos local.
+
+### Auditorías manuales
 
 Lo que sí se hizo, de forma manual y puntual durante el desarrollo, fueron dos auditorías
 con Chrome headless:
@@ -128,8 +161,8 @@ cobertura que no se corresponde:
 | Área | Estado |
 |------|--------|
 | **Cobertura medida** | No hay JaCoCo. No existe un porcentaje y no se debe citar ninguno |
-| **Frontend** | Sin pruebas automatizadas de ningún tipo |
-| **Extremo a extremo** | No hay pruebas de navegador que recorran el flujo completo |
+| **Frontend** | Solo la reserva sin cuenta tiene E2E. Login, «Mis citas», cancelación, el panel del médico y el resto de páginas, sin cubrir |
+| **Extremo a extremo** | Las E2E del CI usan una API simulada: ninguna prueba de navegador recorre frontend, backend y base de datos a la vez |
 | **MySQL** | El perfil existe y tiene sus migraciones, pero **el CI solo prueba PostgreSQL**: cada migración de MySQL viaja sin verificar |
 | **Carga y rendimiento** | Sin medir. El bloqueo pesimista se ha probado correcto, no rápido |
 | **Entrega de notificaciones** | Se prueba que se construyen y se envían; no hay reintentos ni verificación de entrega real |
@@ -143,8 +176,8 @@ Por orden de lo que más valor daría:
 
 1. **JaCoCo en el CI**, con un umbral que falle si baja. Convierte «hay 115 pruebas» en un
    dato comprobable.
-2. **Pruebas E2E** de los dos flujos que más duelen si se rompen: reservar sin cuenta y
-   volver a la cita desde el enlace del correo.
+2. **Más pruebas E2E.** La reserva sin cuenta ya está. Falta el otro flujo que más duele si
+   se rompe: volver a la cita desde el enlace del correo y cancelarla.
 3. **Recuperar el arnés de maquetación y contraste** como script versionado, para que las
    dos auditorías dejen de ser irrepetibles.
 4. **Probar MySQL en CI**, o retirar el perfil si no se va a usar. Hoy es código que nadie

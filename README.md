@@ -131,6 +131,7 @@ de la URL, que el navegador no manda al servidor.
 
 ```bash
 cd backend && mvn test
+cd e2e && npm ci && npm test   # E2E del frontend (la primera vez: npx playwright install chromium)
 ```
 
 **115 pruebas** en tres niveles: 70 unitarias, 27 de capa REST (`@WebMvcTest` con la
@@ -142,9 +143,13 @@ Las de integración **necesitan Docker**; sin él se marcan como saltadas en lug
 El CI lo compensa: revisa los informes de Surefire y **falla si alguna quedó sin ejecutar**.
 Hay además análisis semanal de vulnerabilidades de dependencias con OWASP dependency-check.
 
+En el frontend, **5 pruebas E2E con Playwright** recorren la reserva sin cuenta, en escritorio
+y en móvil. La API está simulada en el navegador, así que no necesitan backend.
+
 Lo que **no** está cubierto, dicho sin adornos: la cobertura no está medida (no hay JaCoCo,
-así que no hay porcentaje), el frontend no tiene pruebas automatizadas, no hay E2E y el
-perfil MySQL no se prueba en CI.
+así que no hay porcentaje), el resto del frontend (login, «Mis citas», panel del médico) no
+tiene pruebas, ninguna prueba recorre frontend, backend y base de datos a la vez, y el perfil
+MySQL no se prueba en CI.
 
 **→ [docs/PRUEBAS-Y-CALIDAD.md](docs/PRUEBAS-Y-CALIDAD.md)**
 
@@ -218,7 +223,7 @@ producción no levanta.
 - [ ] Pasarela de pago en línea (la cobertura y la preferencia ya se capturan)
 - [ ] Panel clínico multi-centro con historial
 - [ ] Refresh token
-- [ ] Cobertura medida con JaCoCo y pruebas E2E
+- [ ] Cobertura medida con JaCoCo, y E2E del resto de flujos (la reserva sin cuenta ya las tiene)
 - [x] Cancelar la cita desde el propio aviso: hecho en el correo (el enlace lleva el token
       de la cita); queda hacerlo desde Telegram y SMS, y confirmar la asistencia
 
