@@ -60,6 +60,11 @@ Todo lo siguiente está implementado en el backend y funciona contra una base de
 - **Avisos automáticos** de confirmación, cancelación y recordatorio 24 h antes, por correo,
   Telegram y SMS/WhatsApp. Quien reserva sin cuenta recibe en el correo el enlace para
   consultar o cancelar su cita desde cualquier dispositivo.
+- **Cuentas verificadas por correo**: el alta se confirma desde un enlace y la contraseña
+  olvidada se recupera igual. Si el correo ya tiene cuenta, la respuesta es la misma que si
+  estuviera libre, para no revelar quién está registrado.
+- **Consentimiento registrado**: cada cita guarda cuándo se aceptó la política de privacidad
+  y qué versión del texto. La hora la pone el servidor, no el navegador.
 - **Cuadro de mando** para el profesional: carga por médico, demanda por especialidad,
   reparto por centro y tasa de cancelación.
 - **Bilingüe** castellano/catalán, con la preferencia guardada en el navegador.
@@ -90,6 +95,10 @@ El backend va en capas clásicas (controlador · servicio · repositorio) con DT
 las entidades. El frontend es estático, sin framework ni paso de compilación, y nada se carga
 de un CDN: tipografías, iconos y Chart.js están autoalojados, lo que permite servir una
 Content-Security-Policy **sin `'unsafe-inline'` en los scripts**.
+
+La configuración de seguridad está **cerrada por defecto**: una ruta de la API que no esté
+declarada se deniega, en vez de quedar abierta a cualquiera con sesión
+([fase 14](docs/EVOLUCION.md#fase-14-securityconfig-cerrada-por-defecto)).
 
 **→ [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md)**: componentes, flujo de una petición,
 autenticación, concurrencia, notificaciones e infraestructura.
@@ -134,14 +143,15 @@ cd backend && mvn test
 cd e2e && npm ci && npm test   # E2E del frontend (la primera vez: npx playwright install chromium)
 ```
 
-**115 pruebas** en tres niveles: 70 unitarias, 27 de capa REST (`@WebMvcTest` con la
-`SecurityConfig` real) y 18 de integración contra un PostgreSQL levantado con Testcontainers.
+**128 pruebas** en tres niveles: 75 unitarias, 31 de capa REST (`@WebMvcTest` con la
+`SecurityConfig` real) y 22 de integración contra un PostgreSQL levantado con Testcontainers.
 Las de correo usan GreenMail, un SMTP en memoria: el token se extrae del correo realmente
 recibido.
 
 Las de integración **necesitan Docker**; sin él se marcan como saltadas en lugar de fallar.
 El CI lo compensa: revisa los informes de Surefire y **falla si alguna quedó sin ejecutar**.
-Hay además análisis semanal de vulnerabilidades de dependencias con OWASP dependency-check.
+Hay además análisis semanal de vulnerabilidades de dependencias con OWASP dependency-check,
+y Dependabot propone las actualizaciones de Maven, Docker y GitHub Actions.
 
 En el frontend, **5 pruebas E2E con Playwright** recorren la reserva sin cuenta, en escritorio
 y en móvil. La API está simulada en el navegador, así que no necesitan backend.
@@ -185,8 +195,9 @@ producción no levanta.
 ```
 .
 ├── backend/          API Spring Boot (controller · service · repository · DTOs)
-│   └── src/main/resources/db/migration/   Flyway V1–V14 (postgresql/ y mysql/)
+│   └── src/main/resources/db/migration/   Flyway V1–V15 (postgresql/ y mysql/)
 ├── frontend/         Sitio estático, PWA y nginx.conf
+├── e2e/              Pruebas E2E del frontend con Playwright
 ├── demo/             API simulada y landing de producto para GitHub Pages
 ├── postman/          Colección de la API
 ├── scripts/          deploy.sh, backup-db.sh, build-demo.sh y capturar-pantallas.sh

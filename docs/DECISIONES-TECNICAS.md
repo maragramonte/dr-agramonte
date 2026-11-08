@@ -299,7 +299,7 @@ falsa.
 **Limitaciones.** Las pruebas de integración necesitan Docker en marcha. En una máquina sin
 Docker se marcan como saltadas en vez de fallar
 (`@Testcontainers(disabledWithoutDocker = true)`), lo que significa que en local es fácil
-creer que todo pasa cuando en realidad dieciocho pruebas no se han ejecutado. El CI lo
+creer que todo pasa cuando en realidad veintidós pruebas no se han ejecutado. El CI lo
 compensa revisando los informes de Surefire y fallando si alguna quedó sin ejecutar.
 
 **Evidencia.**
