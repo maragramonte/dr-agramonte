@@ -1,0 +1,17 @@
+{
+  "name": "dr-agramonte-e2e",
+  "private": true,
+  "description": "Pruebas de extremo a extremo del frontend con Playwright",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "report": "playwright show-report",
+    "instalar-navegadores": "playwright install --with-deps chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1",
+    "http-server": "14.1.1"
+  }
+}
