@@ -1,6 +1,6 @@
 # Base de datos
 
-> **TFG DAM · Dr. Agramonte.** Esquema real reconstruido de las migraciones **Flyway V1–V14** (`backend/src/main/resources/db/migration/postgresql/`). **PostgreSQL 15.** Hibernate arranca con `ddl-auto: validate`, así que el esquema de esta referencia coincide exactamente con las entidades JPA.
+> **TFG DAM · Dr. Agramonte.** Esquema real reconstruido de las migraciones **Flyway V1–V15** (`backend/src/main/resources/db/migration/postgresql/`). **PostgreSQL 15.** Hibernate arranca con `ddl-auto: validate`, así que el esquema de esta referencia coincide exactamente con las entidades JPA.
 
 ## Resumen en una frase
 6 tablas en **3ª forma normal**, claves `BIGSERIAL`, integridad referencial con **claves foráneas** (unas en `CASCADE`, otras en `SET NULL` según convenga conservar o no el dato), un **índice único** que (junto al bloqueo pesimista) evita las dobles reservas, e **índices** sobre las consultas más frecuentes.
@@ -73,6 +73,8 @@ erDiagram
         varchar  preferencia_pago "V8 (null)"
         varchar  acceso_token_hash "V11 (null)"
         varchar  recordatorio_token_hash "V14 (null)"
+        timestamp privacidad_aceptada_en "V15 (null)"
+        varchar  privacidad_version "V15 (null)"
     }
     NOTIFICACIONES {
         bigint   id PK
@@ -165,8 +167,12 @@ erDiagram
 | `preferencia_pago` | VARCHAR(20) | **V8**: nullable (`en-consulta`) |
 | `acceso_token_hash` | VARCHAR(64) | **V11**: nullable, **UNIQUE**; SHA-256 del token entregado al reservar sin cuenta |
 | `recordatorio_token_hash` | VARCHAR(64) | **V14**: nullable, **UNIQUE**; SHA-256 del segundo token de la misma cita, el que viaja en el correo de recordatorio. Son dos porque del primero solo queda el hash: rotarlo invalidaría el enlace del correo de la reserva y el token guardado en el navegador que reservó |
+| `privacidad_aceptada_en` | TIMESTAMP | **V15**: nullable; cuándo aceptó el paciente la política de privacidad. Lo fija el servidor al crear la cita, no el navegador |
+| `privacidad_version` | VARCHAR(20) | **V15**: nullable; qué versión del texto aceptó (`PoliticaPrivacidad.VERSION_VIGENTE`, hoy `2026-11`). Al cambiar `privacidad.html` hay que subir esta versión |
 
 > La cita **hereda el centro de su horario** (no se elige aparte): al reservar, `centro_id` se toma del horario bloqueado.
+
+> **Por qué V15.** Hasta entonces la casilla de privacidad solo existía en el navegador: no quedaba ninguna prueba de que alguien la hubiera marcado, y el RGPD pide poder demostrar el consentimiento (art. 7.1). Ahora el backend rechaza con **400** una reserva sin aceptación y guarda cuándo y qué versión se aceptó. Las citas anteriores a V15 tienen las dos columnas a `NULL`.
 
 ### `notificaciones`: avisos (Twilio / Telegram / email)
 | Columna | Tipo | Restricción |
@@ -230,7 +236,7 @@ Está **probado**: `ReservaPublicaIntegrationTest` lanza dos hilos en paralelo c
 ## Decisiones de diseño
 - **Claves `BIGSERIAL`/`BIGINT`:** autoincremento nativo de PostgreSQL; margen de crecimiento frente a `INT`.
 - **Enums como `VARCHAR` + `@Enumerated(STRING)`:** dominios pequeños y estables (estado, rol, canal); legibles en la BD y sin una tabla-catálogo que sería sobre-ingeniería.
-- **Columnas nuevas siempre `nullable`** (centro_id V5/V6, recordatorio V2, cobertura V8, Telegram V9/V10, token de acceso V11, cuenta del médico V12, activación V13, token del recordatorio V14): no rompen las filas existentes al migrar (compatibilidad hacia atrás).
+- **Columnas nuevas siempre `nullable`** (centro_id V5/V6, recordatorio V2, cobertura V8, Telegram V9/V10, token de acceso V11, cuenta del médico V12, activación V13, token del recordatorio V14, consentimiento V15): no rompen las filas existentes al migrar (compatibilidad hacia atrás).
 - **Flyway forward-only:** cada cambio es una migración numerada; el esquema se reconstruye idéntico en cualquier entorno. No hay *undo* automático (edición community): se corrige con una nueva V.
 - **Normalización 3FN:** sin datos repetidos; cada hecho vive en un único sitio y se referencia por FK.
 

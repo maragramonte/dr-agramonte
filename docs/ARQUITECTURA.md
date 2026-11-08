@@ -110,8 +110,8 @@ El catálogo completo de endpoints está en [API.md](API.md).
 ## Base de datos
 
 PostgreSQL 15, con el esquema versionado en migraciones Flyway
-(`backend/src/main/resources/db/migration/`). Hay catorce, de `V1__init.sql` a
-`V14__cita_recordatorio_token.sql`, y una copia paralela para el perfil MySQL.
+(`backend/src/main/resources/db/migration/`). Hay quince, de `V1__init.sql` a
+`V15__cita_aceptacion_privacidad.sql`, y una copia paralela para el perfil MySQL.
 
 Tablas principales: `usuarios`, `medicos`, `centros`, `horarios`, `citas` y
 `notificaciones`. El detalle tabla a tabla, el diagrama entidad-relación y los índices están

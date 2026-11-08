@@ -17,21 +17,21 @@ cd e2e && npm test            # pruebas E2E del frontend
 Las de integración necesitan **Docker en marcha**. Si no lo hay, se marcan como saltadas en
 lugar de fallar (`@Testcontainers(disabledWithoutDocker = true)`).
 
-> Cuidado con esto en local: sin Docker, `mvn test` sale en verde habiendo omitido dieciocho
+> Cuidado con esto en local: sin Docker, `mvn test` sale en verde habiendo omitido veintidós
 > pruebas. El CI lo compensa (ver [más abajo](#integración-continua)).
 
 ---
 
 ## El conjunto, en números
 
-**115 pruebas** en 20 clases. El recuento sale de contar las anotaciones `@Test` y
+**128 pruebas** en 19 clases. El recuento sale de contar las anotaciones `@Test` y
 `@ParameterizedTest` del árbol `backend/src/test`.
 
 | Nivel | Pruebas | Qué verifica | Necesita Docker |
 |-------|---------|--------------|-----------------|
-| Unitarias de servicio y componentes | 70 | Lógica de negocio aislada, con dobles de prueba | No |
-| Web (`@WebMvcTest`) | 27 | Capa REST con la `SecurityConfig` real: roles, códigos, validación | No |
-| Integración (Testcontainers) | 18 | El sistema completo contra un PostgreSQL real | **Sí** |
+| Unitarias de servicio y componentes | 75 | Lógica de negocio aislada, con dobles de prueba | No |
+| Web (`@WebMvcTest`) | 31 | Capa REST con la `SecurityConfig` real: roles, códigos, validación | No |
+| Integración (Testcontainers) | 22 | El sistema completo contra un PostgreSQL real | **Sí** |
 
 ### Las de integración, una a una
 
@@ -39,7 +39,7 @@ lugar de fallar (`@Testcontainers(disabledWithoutDocker = true)`).
 |-------|---------|-------|
 | `ReservaPublicaIntegrationTest` | 13 | Reserva sin cuenta, doble reserva concurrente, cancelación, token de acceso |
 | `AccesoCitaPorCorreoIntegrationTest` | 3 | El enlace del correo abre la cita; el del recordatorio no invalida el de la reserva |
-| `ActivacionCuentaIntegrationTest` | 2 | Activación de una cuenta invitada desde el enlace |
+| `ActivacionCuentaIntegrationTest` | 6 | Activación de una cuenta invitada, alta que exige abrir el buzón, correo ya registrado indistinguible de uno libre y recuperación de contraseña |
 
 Las tres levantan PostgreSQL con Testcontainers. Las de correo usan además **GreenMail**, un
 servidor SMTP en memoria: el token se extrae del correo realmente recibido y se comprueba
@@ -174,7 +174,7 @@ cobertura que no se corresponde:
 
 Por orden de lo que más valor daría:
 
-1. **JaCoCo en el CI**, con un umbral que falle si baja. Convierte «hay 115 pruebas» en un
+1. **JaCoCo en el CI**, con un umbral que falle si baja. Convierte «hay 128 pruebas» en un
    dato comprobable.
 2. **Más pruebas E2E.** La reserva sin cuenta ya está. Falta el otro flujo que más duele si
    se rompe: volver a la cita desde el enlace del correo y cancelarla.
