@@ -93,6 +93,15 @@ NVD](https://nvd.nist.gov/developers/request-an-api-key)): sin ella la descarga 
 minutos a horas, así que mientras no esté configurado el workflow se salta el análisis y lo
 deja dicho en el resumen del run en vez de fallar.
 
+Algunos CVE están suprimidos en
+[`backend/dependency-check-suppressions.xml`](../backend/dependency-check-suppressions.xml).
+Spring Boot 3.5.16 es la última 3.5 en Maven Central y los parches de Spring Framework 6.2 y
+Spring Security 6.5 solo salen ya en el soporte comercial. Revisé cada CVE contra el código y
+ninguno toca lo que usa el backend: dependen de WebFlux, RSocket, SSE, SpEL, LDAP, WebAuthn,
+DPoP o XsltView. Cada supresión explica su motivo, solo vale para la versión exacta del jar y
+caduca el 10/02/2027, cuando el análisis vuelve a fallar para obligar a revisarla. La solución
+de fondo es migrar a Spring Boot 4.
+
 ---
 
 ## Frontend
