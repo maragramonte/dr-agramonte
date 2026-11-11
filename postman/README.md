@@ -40,7 +40,7 @@ Tras editar los `.json` en el repo: **reimportar** o **Replace** en Postman.
 ### Opción B – CLI desde la carpeta
 
 ```powershell
-cd C:\Users\marac\DR-AGRAMONTE-PROYECTO
+cd <raíz del repo>
 npx postman-cli collection run postman/Dr-Agramonte-API.postman_collection.json -e postman/Local-Docker.postman_environment.json
 ```
 

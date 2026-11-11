@@ -1,3 +1,6 @@
+# Nombre fijo: el volumen de datos (dr-agramonte-proyecto_postgres_data) no depende de cómo se llame la carpeta.
+name: dr-agramonte-proyecto
+
 services:
   postgres:
     image: postgres:15
