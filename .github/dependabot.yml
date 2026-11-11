@@ -7,6 +7,11 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    # El salto a Spring Boot 4 es una migración (Jackson 3, Security 7) y se hará a mano.
+    # Dependabot solo propone parches y menores de la rama 3.x.
+    ignore:
+      - dependency-name: "org.springframework.boot:*"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
