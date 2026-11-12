@@ -66,7 +66,7 @@ jobs:
 
       - name: Preparar JDK 21
         if: steps.clave.outputs.hay_clave == 'true'
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '21'
