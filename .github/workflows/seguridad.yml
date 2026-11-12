@@ -124,7 +124,7 @@ jobs:
       # paso anterior ha fallado por encontrar un CVE con CVSS >= 7.
       - name: Guardar el informe
         if: always() && steps.clave.outputs.hay_clave == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dependency-check-report
           path: |
