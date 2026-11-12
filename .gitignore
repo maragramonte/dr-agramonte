@@ -54,4 +54,6 @@ dist-capturas/
 
 # Instrucciones de mis herramientas locales
 CLAUDE.md
-.claude/
+.claude/*
+# Las reglas deny de .claude/settings.json sí se suben: protegen los secretos
+!.claude/settings.json

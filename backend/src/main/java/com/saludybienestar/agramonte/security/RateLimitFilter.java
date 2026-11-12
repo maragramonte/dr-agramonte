@@ -18,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.UrlPathHelper;
 
 /**
  * Límite de peticiones por IP para las rutas públicas que escriben o gastan CPU.
@@ -88,26 +89,22 @@ public class RateLimitFilter extends OncePerRequestFilter {
         if (!"POST".equalsIgnoreCase(request.getMethod())) {
             return null;
         }
-        String ruta = request.getRequestURI();
-        if (ruta == null) {
+        if (request.getRequestURI() == null) {
             return null;
         }
-        // Mismo cubo para las cuatro: todas son intentos contra credenciales. En
-        // /api/auth/activar lo que se probaría a ciegas es el token del correo, y aunque
-        // son 32 bytes de SecureRandom, no hay motivo para dejar barrer sin freno.
-        if (ruta.endsWith("/api/auth/login")
-                || ruta.endsWith("/api/auth/registro")
-                || ruta.endsWith("/api/auth/recuperar")
-                || ruta.endsWith("/api/auth/activar")) {
-            return "auth";
-        }
-        if (ruta.endsWith("/api/contact")) {
-            return "contacto";
-        }
-        if (ruta.endsWith("/api/citas/reserva-publica")) {
-            return "reserva";
-        }
-        return null;
+        // La ruta decodificada, la misma que usa Spring para elegir el controlador.
+        // getRequestURI() llega tal cual la escribió el cliente: con ella,
+        // /api/auth/log%69n iba al login sin contar para el límite.
+        String ruta = UrlPathHelper.defaultInstance.getPathWithinApplication(request);
+        return switch (ruta) {
+            // Mismo cubo para las cuatro: todas son intentos contra credenciales. En
+            // /api/auth/activar lo que se probaría a ciegas es el token del correo, y aunque
+            // son 32 bytes de SecureRandom, no hay motivo para dejar barrer sin freno.
+            case "/api/auth/login", "/api/auth/registro", "/api/auth/recuperar", "/api/auth/activar" -> "auth";
+            case "/api/contact" -> "contacto";
+            case "/api/citas/reserva-publica" -> "reserva";
+            default -> null;
+        };
     }
 
     /**

@@ -1,0 +1,75 @@
+# Análisis estático con Semgrep Community Edition en cada pull request a main.
+#
+# Cubre lo que CodeQL no mira: secretos escritos en el código (claves, tokens,
+# contraseñas) y patrones de riesgo en Java con las reglas públicas de Semgrep.
+# No necesita cuenta ni token: las reglas p/java y p/secrets se descargan del
+# registro público y se ejecutan aquí, sin subir el código a ningún sitio.
+#
+# De momento solo informa. Sin --error, Semgrep termina en verde aunque encuentre
+# algo, y los resultados quedan en el resumen del run y en un SARIF descargable.
+# Cuando sepamos cuánto ruido mete, se decide si pasa a bloquear el merge.
+name: Semgrep
+
+on:
+  pull_request:
+    branches: [main]
+
+# Solo lectura: no comenta en la PR ni sube nada a code scanning.
+permissions:
+  contents: read
+
+# Si se empujan varios commits seguidos, solo se analiza el último.
+concurrency:
+  group: semgrep-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  semgrep:
+    name: Semgrep (Java y secretos)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      # Versión fija: con «latest» un cambio de reglas o del motor podría cambiar
+      # el resultado de una PR a otra sin que haya cambiado el código.
+      - name: Instalar Semgrep
+        run: pip install semgrep==1.185.0
+
+      # --metrics=off: el código es nuestro y la telemetría no aporta nada aquí.
+      - name: Analizar
+        run: |
+          semgrep scan \
+            --config p/java \
+            --config p/secrets \
+            --metrics=off \
+            --sarif-output=semgrep.sarif \
+            --text-output=semgrep.txt
+
+      # El resumen se ve sin descargar nada; el SARIF queda para revisar a fondo.
+      - name: Resumen
+        if: always()
+        run: |
+          total=$(jq '[.runs[].results[]] | length' semgrep.sarif 2>/dev/null || echo "?")
+          {
+            echo "### Semgrep: $total hallazgo(s)"
+            echo
+            echo "Solo informativo: no bloquea el merge."
+            echo
+            echo '```'
+            cat semgrep.txt 2>/dev/null || echo "Semgrep no ha generado salida."
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Guardar el informe
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-sarif
+          path: semgrep.sarif
+          retention-days: 14
+          if-no-files-found: warn
