@@ -121,6 +121,26 @@ class RateLimitFilterTest {
     }
 
     @Test
+    @DisplayName("Codificar una letra de la ruta no da un cupo nuevo: /api/auth/log%69n es el login")
+    void limite_rutaCodificada_cuentaComoLaRutaReal() throws Exception {
+        // Tomcat entrega getRequestURI() sin decodificar, pero Spring decodifica la ruta
+        // antes de buscar el controlador, así que /api/auth/log%69n acaba en el login.
+        // Si el filtro mirase la URI en bruto, cada variante sería un cubo nuevo.
+        FilterChain cadena = mock(FilterChain.class);
+        for (int i = 0; i < MAX; i++) {
+            assertThat(pedir("POST", "/api/auth/login", "10.0.0.6", cadena).getStatus()).isEqualTo(200);
+        }
+        assertThat(pedir("POST", "/api/auth/log%69n", "10.0.0.6", cadena).getStatus()).isEqualTo(429);
+
+        // Y al revés: gastar el cupo con la ruta codificada también cierra la normal.
+        for (int i = 0; i < MAX; i++) {
+            assertThat(pedir("POST", "/api/citas/reserva%2Dpublica", "10.0.0.7", cadena).getStatus())
+                    .isEqualTo(200);
+        }
+        assertThat(pedir("POST", "/api/citas/reserva-publica", "10.0.0.7", cadena).getStatus()).isEqualTo(429);
+    }
+
+    @Test
     @DisplayName("No limita lo que no escribe: consultar la agenda o los centros nunca se corta")
     void limite_noAfectaALasLecturas() throws Exception {
         for (int i = 0; i < MAX * 5; i++) {
