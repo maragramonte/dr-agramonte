@@ -5,9 +5,11 @@
 Desde la raíz del proyecto:
 
 ```powershell
-cd C:\Users\marac\DR-AGRAMONTE-PROYECTO
+cd <raíz del repo>
 docker compose up -d --build
 ```
+
+El proyecto de Compose se llama siempre `dr-agramonte-proyecto` (lo fija `name:` en `docker-compose.yml`), así que da igual en qué carpeta tengas el repo: los contenedores y el volumen de la base de datos son los mismos.
 
 Espera hasta que los tres contenedores estén **healthy** (1–3 min la primera vez; Maven compila el backend dentro de la imagen).
 
@@ -67,7 +69,7 @@ Mensaje típico: `Bind for 0.0.0.0:80 failed` o `5432`.
 | **8080** | Otro Spring/Java |
 | **5432** | PostgreSQL instalado en Windows |
 
-**PostgreSQL del proyecto:** el host usa **5433** (contenedor sigue en 5432 internamente). Conéctate con DBeaver a `localhost:5433` si hace falta.
+**PostgreSQL del proyecto:** el host usa **5433** (contenedor sigue en 5432 internamente). Conéctate con DBeaver o IntelliJ a `localhost:5433/dr_agramonte` si hace falta. El backend lanzado desde el IDE también apunta ahí por defecto (`application-postgres.yml`). El 5432 es el PostgreSQL de Windows: no lo uses para este proyecto.
 
 Para liberar puertos:
 
@@ -75,6 +77,28 @@ Para liberar puertos:
 docker compose down
 # Cierra IIS u otros servicios que usen 80/8080
 ```
+
+---
+
+## `not a directory` al arrancar `agramonte_web` después de mover el repo
+
+Mensaje típico:
+
+```
+error mounting ".../frontend/nginx.conf" to rootfs at "/etc/nginx/conf.d/default.conf": ... not a directory
+```
+
+Los contenedores guardan la ruta absoluta de sus bind mounts. Si mueves o renombras la carpeta del repo y luego arrancas el contenedor viejo (desde Docker Desktop, por ejemplo), Docker no encuentra `frontend/nginx.conf`, crea en su lugar una carpeta vacía con ese nombre e intenta montarla sobre un archivo. Por eso falla.
+
+Solución: recrea los contenedores desde la carpeta nueva. El volumen de la base de datos se conserva.
+
+```powershell
+cd <raíz del repo>
+docker compose down
+docker compose up -d --build
+```
+
+Después borra la carpeta antigua, que solo tendrá esa carpeta `nginx.conf` vacía.
 
 ---
 

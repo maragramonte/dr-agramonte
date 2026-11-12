@@ -134,7 +134,7 @@ acceso a las citas, y la lista ahora se construye con los tokens guardados.
 ### 1. Preparación
 
 ```powershell
-cd DR-AGRAMONTE-PROYECTO
+cd <raíz del repo>
 docker compose up -d --build
 docker compose ps   # postgres, backend, frontend → Up (healthy)
 ```
