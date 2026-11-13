@@ -51,8 +51,8 @@ class CorreoRecordatorioCitaServiceTest {
         medico.setNombre("Dr. Juan Manuel Agramonte");
 
         Centro centro = new Centro();
-        centro.setCodigo("miramar");
-        centro.setNombre("Policlínica Miramar");
+        centro.setCodigo("palma");
+        centro.setNombre("Consulta Palma");
 
         Cita cita = new Cita();
         cita.setId(42L);
@@ -81,7 +81,7 @@ class CorreoRecordatorioCitaServiceTest {
         verify(correoSaliente).enviar(eq("paciente@example.com"), anyString(), cuerpo.capture());
         assertThat(cuerpo.getValue())
                 .contains("https://ejemplo/enlace")
-                .contains("Policlínica Miramar")
+                .contains("Consulta Palma")
                 .contains("No lo reenvíes");
         // Recordar una cita a quien no puede ir, sin darle forma de cancelarla, deja la
         // franja ocupada igual: el enlace es lo que hace accionable el aviso.

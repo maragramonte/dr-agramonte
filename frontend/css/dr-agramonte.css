@@ -400,36 +400,6 @@ a {
     font-size: 0.85rem;
     color: var(--text-light);
 }
-.sobre-mi-stats {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: 1fr;
-    gap: var(--space-2);
-}
-.stat-card {
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: var(--space-3);
-    text-align: center;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.35rem;
-}
-.stat-number {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--teal);
-    font-family: var(--font-display);
-    letter-spacing: var(--tracking-title);
-}
-.stat-label {
-    font-size: 0.75rem;
-    color: var(--text-light);
-}
 
 /* CTA final (index) */
 .cta-section {
@@ -505,6 +475,15 @@ a {
     background: var(--card);
     border-radius: var(--radius-lg);
 }
+/* El título del proceso y sus pasos subieron un nivel (h2/h3) para que los
+   encabezados no salten de h2 a h4; el tamaño se queda como estaba. */
+.proceso-atencion > h2 {
+    font-size: 1.17em;
+}
+.paso h3 {
+    font-size: 1em;
+}
+
 .proceso-pasos {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
@@ -526,35 +505,7 @@ a {
     margin-bottom: var(--space-2);
 }
 
-/* Contacto – mapa, FAQ */
-.mapa-ubicacion {
-    margin-top: var(--space-5);
-    margin-bottom: var(--space-5);
-}
-/* Antes aquí había un iframe de Google Maps. Se cambió por un enlace: el mapa
-   embebido cargaba scripts y cookies de Google en cada visita a la página, y era
-   el unico tercero que quedaba en la web (ver la CSP del Caddyfile). */
-.mapa-contenedor {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    flex-wrap: wrap;
-    background: var(--teal-pale);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: var(--space-3);
-}
-.mapa-contenedor > i {
-    font-size: 1.75rem;
-    color: var(--teal);
-}
-.mapa-contenedor p {
-    margin: 0;
-    flex: 1 1 12rem;
-}
-.mapa-contenedor .btn {
-    white-space: nowrap;
-}
+/* Contacto – FAQ */
 .faq-grid {
     display: grid;
     gap: var(--space-2);
@@ -578,18 +529,32 @@ a {
     text-align: center;
     margin-top: var(--space-4);
 }
-.checkbox-group {
+/* Con dos clases: .form-group (más abajo) pone la columna y, con la misma
+   especificidad, ganaba siempre. */
+.form-group.checkbox-group {
     flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
     gap: var(--space-2);
 }
-.enlace-mapa {
-    display: inline-block;
-    margin-top: 0.3rem;
-    font-size: 0.8rem;
-    color: var(--teal);
+/* La casilla iba con el relleno y el borde de los campos de texto y quedaba
+   pegada a la frase. Casilla a la izquierda, texto a su lado y alineado. */
+.checkbox-group .checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    margin-bottom: 0;
+    font-weight: 400;
+    text-align: left;
 }
-
+.checkbox-group input[type="checkbox"] {
+    flex: none;
+    width: 1.15rem;
+    height: 1.15rem;
+    margin-top: 0.15rem;
+    padding: 0;
+    accent-color: var(--teal);
+}
 /* ========== 4. ACCESIBILIDAD – para usuarios que lo necesitan ========== */
 @media (prefers-reduced-motion: reduce) {
     *,
@@ -911,7 +876,7 @@ a {
     transform: scale(1.08);
 }
 
-.logo-text h1 {
+.logo-text .logo-title {
     font-family: var(--font-display);
     letter-spacing: var(--tracking-title);
     font-size: clamp(1rem, 3.4vw, 1.25rem);
@@ -923,7 +888,7 @@ a {
     text-overflow: ellipsis;
 }
 
-.logo-text p {
+.logo-text .logo-subtitle {
     font-size: 0.7rem;
     color: var(--text-light);
 }
@@ -1308,11 +1273,11 @@ a {
         padding: 0.65rem 1.15rem;
     }
 
-    .logo-text h1 {
+    .logo-text .logo-title {
         font-size: 1.35rem;
     }
 
-    .logo-text p {
+    .logo-text .logo-subtitle {
         font-size: 0.75rem;
     }
 
@@ -1344,11 +1309,11 @@ a {
         font-size: 1.5rem;
     }
 
-    .logo-text h1 {
+    .logo-text .logo-title {
         font-size: 1.5rem;
     }
 
-    .logo-text p {
+    .logo-text .logo-subtitle {
         font-size: 0.82rem;
     }
 
@@ -1449,7 +1414,7 @@ a {
 /* Aquí ya no caben ni el subtítulo del logo ni las etiquetas de los botones:
    el CTA y el menú se quedan en icono, y el idioma se va al pie del panel. */
 @media (max-width: 600px) {
-    .logo-text p {
+    .logo-text .logo-subtitle {
         display: none;
     }
 
@@ -1497,7 +1462,7 @@ a {
         font-size: 1.1rem;
     }
 
-    .logo-text h1 {
+    .logo-text .logo-title {
         font-size: 1.05rem;
     }
 
@@ -1524,7 +1489,7 @@ a {
         font-size: 1rem;
     }
 
-    .logo-text h1 {
+    .logo-text .logo-title {
         font-size: 0.88rem;
     }
 
@@ -2048,21 +2013,6 @@ a {
     font-size: 0.92rem;
     color: var(--text-light);
     line-height: 1.6;
-}
-
-.image-badge {
-    position: absolute;
-    bottom: var(--space-2);
-    right: var(--space-2);
-    background: rgba(255, 255, 255, 0.95);
-    padding: 0.4rem 0.8rem;
-    border-radius: var(--radius-full);
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--teal);
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
 }
 
 /* ========== 10. TESTIMONIOS – glassmorphismo elegante ========== */
@@ -2772,26 +2722,15 @@ a {
     }
 }
 
-/* Banda de estadísticas (página Sobre el Dr. Agramonte) */
-.stats-band {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-3);
-    margin-top: var(--space-6);
-}
-.stats-band .stat-card {
-    transition: var(--transition);
-}
-.stats-band .stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--teal-light);
-}
-@media (max-width: 720px) {
-    .stats-band {
-        grid-template-columns: repeat(2, 1fr);
+/* En escritorio el texto es bastante más largo que la foto: que la foto le
+   acompañe al bajar en vez de quedarse sola arriba con un hueco debajo. */
+@media (min-width: 901px) {
+    .sobre-mi-imagen {
+        position: sticky;
+        top: 6.5rem;
     }
 }
+
 
 .sobre-mi-imagen {
     position: relative;
@@ -2805,11 +2744,6 @@ a {
     box-shadow: var(--shadow-lg);
     aspect-ratio: 4 / 5;
     transition: var(--transition);
-}
-
-.sobre-mi-imagen:hover {
-    box-shadow: 0 20px 48px rgba(15, 118, 110, 0.18);
-    transform: translateY(-4px);
 }
 
 /* La foto rellena y se centra en la tarjeta 4:5 (igual que el hero de inicio);
@@ -2861,21 +2795,6 @@ a {
     color: var(--teal);
 }
 
-.experiencia-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: rgba(15, 118, 110, 0.08);
-    border: 1px solid rgba(15, 118, 110, 0.15);
-    padding: 0.45rem 1rem;
-    border-radius: var(--radius-full);
-    font-weight: 600;
-    font-size: 0.88rem;
-    color: var(--teal);
-    margin-bottom: var(--space-3);
-}
-
-.lista-formacion,
 .lista-experiencia {
     list-style: none;
     padding: 0;
@@ -2886,14 +2805,12 @@ a {
     overflow: hidden;
 }
 
-.lista-formacion li,
 .lista-experiencia li {
     padding: 0.6rem 1rem 0.6rem 2.2rem;
     position: relative;
     border-bottom: 1px solid var(--border);
 }
 
-.lista-formacion li::before,
 .lista-experiencia li::before {
     content: '';
     position: absolute;
