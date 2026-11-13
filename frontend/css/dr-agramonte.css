@@ -3465,3 +3465,8 @@ select,
 textarea {
     font-family: inherit;
 }
+
+/* El botón final de Servicios iba pegado al recuadro del proceso. */
+.cta-servicios {
+    margin-top: var(--space-4);
+}
