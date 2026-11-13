@@ -3092,7 +3092,183 @@ a {
     display: block;
 }
 
-/* Texto a 18 px: con la Atkinson y un público mayor, 16 px se quedaba corto. */
+
+/* ============================================================
+   DIRECCIÓN VISUAL v3 — legibilidad primero
+
+   Quién lee esta web: pacientes de Medicina Interna, muchos mayores, que
+   vienen a saber quién es el doctor y a pedir hora. De ahí salen tres reglas:
+
+   1. Texto a 18 px y Atkinson Hyperlegible Next (ver vendor/fonts/atkinson.css).
+   2. El teal es solo para lo que se puede pulsar. Las superficies oscuras van
+      en petróleo, que no compite con los botones.
+   3. Lo que pesa lo mismo no va en tarjetas sueltas: los servicios son filas
+      de una lista, el doctor es un texto junto a su dibujo y el cierre es una
+      banda clara. El dibujo a lápiz es lo único que lleva protagonismo.
+   ============================================================ */
+
 body {
     font-size: 1.125rem;
+}
+
+.section-title {
+    letter-spacing: var(--tracking-title);
+}
+
+/* ---- Servicios: filas con filete, no tarjetas ---- */
+.servicios-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--border);
+}
+
+.servicio-fila {
+    display: grid;
+    gap: 0.35rem 2rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.servicio-fila__titulo {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--heading);
+    letter-spacing: var(--tracking-title);
+}
+
+.servicio-fila__texto {
+    color: var(--text-light);
+    max-width: 42ch;
+}
+
+.servicio-fila__accion,
+.servicios-mas a,
+.doctor-portada__enlace a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
+    font-weight: 700;
+    color: var(--teal);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.3em;
+}
+
+.servicio-fila__accion:hover,
+.servicios-mas a:hover,
+.doctor-portada__enlace a:hover {
+    color: var(--teal-dark);
+    text-decoration-thickness: 3px;
+}
+
+@media (min-width: 900px) {
+    .servicio-fila {
+        grid-template-columns: minmax(14rem, 1fr) minmax(0, 1.6fr) auto;
+        align-items: baseline;
+    }
+}
+
+.servicios-mas {
+    margin-top: var(--space-2);
+}
+
+/* ---- El doctor: el dibujo manda ---- */
+.doctor-portada {
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+.doctor-portada__rejilla {
+    display: grid;
+    gap: var(--space-4);
+    align-items: center;
+}
+
+@media (min-width: 900px) {
+    .doctor-portada__rejilla {
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+        gap: var(--space-6);
+    }
+}
+
+.doctor-portada__boceto {
+    margin: 0;
+}
+
+.doctor-portada__boceto img {
+    display: block;
+    width: 100%;
+    height: auto;
+    /* El dibujo está sobre papel gris claro: en multiplicar, el papel se
+       funde con el blanco de la banda y solo queda el trazo. */
+    mix-blend-mode: multiply;
+    /* Y los bordes del papel se difuminan, para que no se lea como una foto
+       pegada en un recuadro. */
+    -webkit-mask-image: radial-gradient(ellipse 72% 70% at 50% 50%, #000 62%, transparent 100%);
+    mask-image: radial-gradient(ellipse 72% 70% at 50% 50%, #000 62%, transparent 100%);
+}
+
+[data-theme="dark"] .doctor-portada__boceto img {
+    mix-blend-mode: normal;
+    border-radius: var(--radius-lg);
+}
+
+.doctor-portada__texto {
+    max-width: 34rem;
+}
+
+.doctor-portada__texto p {
+    margin-bottom: var(--space-2);
+}
+
+/* ---- Cierre: una banda clara, sin tarjetas dentro ---- */
+.cierre-portada {
+    background: var(--banda);
+    padding: clamp(2rem, 5vw, 3rem) 0;
+}
+
+.cierre-portada__fila {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+.cierre-portada__titulo {
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 3vw, 1.75rem);
+    font-weight: 700;
+    color: var(--heading);
+    letter-spacing: var(--tracking-title);
+    max-width: 32ch;
+}
+
+.cierre-portada__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+
+
+/* ---- Tamaños mínimos de lectura en controles ---- */
+.btn {
+    font-size: 1rem;
+}
+
+
+/* ---- Cierre de portada en móvil: botones a todo el ancho y la reserva
+   primero, que es lo que viene a hacer la mayoría. ---- */
+@media (max-width: 599px) {
+    .cierre-portada__acciones {
+        flex-direction: column-reverse;
+        width: 100%;
+    }
+
+    .cierre-portada__acciones .btn {
+        width: 100%;
+    }
 }

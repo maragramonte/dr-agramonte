@@ -138,11 +138,6 @@
                     <li><i class="fas fa-check" aria-hidden="true"></i><span data-i18n="home.tick.2">Consulta privada 80 €, se abona después de la visita</span></li>
                     <li><i class="fas fa-check" aria-hidden="true"></i><span data-i18n="home.tick.3">También con su seguro médico</span></li>
                 </ul>
-                <ul class="hero-facts" aria-label="Datos de la consulta">
-                    <li><b>35+</b><span data-i18n="home.fact.anios">años ejerciendo</span></li>
-                    <li><b id="heroNumCentros">2</b><span data-i18n="home.fact.centros">centros en Palma</span></li>
-                    <li><b>6</b><span data-i18n="home.fact.dias">días de agenda a la semana</span></li>
-                </ul>
             </div>
 
             <!-- Selector de cita. El contenido lo rellena js/pages/hero-reserva.js
@@ -187,55 +182,51 @@
 
     <section class="section servicios-resumen" aria-labelledby="servicios-title">
         <div class="container">
-            <header class="section-header"><h2 id="servicios-title" class="section-title">Servicios Médicos Especializados</h2><p class="section-subtitle">Atención integral con diagnóstico preciso y tratamiento personalizado.</p></header>
-            <div class="grid grid--services" role="list">
-                <article class="card card--service" role="listitem"><div class="card__icon"><i class="fas fa-heartbeat"></i></div><h3 class="card__title">Consulta General</h3><p class="card__text">Evaluación médica completa para diagnóstico y tratamiento.</p><a href="reservar.html?servicio=consulta-general" class="btn btn--primary btn--reserva btn--full"><i class="fas fa-calendar-plus" aria-hidden="true"></i> Reservar cita</a></article>
-                <article class="card card--service" role="listitem"><div class="card__icon"><i class="fas fa-pills"></i></div><h3 class="card__title">Enfermedades Crónicas</h3><p class="card__text">Control de diabetes, hipertensión y enfermedades cardiovasculares.</p><a href="reservar.html?servicio=enfermedades-cronicas" class="btn btn--primary btn--reserva btn--full"><i class="fas fa-calendar-plus" aria-hidden="true"></i> Reservar cita</a></article>
-                <article class="card card--service" role="listitem"><div class="card__icon"><i class="fas fa-clipboard-check"></i></div><h3 class="card__title">Chequeos Preventivos</h3><p class="card__text">Revisiones completas para detectar factores de riesgo.</p><a href="reservar.html?servicio=chequeos-preventivos" class="btn btn--primary btn--reserva btn--full"><i class="fas fa-calendar-plus" aria-hidden="true"></i> Reservar cita</a></article>
-            </div>
-            <div class="section-footer"><a href="servicios.html" class="btn btn--secondary">Ver todos los servicios <i class="fas fa-arrow-right"></i></a></div>
+            <header class="section-header"><h2 id="servicios-title" class="section-title" data-i18n="home.serv.title">Servicios médicos</h2></header>
+            <ul class="servicios-lista">
+                <li class="servicio-fila">
+                    <h3 class="servicio-fila__titulo" data-i18n="home.serv.general.t">Consulta general</h3>
+                    <p class="servicio-fila__texto" data-i18n="home.serv.general.d">Evaluación médica completa para diagnóstico y tratamiento.</p>
+                    <a class="servicio-fila__accion" href="reservar.html?servicio=consulta-general"><span data-i18n="home.serv.reservar">Reservar esta consulta</span></a>
+                </li>
+                <li class="servicio-fila">
+                    <h3 class="servicio-fila__titulo" data-i18n="home.serv.cronicas.t">Enfermedades crónicas</h3>
+                    <p class="servicio-fila__texto" data-i18n="home.serv.cronicas.d">Control de diabetes, hipertensión y enfermedades cardiovasculares.</p>
+                    <a class="servicio-fila__accion" href="reservar.html?servicio=enfermedades-cronicas"><span data-i18n="home.serv.reservar">Reservar esta consulta</span></a>
+                </li>
+                <li class="servicio-fila">
+                    <h3 class="servicio-fila__titulo" data-i18n="home.serv.chequeos.t">Chequeos preventivos</h3>
+                    <p class="servicio-fila__texto" data-i18n="home.serv.chequeos.d">Revisiones completas para detectar factores de riesgo.</p>
+                    <a class="servicio-fila__accion" href="reservar.html?servicio=chequeos-preventivos"><span data-i18n="home.serv.reservar">Reservar esta consulta</span></a>
+                </li>
+            </ul>
+            <p class="servicios-mas"><a href="servicios.html" data-i18n="home.serv.vertodos">Ver los cinco servicios</a></p>
         </div>
     </section>
 
-    <section class="section sobre-mi-resumen" aria-labelledby="sobre-mi-title">
-        <div class="container">
-            <header class="section-header"><h2 id="sobre-mi-title" class="section-title">El Dr. Agramonte</h2><p class="section-subtitle">Especialista en Medicina Interna con enfoque en el paciente</p></header>
-            <div class="sobre-mi-content">
-                <div class="sobre-mi-text">
-                    <p>El <strong>Dr. Juan Manuel Agramonte</strong> es especialista en <a href="servicios.html">Medicina Interna</a> con más de 35 años de experiencia en el diagnóstico y tratamiento de enfermedades complejas. Puede leer la opinión de sus pacientes en los <a href="testimonios.html">testimonios</a>.</p>
-                    <div class="valores-list" role="list">
-                        <div class="valor-item" role="listitem"><i class="fas fa-user-md"></i><div><h3 class="valor-title">Experiencia Certificada</h3><p class="valor-text">Especialista en Medicina Interna con formación continua y actualización constante.</p></div></div>
-                        <div class="valor-item" role="listitem"><i class="fas fa-heart"></i><div><h3 class="valor-title">Atención Personalizada</h3><p class="valor-text">Cada paciente recibe un plan de tratamiento adaptado a sus necesidades específicas.</p></div></div>
-                        <div class="valor-item" role="listitem"><i class="fas fa-comments"></i><div><h3 class="valor-title">Comunicación Clara</h3><p class="valor-text">Explicaciones comprensibles y tiempo para resolver todas sus dudas.</p></div></div>
-                    </div>
-                    <div class="sobre-mi-actions"><a href="sobre-mi.html" class="btn btn--secondary"><i class="fas fa-user"></i> Conocer más sobre mí</a></div>
-                </div>
-                <!-- Aquí había cuatro cifras: «500+ pacientes atendidos», «4.9
-                     valoración media» y «100% compromiso con la salud». Las tres
-                     eran inventadas y estaban publicadas con el nombre real del
-                     doctor; una valoración media sin reseñas detrás es un reclamo
-                     falso en la web de un profesional sanitario. La única real,
-                     los 35+ años, ya figura en el hero. En su lugar va el retrato,
-                     que es lo que esta sección necesitaba. -->
-                <figure class="sobre-mi-retrato">
-                    <picture>
-                        <source type="image/webp" srcset="pictures/Profesional-480.webp 480w, pictures/Profesional-959.webp 959w" sizes="(max-width: 1000px) 96vw, 530px">
-                        <img src="pictures/Profesional.png" alt="El Dr. Juan Manuel Agramonte, especialista en Medicina Interna, con bata blanca y fonendoscopio" width="959" height="753" loading="lazy" decoding="async">
-                    </picture>
-                </figure>
+    <section class="section doctor-portada" aria-labelledby="sobre-mi-title">
+        <div class="container doctor-portada__rejilla">
+            <figure class="doctor-portada__boceto">
+                <picture>
+                    <source type="image/webp" srcset="pictures/Boceto-400.webp 400w, pictures/Boceto-800.webp 800w" sizes="(max-width: 900px) 92vw, 560px">
+                    <img src="pictures/Boceto.png" alt="Dibujo a lápiz del Dr. Agramonte con bata y fonendoscopio" width="1536" height="1024" loading="lazy" decoding="async">
+                </picture>
+            </figure>
+            <div class="doctor-portada__texto">
+                <h2 id="sobre-mi-title" class="section-title" data-i18n="home.sobre.title">El Dr. Agramonte</h2>
+                <p data-i18n-html="home.sobre.bio">El <strong>Dr. Juan Manuel Agramonte</strong> es especialista en Medicina Interna con más de 35 años de experiencia en el diagnóstico y tratamiento de enfermedades complejas.</p>
+                <p data-i18n="home.sobre.enfoque">Su forma de trabajar: escuchar bien, explicar mejor y acompañar siempre.</p>
+                <p class="doctor-portada__enlace"><a href="sobre-mi.html" data-i18n="home.sobre.btn">Conocer al doctor</a></p>
             </div>
         </div>
     </section>
 
-    <section class="cta-section" aria-labelledby="cta-title">
-        <div class="container">
-            <div class="cta-content">
-                <header class="cta-header"><h2 id="cta-title" class="cta-title">¿Necesita una Consulta Médica?</h2><p class="cta-text">Reserve su cita ahora y reciba atención médica de calidad con un especialista en Medicina Interna.</p></header>
-                <div class="grid grid--cta" role="list">
-                    <div class="cta-option" role="listitem"><div class="cta-option__icon"><i class="fas fa-calendar-check"></i></div><h3 class="cta-option__title">Reserva Online</h3><p class="cta-option__text">Elija fecha y hora que mejor le convenga</p><a href="reservar.html" class="btn btn--primary btn--reserva cta-option__action"><i class="fas fa-calendar-plus" aria-hidden="true"></i> Reservar cita</a></div>
-                    
-                    <div class="cta-option" role="listitem"><div class="cta-option__icon"><i class="fas fa-envelope"></i></div><h3 class="cta-option__title">Escríbanos</h3><p class="cta-option__text">Para dudas que no requieren cita</p><a href="contacto.html" class="btn btn--secondary cta-option__action">Ir al formulario</a></div>
-                </div>
+    <section class="cierre-portada" aria-labelledby="cta-title">
+        <div class="container cierre-portada__fila">
+            <h2 id="cta-title" class="cierre-portada__titulo" data-i18n="home.cta.title">¿Prefiere preguntar antes de pedir cita?</h2>
+            <div class="cierre-portada__acciones">
+                <a href="contacto.html" class="btn btn--secondary" data-i18n="home.cta.escribir">Escribir a la consulta</a>
+                <a href="reservar.html" class="btn btn--primary btn--reserva" data-i18n="btn.reservar">Reservar cita</a>
             </div>
         </div>
     </section>
@@ -244,9 +235,9 @@
 <footer class="footer">
     <div class="footer-content">
         <div class="footer-section"><h3>Dr. Agramonte</h3><p data-i18n="footer.especialista">Especialista en Medicina Interna</p><p data-i18n="footer.ubicacion">Palma de Mallorca, Islas Baleares</p></div>
-        <div class="footer-section"><h3 data-i18n="footer.contacto">Contacto</h3><a href="contacto.html"><i class="fas fa-envelope"></i> <span data-i18n="footer.formulario">Formulario de contacto</span></a><p><i class="fas fa-map-marker-alt"></i> Palma de Mallorca</p></div>
+        <div class="footer-section"><h3 data-i18n="footer.contacto">Contacto</h3><a href="contacto.html"><span data-i18n="footer.formulario">Formulario de contacto</span></a><p>Palma de Mallorca</p></div>
         <div class="footer-section"><h3 data-i18n="footer.horario">Horario</h3><p><strong data-i18n="footer.lunVie">Lunes a Viernes</strong><br>9:00 - 14:00<br>16:00 - 19:00</p><p><strong data-i18n="footer.sabado">Sábados</strong><br><span data-i18n="footer.sabadoHoras">9:00 - 13:00 (con cita)</span></p></div>
-        <div class="footer-section"><h3 data-i18n="footer.enlaces">Enlaces</h3><a href="sobre-mi.html"><i class="fas fa-user-md"></i> El Dr. Agramonte</a><a href="servicios.html"><i class="fas fa-stethoscope"></i> <span data-i18n="nav.servicios">Servicios</span></a><a href="testimonios.html"><i class="fas fa-star"></i> <span data-i18n="nav.testimonios">Testimonios</span></a><a href="contacto.html"><i class="fas fa-envelope"></i> <span data-i18n="nav.contacto">Contacto</span></a><a href="reservar.html"><i class="fas fa-calendar-plus"></i> <span data-i18n="nav.reservar">Reservar cita</span></a><a href="privacidad.html"><i class="fas fa-shield-alt"></i> <span data-i18n="footer.privacidad">Política de Privacidad</span></a></div>
+        <div class="footer-section"><h3 data-i18n="footer.enlaces">Enlaces</h3><a href="sobre-mi.html">El Dr. Agramonte</a><a href="servicios.html"><span data-i18n="nav.servicios">Servicios</span></a><a href="testimonios.html"><span data-i18n="nav.testimonios">Testimonios</span></a><a href="contacto.html"><span data-i18n="nav.contacto">Contacto</span></a><a href="reservar.html"><span data-i18n="nav.reservar">Reservar cita</span></a><a href="privacidad.html"><span data-i18n="footer.privacidad">Política de Privacidad</span></a></div>
     </div>
     <div class="footer-bottom"><p><span data-i18n="footer.copyright">© 2026 Dr. Juan Manuel Agramonte.</span> <a href="privacidad.html" data-i18n="footer.privacidad">Política de Privacidad</a></p></div>
 </footer>
