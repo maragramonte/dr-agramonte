@@ -14,6 +14,19 @@ COPY backend/pom.xml .
 COPY backend/src ./src
 # El frontend se empaqueta como recursos estáticos del backend (se sirve en /)
 COPY frontend ./src/main/resources/static
+
+# Las páginas del repositorio llevan el canonical, el sitemap y robots.txt de la demo
+# de GitHub Pages. En producción tienen que apuntar al dominio real, o Google tomaría
+# la demo por la web original. docker-compose.prod.yml pasa la URL pública; sin ella
+# (desarrollo, CI) las páginas se quedan como están.
+ARG URL_PUBLICA=
+RUN if [ -n "$URL_PUBLICA" ]; then \
+      case "$URL_PUBLICA" in https://*) ;; *) echo "URL_PUBLICA debe empezar por https://" >&2; exit 1 ;; esac; \
+      base="${URL_PUBLICA%/}"; \
+      find src/main/resources/static -maxdepth 1 \( -name '*.html' -o -name sitemap.xml -o -name robots.txt \) \
+        -exec sed -i "s#https://maragramonte.github.io/dr-agramonte/app#${base}#g" {} +; \
+    fi
+
 RUN mvn -DskipTests package
 
 # Mismo Java que compila y pasa las pruebas (JDK 21 en el CI). Un runtime más nuevo

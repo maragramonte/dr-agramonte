@@ -38,6 +38,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile # imagen combinada: frontend dentro del backend
+      args:
+        # canonical, sitemap.xml y robots.txt apuntan aquí y no a la demo de GitHub Pages
+        URL_PUBLICA: ${APP_URL_PUBLICA:-https://${DOMAIN_WWW}}
     image: dr-agramonte:prod
     container_name: agramonte_app
     restart: unless-stopped
