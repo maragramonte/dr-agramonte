@@ -21,11 +21,6 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://maragramonte.github.io/dr-agramonte/app/testimonios.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://maragramonte.github.io/dr-agramonte/app/contacto.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
