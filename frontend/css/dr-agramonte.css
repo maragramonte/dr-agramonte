@@ -131,6 +131,10 @@
        las letras no se peguen; apretarla tanto como la DM Sans le quitaría
        justo lo que la hace legible. */
     --tracking-title: -0.012em;
+
+    /* Petróleo: el color de las superficies oscuras (pie). El teal queda
+       solo para lo que se puede pulsar. */
+    --petroleo: #12404A;
 }
 
 /* Modo oscuro – activado con atributo data-theme */
@@ -2669,7 +2673,6 @@ a {
 
     .footer-content {
         grid-template-columns: 1fr;
-        text-align: center;
     }
 
     .social-links {
@@ -3252,13 +3255,66 @@ body {
     gap: var(--space-2);
 }
 
+/* ---- Pie en petróleo, alineado a la izquierda también en móvil ---- */
+.footer {
+    background: var(--petroleo);
+}
 
+.footer-section a:hover {
+    transform: none;
+    text-decoration: underline;
+}
+
+.footer-section a {
+    font-size: 1rem;
+}
 
 /* ---- Tamaños mínimos de lectura en controles ---- */
 .btn {
     font-size: 1rem;
 }
 
+.nav-link {
+    font-size: 1rem;
+}
+
+/* «Iniciar sesión» es un <button>: sin esto no hereda la letra del resto
+   del menú y salía más grande y más oscuro que sus vecinos. */
+button.nav-link {
+    font: inherit;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-light);
+    background: none;
+    border: 0;
+    cursor: pointer;
+}
+
+/* ---- Cabecera de las páginas interiores: título sobre papel ----
+   Fuera el degradado teal con brillo animado en bucle: era el único sitio
+   de la web con ese lenguaje y hacía que cada página interior pareciera de
+   otra plantilla. Ahora el título va igual que en la portada. */
+.page-hero {
+    background: var(--bg);
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    animation: none;
+}
+
+.page-hero::before,
+.page-hero h1::after {
+    content: none;
+}
+
+.page-hero h1 {
+    color: var(--heading);
+    font-weight: 700;
+    padding-bottom: 0;
+}
+
+.page-hero p {
+    color: var(--text-light);
+}
 
 /* ---- Cierre de portada en móvil: botones a todo el ancho y la reserva
    primero, que es lo que viene a hacer la mayoría. ---- */
@@ -3271,4 +3327,8 @@ body {
     .cierre-portada__acciones .btn {
         width: 100%;
     }
+}
+
+.page-hero a {
+    color: var(--teal);
 }
