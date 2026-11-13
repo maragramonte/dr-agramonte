@@ -4,7 +4,9 @@ COPY pom.xml .
 COPY src ./src
 RUN mvn -DskipTests package
 
-FROM eclipse-temurin:25-jre-jammy
+# Mismo Java que compila y pasa las pruebas (JDK 21 en el CI). Un runtime más nuevo
+# ejecutaría en producción una versión que ningún test ha probado.
+FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 COPY --from=build /workspace/target/*.jar app.jar
 EXPOSE 8080

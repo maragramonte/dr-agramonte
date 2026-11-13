@@ -1,8 +1,8 @@
 package com.saludybienestar.agramonte.service;
 
 import com.saludybienestar.agramonte.config.TelegramProperties;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -14,14 +14,21 @@ import java.util.Map;
  * false y deja traza en el log.
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class TelegramMessageService {
 
-    private static final String API_BASE = "https://api.telegram.org/bot";
-
     private final TelegramProperties telegram;
-    private final RestClient restClient = RestClient.create();
+    private final RestClient restClient;
+
+    public TelegramMessageService(TelegramProperties telegram) {
+        this.telegram = telegram;
+        // Tiempos máximos explícitos: por defecto el cliente HTTP puede esperar minutos,
+        // y este envío ocurre en el mismo hilo que atiende la reserva.
+        SimpleClientHttpRequestFactory http = new SimpleClientHttpRequestFactory();
+        http.setConnectTimeout(telegram.getConnectTimeout());
+        http.setReadTimeout(telegram.getReadTimeout());
+        this.restClient = RestClient.builder().requestFactory(http).build();
+    }
 
     public boolean send(String chatId, String body) {
         if (!telegram.isEnabled()) {
@@ -39,7 +46,7 @@ public class TelegramMessageService {
 
         try {
             restClient.post()
-                    .uri(API_BASE + telegram.getBotToken() + "/sendMessage")
+                    .uri(telegram.getApiBase() + "/bot" + telegram.getBotToken() + "/sendMessage")
                     .body(Map.of("chat_id", chatId.trim(), "text", body))
                     .retrieve()
                     .toBodilessEntity();

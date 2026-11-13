@@ -362,31 +362,80 @@ El volumen de Docker aguanta reinicios y actualizaciones, pero no un borrado por
 error ni la pérdida del servidor. Con datos de pacientes de por medio, esto no es
 opcional.
 
-**Copia manual:**
+Tres reglas: **cifrada**, **fuera del servidor** y **probada**. Una copia que solo
+vive en el VPS cae con él, y una que nunca se ha restaurado no se sabe si sirve.
+
+### 8.1 Preparar el cifrado (una vez, en tu ordenador)
+
+La clave privada **no va en el servidor**. Si alguien entra en el VPS, ve copias
+cifradas que no puede abrir.
+
+```bash
+# En tu ordenador (Ubuntu/Debian: sudo apt install age · macOS: brew install age)
+mkdir -p ~/.config/age
+age-keygen -o ~/.config/age/dr-agramonte.txt
+age-keygen -y ~/.config/age/dr-agramonte.txt     # imprime la clave pública: age1...
+```
+
+Guarda `dr-agramonte.txt` en tu gestor de contraseñas además de en el disco. **Sin
+ella no hay forma de recuperar ninguna copia.**
+
+### 8.2 Preparar el servidor
+
+```bash
+sudo apt install -y age rclone
+rclone config        # crea un remoto, p. ej. "copias", hacia otro proveedor o tu NAS
+```
+
+Y en `.env.prod`:
+
+```bash
+BACKUP_AGE_RECIPIENT=age1...            # la clave pública del paso anterior
+BACKUP_RCLONE_DESTINO=copias:dr-agramonte
+# RETENER=14                # copias que se quedan en el servidor
+# RETENER_REMOTO_DIAS=30    # días que se conservan en el remoto
+```
+
+El destino remoto debe estar en la UE y no ser el mismo proveedor del VPS. Con
+`BACKUP_RCLONE_DESTINO` y sin `BACKUP_AGE_RECIPIENT`, el script se niega a subir
+nada: fuera del servidor nunca sale una copia en claro.
+
+### 8.3 Copia manual y automática
 
 ```bash
 cd ~/dr-agramonte && ./scripts/backup-db.sh
 ```
 
-Deja `backups/dr_agramonte_AAAAMMDD_HHMMSS.sql.gz` y conserva las 14 últimas.
+Deja `backups/dr_agramonte_AAAAMMDD_HHMMSS.sql.gz.age`, la copia en el remoto y
+conserva las 14 últimas en el servidor. Sin las dos variables funciona como antes,
+pero avisa de que la copia queda sin cifrar y solo en el servidor.
 
-**Copia automática cada noche.** Con `crontab -e`, añade:
+**Cada noche**, con `crontab -e`:
 
 ```cron
 30 3 * * * cd /home/mar/dr-agramonte && ./scripts/backup-db.sh >> /home/mar/backup.log 2>&1
 ```
 
-**Bájatelas a tu ordenador de vez en cuando.** Una copia que solo vive en el
-servidor no te salva si pierdes el servidor:
+### 8.4 Restauración de prueba (una vez al mes)
+
+En tu ordenador, que es donde está la clave privada. Necesita Docker y age, y no
+toca producción: carga la copia en un PostgreSQL temporal y lo borra al acabar.
 
 ```bash
-scp mar@LA_IP:~/dr-agramonte/backups/*.sql.gz ./backups/
+rclone copy copias:dr-agramonte/dr_agramonte_AAAAMMDD_HHMMSS.sql.gz.age ./
+./scripts/probar-restauracion.sh dr_agramonte_AAAAMMDD_HHMMSS.sql.gz.age ~/.config/age/dr-agramonte.txt
 ```
 
-**Restaurar** un volcado:
+Tiene que terminar con `Restauración correcta` y el número de usuarios y citas. Si
+falla, la copia no sirve: arréglalo antes de que haga falta.
+
+### 8.5 Restaurar en producción
+
+Solo cuando haga falta de verdad. Descifra en tu ordenador, sube el `.sql.gz` por
+`scp` y bórralo del servidor al terminar:
 
 ```bash
-gunzip -c backups/dr_agramonte_AAAAMMDD_HHMMSS.sql.gz | \
+gunzip -c dr_agramonte_AAAAMMDD_HHMMSS.sql.gz | \
   docker compose --env-file .env.prod -f docker-compose.prod.yml \
   exec -T postgres psql -U agramonte -d dr_agramonte
 ```

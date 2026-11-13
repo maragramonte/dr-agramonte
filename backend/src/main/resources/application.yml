@@ -13,6 +13,11 @@ spring:
           auth: ${MAIL_SMTP_AUTH:true}
           starttls:
             enable: ${MAIL_SMTP_STARTTLS:true}
+          # Sin esto JavaMail espera para siempre. Los correos salen en el hilo de la
+          # petición: un SMTP colgado dejaba colgadas reservas, altas y recuperaciones.
+          connectiontimeout: 5000
+          timeout: 10000
+          writetimeout: 10000
   jackson:
     serialization:
       write-dates-as-timestamps: false
