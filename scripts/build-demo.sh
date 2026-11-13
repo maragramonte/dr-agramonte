@@ -42,22 +42,22 @@ rm -f "$APP/nginx.conf" "$APP/service-worker.js" "$APP/sitemap.xml" "$APP/robots
 # siendo válidas bajo app/ porque se resuelven contra el propio manifest.
 sed -i -e 's#"start_url": *"/"#"start_url": "./"#' -e 's#"/icons/#"icons/#g' "$APP/manifest.json"
 
-# El panel del médico habla de "reservas reales en el servidor": en la demo no lo son.
-# La última sustitución es la del <meta description>, que no se ve en pantalla pero
-# acompaña a la página si alguien comparte el enlace.
+# La agenda del médico habla de reservas "guardadas en el servidor": en la demo son
+# ficticias y viven en el navegador. La última sustitución es la del <meta
+# description>, que no se ve en pantalla pero acompaña a la página si se comparte.
 sed -i \
-    -e 's#<strong>todas las reservas reales</strong> guardadas en el servidor#<strong>todas las reservas de la demo</strong> (ficticias, guardadas en tu navegador)#' \
-    -e 's#Cada fila es una cita creada en base de datos (pruebas de integración, demos del tribunal, reservas de pacientes registrados)\.#Cada fila es una cita ficticia de la demo, más las que reserves tú desde reservar.html.#' \
-    -e 's#reservas reales y vista del acceso médico#reservas ficticias de demo y vista del acceso médico#' \
+    -e 's#<strong>todas las reservas</strong> guardadas en el servidor#<strong>todas las reservas de la demo</strong> (ficticias, guardadas en tu navegador)#' \
+    -e 's#Cada fila es una cita guardada en el servidor\.#Cada fila es una cita ficticia de la demo, más las que reserves tú desde reservar.html.#' \
+    -e 's#Agenda del médico: reservas y pacientes con cita\.#Agenda del médico en la demo: reservas ficticias y pacientes con cita.#' \
     "$APP/panel-pruebas.html"
-for marca in 'reservas de la demo' 'cita ficticia de la demo' 'reservas ficticias de demo'; do
+for marca in 'reservas de la demo' 'cita ficticia de la demo' 'reservas ficticias'; do
     grep -q "$marca" "$APP/panel-pruebas.html" ||
         { echo "✗ no se pudo adaptar el texto de panel-pruebas.html: falta «$marca»" >&2; exit 1; }
 done
 # Con «set -e», esta comprobación tiene que ir en un if: un grep sin coincidencias
 # devuelve 1, y en una lista «&&» eso abortaría el script justo cuando todo va bien.
-if grep -q 'reservas reales' "$APP/panel-pruebas.html"; then
-    echo "✗ queda texto de «reservas reales» en panel-pruebas.html" >&2
+if grep -q 'guardadas en el servidor' "$APP/panel-pruebas.html"; then
+    echo "✗ queda texto de «guardadas en el servidor» en panel-pruebas.html" >&2
     exit 1
 fi
 

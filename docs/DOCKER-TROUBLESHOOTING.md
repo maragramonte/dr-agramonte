@@ -22,7 +22,7 @@ Deberías ver `postgres`, `backend` y `frontend` en estado **Up**.
 | http://localhost | Web (nginx) |
 | http://localhost:8080/actuator/health | API directa |
 | http://localhost/reservar.html | Reserva + «Mis citas» (sincroniza con BD) |
-| http://localhost/panel-pruebas.html | Panel TFG (mismas reservas que el API) |
+| http://localhost/panel-pruebas.html | Agenda del médico (mismas reservas que el API; en el menú solo con sesión de médico) |
 
 Tras cambiar código de reservas: `docker compose up -d --build backend` y recarga forzada en el navegador (Ctrl+Shift+R). Ver [SINCRONIZACION-CITAS.md](SINCRONIZACION-CITAS.md).
 

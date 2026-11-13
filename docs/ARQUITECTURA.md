@@ -72,8 +72,8 @@ Tipografías, iconos y Chart.js están autoalojados en `frontend/vendor/`. Eso e
 permite servir una Content-Security-Policy sin `'unsafe-inline'` en los scripts
 (`Caddyfile`): un tercero colado por descuido deja de cargar en vez de pasar inadvertido.
 
-Por el mismo motivo, cuatro ficheros de `js/pages/` (`index-preload`, `privacidad`,
-`offline-menu`, `offline-reconexion`) existen como ficheros separados: era JavaScript que
+Por el mismo motivo, tres ficheros de `js/pages/` (`privacidad`, `offline-menu`,
+`offline-reconexion`) existen como ficheros separados: era JavaScript que
 estaba embebido en el HTML y hubo que sacarlo para poder aplicar esa CSP.
 
 ### PWA
