@@ -24,13 +24,13 @@ lugar de fallar (`@Testcontainers(disabledWithoutDocker = true)`).
 
 ## El conjunto, en números
 
-**128 pruebas** en 19 clases. El recuento sale de contar las anotaciones `@Test` y
+**130 pruebas** en 20 clases. El recuento sale de contar las anotaciones `@Test` y
 `@ParameterizedTest` del árbol `backend/src/test`.
 
 | Nivel | Pruebas | Qué verifica | Necesita Docker |
 |-------|---------|--------------|-----------------|
-| Unitarias de servicio y componentes | 75 | Lógica de negocio aislada, con dobles de prueba | No |
-| Web (`@WebMvcTest`) | 31 | Capa REST con la `SecurityConfig` real: roles, códigos, validación | No |
+| Unitarias de servicio y componentes | 76 | Lógica de negocio aislada, con dobles de prueba | No |
+| Web (`@WebMvcTest`) | 32 | Capa REST con la `SecurityConfig` real: roles, códigos, validación | No |
 | Integración (Testcontainers) | 22 | El sistema completo contra un PostgreSQL real | **Sí** |
 
 ### Las de integración, una a una
@@ -101,6 +101,13 @@ ninguno toca lo que usa el backend: dependen de WebFlux, RSocket, SSE, SpEL, LDA
 DPoP o XsltView. Cada supresión explica su motivo, solo vale para la versión exacta del jar y
 caduca el 10/02/2027, cuando el análisis vuelve a fallar para obligar a revisarla. La solución
 de fondo es migrar a Spring Boot 4.
+
+**Semgrep y gitleaks.** Cada PR a `main` pasa por Semgrep Community Edition con las reglas
+públicas de Java y de secretos ([`.github/workflows/semgrep.yml`](../.github/workflows/semgrep.yml)).
+De momento solo informa: deja el resultado en el resumen del run y no bloquea el merge
+hasta ver cuánto ruido mete. Los lunes, junto a OWASP, gitleaks revisa todo el historial de
+git, no solo el último commit, porque una clave borrada sigue en el historial de un repo
+público. Los falsos positivos revisados están en `.gitleaksignore`, uno a uno por huella.
 
 ---
 
@@ -183,7 +190,7 @@ cobertura que no se corresponde:
 
 Por orden de lo que más valor daría:
 
-1. **JaCoCo en el CI**, con un umbral que falle si baja. Convierte «hay 128 pruebas» en un
+1. **JaCoCo en el CI**, con un umbral que falle si baja. Convierte «hay 130 pruebas» en un
    dato comprobable.
 2. **Más pruebas E2E.** La reserva sin cuenta ya está. Falta el otro flujo que más duele si
    se rompe: volver a la cita desde el enlace del correo y cancelarla.
