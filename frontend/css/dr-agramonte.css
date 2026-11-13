@@ -255,17 +255,6 @@ a {
     }
 }
 
-@keyframes fadeInRight {
-    from {
-        opacity: 0;
-        transform: translateX(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
 @keyframes scaleIn {
     from {
         opacity: 0;
@@ -288,15 +277,6 @@ a {
     }
 }
 
-@keyframes gentleFloat {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-8px);
-    }
-}
-
 @keyframes pulseMedical {
     0% {
         box-shadow: 0 0 0 0 rgba(15, 118, 110, 0.4);
@@ -307,28 +287,6 @@ a {
     100% {
         box-shadow: 0 0 0 0 rgba(15, 118, 110, 0);
     }
-}
-
-@keyframes heartbeat {
-    0%, 100% { transform: scale(1); }
-    25% { transform: scale(1.12); }
-    35% { transform: scale(1.08); }
-    45% { transform: scale(1.12); }
-}
-
-/* Clases utilitarias de animación */
-.animate-heartbeat {
-    animation: heartbeat 1.2s ease-in-out infinite;
-    display: inline-block;
-}
-
-.animate-pulse-medical {
-    animation: pulseMedical 1.5s infinite;
-    border-radius: 50%;
-}
-
-.animate-float {
-    animation: gentleFloat 3s ease-in-out infinite;
 }
 
 /* Reveal en scroll (se activa con JS añadiendo clase .revealed) */
@@ -342,122 +300,9 @@ a {
     opacity: 1;
     transform: translateY(0);
 }
-
-/* ========== COMPONENTES FALTANTES ========== */
-
-/* Enlaces dentro de cards */
-.card__link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    margin-top: var(--space-3);
-    font-weight: 600;
-    color: var(--teal);
-    transition: var(--transition-fast);
-}
-.card__link i {
-    transition: transform 0.2s;
-}
-.card__link:hover {
-    gap: 0.6rem;
-    color: var(--heading);
-}
-.card__link:hover i {
-    transform: translateX(4px);
-}
-
-/* Sección "Sobre mí" resumen (index) */
-.sobre-mi-resumen .sobre-mi-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-5);
-    align-items: stretch;
-}
-@media (max-width: 48em) {
-    .sobre-mi-resumen .sobre-mi-content {
-        grid-template-columns: 1fr;
-    }
-}
-.valores-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    margin: var(--space-4) 0;
-}
-.valor-item {
-    display: flex;
-    gap: var(--space-3);
-    padding: var(--space-2);
-    background: var(--card);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
-}
-.valor-item i {
-    font-size: 1.5rem;
-    color: var(--teal);
-    flex-shrink: 0;
-}
-.valor-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--heading);
-}
-.valor-text {
-    font-size: 0.85rem;
-    color: var(--text-light);
-}
-
-/* CTA final (index) */
-.cta-section {
-    background: linear-gradient(135deg, var(--teal-pale), var(--teal-glow));
-    padding: var(--space-5) 0;
-}
-.cta-content {
-    max-width: var(--maxw);
-    margin: 0 auto;
-    text-align: center;
-}
-.cta-title {
-    font-family: var(--font-display);
-    font-weight: 600;
-    letter-spacing: var(--tracking-title);
-    font-size: 1.8rem;
-    color: var(--heading);
-}
 .cta-text {
     color: var(--text-light);
     margin-bottom: var(--space-4);
-}
-.grid--cta {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
-    gap: var(--space-4);
-    margin-top: var(--space-4);
-}
-.cta-option {
-    background: var(--card);
-    border-radius: var(--radius-lg);
-    padding: var(--space-4);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
-    transition: var(--transition);
-}
-.cta-option:hover {
-    transform: translateY(-4px);
-    border-color: var(--teal);
-}
-.cta-option__icon {
-    font-size: 2rem;
-    color: var(--teal);
-    margin-bottom: var(--space-2);
-}
-.cta-option__title {
-    font-size: 1.1rem;
-    color: var(--heading);
-}
-.cta-option__action {
-    margin-top: var(--space-3);
 }
 
 /* Servicios – detalles y proceso */
@@ -646,7 +491,6 @@ a {
     content: none;
 }
 
-.section-subtitle,
 .section__subtitle {
     font-size: clamp(0.95rem, 2vw, 1.1rem);
     color: var(--text-light);
@@ -765,7 +609,6 @@ a {
     padding: clamp(1.75rem, 5vw, 2.5rem) 0;
 }
 
-.page-hero i.fa,
 .page-hero h1 i {
     margin-right: 0.35rem;
     opacity: 0.95;
@@ -793,27 +636,9 @@ a {
     gap: var(--space-4);
 }
 
-.grid--2 {
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
-}
-
-.grid--3 {
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-}
-
 /* Rejilla de servicios (index): mosaico responsivo de tarjetas iguales */
 .grid--services {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
-}
-
-/* Tarjeta de servicio: misma altura y botón anclado abajo para una
-   cuadrícula limpia y alineada (estilo mosaico moderno). */
-.card--service {
-    display: flex;
-    flex-direction: column;
-}
-.card--service .btn {
-    margin-top: auto;
 }
 
 /* ========== 6. HEADER Y NAVEGACIÓN (sticky + menú completo) ==========
@@ -860,27 +685,6 @@ a {
        Por debajo de 992px sí se le deja ceder (ver más abajo), porque allí la
        barra de destinos está oculta y el logo es lo único que puede dar. */
     flex-shrink: 0;
-}
-
-.logo-icon {
-    /* Insignia de tamaño fijo: sin esto el flex la aplastaba (31,7px en vez de
-       los 34 que le tocan) al pelear por el sitio en pantallas de 320px. */
-    flex-shrink: 0;
-    width: 48px;
-    height: 48px;
-    background: linear-gradient(135deg, var(--teal-fill) 0%, var(--teal-fill-light) 100%);
-    border-radius: var(--radius);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.3rem;
-    font-weight: 600;
-    transition: var(--transition-fast);
-}
-
-.logo-link:hover .logo-icon {
-    transform: scale(1.08);
 }
 
 .logo-text .logo-title {
@@ -1310,12 +1114,6 @@ a {
         gap: var(--space-4);
     }
 
-    .logo-icon {
-        width: 56px;
-        height: 56px;
-        font-size: 1.5rem;
-    }
-
     .logo-text .logo-title {
         font-size: 1.5rem;
     }
@@ -1465,12 +1263,6 @@ a {
         padding: 0.55rem 0.7rem;
     }
 
-    .logo-icon {
-        width: 38px;
-        height: 38px;
-        font-size: 1.1rem;
-    }
-
     .logo-text .logo-title {
         font-size: 1.05rem;
     }
@@ -1490,12 +1282,6 @@ a {
 @media (max-width: 22.5em) {
     .header-content {
         gap: 0.4rem;
-    }
-
-    .logo-icon {
-        width: 34px;
-        height: 34px;
-        font-size: 1rem;
     }
 
     .logo-text .logo-title {
@@ -1550,10 +1336,6 @@ a {
     font-size: 1rem;
 }
 
-.btn--full {
-    width: 100%;
-}
-
 /* Grupos de botones y enlaces de acción: más aire para que no se vean
    apretados (evita la sensación de agobio). */
 .btn-row {
@@ -1563,22 +1345,6 @@ a {
     justify-content: flex-start;
     gap: var(--space-3);
     margin-top: var(--space-4);
-}
-.section-footer {
-    margin-top: var(--space-5);
-    text-align: center;
-}
-.sobre-mi-actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: flex-start;
-    gap: var(--space-3);
-    margin-top: var(--space-4);
-}
-/* En las tarjetas de servicio, separación garantizada texto -> botón */
-.card--service .card__text {
-    margin-bottom: var(--space-3);
 }
 
 /* Botón de reserva unificado en todo el sitio */
@@ -1593,36 +1359,6 @@ a {
     transform: translateY(-2px);
     box-shadow: var(--shadow);
     color: #fff;
-}
-
-.nav-link--reserva {
-    background: linear-gradient(135deg, var(--teal-fill) 0%, var(--teal-fill-light) 100%) !important;
-    color: #fff !important;
-    font-weight: 600;
-    box-shadow: var(--shadow-sm);
-}
-
-.nav-link--reserva:hover {
-    color: #fff !important;
-    transform: translateY(-1px);
-    box-shadow: var(--shadow);
-}
-
-.nav-link--reserva.active::after {
-    display: none;
-}
-
-.nav-link--panel {
-    font-weight: 600;
-    color: var(--teal) !important;
-}
-
-.nav-link--panel:hover {
-    color: var(--heading) !important;
-}
-
-.nav-link--panel.active::after {
-    display: none;
 }
 
 /* ========== 8. CARDS – con hover elegante ========== */
@@ -1641,25 +1377,6 @@ a {
     transform: translateY(-4px);
 }
 
-.card__icon {
-    width: 56px;
-    height: 56px;
-    background: rgba(15, 118, 110, 0.08);
-    border-radius: var(--radius);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.6rem;
-    color: var(--teal);
-    margin-bottom: var(--space-3);
-    transition: var(--transition-fast);
-}
-
-.card:hover .card__icon {
-    background: rgba(15, 118, 110, 0.12);
-    transform: scale(1.08);
-}
-
 .card__title {
     font-size: 1.2rem;
     color: var(--heading);
@@ -1673,8 +1390,6 @@ a {
     color: var(--text-light);
     line-height: 1.7;
 }
-
-/* ========== 9. HERO – el gancho visual ========== */
 /* ========== HERO — el calendario dentro del hero ==========
    Antes el hero era una banda de degradado teal con la foto del doctor
    sangrando por la derecha y un boton que llevaba a reservar.html. Era
@@ -1785,31 +1500,6 @@ a {
     display: grid;
     place-items: center;
     font-size: 0.6rem;
-}
-
-/* Los datos que identifican la consulta de un vistazo. */
-.hero-facts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3) var(--space-4);
-    list-style: none;
-    margin: 0;
-    padding: var(--space-3) 0 0;
-    border-top: 1px solid var(--border);
-}
-
-.hero-facts li {
-    font-size: 0.85rem;
-    color: var(--muted);
-}
-
-.hero-facts b {
-    display: block;
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: var(--heading);
-    letter-spacing: var(--tracking-title);
-    line-height: 1.2;
 }
 
 /* ========== El selector de cita del hero ==========
@@ -2033,40 +1723,6 @@ a.hw-option:hover {
 }
 
 /* ========== 10. TESTIMONIOS – glassmorphismo elegante ========== */
-.testimonios-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
-    gap: var(--space-4);
-}
-
-.testimonial-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-xl);
-    padding: var(--space-4);
-    transition: var(--transition);
-    position: relative;
-    overflow: hidden;
-}
-
-.testimonial-card:hover {
-    transform: translateY(-6px);
-    border-color: var(--teal);
-    box-shadow: var(--shadow-glass);
-}
-
-.testimonial-card::before {
-    content: '"';
-    position: absolute;
-    top: -20px;
-    right: 20px;
-    font-size: 6rem;
-    color: var(--silver);
-    opacity: 0.3;
-    font-family: Georgia, serif;
-    pointer-events: none;
-}
 
 .testimonial__header {
     display: flex;
@@ -2238,25 +1894,12 @@ a.hw-option:hover {
 }
 
 /* ========== 12. RESERVAS PRO – sistema tipo Calendly ========== */
-.reserva-wrapper {
-    max-width: var(--maxw);
-    margin: 0 auto;
-    padding: var(--space-4) var(--space-3);
-}
 
 @media (min-width: 64em) {
     .reserva-grid {
         grid-template-columns: 1.2fr 0.8fr;
         align-items: start;
     }
-}
-
-.reserva-card {
-    background: var(--card);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
-    padding: var(--space-4);
 }
 
 /* Stepper – indicador de progreso */
@@ -2309,34 +1952,6 @@ a.hw-option:hover {
 /* Calendario – diseño limpio */
 .calendar {
     width: 100%;
-}
-
-.calendar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-2);
-}
-
-.calendar-title {
-    font-family: var(--font-display);
-    font-weight: 600;
-    letter-spacing: var(--tracking-title);
-    font-size: 1.1rem;
-}
-
-.calendar-nav {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--teal);
-    font-size: 1rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: var(--radius-sm);
-}
-
-.calendar-nav:hover {
-    background: var(--teal-pale);
 }
 
 .cal-day:hover:not(:disabled) {
@@ -2411,98 +2026,7 @@ a.hw-option:hover {
     cursor: not-allowed;
 }
 
-/* Formulario de datos */
-.form-pro {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    margin-top: var(--space-4);
-}
-
-.input-pro {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.input-pro label {
-    font-size: 0.8rem;
-    font-weight: 600;
-}
-
-.input-pro input,
-.input-pro select,
-.input-pro textarea {
-    padding: 0.65rem;
-    border-radius: var(--radius);
-    border: 1.5px solid var(--border);
-    background: var(--card);
-    transition: var(--transition-fast);
-}
-
-.input-pro input:focus {
-    border-color: var(--teal);
-    outline: none;
-    box-shadow: 0 0 0 3px var(--teal-glow);
-}
-
-/* Resumen sticky */
-.reserva-side {
-    position: sticky;
-    top: 90px;
-}
-
-.summary-pro {
-    background: var(--card);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border);
-    padding: var(--space-3);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-}
-
-.summary-item {
-    font-size: 0.85rem;
-    padding: var(--space-1) 0;
-    border-bottom: 1px dashed var(--border);
-    display: flex;
-    justify-content: space-between;
-}
-
-.summary-item strong {
-    color: var(--heading);
-}
-
-.btn-reserva {
-    width: 100%;
-    margin-top: var(--space-3);
-    padding: 0.85rem;
-    border-radius: var(--radius-full);
-    background: linear-gradient(135deg, var(--teal-fill), var(--teal-fill-light));
-    color: white;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.btn-reserva:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow);
-}
-
 /* ========== 13. POLÍTICA DE PRIVACIDAD ========== */
-.privacy-hero {
-    background: linear-gradient(135deg, var(--teal-fill) 0%, var(--teal-fill-light) 100%);
-    color: white;
-    padding: 3rem var(--space-3) 4rem;
-    text-align: center;
-    border-radius: var(--radius-lg);
-    margin-bottom: var(--space-6);
-    position: relative;
-    overflow: hidden;
-}
 
 .privacy-grid {
     display: grid;
@@ -2590,28 +2114,6 @@ a.hw-option:hover {
     transform: translateX(3px);
 }
 
-.social-links {
-    display: flex;
-    gap: var(--space-2);
-    margin-top: var(--space-2);
-}
-
-.social-link {
-    width: 36px;
-    height: 36px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-full);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: var(--transition-fast);
-}
-
-.social-link:hover {
-    background: var(--teal);
-    transform: translateY(-3px);
-}
-
 .footer-bottom {
     text-align: center;
     padding-top: var(--space-3);
@@ -2622,21 +2124,6 @@ a.hw-option:hover {
 /* ========== 16. UTILIDADES ========== */
 .text-center {
     text-align: center;
-}
-
-.mt-1 { margin-top: var(--space-1); }
-.mt-2 { margin-top: var(--space-2); }
-.mb-1 { margin-bottom: var(--space-1); }
-.mb-2 { margin-bottom: var(--space-2); }
-
-.loading-spinner {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 2px solid var(--border);
-    border-top-color: var(--teal);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
@@ -2676,20 +2163,8 @@ a.hw-option:hover {
         --space-6: 2.5rem;
     }
 
-    .hero-actions {
-        flex-direction: column;
-    }
-
-    .hero-actions .btn {
-        width: 100%;
-    }
-
     .footer-content {
         grid-template-columns: 1fr;
-    }
-
-    .social-links {
-        justify-content: center;
     }
 
     .reserva-grid {
@@ -2748,7 +2223,6 @@ a.hw-option:hover {
     }
 }
 
-
 .sobre-mi-imagen {
     position: relative;
     max-width: 400px;
@@ -2762,13 +2236,9 @@ a.hw-option:hover {
     aspect-ratio: 4 / 5;
     transition: var(--transition);
 }
-
-/* La foto rellena y se centra en la tarjeta 4:5 (igual que el hero de inicio);
-   sin esto la imagen apaisada deja un bloque vacío de tarjeta debajo. */
 /* <picture> solo elige el formato (WebP o PNG): que no cuente como caja, para que
    la imagen siga midiéndose contra la tarjeta y la figura como antes. */
-.sobre-mi-imagen picture,
-.sobre-mi-retrato picture {
+.sobre-mi-imagen picture {
     display: contents;
 }
 
@@ -2848,24 +2318,14 @@ a.hw-option:hover {
     border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
 }
 
-.cta-section {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    margin-top: var(--space-5);
-    padding-top: var(--space-4);
-    border-top: 1px solid var(--border);
-}
-
 /* ========== 19. PRINT – para cuando imprimen la política ========== */
 @media print {
     .main-header,
-    .footer,
-    .nav-toggle,
-    .mega-menu,
-    .hero-actions,
-    .btn,
-    .btn-enviar {
+.footer,
+.nav-toggle,
+.mega-menu,
+.btn,
+.btn-enviar {
         display: none !important;
     }
 
@@ -2886,7 +2346,6 @@ a.hw-option:hover {
         padding: 0;
     }
 }
-
 
 /* ============================================================
    PORTADA — el mismo eje asimetrico del hero en el resto de la pagina.
@@ -2910,7 +2369,6 @@ a.hw-option:hover {
 /* (El filete bajo los titulos de seccion ya no existe; antes aqui se movia
    a la izquierda para las paginas interiores.) */
 
-.section-subtitle,
 .section__subtitle {
     margin-left: 0;
     margin-right: 0;
@@ -2931,56 +2389,6 @@ a.hw-option:hover {
         grid-template-columns: repeat(3, 1fr);
         align-items: stretch;
     }
-
-    /* El enlace de "ver todos" cae al lado contrario del titulo. */
-    .home .section-footer {
-        text-align: right;
-    }
-}
-
-/* Sobre el doctor: manda la columna de texto y las cifras van al lado,
-   arrancando a la misma altura (antes las pares bajaban otro escalon). */
-@media (min-width: 56.25em) {
-    .home .sobre-mi-resumen .sobre-mi-content {
-        grid-template-columns: 1.4fr 0.9fr;
-        align-items: start;
-    }
-
-    .home .sobre-mi-stats {
-        align-content: start;
-    }
-}
-
-/* Llamada final: un bloque compacto en teal oscuro, centrado.
-
-   Antes era el titular a un lado y las dos opciones apiladas al otro sobre
-   una banda de degradado verde palido. A ancho completo dejaba media
-   pantalla vacia a la izquierda —las tarjetas solo llenaban la columna
-   derecha— y el degradado palido no llegaba a leerse como un cierre: la
-   pagina se desvanecia en vez de terminar.
-
-   Ahora el bloque es una pieza oscura con aire alrededor, las dos opciones
-   van en fila y el contraste marca el final del recorrido. Ademas deshace
-   el display:flex que le cae encima de la segunda regla .cta-section del
-   fichero (ver L2324), pensada para otro componente. */
-.home .cta-section {
-    display: block;
-    background: none;
-    margin-top: 0;
-    padding: clamp(2rem, 5vw, 3.5rem) 0;
-    border-top: 0;
-}
-
-.home .cta-content {
-    background: var(--teal-dark);
-    color: #fff;
-    border-radius: var(--radius-lg);
-    padding: clamp(2rem, 5vw, 3rem);
-    text-align: center;
-}
-
-.home .cta-title {
-    color: #fff;
 }
 
 .home .cta-text {
@@ -2990,31 +2398,6 @@ a.hw-option:hover {
     margin-left: auto;
     margin-right: auto;
 }
-
-@media (min-width: 43.75em) {
-    .home .grid--cta {
-        grid-template-columns: repeat(2, 1fr);
-        max-width: 42rem;
-        margin-left: auto;
-        margin-right: auto;
-    }
-}
-
-/* Las dos tarjetas siguen siendo de papel blanco dentro del bloque oscuro,
-   asi que tienen que recuperar la tinta: el color: #fff de .cta-content se
-   heredaba hasta el texto de dentro y lo dejaba blanco sobre blanco. */
-.home .cta-option {
-    color: var(--text);
-}
-
-.home .cta-option__title {
-    color: var(--heading);
-}
-
-.home .cta-option__text {
-    color: var(--text-light);
-}
-
 
 /* ============================================================
    PAGINAS INTERIORES — el mismo eje que la portada.
@@ -3061,12 +2444,6 @@ a.hw-option:hover {
         align-items: stretch;
     }
 
-    /* Testimonios: una sola columna, sin sangrar los pares un 8% por la
-       izquierda. El zigzag rompia el eje de lectura y dejaba el bloque
-       con el margen derecho dentado. */
-
-    /* La banda de cifras, alineada (antes las pares bajaban 2rem). */
-
     /* Sobre el doctor y contacto: asimetricas, que eso si funciona —una
        columna manda y la otra acompana—, pero las dos arrancan arriba. */
     .sobre-mi-layout {
@@ -3084,30 +2461,6 @@ a.hw-option:hover {
         grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
     }
 }
-
-
-/* ============================================================
-   RETRATO DEL DOCTOR (portada)
-
-   Sustituye a la rejilla de cuatro cifras que ocupaba esta columna. La foto
-   se recorta por arriba: es un retrato de medio cuerpo y, encuadrado al
-   centro, la cara quedaba en el tercio superior con medio metro de bata
-   debajo.
-   ============================================================ */
-.sobre-mi-retrato {
-    margin: 0;
-}
-
-.sobre-mi-retrato img {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 3 / 4;
-    object-fit: cover;
-    object-position: top center;
-    border-radius: var(--radius-lg);
-    display: block;
-}
-
 
 /* ============================================================
    DIRECCIÓN VISUAL v3 — legibilidad primero

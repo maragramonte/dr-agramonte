@@ -1,7 +1,6 @@
 /* Páginas auxiliares – privacidad, panel TFG, offline */
 /* --- Privacidad --- */
 /* Estilos originales de privacidad.html – se mantienen igual, solo se ajusta el header */
-        .privacidad-badge,
         .page-hero-badge { display: inline-flex; align-items: center; gap: 0.8rem; }
         .toc-container { background: var(--card); border-radius: var(--radius-lg); padding: var(--space-3) var(--space-4); margin-bottom: var(--space-5); border: 1px solid var(--gray-200); }
         .toc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr)); gap: 0.5rem; }
@@ -71,24 +70,6 @@
         .empty-msg {
             text-align: center; padding: 2rem; color: var(--gray-500);
             background: var(--gray-50); border-radius: var(--radius-lg); margin-top: 1rem;
-        }
-        .acceso-card {
-            background: var(--card); border: 1px solid var(--gray-200);
-            border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem;
-        }
-        .acceso-card h3 { font-size: 1rem; color: var(--teal); margin-bottom: .75rem; }
-        .acceso-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
-        }
-        @media (max-width: 48em) { .acceso-grid { grid-template-columns: 1fr; } }
-        .acceso-list { list-style: none; font-size: .82rem; }
-        .acceso-list li {
-            padding: .45rem 0; border-bottom: 1px solid var(--gray-100);
-            display: flex; gap: .5rem; align-items: flex-start;
-        }
-        .acceso-list code {
-            font-size: .72rem; background: var(--gray-100); padding: .15rem .4rem;
-            border-radius: 4px; white-space: nowrap;
         }
         .medico-layout {
             display: grid; grid-template-columns: 260px 1fr; gap: 1rem;
@@ -192,7 +173,6 @@ body.offline-page {
 
 [data-theme="dark"] .stat-box,
 [data-theme="dark"] .table-wrap,
-[data-theme="dark"] .acceso-card,
 [data-theme="dark"] .medico-list,
 [data-theme="dark"] .medico-detail,
 [data-theme="dark"] .field-inline select {
