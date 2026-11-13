@@ -22,3 +22,8 @@ updates:
       - /backend
     schedule:
       interval: monthly
+    # El runtime va en Java 21, el mismo con el que se prueba. Subir de mayor es una
+    # decisión que va junto al JDK del CI y del pom, no una actualización suelta.
+    ignore:
+      - dependency-name: "eclipse-temurin"
+        update-types: ["version-update:semver-major"]
