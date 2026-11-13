@@ -461,7 +461,7 @@ class ThemeToggle {
         }
 
         const meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) meta.setAttribute('content', t === 'dark' ? '#0f172a' : '#0ea5a5');
+        if (meta) meta.setAttribute('content', t === 'dark' ? '#0f172a' : '#0F766E');
     }
 
     _ensureButton() {
@@ -515,7 +515,7 @@ class Accesibilidad {
             position:absolute; top:0; left:0; transform:translateY(-110%);
             background:var(--teal-fill); color:#fff;
             padding:8px 16px; z-index:9999;
-            border-radius:0 0 8px 0; transition:top .2s;
+            border-radius:0 0 8px 0; transition:transform .2s;
             text-decoration:none; font-weight:600;
         `;
         // Con translate y no con top en píxeles: si el paciente agranda la letra,

@@ -65,7 +65,7 @@
         'footer.copyright': '© 2026 Dr. Juan Manuel Agramonte.',
 
         // ---- Inicio ----
-        'home.eyebrow': 'Medicina Interna · Palma de Mallorca',
+        'home.eyebrow': 'Medicina Interna a Palma de Mallorca',
         'home.hero.title': 'La seva cita amb el Dr. Agramonte, en un minut.',
         'home.hero.subtitle': "Triï centre, dia i hora sobre l'agenda real del doctor. Sense trucar, sense registrar-se i sense esperar confirmació.",
         'home.tick.1': "Rep per correu l'enllaç per consultar o anul·lar la seva cita",

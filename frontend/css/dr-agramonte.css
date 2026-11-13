@@ -3346,6 +3346,104 @@ button.nav-link {
     color: var(--teal);
 }
 
+/* ---- Servicios (página): las mismas filas que en la portada ----
+   Cinco tarjetas en una rejilla de tres dejaban un hueco en la segunda fila
+   y cinco botones verdes iguales. En filas, el nombre manda, la explicación
+   se lee a su lado y los detalles se despliegan sin salir de la fila. */
+.servicios-grid.servicios-grid--filas {
+    display: block;
+    border-top: 1px solid var(--border);
+}
+
+.servicios-grid--filas .servicio-card {
+    display: grid;
+    gap: 0.35rem 2rem;
+    padding: 1.75rem 0;
+    border-bottom: 1px solid var(--border);
+    background: none;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+.servicios-grid--filas .card__title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--heading);
+    letter-spacing: var(--tracking-title);
+    margin: 0;
+}
+
+.servicios-grid--filas .card__text {
+    color: var(--text);
+    margin: 0;
+}
+
+.servicios-grid--filas .help {
+    color: var(--text-light);
+    margin: 0;
+}
+
+.servicios-grid--filas .servicio-acciones {
+    margin: 0;
+}
+
+.servicios-grid--filas .servicio-fila__accion {
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
+    font-weight: 700;
+    color: var(--teal);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.3em;
+}
+
+@media (min-width: 56.25em) {
+    .servicios-grid--filas .servicio-card {
+        grid-template-columns: minmax(15rem, 1fr) minmax(0, 1.7fr) auto;
+        align-items: baseline;
+    }
+
+    .servicios-grid--filas .card__title { grid-column: 1; grid-row: 1 / span 3; }
+    .servicios-grid--filas .card__text,
+    .servicios-grid--filas .help,
+    .servicios-grid--filas .servicio-detalles { grid-column: 2; }
+    .servicios-grid--filas .servicio-acciones { grid-column: 3; grid-row: 1; }
+}
+
+/* ---- Antetítulo del hero: una línea de texto, no una pastilla ---- */
+.hero-eyebrow {
+    display: block;
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--teal-dark);
+}
+
+/* ---- Logotipo: solo el nombre ---- */
+.logo-text .logo-title {
+    font-weight: 700;
+}
+
+.logo-text .logo-subtitle {
+    font-size: 0.8rem;
+}
+
+/* El selector de tema vive ahora en el pie del menú, junto al idioma. */
+.mega-menu__pie .theme-toggle {
+    margin-left: auto;
+}
+
+.servicios-grid--filas .servicio-detalles summary {
+    font-size: 1rem;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
 /* Con la letra del navegador agrandada, un botón no puede ser más ancho que
    la pantalla. */
 .btn {

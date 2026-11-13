@@ -167,6 +167,9 @@ function replegar(motivo) {
     const pie = $('heroReservaPie');
     if (pie) pie.hidden = true;
     if (!cuerpo) return;
+    // «Huecos reales de los próximos días» deja de ser verdad sin agenda.
+    const subtitulo = document.querySelector('#heroReserva .hero-widget__head p');
+    if (subtitulo) subtitulo.hidden = true;
     cuerpo.innerHTML = `
         <div class="hero-widget__fallback">
             <p class="hw-label" id="hwLabelCentroRepliegue">Elija centro y verá los días libres</p>
