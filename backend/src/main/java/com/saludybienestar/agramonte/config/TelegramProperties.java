@@ -22,6 +22,12 @@ public class TelegramProperties {
      */
     private String secretToken = "";
 
+    /**
+     * Raíz de la Bot API. Solo cambia en los tests, que la apuntan a un servidor local
+     * para comprobar qué pasa cuando Telegram no responde.
+     */
+    private String apiBase = "https://api.telegram.org";
+
     public boolean isConfigured() {
         return botToken != null && !botToken.isBlank();
     }

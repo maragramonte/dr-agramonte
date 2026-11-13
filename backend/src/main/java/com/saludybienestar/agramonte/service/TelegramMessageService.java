@@ -18,8 +18,6 @@ import java.util.Map;
 @Slf4j
 public class TelegramMessageService {
 
-    private static final String API_BASE = "https://api.telegram.org/bot";
-
     private final TelegramProperties telegram;
     private final RestClient restClient = RestClient.create();
 
@@ -39,7 +37,7 @@ public class TelegramMessageService {
 
         try {
             restClient.post()
-                    .uri(API_BASE + telegram.getBotToken() + "/sendMessage")
+                    .uri(telegram.getApiBase() + "/bot" + telegram.getBotToken() + "/sendMessage")
                     .body(Map.of("chat_id", chatId.trim(), "text", body))
                     .retrieve()
                     .toBodilessEntity();
