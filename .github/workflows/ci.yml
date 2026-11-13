@@ -110,8 +110,18 @@ jobs:
 
       # El Dockerfile de la raíz es el que usa el VPS (docker-compose.prod.yml):
       # empaqueta el frontend como recursos estáticos dentro del jar del backend.
+      # URL_PUBLICA es la que pone docker-compose.prod.yml con el dominio real. Aquí se
+      # usa un dominio de prueba para comprobar después que ha llegado a las páginas.
       - name: Construir la imagen combinada
-        run: docker build -t dr-agramonte:ci .
+        run: docker build --build-arg URL_PUBLICA=https://www.ejemplo.test -t dr-agramonte:ci .
+
+      # Las pruebas del backend corren con JDK 21. Si la imagen ejecutara otra versión,
+      # producción usaría un Java que el CI no ha probado nunca.
+      - name: Comprobar que la imagen ejecuta el mismo Java que las pruebas
+        run: |
+          version=$(docker run --rm --entrypoint java dr-agramonte:ci -version 2>&1 | head -1)
+          echo "$version"
+          echo "$version" | grep -q 'version "21\.'
 
       # Si el COPY del frontend se rompiera, la imagen seguiría construyéndose
       # pero arrancaría sin web. Se comprueba que los estáticos están en el jar.
@@ -121,3 +131,18 @@ jobs:
           docker cp comprobacion:/app/app.jar app.jar
           docker rm comprobacion
           unzip -l app.jar | grep -q 'BOOT-INF/classes/static/index.html'
+
+      # Las páginas del repositorio apuntan su canonical, el sitemap y robots.txt a la
+      # demo de GitHub Pages. En la imagen de producción tienen que apuntar al dominio
+      # real, o Google tomaría la demo por la web original.
+      - name: Comprobar que canonical, sitemap y robots apuntan al dominio real
+        run: |
+          estaticos=BOOT-INF/classes/static
+          unzip -p app.jar "$estaticos/index.html" | grep -q 'rel="canonical" href="https://www.ejemplo.test/"'
+          unzip -p app.jar "$estaticos/sitemap.xml" | grep -q '<loc>https://www.ejemplo.test/</loc>'
+          unzip -p app.jar "$estaticos/robots.txt" | grep -q '^Sitemap: https://www.ejemplo.test/sitemap.xml'
+          if unzip -p app.jar "$estaticos/*.html" "$estaticos/sitemap.xml" "$estaticos/robots.txt" \
+              | grep -q 'maragramonte.github.io/dr-agramonte/app'; then
+            echo "Queda alguna URL de la demo en la imagen de producción" >&2
+            exit 1
+          fi
