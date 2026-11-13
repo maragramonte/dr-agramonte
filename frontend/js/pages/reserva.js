@@ -113,10 +113,10 @@ function updateConnectionBanner() {
     if (!el) return;
     if (isAuthenticated()) {
         el.className = 'status-banner online';
-        el.innerHTML = '<i class="fas fa-circle-check"></i> Sesión activa: reserva y cancelación en el servidor';
+        el.innerHTML = '<i class="fas fa-circle-check"></i> Ha iniciado sesión: sus citas quedan guardadas en su cuenta';
     } else {
         el.className = 'status-banner online';
-        el.innerHTML = '<i class="fas fa-circle-check"></i> Reserva sin cuenta: la cita se guarda en el servidor. Contraseña opcional o inicia sesión';
+        el.innerHTML = '<i class="fas fa-circle-check"></i> Puede reservar sin cuenta. Le enviaremos un enlace por correo para consultar o cancelar la cita';
     }
 }
 
@@ -224,7 +224,7 @@ async function eliminarVinculacionTelegram() {
 function textoCitaRecuperada() {
     return document.documentElement.lang === 'ca'
         ? 'Hem recuperat la teva cita en aquest dispositiu.'
-        : 'Hemos recuperado tu cita en este dispositivo.';
+        : 'Hemos recuperado su cita en este dispositivo.';
 }
 
 /**
@@ -390,7 +390,7 @@ async function syncMisCitas() {
         } catch (err) {
             console.error(err);
             saveCitas(loadCitas().filter((c) => isServerCitaId(c.id)));
-            showToast('No se pudo sincronizar citas con el servidor', 'warning');
+            showToast('No hemos podido actualizar sus citas. Pruebe de nuevo en unos minutos', 'warning');
         }
         return;
     }
@@ -423,7 +423,7 @@ async function syncMisCitas() {
 
     const recuperadas = citas.filter(Boolean);
     if (huboErrorDeRed) {
-        showToast('No se pudo sincronizar citas con el servidor', 'warning');
+        showToast('No hemos podido actualizar sus citas. Pruebe de nuevo en unos minutos', 'warning');
         // Se conserva lo que ya había para no vaciar la lista por un error puntual.
         const previas = loadCitas().filter((c) => isServerCitaId(c.id)
             && !recuperadas.some((r) => r.id === c.id));
@@ -443,13 +443,13 @@ async function cargarMedicos() {
             return;
         }
         medicoSelect.innerHTML = html`
-            <option value="">Selecciona especialista...</option>
+            <option value="">Seleccione especialista…</option>
             ${medicos.map((m) => html`<option value="${m.id}">${m.nombre}${m.especialidad ? ` - ${m.especialidad}` : ''}</option>`)}
         `;
     } catch (err) {
         console.error(err);
         medicoSelect.innerHTML = '<option value="">No se pudieron cargar especialistas</option>';
-        showToast('No se pudo cargar especialistas desde servidor', 'warning');
+        showToast('No hemos podido cargar la agenda. Pruebe de nuevo en unos minutos', 'warning');
     }
 }
 
@@ -612,7 +612,7 @@ async function renderSlotsFromBackend() {
         return true;
     } catch (err) {
         console.error(err);
-        showToast('No se pudo cargar disponibilidad real. Se usa modo local.', 'warning');
+        showToast('No hemos podido consultar la agenda. Las horas que ve son orientativas y pueden estar ocupadas', 'warning');
         return false;
     }
 }
@@ -647,18 +647,18 @@ function validarCampos() {
     const medicoSelect = $('medicoSelect');
     if (!medicoSelect.value) {
         medicoSelect.setAttribute('aria-invalid', 'true');
-        return showToast('Selecciona un especialista', 'error'), false;
+        return showToast('Seleccione un especialista', 'error'), false;
     }
     medicoSelect.removeAttribute('aria-invalid');
 
     const nombre = $('nombre').value.trim();
     const email = $('email').value.trim();
     const telefono = $('telefono').value.trim().replace(/\s/g, '');
-    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s-]{3,}$/.test(nombre)) return showToast('Nombre invalido', 'error'), false;
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showToast('Email invalido', 'error'), false;
-    if (!/^(\+34|34)?[6789]\d{8}$/.test(telefono)) return showToast('Telefono invalido', 'error'), false;
-    if (!$('tipoConsulta').value) return showToast('Selecciona un tipo de consulta', 'error'), false;
-    if (!$('acepto').checked) return showToast('Acepta la politica de privacidad', 'error'), false;
+    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s-]{3,}$/.test(nombre)) return showToast('Revise el nombre: solo letras, al menos 3', 'error'), false;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showToast('Revise el correo electrónico', 'error'), false;
+    if (!/^(\+34|34)?[6789]\d{8}$/.test(telefono)) return showToast('Revise el teléfono: 9 cifras, de España', 'error'), false;
+    if (!$('tipoConsulta').value) return showToast('Seleccione el tipo de consulta', 'error'), false;
+    if (!$('acepto').checked) return showToast('Para reservar tiene que aceptar la política de privacidad', 'error'), false;
     return true;
 }
 
@@ -702,7 +702,7 @@ function renderAppointments() {
     $('aptsBadge').className = `apts-badge${pending.length ? '' : ' zero'}`;
     const list = $('aptsList');
     if (!pending.length) {
-        list.innerHTML = '<div class="no-apts"><i class="fas fa-calendar-check"></i> No tienes citas proximas</div>';
+        list.innerHTML = '<div class="no-apts"><i class="fas fa-calendar-check"></i> No tiene citas próximas</div>';
         return;
     }
     list.innerHTML = pending.map((c) => {
@@ -720,7 +720,7 @@ function renderAppointments() {
             } else if (isServerCitaId(cita.id)) {
                 const token = tokenDeCita(cita.id);
                 if (!token) {
-                    showToast('Esta cita se reservó en otro navegador: no tenemos su clave de acceso. Llama a la consulta para cancelarla', 'error');
+                    showToast('Esta cita se reservó en otro navegador: no tenemos su clave de acceso. Llame a la consulta para cancelarla', 'error');
                     return;
                 }
                 await apiClient.cancelarReservaPublica(cita.id, token);
@@ -737,7 +737,7 @@ function renderAppointments() {
             await syncMisCitas();
         } catch (err) {
             console.error(err);
-            showToast(err.message || 'No se pudo cancelar en servidor', 'error');
+            showToast(err.message || 'No hemos podido cancelar la cita. Pruebe de nuevo en unos minutos', 'error');
             return;
         }
         renderAppointments();
@@ -747,13 +747,13 @@ function renderAppointments() {
 
 async function onSubmit(e) {
     e.preventDefault();
-    if (!state.centroId) return showToast('Selecciona un centro', 'error');
-    if (!state.medicoId) return showToast('Selecciona un especialista', 'error');
-    if (!state.dateISO) return showToast('Selecciona una fecha', 'error');
-    if (!state.hour) return showToast('Selecciona una hora', 'error');
+    if (!state.centroId) return showToast('Seleccione un centro', 'error');
+    if (!state.medicoId) return showToast('Seleccione un especialista', 'error');
+    if (!state.dateISO) return showToast('Seleccione un día', 'error');
+    if (!state.hour) return showToast('Seleccione una hora', 'error');
     if (!validarCampos()) return;
     if ((document.querySelector('input[name="cobertura"]:checked')?.value) === 'seguro' && !$('aseguradora').value) {
-        return showToast('Selecciona tu aseguradora', 'error');
+        return showToast('Seleccione su aseguradora', 'error');
     }
     const btn = $('btnSubmit');
     btn.disabled = true; btn.classList.add('loading');
@@ -832,7 +832,7 @@ async function onSubmit(e) {
         renderCalendar();
     } catch (err) {
         console.error(err);
-        showToast(err.message || 'Error al reservar en servidor', 'error');
+        showToast(err.message || 'No hemos podido guardar la reserva. Pruebe de nuevo en unos minutos', 'error');
     } finally {
         btn.disabled = false; btn.classList.remove('loading');
     }
