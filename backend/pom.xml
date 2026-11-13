@@ -29,6 +29,11 @@
              publicados después. Quitarlas cuando el parent las alcance. -->
         <tomcat.version>10.1.61</tomcat.version>
         <jackson-bom.version>2.21.8</jackson-bom.version>
+        <!-- Cliente HTTP que trae el SDK de Twilio. 5.5.2 y 5.3.6 tienen CVE-2026-71290
+             (9.1) y CVE-2026-54399/54428 (7.5). La 5.6.x del cliente va con la rama
+             5.4 del core. Quitarlas cuando el parent las alcance. -->
+        <httpclient5.version>5.6.5</httpclient5.version>
+        <httpcore5.version>5.4.4</httpcore5.version>
         <mysql.version>26.10.0</mysql.version>
         <lombok.version>1.18.48</lombok.version>
         <flyway.version>13.12.1</flyway.version>
