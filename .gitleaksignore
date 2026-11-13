@@ -1,0 +1,11 @@
+# Falsos positivos revisados a mano (12/11/2026). Ninguno es una clave real:
+# contraseñas y claves de tests, el nombre de una clave de localStorage y
+# valores de ejemplo de los .env.example. Una clave real nueva no está aquí,
+# así que sigue haciendo fallar el job.
+b0f61b7f4fed2b57ddec7430693eb36b46d19a9d:backend/src/test/java/com/saludybienestar/agramonte/integration/ActivacionCuentaIntegrationTest.java:generic-api-key:309
+f7acfd6d0973fbd8d162c9d79eeed1f7afca4055:frontend/js/pages/reserva.js:generic-api-key:15
+ae8e6cec140b9c51fdfedad0a9f4056930fbbc16:.env.prod.example:telegram-bot-api-token:47
+82033acc11d44fb8a3ad2e1b7ef8550fef0f9575:.env.example:telegram-bot-api-token:33
+35ceefa1ddc8109d231dfbb94e0bdf242d11d4e7:backend/src/test/java/com/saludybienestar/agramonte/security/JwtProviderTest.java:generic-api-key:22
+c56eb1ac1f6b338c8fb3af6796c9fc1bd5f07b06:.env.example:generic-api-key:2
+c56eb1ac1f6b338c8fb3af6796c9fc1bd5f07b06:frontend/js/pages/reserva.js:generic-api-key:17
