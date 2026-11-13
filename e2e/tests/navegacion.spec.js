@@ -47,6 +47,10 @@ for (const ruta of PAGINAS_PUBLICAS) {
         expect(texto).not.toMatch(/24 horas/);
         // El repositorio es del proyecto, no un canal de contacto para pacientes.
         await expect(page.locator('a[href*="github.com"]')).toHaveCount(0);
+        // Ni cifras sin fuente: «500+ pacientes atendidos» no lo respalda nada.
+        expect(texto).not.toMatch(/500\+/);
+        // Un solo h1 por página: el título de la página, no el logo.
+        await expect(page.locator('h1')).toHaveCount(1);
     });
 }
 
