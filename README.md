@@ -143,7 +143,7 @@ cd backend && mvn test
 cd e2e && npm ci && npm test   # E2E del frontend (la primera vez: npx playwright install chromium)
 ```
 
-**128 pruebas** en tres niveles: 75 unitarias, 31 de capa REST (`@WebMvcTest` con la
+**130 pruebas** en tres niveles: 76 unitarias, 32 de capa REST (`@WebMvcTest` con la
 `SecurityConfig` real) y 22 de integración contra un PostgreSQL levantado con Testcontainers.
 Las de correo usan GreenMail, un SMTP en memoria: el token se extrae del correo realmente
 recibido.
@@ -151,7 +151,9 @@ recibido.
 Las de integración **necesitan Docker**; sin él se marcan como saltadas en lugar de fallar.
 El CI lo compensa: revisa los informes de Surefire y **falla si alguna quedó sin ejecutar**.
 Hay además análisis semanal de vulnerabilidades de dependencias con OWASP dependency-check,
-y Dependabot propone las actualizaciones de Maven, Docker y GitHub Actions.
+y Dependabot propone las actualizaciones de Maven, Docker y GitHub Actions. Cada PR pasa por
+Semgrep (reglas de Java y de secretos, de momento solo informativo) y cada semana gitleaks
+revisa todo el historial de git en busca de claves subidas por error.
 
 En el frontend, **5 pruebas E2E con Playwright** recorren la reserva sin cuenta, en escritorio
 y en móvil. La API está simulada en el navegador, así que no necesitan backend.
@@ -251,8 +253,8 @@ creciendo porque hay una consulta de verdad detrás. Ahora mismo estoy desarroll
 una web para un negocio real.
 
 Trabajo con **Java, JavaScript, HTML y CSS**. Sé consumir y probar APIs e integrar servicios
-externos en una aplicación: aquí están Twilio, la Bot API de Telegram y el despliegue en un
-VPS propio con Docker, dominio propio y HTTPS automático con Caddy.
+externos en una aplicación: aquí están Twilio, la Bot API de Telegram y un despliegue
+preparado para un VPS propio con Docker y HTTPS automático con Caddy.
 
 Uso herramientas de IA como apoyo activo (para aprender más rápido, depurar y desatascarme)
 igual que cualquier desarrolladora junior hoy. Las decisiones técnicas de este repositorio, y
