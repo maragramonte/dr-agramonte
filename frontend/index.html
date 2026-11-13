@@ -218,7 +218,10 @@
                      los 35+ años, ya figura en el hero. En su lugar va el retrato,
                      que es lo que esta sección necesitaba. -->
                 <figure class="sobre-mi-retrato">
-                    <img src="pictures/Profesional.png" alt="El Dr. Juan Manuel Agramonte, especialista en Medicina Interna, con bata blanca y fonendoscopio" width="959" height="750" loading="lazy" decoding="async">
+                    <picture>
+                        <source type="image/webp" srcset="pictures/Profesional-480.webp 480w, pictures/Profesional-959.webp 959w" sizes="(max-width: 1000px) 96vw, 530px">
+                        <img src="pictures/Profesional.png" alt="El Dr. Juan Manuel Agramonte, especialista en Medicina Interna, con bata blanca y fonendoscopio" width="959" height="753" loading="lazy" decoding="async">
+                    </picture>
                 </figure>
             </div>
         </div>
@@ -251,7 +254,6 @@
 <script src="js/modules/api-config.js"></script>
 <script src="js/modules/auth-ui.js" defer></script>
 <script src="js/pages/dr-agramonte.js" defer></script>
-<script src="js/pages/index-preload.js"></script>
 <script type="module" src="./js/pages/hero-reserva.js"></script>
 </body>
 </html>

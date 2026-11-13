@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dr-agramonte-v49';
+const CACHE_NAME = 'dr-agramonte-v50';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -36,7 +36,6 @@ const urlsToCache = [
     '/js/pages/activar.js',
     // Extraidos del HTML para poder aplicar la CSP; sin ellos la pagina sin
     // conexion se quedaria sin menu ni reintento de reconexion.
-    '/js/pages/index-preload.js',
     '/js/pages/privacidad.js',
     '/js/pages/offline-menu.js',
     '/js/pages/offline-reconexion.js',
