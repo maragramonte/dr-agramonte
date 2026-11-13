@@ -3456,3 +3456,12 @@ button.nav-link {
 .grid--testimonials {
     grid-template-columns: minmax(0, 1fr);
 }
+
+/* Los controles de formulario no heredan la letra por defecto: las horas
+   del calendario de reserva salían en la fuente del sistema. */
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+}
