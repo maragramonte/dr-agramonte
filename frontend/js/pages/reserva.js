@@ -923,11 +923,15 @@ async function applySeleccionDelHero() {
     const centroId = q.get('centro');
     const fecha = q.get('fecha');
     const hora = q.get('hora');
-    if (!centroId || !/^\d{4}-\d{2}-\d{2}$/.test(fecha || '')) return;
+    if (!centroId) return;
 
     const btnCentro = document.querySelector(`.centro-opt[data-id="${CSS.escape(centroId)}"]`);
     if (!btnCentro) return;
     selectCentro(btnCentro);
+
+    // Desde el repliegue del hero llega solo el centro: se queda en el
+    // calendario para que el paciente elija día.
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha || '')) return;
 
     // El día puede caer en el mes siguiente: hay que mover el calendario antes
     // de buscar su botón, porque solo se pinta el mes en curso.

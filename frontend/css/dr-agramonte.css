@@ -1848,10 +1848,8 @@ a {
 
 .hw-label {
     display: block;
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    font-size: 0.95rem;
+    font-weight: 700;
     color: var(--muted);
     margin-bottom: 0.5rem;
 }
@@ -1953,13 +1951,23 @@ a {
 /* Repliegue: lo que se ve si el backend no contesta. */
 .hero-widget__fallback {
     padding: var(--space-3);
-    text-align: center;
 }
 
-.hero-widget__fallback p {
-    font-size: 0.9rem;
-    color: var(--text-light);
-    margin-bottom: var(--space-2);
+.hero-widget__fallback .hw-options {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* En el repliegue los centros son enlaces, no botones. */
+a.hw-option {
+    display: block;
+    min-height: 48px;
+    text-decoration: none;
+}
+
+a.hw-option:hover {
+    border-color: var(--teal-fill);
 }
 
 /* ========== Los tres pasos ==========
