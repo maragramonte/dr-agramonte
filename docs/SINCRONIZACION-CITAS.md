@@ -1,6 +1,6 @@
 # Sincronización de citas: Guía de control (TFG)
 
-Documento operativo para comprobar que **Mis citas programadas** (`reservar.html`), el **panel TFG** (`panel-pruebas.html`) y **PostgreSQL** muestran el mismo dato.
+Documento operativo para comprobar que **Mis citas programadas** (`reservar.html`), la **agenda del médico** (`panel-pruebas.html`) y **PostgreSQL** muestran el mismo dato.
 
 Aquí está el diseño completo: qué problema resolvía, cómo quedó y cómo comprobarlo.
 
@@ -17,7 +17,7 @@ Aquí está el diseño completo: qué problema resolvía, cómo quedó y cómo c
 | Vista | Antes (confuso) | Ahora |
 |-------|-----------------|--------|
 | **Mis citas programadas** | Lista en `localStorage` del navegador | Caché local **rellenada desde el API** |
-| **Panel TFG** | Solo `GET /api/citas/agenda/reservas` (BD) | Igual (BD) |
+| **Agenda del médico** | Solo `GET /api/citas/agenda/reservas` (BD) | Igual (BD) |
 | **Reserva sin login** | A veces solo `localStorage` | Siempre persiste en BD + sincroniza lista |
 
 Consecuencias antiguas: citas que aparecían en «Mis citas» pero no en el panel; cancelaciones de invitado solo en el navegador; reservas legacy con id `CITA-XXXX` que nunca existieron en el servidor.
@@ -88,7 +88,7 @@ acceso a las citas, y la lista ahora se construye con los tokens guardados.
 6. `syncMisCitas()` recorre los tokens guardados: `GET /api/citas/publica/{id}` con `X-Cita-Token`.  
 7. Cancelar: `DELETE /api/citas/publica/{id}` con la cabecera `X-Cita-Token` de esa cita. Sale un correo que lo confirma, **sin enlace**: la cita cancelada no tiene nada que gestionar.
 
-### Panel TFG (`panel-pruebas.html`)
+### Agenda del médico (`panel-pruebas.html`)
 
 - Carga: `GET /api/citas/agenda/reservas`, con el JWT del médico. De quién es la agenda lo deduce el backend del token (`medicos.usuario_id`, V12); solo un `ADMIN` puede pasar `medicoId`.  
 - Refresco automático al reservar en otra pestaña (`BroadcastChannel` + clave `dr-agramonte-cita-creada`).  
@@ -148,7 +148,7 @@ docker compose ps   # postgres, backend, frontend → Up (healthy)
 5. Aceptar privacidad → **Confirmar reserva**.  
 6. Desplegar **Mis citas programadas** → debe listar la cita.
 
-### 3. Panel TFG
+### 3. Agenda del médico
 
 1. http://localhost/panel-pruebas.html (misma sesión de navegador u otra pestaña).  
 2. Pestaña **Pruebas de reservas** → fila con `test.sync@example.com`.  

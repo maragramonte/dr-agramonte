@@ -1,5 +1,5 @@
 /**
- * Centro de pruebas TFG: historial de reservas + vista médico integrada.
+ * Agenda del médico: historial de reservas + pacientes con cita.
  */
 import apiClient from '../modules/api-client.js';
 import { html } from '../modules/html.js';
@@ -113,7 +113,7 @@ async function loadReservas() {
     } catch (err) {
         console.warn(err);
         setConn(false, 'Sin conexión al API. Arranca docker compose up.');
-        tbody.innerHTML = '<tr><td colspan="7" class="error-cell">No se pudo cargar. Comprueba que el backend esté en marcha.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="error-cell">No se pudo cargar la agenda. Inténtalo de nuevo en unos minutos.</td></tr>';
         empty.hidden = true;
     }
 }
@@ -150,7 +150,7 @@ function renderListaPacientesMedico() {
     if (!lista) return;
 
     if (!pacientesAgenda.length) {
-        lista.innerHTML = `<p class="medico-placeholder">Sin pacientes con cita.<br><a href="reservar.html">Crear una reserva de prueba</a></p>`;
+        lista.innerHTML = `<p class="medico-placeholder">Sin pacientes con cita.</p>`;
         $('medicoDetalle').innerHTML = '<p class="medico-placeholder">Sin pacientes en agenda.</p>';
         pacienteSeleccionado = null;
         return;

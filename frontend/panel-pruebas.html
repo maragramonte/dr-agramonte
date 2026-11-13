@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="description" content="Centro de pruebas TFG – reservas reales y vista del acceso médico.">
+    <meta name="description" content="Agenda del médico: reservas y pacientes con cita.">
     <meta name="robots" content="noindex, nofollow">
-    <title>Pruebas TFG – Reservas y vista médico | Dr. Agramonte</title>
+    <title>Agenda del médico | Dr. Agramonte</title>
     
     <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
     <link rel="apple-touch-icon" href="icons/app-icon.svg">
@@ -75,13 +75,6 @@
                     <li><a href="contacto.html" class="mega-link"><i class="fas fa-envelope" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.contacto">Contacto</span><span class="mega-link__hint" data-i18n="menu.contacto.hint">Formulario y ubicación</span></span></a></li>
                 </ul>
             </div>
-            <div class="mega-menu__group mega-menu__group--herramientas">
-                <h2 class="mega-menu__title" data-i18n="menu.herramientas">Herramientas</h2>
-                <ul class="mega-menu__list">
-                    <li><a href="estadisticas.html" class="mega-link"><i class="fas fa-chart-line" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="footer.cuadro">Cuadro de mando</span><span class="mega-link__hint" data-i18n="menu.cuadro.hint">Estadísticas de la agenda</span></span></a></li>
-                    <li><a href="offline.html" class="mega-link"><i class="fas fa-plug-circle-xmark" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="footer.offline">Modo offline</span><span class="mega-link__hint" data-i18n="menu.offline.hint">La web sin conexión</span></span></a></li>
-                </ul>
-            </div>
         </div>
         <div class="mega-menu__pie">
             <a href="privacidad.html" class="mega-menu__legal"><i class="fas fa-shield-alt" aria-hidden="true"></i> <span data-i18n="footer.privacidad">Política de Privacidad</span></a>
@@ -93,12 +86,10 @@
 
 <section class="page-hero page-hero--compact">
     <div class="container">
-        <h1><i class="fas fa-flask"></i> Pruebas de reservas y acceso médico</h1>
+        <h1><i class="fas fa-calendar-check"></i> Agenda del médico</h1>
         <p>
-            Espacio técnico para el TFG: aquí ves <strong>todas las reservas reales</strong> guardadas en el servidor
-            cuando un paciente prueba <a href="reservar.html">reservar.html</a>,
-            y en la segunda pestaña la <strong>vista que tendría el médico</strong> (agenda de pacientes con cita).
-            No es el menú público para pacientes.
+            Aquí están <strong>todas las reservas</strong> guardadas en el servidor y, en la segunda
+            pestaña, los pacientes con cita. Es una página interna: no aparece en el menú de los pacientes.
         </p>
     </div>
 </section>
@@ -114,16 +105,16 @@
 
     <div class="pruebas-tabs" role="tablist">
         <button type="button" class="pruebas-tab active" data-tab="reservas" role="tab">
-            <i class="fas fa-calendar-check"></i> Pruebas de reservas
+            <i class="fas fa-calendar-check"></i> Reservas
         </button>
         <button type="button" class="pruebas-tab" data-tab="medico" role="tab">
-            <i class="fas fa-stethoscope"></i> Vista y acceso médico
+            <i class="fas fa-stethoscope"></i> Pacientes con cita
         </button>
     </div>
 
     <div id="panel-reservas" class="pruebas-panel active" role="tabpanel">
         <p style="font-size:.88rem;color:var(--gray-500);margin-bottom:1rem">
-            Cada fila es una cita creada en base de datos (pruebas de integración, demos del tribunal, reservas de pacientes registrados).
+            Cada fila es una cita guardada en el servidor.
             Se actualiza sola al reservar en otra pestaña.
         </p>
         <div class="stats-row">
@@ -151,19 +142,11 @@
             </table>
         </div>
         <p id="reservasEmpty" class="empty-msg" hidden>
-            <i class="fas fa-inbox"></i> Aún no hay reservas de prueba para este médico.
-            Crea una desde <a href="reservar.html">reservar.html</a> (inicia sesión como paciente).
+            <i class="fas fa-inbox"></i> Aún no hay reservas para este médico.
         </p>
     </div>
 
     <div id="panel-medico" class="pruebas-panel" role="tabpanel">
-        <div class="acceso-card" style="margin-bottom:1rem">
-            <h3><i class="fas fa-lock"></i> Acceso del rol MEDICO (prototipo TFG)</h3>
-            <p style="font-size:.82rem;color:var(--gray-500);margin-bottom:.5rem">
-                En producción: JWT + rol <code>MEDICO</code>. Aquí se usa <code>GET /api/citas/agenda/pacientes</code> (vista inferior)
-                y <code>GET /api/citas/agenda/reservas</code> (pestaña anterior). Historial clínico y alertas: evolución futura.
-            </p>
-        </div>
         <div style="margin-bottom:.75rem">
             <button type="button" class="btn-pruebas outline" id="btnRefreshMedico"><i class="fas fa-sync-alt"></i> Actualizar agenda médico</button>
         </div>
@@ -186,7 +169,7 @@
         <div class="footer-section"><h3>Dr. Agramonte</h3><p data-i18n="footer.especialista">Especialista en Medicina Interna</p><p data-i18n="footer.ubicacion">Palma de Mallorca, Islas Baleares</p></div>
         <div class="footer-section"><h3 data-i18n="footer.contacto">Contacto</h3><a href="https://github.com/maragramonte/dr-agramonte"><i class="fab fa-github"></i> GitHub</a><p><i class="fas fa-map-marker-alt"></i> Palma de Mallorca</p></div>
         <div class="footer-section"><h3 data-i18n="footer.horario">Horario</h3><p><strong data-i18n="footer.lunVie">Lunes a Viernes</strong><br>9:00 - 14:00<br>16:00 - 19:00</p><p><strong data-i18n="footer.sabado">Sábados</strong><br><span data-i18n="footer.sabadoHoras">9:00 - 13:00 (con cita)</span></p></div>
-        <div class="footer-section"><h3 data-i18n="footer.enlaces">Enlaces</h3><a href="sobre-mi.html"><i class="fas fa-user-md"></i> El Dr. Agramonte</a><a href="servicios.html"><i class="fas fa-stethoscope"></i> <span data-i18n="nav.servicios">Servicios</span></a><a href="testimonios.html"><i class="fas fa-star"></i> <span data-i18n="nav.testimonios">Testimonios</span></a><a href="contacto.html"><i class="fas fa-envelope"></i> <span data-i18n="nav.contacto">Contacto</span></a><a href="reservar.html"><i class="fas fa-calendar-plus"></i> <span data-i18n="nav.reservar">Reservar cita</span></a><a href="privacidad.html"><i class="fas fa-shield-alt"></i> <span data-i18n="footer.privacidad">Política de Privacidad</span></a><a href="offline.html"><i class="fas fa-plug-circle-xmark"></i> <span data-i18n="footer.offline">Modo Offline</span></a><a href="estadisticas.html"><i class="fas fa-chart-line"></i> <span data-i18n="footer.cuadro">Cuadro de mando</span></a></div>
+        <div class="footer-section"><h3 data-i18n="footer.enlaces">Enlaces</h3><a href="sobre-mi.html"><i class="fas fa-user-md"></i> El Dr. Agramonte</a><a href="servicios.html"><i class="fas fa-stethoscope"></i> <span data-i18n="nav.servicios">Servicios</span></a><a href="testimonios.html"><i class="fas fa-star"></i> <span data-i18n="nav.testimonios">Testimonios</span></a><a href="contacto.html"><i class="fas fa-envelope"></i> <span data-i18n="nav.contacto">Contacto</span></a><a href="reservar.html"><i class="fas fa-calendar-plus"></i> <span data-i18n="nav.reservar">Reservar cita</span></a><a href="privacidad.html"><i class="fas fa-shield-alt"></i> <span data-i18n="footer.privacidad">Política de Privacidad</span></a></div>
     </div>
     <div class="footer-bottom"><p><span data-i18n="footer.copyright">© 2026 Dr. Juan Manuel Agramonte.</span> <a href="privacidad.html" data-i18n="footer.privacidad">Política de Privacidad</a></p></div>
 </footer>

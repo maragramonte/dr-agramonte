@@ -30,15 +30,16 @@
         'nav.menu': 'Menú',
         'menu.consulta': 'La consulta',
         'menu.citas': 'Cites',
-        'menu.herramientas': 'Eines',
         'menu.inicio.hint': 'Portada i resum',
         'menu.sobre.hint': 'Trajectòria i formació',
         'menu.servicios.hint': "Què s'atén a la consulta",
         'menu.testimonios.hint': 'Opinions de pacients',
         'menu.reservar.hint': 'Triï centre, dia i hora',
         'menu.contacto.hint': 'Formulari i ubicació',
+        // Accesos que solo ve el médico con sesión (auth-ui.js)
+        'menu.agenda': 'Agenda del metge',
+        'menu.agenda.hint': 'Reserves i pacients amb cita',
         'menu.cuadro.hint': "Estadístiques de l'agenda",
-        'menu.offline.hint': 'El web sense connexió',
 
         // ---- Footer (compartido) ----
         'footer.especialista': 'Especialista en Medicina Interna',
@@ -59,7 +60,6 @@
         'activar.repetir': 'Repeteix la contrasenya',
         'activar.enviar': 'Desa la contrasenya',
         'activar.volver': 'Torna a les meves cites',
-        'footer.offline': 'Mode Fora de línia',
         'footer.cuadro': 'Quadre de comandament',
         'footer.copyright': '© 2026 Dr. Juan Manuel Agramonte.',
 
@@ -189,5 +189,7 @@
         init();
     }
 
-    window.i18n = { setLang: setLang, getLang: getLang };
+    // refresh: vuelve a traducir lo que se ha añadido después de cargar (p. ej. los
+    // accesos del médico que pone auth-ui.js al iniciar sesión).
+    window.i18n = { setLang: setLang, getLang: getLang, refresh: function () { apply(getLang()); } };
 })();

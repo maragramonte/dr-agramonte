@@ -79,6 +79,39 @@ class AuthUI {
             destino.textContent = texto;
             btn.setAttribute('aria-label', authed ? 'Cerrar sesión' : 'Iniciar sesión');
         });
+        this.#renderGestion(authed);
+    }
+
+    /**
+     * Agenda del médico y cuadro de mando: solo en el menú de quien entra como
+     * médico o administrador. El paciente no los ve. Las páginas siguen en su ruta
+     * y el backend sigue exigiendo el rol; esto solo decide qué se enseña.
+     */
+    #renderGestion(authed) {
+        const rol = (localStorage.getItem('rol') || '').toUpperCase();
+        const gestion = authed && (rol === 'MEDICO' || rol === 'ADMIN');
+        document.querySelectorAll('[data-auth-slot]').forEach((lista) => {
+            lista.querySelectorAll('[data-gestion]').forEach((li) => li.remove());
+            if (!gestion) return;
+            const acceso = lista.querySelector('.mega-link--auth')?.closest('li') || null;
+            [
+                ['panel-pruebas.html', 'fa-calendar-check', 'menu.agenda', 'Agenda del médico',
+                    'menu.agenda.hint', 'Reservas y pacientes con cita'],
+                ['estadisticas.html', 'fa-chart-line', 'footer.cuadro', 'Cuadro de mando',
+                    'menu.cuadro.hint', 'Estadísticas de la agenda'],
+            ].forEach(([href, icono, claveTexto, texto, clavePista, pista]) => {
+                const li = document.createElement('li');
+                li.dataset.gestion = '';
+                li.innerHTML =
+                    `<a href="${href}" class="mega-link"><i class="fas ${icono}" aria-hidden="true"></i>` +
+                    '<span class="mega-link__text">' +
+                    `<span class="mega-link__label" data-i18n="${claveTexto}">${texto}</span>` +
+                    `<span class="mega-link__hint" data-i18n="${clavePista}">${pista}</span>` +
+                    '</span></a>';
+                lista.insertBefore(li, acceso);
+            });
+        });
+        window.i18n?.refresh?.();
     }
 
     #setPageLocked(locked) {
