@@ -18,7 +18,7 @@ trap 'rm -rf "$TMP"' EXIT
 fallo() { echo "FALLO: $*" >&2; exit 1; }
 
 preparar() {
-  rm -rf "$TMP/repo" "$TMP/bin" "$TMP/rclone.log"
+  rm -rf "${TMP:?}/repo" "${TMP:?}/bin" "${TMP:?}/rclone.log"
   mkdir -p "$TMP/repo/scripts" "$TMP/bin"
   cp "$RAIZ/scripts/backup-db.sh" "$TMP/repo/scripts/"
 
@@ -52,7 +52,7 @@ EOF
 PATH="$TMP/bin:$PATH" bash "$TMP/repo/scripts/backup-db.sh" > /dev/null
 
 ls "$TMP"/repo/backups/*.sql.gz >/dev/null 2>&1 && fallo "queda un volcado sin cifrar en disco"
-cifrado=$(ls "$TMP"/repo/backups/*.sql.gz.age 2>/dev/null | head -1)
+cifrado=$(find "$TMP/repo/backups" -name '*.sql.gz.age' | head -1)
 [ -n "$cifrado" ] || fallo "no se ha creado el volcado cifrado (.sql.gz.age)"
 age -d -i "$TMP/clave.txt" "$cifrado" | gunzip | grep -q "CREATE TABLE citas" \
   || fallo "el volcado cifrado no se descifra o no contiene el SQL"
