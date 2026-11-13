@@ -1,6 +1,6 @@
 # Dr. Agramonte
 
-Plataforma de gestión de citas médicas para la consulta de un internista real en Palma de
+Plataforma de gestión de citas médicas para la consulta de un internista de Palma de
 Mallorca. Los pacientes reservan, consultan y cancelan sus citas por su cuenta, sin depender
 del teléfono.
 
