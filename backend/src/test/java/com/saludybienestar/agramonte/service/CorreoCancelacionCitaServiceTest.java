@@ -45,8 +45,8 @@ class CorreoCancelacionCitaServiceTest {
         medico.setNombre("Dr. Juan Manuel Agramonte");
 
         Centro centro = new Centro();
-        centro.setCodigo("miramar");
-        centro.setNombre("Policlínica Miramar");
+        centro.setCodigo("palma");
+        centro.setNombre("Consulta Palma");
 
         Cita cita = new Cita();
         cita.setId(42L);
@@ -78,7 +78,7 @@ class CorreoCancelacionCitaServiceTest {
         assertThat(cuerpo.getValue())
                 .contains("Tu cita queda cancelada")
                 .contains("https://ejemplo/reservar.html")
-                .contains("Policlínica Miramar")
+                .contains("Consulta Palma")
                 // Si no fue el paciente quien canceló, tiene que saber que la hora puede
                 // haberla cogido otro: es lo que no se puede deshacer solo.
                 .contains("Si no has sido tú");

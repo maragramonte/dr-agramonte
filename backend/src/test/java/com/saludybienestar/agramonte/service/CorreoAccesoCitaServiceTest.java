@@ -43,7 +43,7 @@ class CorreoAccesoCitaServiceTest {
         return new CitaResponse(42L, 7L, 1L, "Dr. Juan Manuel Agramonte",
                 LocalDateTime.now().plusDays(3).withHour(9).withMinute(30),
                 "Revisión general", EstadoCita.CONFIRMADA,
-                "miramar", "Policlínica Miramar",
+                "palma", "Consulta Palma",
                 null, null, null, null);
     }
 
@@ -96,7 +96,7 @@ class CorreoAccesoCitaServiceTest {
         verify(correoSaliente).enviar(eq("paciente@example.com"), anyString(), cuerpo.capture());
         assertThat(cuerpo.getValue())
                 .contains("https://ejemplo/enlace")
-                .contains("Policlínica Miramar")
+                .contains("Consulta Palma")
                 .as("quien abra el enlace puede cancelar la cita, y el correo debe decirlo")
                 .contains("No lo reenvíes");
         // El motivo de consulta es dato de salud (art. 9 RGPD) y el correo no lo necesita:

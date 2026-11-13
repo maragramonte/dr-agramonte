@@ -555,13 +555,6 @@ a {
     padding: 0;
     accent-color: var(--teal);
 }
-.enlace-mapa {
-    display: inline-block;
-    margin-top: 0.3rem;
-    font-size: 0.8rem;
-    color: var(--teal);
-}
-
 /* ========== 4. ACCESIBILIDAD – para usuarios que lo necesitan ========== */
 @media (prefers-reduced-motion: reduce) {
     *,
