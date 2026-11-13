@@ -196,7 +196,9 @@
 
 html {
     scroll-behavior: smooth;
-    font-size: 16px;
+    /* 100 % y no 16px: con píxeles fijos se ignoraba el tamaño de letra que
+       el paciente elige en su navegador. */
+    font-size: 100%;
 }
 
 body {
@@ -371,7 +373,7 @@ a {
     gap: var(--space-5);
     align-items: stretch;
 }
-@media (max-width: 768px) {
+@media (max-width: 48em) {
     .sobre-mi-resumen .sobre-mi-content {
         grid-template-columns: 1fr;
     }
@@ -598,7 +600,7 @@ a {
     padding: 0 var(--space-3);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 48em) {
     .container {
         padding: 0 var(--space-2);
     }
@@ -1258,13 +1260,13 @@ a {
 
 /* Donde aparecen los destinos, la rejilla se ensancha para que la fila respire
    y de paso el contenido deje de quedarse estrecho en cuanto crece la pantalla. */
-@media (min-width: 1250px) {
+@media (min-width: 78.0625em) {
     :root {
         --maxw: 1320px;
     }
 }
 
-@media (min-width: 1400px) {
+@media (min-width: 87.5em) {
     .header-content {
         padding: 1.35rem var(--space-3);
     }
@@ -1298,7 +1300,7 @@ a {
    vacío a los lados, y una cabecera más ancha que el contenido quedaría
    desalineada. Para volver atrás basta con quitar la redefinición de --maxw
    de este bloque y del siguiente. */
-@media (min-width: 1600px) {
+@media (min-width: 100em) {
     :root {
         --maxw: 1440px;
     }
@@ -1358,7 +1360,7 @@ a {
     }
 }
 
-@media (min-width: 2000px) {
+@media (min-width: 125em) {
     :root {
         --maxw: 1560px;
     }
@@ -1371,13 +1373,15 @@ a {
    de contenido, así que hacen falta unos 1213px; el umbral queda en 1250 para
    tener margen con las etiquetas en catalán y con un nombre largo al iniciar
    sesión. Antes salían a 992px y a 1024 la barra desbordaba con scroll. */
-@media (max-width: 1249px) {
+/* En em y no en px: así el menú también se pliega cuando el paciente sube
+   el tamaño de letra del navegador (78em = 1248px a 16px). */
+@media (max-width: 78em) {
     .main-nav {
         display: none;
     }
 }
 
-@media (max-width: 992px) {
+@media (max-width: 62em) {
     .header-content {
         gap: 0.5rem;
         padding-left: 0.75rem;
@@ -1418,7 +1422,7 @@ a {
 
 /* Aquí ya no caben ni el subtítulo del logo ni las etiquetas de los botones:
    el CTA y el menú se quedan en icono, y el idioma se va al pie del panel. */
-@media (max-width: 600px) {
+@media (max-width: 37.5em) {
     .logo-text .logo-subtitle {
         display: none;
     }
@@ -1447,7 +1451,7 @@ a {
 
 /* Móviles estrechos: encoge logo e iconos para que nada se recorte. Antes este
    bloque entraba a 380px y en un móvil de 390 la barra ya se desbordaba. */
-@media (max-width: 480px) {
+@media (max-width: 30em) {
     .header-content {
         padding-left: 0.6rem;
         padding-right: 0.6rem;
@@ -1483,7 +1487,7 @@ a {
 
 /* Los más estrechos que se ven hoy (320px, iPhone SE de primera hornada): con
    los tamaños del tramo de 480 el nombre aún salía como «Dr. Agram…». */
-@media (max-width: 360px) {
+@media (max-width: 22.5em) {
     .header-content {
         gap: 0.4rem;
     }
@@ -1704,7 +1708,7 @@ a {
     padding: clamp(2.5rem, 6vw, 4.5rem) var(--space-3);
 }
 
-@media (min-width: 992px) {
+@media (min-width: 62em) {
     .hero-content {
         /* 420px es el ancho al que caben cuatro huecos por fila sin apretar. */
         grid-template-columns: minmax(0, 1fr) 420px;
@@ -1989,7 +1993,7 @@ a.hw-option:hover {
     counter-reset: paso;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 48em) {
     .pasos-grid {
         grid-template-columns: repeat(3, 1fr);
         gap: var(--space-5);
@@ -2075,6 +2079,7 @@ a.hw-option:hover {
 
 .testimonial__rating {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.2rem;
     color: #f5b042;
 }
@@ -2116,7 +2121,7 @@ a.hw-option:hover {
     gap: var(--space-5);
 }
 
-@media (min-width: 992px) {
+@media (min-width: 62em) {
     .contacto-container {
         grid-template-columns: 1.2fr 1fr;
     }
@@ -2239,7 +2244,7 @@ a.hw-option:hover {
     padding: var(--space-4) var(--space-3);
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 64em) {
     .reserva-grid {
         grid-template-columns: 1.2fr 0.8fr;
         align-items: start;
@@ -2664,7 +2669,7 @@ a.hw-option:hover {
 }
 
 /* ========== 17. RESPONSIVE AJUSTES FINOS ========== */
-@media (max-width: 768px) {
+@media (max-width: 48em) {
     :root {
         --space-4: 1.5rem;
         --space-5: 2rem;
@@ -2703,7 +2708,7 @@ a.hw-option:hover {
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 30em) {
     .container {
         padding: 0 var(--space-2);
     }
@@ -2727,7 +2732,7 @@ a.hw-option:hover {
     z-index: 1;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 56.25em) {
     .sobre-mi-layout {
         grid-template-columns: 1fr;
         gap: var(--space-5);
@@ -2736,7 +2741,7 @@ a.hw-option:hover {
 
 /* En escritorio el texto es bastante más largo que la foto: que la foto le
    acompañe al bajar en vez de quedarse sola arriba con un hueco debajo. */
-@media (min-width: 901px) {
+@media (min-width: 56.3125em) {
     .sobre-mi-imagen {
         position: sticky;
         top: 6.5rem;
@@ -2921,7 +2926,7 @@ a.hw-option:hover {
    de texto, mismo boton— y el desnivel no se leia como ritmo sino como
    rejilla rota, con el borde inferior del bloque en diagonal. Ademas la
    tercera salia mas estrecha sin ninguna razon de contenido. */
-@media (min-width: 900px) {
+@media (min-width: 56.25em) {
     .home .grid--services {
         grid-template-columns: repeat(3, 1fr);
         align-items: stretch;
@@ -2935,7 +2940,7 @@ a.hw-option:hover {
 
 /* Sobre el doctor: manda la columna de texto y las cifras van al lado,
    arrancando a la misma altura (antes las pares bajaban otro escalon). */
-@media (min-width: 900px) {
+@media (min-width: 56.25em) {
     .home .sobre-mi-resumen .sobre-mi-content {
         grid-template-columns: 1.4fr 0.9fr;
         align-items: start;
@@ -2986,7 +2991,7 @@ a.hw-option:hover {
     margin-right: auto;
 }
 
-@media (min-width: 700px) {
+@media (min-width: 43.75em) {
     .home .grid--cta {
         grid-template-columns: repeat(2, 1fr);
         max-width: 42rem;
@@ -3047,7 +3052,7 @@ a.hw-option:hover {
     max-width: 38rem;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 56.25em) {
     /* Servicios: columnas iguales y alineadas, igual que en la portada.
        Aqui habia el mismo escalonado (anchos 1.15/1/0.9 y margenes
        crecientes) y fallaba por lo mismo. */
@@ -3076,7 +3081,7 @@ a.hw-option:hover {
     /* Privacidad: el indice se queda estrecho a un lado en vez de ocupar todo
        el ancho por encima del texto. */
     .toc-grid {
-        grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
     }
 }
 
@@ -3173,7 +3178,7 @@ body {
     text-decoration-thickness: 3px;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 56.25em) {
     .servicio-fila {
         grid-template-columns: minmax(14rem, 1fr) minmax(0, 1.6fr) auto;
         align-items: baseline;
@@ -3197,7 +3202,7 @@ body {
     align-items: center;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 56.25em) {
     .doctor-portada__rejilla {
         grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
         gap: var(--space-6);
@@ -3326,7 +3331,7 @@ button.nav-link {
 
 /* ---- Cierre de portada en móvil: botones a todo el ancho y la reserva
    primero, que es lo que viene a hacer la mayoría. ---- */
-@media (max-width: 599px) {
+@media (max-width: 37.4375em) {
     .cierre-portada__acciones {
         flex-direction: column-reverse;
         width: 100%;
@@ -3339,4 +3344,17 @@ button.nav-link {
 
 .page-hero a {
     color: var(--teal);
+}
+
+/* Con la letra del navegador agrandada, un botón no puede ser más ancho que
+   la pantalla. */
+.btn {
+    max-width: 100%;
+    text-align: center;
+}
+
+/* Testimonios: la rejilla no declaraba columnas y la pista implícita medía
+   lo que su contenido más ancho; con la letra grande se salía de la pantalla. */
+.grid--testimonials {
+    grid-template-columns: minmax(0, 1fr);
 }

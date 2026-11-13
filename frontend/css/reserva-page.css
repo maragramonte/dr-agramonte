@@ -40,7 +40,7 @@ body.reserva-page {
 
         /* ── Selector de centro (NUEVO) ── */
         .centros-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1.25rem;}
-        @media(max-width:400px){.centros-grid{grid-template-columns:1fr;}}
+        @media(max-width: 25em){.centros-grid{grid-template-columns:1fr;}}
         .centro-opt{display:flex;flex-direction:column;align-items:flex-start;gap:.15rem;padding:.875rem;border-radius:10px;border:2px solid var(--gray-200);background:var(--card);cursor:pointer;text-align:left;transition:var(--transition);width:100%;}
         .centro-opt:hover{border-color:var(--teal-border);background:var(--teal-pale);}
         .centro-opt.selected{border-color:var(--teal);background:var(--teal-pale);}
@@ -57,7 +57,7 @@ body.reserva-page {
         .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}.cal-nav h3{font-family:var(--font-display);font-size:1.1rem;}.btn-nav{width:34px;height:34px;border-radius:8px;border:1px solid var(--gray-200);background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--gray-500);font-size:.875rem;transition:var(--transition);}.btn-nav:hover{background:var(--teal-pale);border-color:var(--teal-border);color:var(--teal);}.btn-nav:disabled{opacity:.35;cursor:not-allowed;}.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:.5rem;text-align:center;font-size:.875rem;font-weight:700;color:var(--gray-500);}.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}.cal-day{aspect-ratio:1;border-radius:8px;border:none;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:1rem;font-weight:500;color:var(--gray-700);position:relative;transition:var(--transition);}.cal-day:hover:not(:disabled){background:var(--teal-mid);color:var(--teal);}.cal-day:disabled{color:var(--gray-200);cursor:default;}.cal-day.today{font-weight:700;color:var(--teal);}.cal-day.today::before{content:'';position:absolute;inset:0;border-radius:8px;border:2px solid var(--teal-border);}.cal-day.selected{background:var(--teal-fill) !important;color:#fff !important;}.cal-day.selected .dot{background:#fff !important;opacity:.7;}.dot{width:5px;height:5px;border-radius:50%;background:var(--teal-light);}.dot.parcial{background:#f59e0b;}.dot.critico{background:#ef4444;}.cal-legend{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--gray-200);}.legend-item{display:flex;align-items:center;gap:.35rem;font-size:.875rem;color:var(--gray-500);}.legend-dot{width:8px;height:8px;border-radius:50%;}
 
         /* ── Panel de horas ── */
-        .time-panel{margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--gray-200);}.time-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem;}.time-panel-header h4{font-size:1.05rem;font-weight:600;}.date-chip{font-size:.9rem;padding:.2rem .6rem;border-radius:100px;background:var(--teal-pale);color:var(--teal);font-weight:500;}.slots-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;}@media(max-width:400px){.slots-grid{grid-template-columns:repeat(3,1fr);}}.slot{min-height:48px;padding:.6rem .3rem;border-radius:7px;border:1px solid var(--gray-200);background:var(--card);cursor:pointer;font-size:1rem;font-weight:500;text-align:center;transition:var(--transition);}.slot:hover:not(:disabled){border-color:var(--teal);background:var(--teal-pale);color:var(--teal);}.slot.selected{background:var(--teal-fill);border-color:var(--teal-fill);color:#fff;}.slot:disabled{background:var(--gray-50);color:var(--gray-200);cursor:default;}.period-label{grid-column:1/-1;font-size:.9rem;font-weight:700;color:var(--gray-500);padding:.35rem 0 .1rem;}.field-hint{font-size:.875rem;color:var(--gray-500);}
+        .time-panel{margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--gray-200);}.time-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem;}.time-panel-header h4{font-size:1.05rem;font-weight:600;}.date-chip{font-size:.9rem;padding:.2rem .6rem;border-radius:100px;background:var(--teal-pale);color:var(--teal);font-weight:500;}.slots-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;}@media(max-width: 25em){.slots-grid{grid-template-columns:repeat(3,1fr);}}.slot{min-height:48px;padding:.6rem .3rem;border-radius:7px;border:1px solid var(--gray-200);background:var(--card);cursor:pointer;font-size:1rem;font-weight:500;text-align:center;transition:var(--transition);}.slot:hover:not(:disabled){border-color:var(--teal);background:var(--teal-pale);color:var(--teal);}.slot.selected{background:var(--teal-fill);border-color:var(--teal-fill);color:#fff;}.slot:disabled{background:var(--gray-50);color:var(--gray-200);cursor:default;}.period-label{grid-column:1/-1;font-size:.9rem;font-weight:700;color:var(--gray-500);padding:.35rem 0 .1rem;}.field-hint{font-size:.875rem;color:var(--gray-500);}
 
         /* ── Formulario ── */
         .form-section{margin-bottom:1.5rem;}.form-section-title{font-size:1.05rem;font-weight:700;color:var(--heading);margin-bottom:.75rem;}.modality-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1rem;}.modality-opt input{position:absolute;opacity:0;width:0;height:0;}.modality-opt label{display:flex;flex-direction:column;align-items:center;gap:.35rem;padding:.875rem .5rem;border-radius:10px;border:2px solid var(--gray-200);cursor:pointer;text-align:center;transition:var(--transition);}.modality-opt input:checked~label{border-color:var(--teal);background:var(--teal-pale);color:var(--teal);}.field{margin-bottom:.875rem;}.field input,.field select,.field textarea{width:100%;min-height:48px;padding:.7rem .9rem;border:1.5px solid var(--gray-200);border-radius:9px;font-family:var(--font-body);font-size:1rem;background:var(--card);color:var(--gray-900);transition:border-color .18s;}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--teal);}.field-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}.char-counter{font-size:.875rem;color:var(--gray-400);text-align:right;margin-top:.2rem;}
@@ -93,23 +93,23 @@ body.reserva-page {
         /* minmax(0,1fr) deja que las columnas encojan por debajo del contenido */
         .modality-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);}
         .field input,.field select,.field textarea{min-width:0;}
-        @media(max-width:480px){
+        @media(max-width: 30em){
             .field-row{grid-template-columns:1fr;}   /* Teléfono y Email apilados en móvil */
         }
-        @media(max-width:400px){
+        @media(max-width: 25em){
             .stepper .step span{display:none;}        /* en pantallas muy estrechas, solo números 1·2·3·4 */
             .stepper .step:not(:last-child)::after{margin:0 .35rem;}
         }
     
 /* En móvil el aviso ocupa el ancho de la pantalla: a 380px fijos se salía
    por la derecha en un teléfono de 360. */
-@media (max-width: 600px) {
+@media (max-width: 37.5em) {
     .toast { left: 1rem; right: 1rem; bottom: 1rem; max-width: none; }
 }
 
 /* En móvil, menos margen alrededor de las tarjetas: con el de escritorio el
    formulario se quedaba en dos tercios de una pantalla de 390px. */
-@media (max-width: 600px) {
+@media (max-width: 37.5em) {
     .page-wrapper { padding: 1rem .75rem 3rem; }
     .card-header, .card-body { padding-left: 1rem; padding-right: 1rem; }
 }

@@ -512,14 +512,16 @@ class Accesibilidad {
         link.className = 'skip-link';
         link.textContent = 'Ir al contenido principal';
         link.style.cssText = `
-            position:absolute; top:-40px; left:0;
+            position:absolute; top:0; left:0; transform:translateY(-110%);
             background:var(--teal-fill); color:#fff;
             padding:8px 16px; z-index:9999;
             border-radius:0 0 8px 0; transition:top .2s;
             text-decoration:none; font-weight:600;
         `;
-        link.addEventListener('focus', () => link.style.top = '0');
-        link.addEventListener('blur',  () => link.style.top = '-40px');
+        // Con translate y no con top en píxeles: si el paciente agranda la letra,
+        // el enlace crece y con -40px asomaba por arriba sin tener el foco.
+        link.addEventListener('focus', () => { link.style.transform = 'translateY(0)'; });
+        link.addEventListener('blur',  () => { link.style.transform = 'translateY(-110%)'; });
         document.body.prepend(link);
     }
 
