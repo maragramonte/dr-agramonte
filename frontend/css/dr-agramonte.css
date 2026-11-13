@@ -20,7 +20,7 @@
  * ============================================================
  */
 
-@import url('../vendor/fonts/dm-fonts.css');
+@import url('../vendor/fonts/atkinson.css');
 
 /* ========== 1. VARIABLES GLOBALES ========== */
 :root {
@@ -124,12 +124,13 @@
        DM Serif Display: el serif de titular daba un aire de folleto que no
        encaja con una web cuyo trabajo principal es que el paciente pida hora.
        --font-display se mantiene como token para no tocar sus ~10 usos. */
-    --font-display: 'DM Sans', system-ui, sans-serif;
-    --font-body: 'DM Sans', system-ui, sans-serif;
+    --font-display: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+    --font-body: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
 
-    /* Interletraje de los titulares: a cuerpo grande, la DM Sans pide
-       negativo para no parecer suelta. */
-    --tracking-title: -0.022em;
+    /* Interletraje de los titulares. La Atkinson ya viene abierta para que
+       las letras no se peguen; apretarla tanto como la DM Sans le quitaría
+       justo lo que la hace legible. */
+    --tracking-title: -0.012em;
 }
 
 /* Modo oscuro – activado con atributo data-theme */
@@ -3089,4 +3090,9 @@ a {
     object-position: top center;
     border-radius: var(--radius-lg);
     display: block;
+}
+
+/* Texto a 18 px: con la Atkinson y un público mayor, 16 px se quedaba corto. */
+body {
+    font-size: 1.125rem;
 }
