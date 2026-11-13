@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dr-agramonte-v50';
+const CACHE_NAME = 'dr-agramonte-v51';
 const urlsToCache = [
     '/',
     '/index.html',

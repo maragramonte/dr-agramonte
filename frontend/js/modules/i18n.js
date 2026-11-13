@@ -45,6 +45,7 @@
         'footer.especialista': 'Especialista en Medicina Interna',
         'footer.ubicacion': 'Palma, Illes Balears',
         'footer.contacto': 'Contacte',
+        'footer.formulario': 'Formulari de contacte',
         'footer.horario': 'Horari',
         'footer.lunVie': 'De dilluns a divendres',
         'footer.sabado': 'Dissabtes',
@@ -110,15 +111,6 @@
         'home.valor.3.t': 'Comunicació Clara',
         'home.valor.3.d': 'Explicacions comprensibles i temps per resoldre tots els seus dubtes.',
         'home.sobre.btn': 'Saber-ne més',
-        'home.cta.title': 'Necessita una Consulta Mèdica?',
-        'home.cta.text': 'Reservi la seva cita ara i rebi atenció mèdica de qualitat amb un especialista en Medicina Interna.',
-        'home.cta.online.t': 'Reserva en línia',
-        'home.cta.online.d': 'Triï la data i l\'hora que millor li convingui',
-        'home.cta.tel.t': 'Truqui per telèfon',
-        'home.cta.tel.d': 'Disponible de dilluns a dissabte',
-        'home.cta.email.t': 'Escrigui un correu',
-        'home.cta.email.d': 'Rebrà resposta en menys de 24 hores',
-        'home.cta.email.btn': 'Enviar correu',
 
         // ---- Botón de idioma (aria) ----
         'lang.aria': 'Idioma'
