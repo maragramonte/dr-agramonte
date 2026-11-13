@@ -8,7 +8,7 @@ del teléfono.
 
 [![CI](https://github.com/maragramonte/dr-agramonte/actions/workflows/ci.yml/badge.svg)](https://github.com/maragramonte/dr-agramonte/actions/workflows/ci.yml)
 
-![Portada de la aplicación: el titular «Su cita con el Dr. Agramonte, en un minuto» junto a un panel de reserva con los dos centros de consulta y los huecos libres del jueves](docs/capturas/01-portada.jpg)
+![Portada de la aplicación: el titular «Su cita con el Dr. Agramonte, en un minuto» y, al lado, el panel de reserva con los dos centros de consulta y los huecos libres del primer día con agenda](docs/capturas/01-portada.jpg)
 
 ---
 
@@ -32,48 +32,70 @@ mucha gente acaba llamando igual.
 producto y, bajo [`/app/`](https://maragramonte.github.io/dr-agramonte/app/), la aplicación
 real con una API simulada en el navegador.
 
-> **Es una simulación, no un servidor.** Los datos son ficticios, viven en tu navegador y no
-> se envía ningún aviso de verdad. Lo que la demo **no** puede demostrar (la concurrencia, la
-> disponibilidad calculada en servidor y el control de acceso por rol) está explicado en
+> La demo no tiene servidor detrás. Los datos son ficticios, se guardan en tu navegador y no
+> se envía ningún aviso de verdad. Hay tres cosas que no puede enseñar: la concurrencia, la
+> disponibilidad calculada en el servidor y el control de acceso por rol. Lo explico en
 > [docs/DEMO.md](docs/DEMO.md#qué-no-puede-demostrar).
 
-**Para verlo en un minuto:** en `/app/`, pulsa «Entrar como paciente» y reserva una cita.
-Después, «Entrar como médico» para verla en la agenda y en el cuadro de mando.
+Si tienes un minuto: entra en `/app/`, pulsa «Entrar como paciente» y reserva una cita.
+Luego pulsa «Entrar como médico» y la verás en la agenda y en el cuadro de mando.
 
 Si prefieres no pulsar nada, en [docs/CAPTURAS.md](docs/CAPTURAS.md) está la aplicación
 pantalla a pantalla. La [memoria completa](docs/Memoria-Dr-Agramonte.pdf) (PDF) cuenta el
 proyecto entero.
 
-> **Estado del despliegue.** La versión pública es la demo. El proyecto no tiene dominio propio
-> y el despliegue en servidor propio está preparado y probado, a la espera de levantar la
-> máquina ([docs/DESPLIEGUE-VPS.md](docs/DESPLIEGUE-VPS.md)).
+> Ahora mismo la única versión pública es la demo. El proyecto no tiene dominio propio. El
+> despliegue en un servidor propio está preparado y probado, y falta levantar la máquina
+> ([docs/DESPLIEGUE-VPS.md](docs/DESPLIEGUE-VPS.md)).
 
 ---
 
 ## Qué hace
 
-Todo lo siguiente está implementado en el backend y funciona contra una base de datos real:
+Todo esto está implementado en el backend y funciona contra una base de datos real:
 
-- **Reserva sin registro previo** o con cuenta: centro → fecha → hora → datos.
-- **Disponibilidad real** calculada en el servidor, repartida por centro y día.
-- **Cobertura y pago**: consulta privada con precio visible, o seguro médico con aseguradora.
-- **Avisos automáticos** de confirmación, cancelación y recordatorio 24 h antes, por correo,
-  Telegram y SMS/WhatsApp. Quien reserva sin cuenta recibe en el correo el enlace para
-  consultar o cancelar su cita desde cualquier dispositivo.
-- **Cuentas verificadas por correo**: el alta se confirma desde un enlace y la contraseña
-  olvidada se recupera igual. Si el correo ya tiene cuenta, la respuesta es la misma que si
-  estuviera libre, para no revelar quién está registrado.
-- **Consentimiento registrado**: cada cita guarda cuándo se aceptó la política de privacidad
-  y qué versión del texto. La hora la pone el servidor, no el navegador.
-- **Cuadro de mando** para el profesional: carga por médico, demanda por especialidad,
-  reparto por centro y tasa de cancelación.
-- **Bilingüe** castellano/catalán, con la preferencia guardada en el navegador.
-- **PWA instalable**, accesible (WCAG 2.1 AA), con modo oscuro y modo sin conexión.
+- Reserva con cuenta o sin ella, en cuatro pasos: centro, día, hora y datos.
+- Disponibilidad calculada en el servidor, por centro y por día.
+- Consulta privada con el precio a la vista, o seguro médico eligiendo la aseguradora.
+- Avisos de confirmación, cancelación y recordatorio 24 h antes, por correo, Telegram y
+  SMS/WhatsApp. Quien reserva sin cuenta recibe por correo un enlace para consultar o
+  cancelar la cita desde cualquier dispositivo.
+- Cuentas que se activan desde un enlace en el correo, y la contraseña olvidada se recupera
+  igual. Si alguien se registra con un correo que ya tiene cuenta, recibe la misma respuesta
+  que si estuviera libre. Así no se puede averiguar quién está dado de alta.
+- Cada cita guarda cuándo se aceptó la política de privacidad y qué versión del texto. La
+  hora la pone el servidor, no el navegador.
+- Un cuadro de mando para el médico: carga por médico, demanda por especialidad, reparto por
+  centro y tasa de cancelación.
+- Castellano y catalán, con el idioma guardado en el navegador.
+- Se puede instalar como app (PWA), tiene modo oscuro y una página para cuando no hay
+  conexión.
 
-Los tres canales de aviso son **opcionales**: con sus credenciales sin configurar la
-aplicación funciona igual, simplemente no envía mensajes.
+Los tres canales de aviso son opcionales. Si no configuras sus credenciales, la aplicación
+funciona igual y simplemente no manda mensajes.
 
 ![Pantalla de reserva: los dos centros de consulta, el calendario del mes con el día elegido y los huecos libres de mañana y tarde](docs/capturas/04-reserva-huecos.png)
+
+---
+
+## Diseño
+
+Quien entra en esta web suele ser un paciente de Medicina Interna, y muchos son mayores. Casi
+todas las decisiones visuales salen de ahí:
+
+- La letra es Atkinson Hyperlegible Next, que hizo el Braille Institute para personas con
+  baja visión. El texto va a 18 px y los campos del formulario a 16 px, que es lo mínimo
+  para que el iPhone no haga zoom al tocarlos.
+- La web respeta el tamaño de letra que cada uno tenga puesto en su navegador. Hay una
+  prueba que lo comprueba con la letra al doble.
+- El verde se reserva para lo que se puede pulsar. Así el botón de reservar no tiene que
+  competir con nada.
+- El doctor aparece en un dibujo a lápiz, no en una foto. Le da carácter a la web y no
+  expone la imagen de nadie.
+- El objetivo de accesibilidad es WCAG 2.1 AA. Los contrastes están medidos, pero no ha
+  pasado una auditoría externa.
+
+Las pantallas, una a una, están en [docs/CAPTURAS.md](docs/CAPTURAS.md).
 
 ---
 
@@ -94,45 +116,44 @@ PostgreSQL no publica ningún puerto fuera de la red interna.
 El backend va en capas clásicas (controlador · servicio · repositorio) con DTOs separados de
 las entidades. El frontend es estático, sin framework ni paso de compilación, y nada se carga
 de un CDN: tipografías, iconos y Chart.js están autoalojados, lo que permite servir una
-Content-Security-Policy **sin `'unsafe-inline'` en los scripts**.
+Content-Security-Policy sin `'unsafe-inline'` en los scripts.
 
-La configuración de seguridad está **cerrada por defecto**: una ruta de la API que no esté
+La configuración de seguridad está cerrada por defecto: una ruta de la API que no esté
 declarada se deniega, en vez de quedar abierta a cualquiera con sesión
 ([fase 14](docs/EVOLUCION.md#fase-14-securityconfig-cerrada-por-defecto)).
 
-**→ [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md)**: componentes, flujo de una petición,
-autenticación, concurrencia, notificaciones e infraestructura.
+En [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) están los componentes, el recorrido de una
+petición, la autenticación, la concurrencia, los avisos y la infraestructura.
 
 ---
 
 ## Decisiones técnicas
 
-Las cuatro que mejor explican el proyecto. El razonamiento completo (con alternativas,
-limitaciones y evidencia en el código) está en
-**[docs/DECISIONES-TECNICAS.md](docs/DECISIONES-TECNICAS.md)**.
+Estas cuatro son las que mejor explican el proyecto. Las demás, con las alternativas que
+descarté y sus limitaciones, están en [docs/DECISIONES-TECNICAS.md](docs/DECISIONES-TECNICAS.md).
 
 **Bloqueo pesimista contra la doble reserva.** La reserva bloquea la fila del horario con
 `SELECT ... FOR UPDATE` sobre un índice `UNIQUE (medico_id, inicio)`. La primera transacción
-gana; la segunda recibe un **409** sin persistir nada. Hay una prueba que lanza dos hilos
+gana; la segunda recibe un 409 y no se guarda nada. Hay una prueba que lanza dos hilos
 sincronizados con `CyclicBarrier` contra la misma franja, sobre un PostgreSQL real levantado
 con Testcontainers, y comprueba que sale exactamente un 201 y un 409.
-[→](docs/DECISIONES-TECNICAS.md#1-bloqueo-pesimista-contra-la-doble-reserva)
+([detalle](docs/DECISIONES-TECNICAS.md#1-bloqueo-pesimista-contra-la-doble-reserva))
 
 **Los avisos salen después del commit.** Se aplazan a la fase `afterCommit`. Así ninguna
 llamada de red ocurre con una fila bloqueada, y si la transacción se revierte nunca se avisa
 de una cita que no llegó a existir.
-[→](docs/DECISIONES-TECNICAS.md#2-las-notificaciones-salen-después-del-commit)
+([detalle](docs/DECISIONES-TECNICAS.md#2-las-notificaciones-salen-después-del-commit))
 
 **De quién es una agenda no lo decide la URL.** `/api/citas/agenda/**` recibía el médico por
 parámetro con `defaultValue = "1"`: el rol se comprobaba bien, pero nadie comprobaba *qué*
 médico, así que bastaba cambiar el número para leer la agenda de otro. Es un fallo que
 ninguna prueba de roles detecta, porque el rol era correcto. Ahora el médico sale del JWT.
-[→](docs/DECISIONES-TECNICAS.md#7-de-quién-es-una-agenda-no-lo-decide-la-url)
+([detalle](docs/DECISIONES-TECNICAS.md#7-de-quién-es-una-agenda-no-lo-decide-la-url))
 
 **El token de la cita, hasheado y en el fragmento.** Quien reserva sin cuenta recibe un token
 opaco entregado una sola vez. En base de datos solo queda su SHA-256, y viaja en el fragmento
 de la URL, que el navegador no manda al servidor.
-[→](docs/DECISIONES-TECNICAS.md#5-token-de-acceso-por-cita-hash-en-base-de-datos-y-fragmento-en-la-url)
+([detalle](docs/DECISIONES-TECNICAS.md#5-token-de-acceso-por-cita-hash-en-base-de-datos-y-fragmento-en-la-url))
 
 ---
 
@@ -143,33 +164,35 @@ cd backend && mvn test
 cd e2e && npm ci && npm test   # E2E del frontend (la primera vez: npx playwright install chromium)
 ```
 
-**130 pruebas** en tres niveles: 76 unitarias, 32 de capa REST (`@WebMvcTest` con la
-`SecurityConfig` real) y 22 de integración contra un PostgreSQL levantado con Testcontainers.
-Las de correo usan GreenMail, un SMTP en memoria: el token se extrae del correo realmente
-recibido.
+El backend tiene 131 pruebas en tres niveles: 77 unitarias, 32 de la capa REST
+(`@WebMvcTest` con la `SecurityConfig` real) y 22 de integración contra un PostgreSQL
+levantado con Testcontainers. Las de correo usan GreenMail, un SMTP en memoria, y sacan el
+token del correo que de verdad ha llegado.
 
-Las de integración **necesitan Docker**; sin él se marcan como saltadas en lugar de fallar.
-El CI lo compensa: revisa los informes de Surefire y **falla si alguna quedó sin ejecutar**.
+Las de integración necesitan Docker. Sin Docker se marcan como saltadas en vez de fallar, así
+que el CI revisa los informes de Surefire y falla si alguna se ha quedado sin ejecutar.
 Hay además análisis semanal de vulnerabilidades de dependencias con OWASP dependency-check,
 y Dependabot propone las actualizaciones de Maven, Docker y GitHub Actions. Cada PR pasa por
 Semgrep (reglas de Java y de secretos, de momento solo informativo) y cada semana gitleaks
 revisa todo el historial de git en busca de claves subidas por error.
 
-En el frontend, **5 pruebas E2E con Playwright** recorren la reserva sin cuenta, en escritorio
-y en móvil. La API está simulada en el navegador, así que no necesitan backend.
+El frontend tiene 22 pruebas E2E con Playwright, y cada una se ejecuta en escritorio y en
+móvil. Cubren la reserva sin cuenta de principio a fin, que los pacientes no vean enlaces a
+las herramientas internas, la portada cuando la agenda no responde y que ninguna página se
+salga de la pantalla con la letra del navegador al doble. La API está simulada en el
+navegador, así que no hace falta backend.
 
-Lo que **no** está cubierto, dicho sin adornos: la cobertura no está medida (no hay JaCoCo,
-así que no hay porcentaje), el resto del frontend (login, «Mis citas», panel del médico) no
-tiene pruebas, ninguna prueba recorre frontend, backend y base de datos a la vez, y el perfil
-MySQL no se prueba en CI.
+Lo que falta: la cobertura no está medida (no hay JaCoCo, así que no hay porcentaje). El
+login, «Mis citas» y el panel del médico no tienen pruebas en el frontend. Ninguna prueba
+recorre frontend, backend y base de datos a la vez, y el perfil MySQL no se prueba en CI.
 
-**→ [docs/PRUEBAS-Y-CALIDAD.md](docs/PRUEBAS-Y-CALIDAD.md)**
+Todo el detalle está en [docs/PRUEBAS-Y-CALIDAD.md](docs/PRUEBAS-Y-CALIDAD.md).
 
 ---
 
 ## Puesta en marcha
 
-Requiere **Docker Desktop**. Para compilar el backend por separado, JDK 21 y Maven 3.9+.
+Hace falta Docker Desktop. Para compilar el backend por separado, JDK 21 y Maven 3.9 o superior.
 
 ```bash
 cp .env.example .env          # editar JWT_SECRET
@@ -180,9 +203,9 @@ docker compose up -d --build
 - API: <http://localhost:8080>
 
 Usuario médico de prueba, que crea la migración V3: `dr.agramonte@example.com` / `Medico123!`
-Esa cuenta es **pública** (la contraseña está en el repositorio); la aplicación la reescribe
-al arrancar con `MEDICO_EMAIL` y `MEDICO_PASSWORD`, y sin esas variables el compose de
-producción no levanta.
+Esa contraseña está en el repositorio, así que cualquiera la conoce. Por eso la aplicación
+la sustituye al arrancar con `MEDICO_EMAIL` y `MEDICO_PASSWORD`, y el compose de producción
+no arranca si faltan esas variables.
 
 | Para | Documento |
 |------|-----------|
@@ -244,24 +267,22 @@ producción no levanta.
 
 ## Sobre mí
 
-Soy **Mar Agramonte**, desarrolladora recién graduada en el Ciclo Superior de **Desarrollo de
-Aplicaciones Multiplataforma**.
+Soy Mar Agramonte. Acabo de terminar el ciclo superior de Desarrollo de Aplicaciones
+Multiplataforma (DAM).
 
-Vengo de administración y he hecho la transición a desarrollo construyendo proyectos reales,
-no solo ejercicios de clase. Este es uno: nació como mi proyecto de fin de ciclo y sigue
-creciendo porque hay una consulta de verdad detrás. Ahora mismo estoy desarrollando además
-una web para un negocio real.
+Antes trabajaba en administración. Me pasé al desarrollo haciendo proyectos con uso real, y
+este es uno de ellos: empezó como mi proyecto de fin de ciclo y lo sigo mejorando porque
+detrás hay una consulta de verdad. Además, ahora estoy haciendo la web de un negocio real.
 
-Trabajo con **Java, JavaScript, HTML y CSS**. Sé consumir y probar APIs e integrar servicios
-externos en una aplicación: aquí están Twilio, la Bot API de Telegram y un despliegue
-preparado para un VPS propio con Docker y HTTPS automático con Caddy.
+Trabajo con Java, JavaScript, HTML y CSS. Sé consumir y probar APIs y conectar servicios
+externos. En este proyecto están Twilio, la Bot API de Telegram y un despliegue para un VPS
+propio con Docker y HTTPS automático con Caddy.
 
-Uso herramientas de IA como apoyo activo (para aprender más rápido, depurar y desatascarme)
-igual que cualquier desarrolladora junior hoy. Las decisiones técnicas de este repositorio, y
-el saber explicarlas, son mías.
+Uso herramientas de IA para aprender más rápido, depurar y desatascarme, como casi cualquier
+junior hoy en día. Las decisiones técnicas de este repositorio las he tomado yo y sé
+explicarlas.
 
-Busco mi **primera oportunidad como desarrolladora junior**, en Mallorca o en remoto, en un
-equipo donde seguir creciendo y aportar desde el primer día.
+Busco mi primer trabajo como desarrolladora junior, en Mallorca o en remoto.
 
 ---
 
