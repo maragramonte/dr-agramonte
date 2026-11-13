@@ -43,6 +43,10 @@ for (const ruta of PAGINAS_PUBLICAS) {
             return copia.textContent;
         });
         expect(texto).not.toMatch(/\bTF[GC]\b/);
+        // Nada de promesas que la consulta no puede garantizar.
+        expect(texto).not.toMatch(/24 horas/);
+        // El repositorio es del proyecto, no un canal de contacto para pacientes.
+        await expect(page.locator('a[href*="github.com"]')).toHaveCount(0);
     });
 }
 
