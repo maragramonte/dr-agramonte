@@ -154,15 +154,33 @@ function pintar() {
     }
 }
 
+/**
+ * Sin agenda (backend caído, sin médicos o la web estática de GitHub Pages)
+ * el recuadro no enseña un error: enseña los centros como enlaces a
+ * reservar.html, que ya sabe preseleccionar el centro. El motivo va a la
+ * consola, que es donde le sirve a quien mantiene la web; al paciente un
+ * «no se ha podido consultar» solo le dice que algo está roto.
+ */
 function replegar(motivo) {
+    console.warn('[hero] sin agenda:', motivo);
     const cuerpo = $('heroReservaCuerpo');
     const pie = $('heroReservaPie');
     if (pie) pie.hidden = true;
     if (!cuerpo) return;
+    // «Huecos reales de los próximos días» deja de ser verdad sin agenda.
+    const subtitulo = document.querySelector('#heroReserva .hero-widget__head p');
+    if (subtitulo) subtitulo.hidden = true;
     cuerpo.innerHTML = `
         <div class="hero-widget__fallback">
-            <p>${motivo}</p>
-            <a href="reservar.html" class="btn btn--primary btn--reserva btn--large">Ver horas libres</a>
+            <p class="hw-label" id="hwLabelCentroRepliegue">Elija centro y verá los días libres</p>
+            <ul class="hw-options" aria-labelledby="hwLabelCentroRepliegue">
+                ${CENTROS.map((c) => `
+                    <li><a class="hw-option" href="reservar.html?centro=${encodeURIComponent(c.id)}">
+                        ${c.nombre}
+                        <small>${c.direccion} · ${c.diasHint}</small>
+                    </a></li>
+                `).join('')}
+            </ul>
         </div>
     `;
 }

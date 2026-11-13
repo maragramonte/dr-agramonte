@@ -26,9 +26,13 @@
     <meta property="og:description" content="Servicios de Medicina Interna en Mallorca: consulta general, control de crónicas y chequeos preventivos.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://maragramonte.github.io/dr-agramonte/app/servicios.html">
-    <meta property="og:image" content="https://maragramonte.github.io/dr-agramonte/app/pictures/Profesional.png">
+    <meta property="og:image" content="https://maragramonte.github.io/dr-agramonte/app/pictures/compartir.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Dibujo a lápiz del Dr. Agramonte junto a su nombre y especialidad">
     <meta property="og:locale" content="es_ES">
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://maragramonte.github.io/dr-agramonte/app/pictures/compartir.jpg">
     <meta name="twitter:title" content="Servicios | Dr. Agramonte">
     <meta name="twitter:description" content="Servicios de Medicina Interna en Mallorca: consulta general, control de crónicas y chequeos preventivos.">
 </head>
@@ -38,7 +42,6 @@
         <div class="header-content">
             <div class="logo-section">
                 <a href="index.html" class="logo-link" aria-label="Inicio - Dr. Agramonte">
-                    <div class="logo-icon" aria-hidden="true"><i class="fas fa-user-md"></i></div>
                     <div class="logo-text">
                         <p class="logo-title">Dr. Agramonte</p>
                         <p class="logo-subtitle" data-i18n="logo.subtitle">Especialista en Medicina Interna</p>
@@ -56,9 +59,6 @@
                 <a href="reservar.html" class="nav-cta" aria-label="Reservar cita"><i class="fas fa-calendar-plus" aria-hidden="true"></i><span class="nav-cta-text" data-i18n="nav.reservar">Reservar cita</span></a>
                 <div class="header-utils">
                     <div class="lang-switch" role="group" aria-label="Idioma"><button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" aria-pressed="true">ES</button><button type="button" class="lang-btn" data-lang-btn="ca" aria-pressed="false">CA</button></div>
-                    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Activar modo oscuro" title="Cambiar tema claro / oscuro" aria-pressed="false">
-                        <i class="fas fa-moon" id="themeToggleIcon" aria-hidden="true"></i>
-                    </button>
                     <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="mega-menu" aria-label="Abrir el menú"><span class="nav-toggle-icon" aria-hidden="true"></span><span class="nav-toggle-text" data-i18n="nav.menu">Menú</span></button>
                 </div>
             </div>
@@ -77,7 +77,6 @@
                     <li><a href="index.html" class="mega-link"><i class="fas fa-home" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.inicio">Inicio</span><span class="mega-link__hint" data-i18n="menu.inicio.hint">Portada y resumen</span></span></a></li>
                     <li><a href="sobre-mi.html" class="mega-link"><i class="fas fa-user-md" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.sobre">El Dr. Agramonte</span><span class="mega-link__hint" data-i18n="menu.sobre.hint">Trayectoria y formación</span></span></a></li>
                     <li><a href="servicios.html" class="mega-link"><i class="fas fa-stethoscope" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.servicios">Servicios</span><span class="mega-link__hint" data-i18n="menu.servicios.hint">Qué se atiende en consulta</span></span></a></li>
-                    <li><a href="testimonios.html" class="mega-link"><i class="fas fa-star" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.testimonios">Testimonios</span><span class="mega-link__hint" data-i18n="menu.testimonios.hint">Opiniones de pacientes</span></span></a></li>
                 </ul>
             </div>
             <div class="mega-menu__group">
@@ -92,13 +91,14 @@
             <a href="privacidad.html" class="mega-menu__legal"><i class="fas fa-shield-alt" aria-hidden="true"></i> <span data-i18n="footer.privacidad">Política de Privacidad</span></a>
             <!-- Copia del selector de idioma para los anchos en los que no cabe en la barra. -->
             <div class="lang-switch lang-switch--menu" role="group" aria-label="Idioma"><button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" aria-pressed="true">ES</button><button type="button" class="lang-btn" data-lang-btn="ca" aria-pressed="false">CA</button></div>
+            <button type="button" class="theme-toggle" id="themeToggle" aria-label="Activar modo oscuro" title="Cambiar tema claro / oscuro" aria-pressed="false"><i class="fas fa-moon" id="themeToggleIcon" aria-hidden="true"></i></button>
         </div>
     </div>
 </header>
 
 <section class="page-hero page-hero--compact">
     <div class="container">
-        <h1><i class="fas fa-stethoscope" aria-hidden="true"></i> Servicios médicos</h1>
+        <h1>Servicios médicos</h1>
         <p>Diagnóstico, prevención y seguimiento con un plan personalizado.</p>
     </div>
 </section>
@@ -106,15 +106,15 @@
 <main id="main-content" class="container">
     <section class="section servicios-section">
         <div class="container">
-            <div class="grid grid--3 servicios-grid" role="list">
-                <article id="consulta-general" class="card servicio-card"><div class="card__icon"><i class="fas fa-stethoscope"></i></div><h2 class="card__title">Consulta General</h2><p class="card__text">Evaluación médica completa, diagnóstico y tratamiento de problemas agudos o recurrentes.</p><p class="help">Ideal si tienes síntomas persistentes, dudas con tu medicación o quieres una segunda opinión.</p><details class="servicio-detalles"><summary>Ver detalles</summary><ul><li>Historia clínica detallada</li><li>Exploración física completa</li><li>Prescripción médica y seguimiento</li></ul></details><div class="servicio-acciones"><a class="btn btn--primary btn--reserva" href="reservar.html?servicio=consulta-general"><i class="fas fa-calendar-plus" aria-hidden="true"></i> Reservar cita</a></div></article>
-                <article id="enfermedades-cronicas" class="card servicio-card"><div class="card__icon"><i class="fas fa-heartbeat"></i></div><h2 class="card__title">Control de Enfermedades Crónicas</h2><p class="card__text">Seguimiento de patologías como diabetes, hipertensión y enfermedad cardiovascular.</p><p class="help">Control, objetivos claros y prevención de complicaciones.</p><details class="servicio-detalles"><summary>Ver detalles</summary><ul><li>Evaluación integral del paciente crónico</li><li>Ajuste de tratamientos</li><li>Prevención de complicaciones</li></ul></details><div class="servicio-acciones"><a class="btn btn--primary btn--reserva" href="reservar.html?servicio=enfermedades-cronicas"><i class="fas fa-calendar-plus" aria-hidden="true"></i> Reservar cita</a></div></article>
-                <article id="chequeos-preventivos" class="card servicio-card"><div class="card__icon"><i class="fas fa-clipboard-check"></i></div><h2 class="card__title">Chequeos Preventivos</h2><p class="card__text">Revisiones periódicas para detectar riesgos antes de que den la cara.</p><p class="help">Porque "me encuentro bien" no siempre significa "todo está bien".</p><details class="servicio-detalles"><summary>Ver detalles</summary><ul><li>Chequeos completos personalizados</li><li>Evaluación cardiovascular y metabólica</li><li>Orientación preventiva y hábitos saludables</li></ul></details><div class="servicio-acciones"><a class="btn btn--primary btn--reserva" href="reservar.html?servicio=chequeos-preventivos"><i class="fas fa-calendar-plus" aria-hidden="true"></i> Reservar cita</a></div></article>
-                <article id="interpretacion-analiticas" class="card servicio-card"><div class="card__icon"><i class="fas fa-vials"></i></div><h2 class="card__title">Interpretación de Analíticas</h2><p class="card__text">Explicación clara de resultados y próximos pasos.</p><p class="help">Sin jeroglíficos: valores, significado clínico y plan.</p><details class="servicio-detalles"><summary>Ver detalles</summary><ul><li>Análisis completo de resultados</li><li>Explicación en lenguaje comprensible</li><li>Recomendaciones personalizadas</li></ul></details><div class="servicio-acciones"><a class="btn btn--primary btn--reserva" href="reservar.html?servicio=interpretacion-analiticas"><i class="fas fa-calendar-plus" aria-hidden="true"></i> Reservar cita</a></div></article>
-                <article id="estilo-vida" class="card servicio-card"><div class="card__icon"><i class="fas fa-apple-alt"></i></div><h2 class="card__title">Asesoramiento en Estilo de Vida</h2><p class="card__text">Plan personalizado para mejorar salud con nutrición, ejercicio y bienestar emocional.</p><p class="help">Pequeños cambios, grandes beneficios a largo plazo.</p><details class="servicio-detalles"><summary>Ver detalles</summary><ul><li>Plan nutricional adaptado</li><li>Rutina de ejercicio recomendada</li><li>Manejo del estrés y descanso</li></ul></details><div class="servicio-acciones"><a class="btn btn--primary btn--reserva" href="reservar.html?servicio=estilo-vida"><i class="fas fa-calendar-plus" aria-hidden="true"></i> Reservar cita</a></div></article>
+            <div class="servicios-grid servicios-grid--filas">
+                <article id="consulta-general" class="servicio-card"><h2 class="card__title">Consulta general</h2><p class="card__text">Evaluación médica completa, diagnóstico y tratamiento de problemas agudos o recurrentes.</p><p class="help">Para síntomas que no se van, dudas con la medicación o una segunda opinión.</p><details class="servicio-detalles"><summary>Ver detalles</summary><ul><li>Historia clínica detallada</li><li>Exploración física completa</li><li>Prescripción médica y seguimiento</li></ul></details><div class="servicio-acciones"><a class="servicio-fila__accion" href="reservar.html?servicio=consulta-general">Reservar esta consulta</a></div></article>
+                <article id="enfermedades-cronicas" class="servicio-card"><h2 class="card__title">Control de enfermedades crónicas</h2><p class="card__text">Seguimiento de patologías como diabetes, hipertensión y enfermedad cardiovascular.</p><p class="help">Control, objetivos claros y prevención de complicaciones.</p><details class="servicio-detalles"><summary>Ver detalles</summary><ul><li>Evaluación integral del paciente crónico</li><li>Ajuste de tratamientos</li><li>Prevención de complicaciones</li></ul></details><div class="servicio-acciones"><a class="servicio-fila__accion" href="reservar.html?servicio=enfermedades-cronicas">Reservar esta consulta</a></div></article>
+                <article id="chequeos-preventivos" class="servicio-card"><h2 class="card__title">Chequeos preventivos</h2><p class="card__text">Revisiones periódicas para detectar riesgos antes de que den la cara.</p><p class="help">Porque "me encuentro bien" no siempre significa "todo está bien".</p><details class="servicio-detalles"><summary>Ver detalles</summary><ul><li>Chequeos completos personalizados</li><li>Evaluación cardiovascular y metabólica</li><li>Orientación preventiva y hábitos saludables</li></ul></details><div class="servicio-acciones"><a class="servicio-fila__accion" href="reservar.html?servicio=chequeos-preventivos">Reservar esta consulta</a></div></article>
+                <article id="interpretacion-analiticas" class="servicio-card"><h2 class="card__title">Interpretación de analíticas</h2><p class="card__text">Explicación clara de resultados y próximos pasos.</p><p class="help">Sin jeroglíficos: valores, significado clínico y plan.</p><details class="servicio-detalles"><summary>Ver detalles</summary><ul><li>Análisis completo de resultados</li><li>Explicación en lenguaje comprensible</li><li>Recomendaciones personalizadas</li></ul></details><div class="servicio-acciones"><a class="servicio-fila__accion" href="reservar.html?servicio=interpretacion-analiticas">Reservar esta consulta</a></div></article>
+                <article id="estilo-vida" class="servicio-card"><h2 class="card__title">Asesoramiento en estilo de vida</h2><p class="card__text">Plan personalizado para mejorar salud con nutrición, ejercicio y bienestar emocional.</p><p class="help">Pequeños cambios, grandes beneficios a largo plazo.</p><details class="servicio-detalles"><summary>Ver detalles</summary><ul><li>Plan nutricional adaptado</li><li>Rutina de ejercicio recomendada</li><li>Manejo del estrés y descanso</li></ul></details><div class="servicio-acciones"><a class="servicio-fila__accion" href="reservar.html?servicio=estilo-vida">Reservar esta consulta</a></div></article>
             </div>
             <div class="notice" style="margin-top:2rem;"><p><strong>Nota:</strong> Todos los servicios incluyen historia clínica detallada y seguimiento personalizado. Para emergencias médicas, contacte directamente con el 112.</p></div>
-            <div class="proceso-atencion"><h2 class="section__title--small">El proceso de atención</h2><div class="proceso-pasos"><div class="paso"><span class="paso-numero">1</span><h3>Evaluación Inicial</h3><p>Historia clínica completa y valoración del estado de salud</p></div><div class="paso"><span class="paso-numero">2</span><h3>Diagnóstico</h3><p>Pruebas complementarias según cada caso</p></div><div class="paso"><span class="paso-numero">3</span><h3>Plan de Tratamiento</h3><p>Diseño de un plan adaptado a las necesidades del paciente</p></div><div class="paso"><span class="paso-numero">4</span><h3>Seguimiento Continuo</h3><p>Revisiones periódicas y ajuste del tratamiento según evolución</p></div></div></div>
+            <div class="proceso-atencion"><h2 class="section__title--small">El proceso de atención</h2><div class="proceso-pasos"><div class="paso"><span class="paso-numero">1</span><h3>Evaluación inicial</h3><p>Historia clínica completa y valoración del estado de salud</p></div><div class="paso"><span class="paso-numero">2</span><h3>Diagnóstico</h3><p>Pruebas complementarias según cada caso</p></div><div class="paso"><span class="paso-numero">3</span><h3>Plan de tratamiento</h3><p>Diseño de un plan adaptado a las necesidades del paciente</p></div><div class="paso"><span class="paso-numero">4</span><h3>Seguimiento continuo</h3><p>Revisiones periódicas y ajuste del tratamiento según evolución</p></div></div></div>
             <div class="cta-servicios"><a href="reservar.html" class="btn btn--primary btn--reserva btn--large"><i class="fas fa-calendar-plus" aria-hidden="true"></i> Reservar cita</a><p class="cta-text">¿No sabe qué servicio necesita? <a href="contacto.html">Contacte</a> y el Dr. Agramonte le asesorará personalmente.</p></div>
         </div>
     </section>
@@ -123,9 +123,8 @@
 <footer class="footer">
     <div class="footer-content">
         <div class="footer-section"><h3>Dr. Agramonte</h3><p data-i18n="footer.especialista">Especialista en Medicina Interna</p><p data-i18n="footer.ubicacion">Palma de Mallorca, Islas Baleares</p></div>
-        <div class="footer-section"><h3 data-i18n="footer.contacto">Contacto</h3><a href="contacto.html"><i class="fas fa-envelope"></i> <span data-i18n="footer.formulario">Formulario de contacto</span></a><p><i class="fas fa-map-marker-alt"></i> Palma de Mallorca</p></div>
-        <div class="footer-section"><h3 data-i18n="footer.horario">Horario</h3><p><strong data-i18n="footer.lunVie">Lunes a Viernes</strong><br>9:00 - 14:00<br>16:00 - 19:00</p><p><strong data-i18n="footer.sabado">Sábados</strong><br><span data-i18n="footer.sabadoHoras">9:00 - 13:00 (con cita)</span></p></div>
-        <div class="footer-section"><h3 data-i18n="footer.enlaces">Enlaces</h3><a href="sobre-mi.html"><i class="fas fa-user-md"></i> El Dr. Agramonte</a><a href="servicios.html"><i class="fas fa-stethoscope"></i> <span data-i18n="nav.servicios">Servicios</span></a><a href="testimonios.html"><i class="fas fa-star"></i> <span data-i18n="nav.testimonios">Testimonios</span></a><a href="contacto.html"><i class="fas fa-envelope"></i> <span data-i18n="nav.contacto">Contacto</span></a><a href="reservar.html"><i class="fas fa-calendar-plus"></i> <span data-i18n="nav.reservar">Reservar cita</span></a><a href="privacidad.html"><i class="fas fa-shield-alt"></i> <span data-i18n="footer.privacidad">Política de Privacidad</span></a></div>
+        <div class="footer-section"><h3 data-i18n="footer.horario">Horario</h3><p><strong data-i18n="footer.lunVie">Lunes a viernes</strong><br>9:00 - 14:00<br>16:00 - 19:00</p><p><strong data-i18n="footer.sabado">Sábados</strong><br><span data-i18n="footer.sabadoHoras">9:00 - 13:00 (con cita)</span></p></div>
+        <div class="footer-section"><h3 data-i18n="footer.enlaces">Enlaces</h3><a href="sobre-mi.html">El Dr. Agramonte</a><a href="servicios.html" data-i18n="nav.servicios">Servicios</a><a href="reservar.html" data-i18n="nav.reservar">Reservar cita</a><a href="contacto.html" data-i18n="nav.contacto">Contacto</a></div>
     </div>
     <div class="footer-bottom"><p><span data-i18n="footer.copyright">© 2026 Dr. Juan Manuel Agramonte.</span> <a href="privacidad.html" data-i18n="footer.privacidad">Política de Privacidad</a></p></div>
 </footer>

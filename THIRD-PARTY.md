@@ -14,8 +14,7 @@ dominio, no desde un CDN. Sus licencias permiten expresamente alojarlos así.
 |---|---|---|---|
 | Chart.js | 4.4.1 | `frontend/js/vendor/chart.umd.min.js` | MIT |
 | Font Awesome Free | 6.4.0 | `frontend/vendor/fontawesome/` | Iconos: CC BY 4.0 · Fuentes: SIL OFL 1.1 · Código: MIT ([texto](frontend/vendor/fontawesome/LICENSE.txt)) |
-| DM Sans | v17 | `frontend/vendor/fonts/` | SIL OFL 1.1 ([texto](frontend/vendor/fonts/LICENSE-DM-fonts.txt)) |
-| DM Serif Display | v17 | `frontend/vendor/fonts/` | SIL OFL 1.1 ([texto](frontend/vendor/fonts/LICENSE-DM-fonts.txt)) |
+| Atkinson Hyperlegible Next | 5.3.0 (Fontsource) | `frontend/vendor/fonts/` | SIL OFL 1.1 ([texto](frontend/vendor/fonts/LICENSE-Atkinson-Hyperlegible-Next.txt)) |
 
 La atribución que pide la CC BY 4.0 de los iconos queda cubierta por el aviso que
 Font Awesome incluye en la cabecera de `all.min.css` y por su fichero de licencia,

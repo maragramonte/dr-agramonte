@@ -4,7 +4,7 @@
         .privacidad-badge,
         .page-hero-badge { display: inline-flex; align-items: center; gap: 0.8rem; }
         .toc-container { background: var(--card); border-radius: var(--radius-lg); padding: var(--space-3) var(--space-4); margin-bottom: var(--space-5); border: 1px solid var(--gray-200); }
-        .toc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr)); gap: 0.5rem; }
+        .toc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr)); gap: 0.5rem; }
         .toc-link { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.8rem; background: var(--gray-100); border-radius: var(--radius); font-size: 0.85rem; color: var(--gray-700); cursor: pointer; transition: all 0.2s; }
         .toc-link.active { background: var(--teal-fill); color: white; }
         .privacy-card { background: var(--card); border-radius: var(--radius-lg); padding: var(--space-4); border: 1px solid var(--gray-200); display: none; }
@@ -14,7 +14,6 @@
         .update-banner { background: var(--teal-pale); border-left: 4px solid var(--teal); border-radius: var(--radius); padding: var(--space-3); margin: var(--space-5) 0; text-align: center; }
         .privacy-cta { background: linear-gradient(135deg, var(--card), var(--bg)); border-radius: var(--radius-lg); padding: var(--space-5); text-align: center; margin: var(--space-6) 0 var(--space-4); border: 1px solid var(--gray-200); }
         .privacy-intro { font-size: 1.05rem; margin: 1rem 0 2rem; max-width: 46rem; }
-        @media (max-width:768px){ .toc-grid { grid-template-columns: 1fr 1fr; } }
 /* --- Panel pruebas --- */
         .pruebas-wrap { max-width: 1100px; margin: 0 auto; padding: 0 1rem 3rem; }
         .pruebas-toolbar {
@@ -81,7 +80,7 @@
         .acceso-grid {
             display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
         }
-        @media (max-width: 768px) { .acceso-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 48em) { .acceso-grid { grid-template-columns: 1fr; } }
         .acceso-list { list-style: none; font-size: .82rem; }
         .acceso-list li {
             padding: .45rem 0; border-bottom: 1px solid var(--gray-100);
@@ -95,7 +94,7 @@
             display: grid; grid-template-columns: 260px 1fr; gap: 1rem;
             min-height: 420px;
         }
-        @media (max-width: 768px) { .medico-layout { grid-template-columns: 1fr; } }
+        @media (max-width: 48em) { .medico-layout { grid-template-columns: 1fr; } }
         .medico-list {
             background: var(--card); border: 1px solid var(--gray-200);
             border-radius: var(--radius-lg); overflow: hidden;
@@ -147,7 +146,7 @@
         }
 /* --- Offline --- */
 /* Estilos específicos de la página offline */
-        body.offline-page{font-family:'DM Sans',sans-serif;min-height:100vh;}
+        body.offline-page{font-family:var(--font-body);min-height:100vh;}
         .offline-container{min-height:calc(100vh - 70px);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;text-align:center;}
         .offline-card{background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:24px;padding:3rem 2rem;max-width:550px;width:100%;box-shadow:0 20px 40px rgba(0,0,0,0.1);animation:fadeInUp 0.6s ease-out;}
         .offline-icon{font-size:5rem;color:#14b8a6;margin-bottom:1.5rem;animation:pulse 2s infinite;}@keyframes pulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.1);opacity:0.8;}}
@@ -170,7 +169,7 @@
         [data-theme="dark"] .offline-text{color:#94A3B8;}
         [data-theme="dark"] .btn-secondary-offline{background:#1E293B;color:#14B8A6;border-color:#14B8A6;}
         [data-theme="dark"] .info-note{color:#94A3B8;border-top-color:rgba(148,163,184,0.2);}
-        @media(max-width:480px){.offline-card{padding:2rem 1.5rem;}.offline-icon{font-size:3.5rem;}.offline-title{font-size:1.5rem;}.btn-group{flex-direction:column;}.btn-offline{justify-content:center;}}
+        @media(max-width: 30em){.offline-card{padding:2rem 1.5rem;}.offline-icon{font-size:3.5rem;}.offline-title{font-size:1.5rem;}.btn-group{flex-direction:column;}.btn-offline{justify-content:center;}}
 
 body.offline-page {
     background: linear-gradient(135deg, var(--silver-light) 0%, rgba(15, 118, 110, 0.14) 100%);

@@ -103,7 +103,7 @@ test('rechaza un teléfono que no es español sin llamar a la API', async ({ pag
     await page.locator('#acepto').check();
     await page.locator('#btnSubmit').click();
 
-    await expect(page.locator('#toast')).toContainText('Telefono invalido');
+    await expect(page.locator('#toast')).toContainText('Revise el teléfono');
     expect(page.api.reservas).toHaveLength(0);
 });
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dr-agramonte-v52';
+const CACHE_NAME = 'dr-agramonte-v53';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -48,9 +48,10 @@ const urlsToCache = [
     // a la red cuando toca, porque aparecen en pantallas que ya necesitan conexion.
     '/vendor/fontawesome/css/all.min.css',
     '/vendor/fontawesome/webfonts/fa-solid-900.woff2',
-    '/vendor/fonts/dm-fonts.css',
-    '/vendor/fonts/dm-sans-normal-latin.woff2',
-    '/vendor/fonts/dm-sans-italic-latin.woff2'
+    '/vendor/fonts/atkinson.css',
+    '/vendor/fonts/atkinson-hyperlegible-next-latin-400-normal.woff2',
+    '/vendor/fonts/atkinson-hyperlegible-next-latin-500-normal.woff2',
+    '/vendor/fonts/atkinson-hyperlegible-next-latin-700-normal.woff2'
 ];
 
 self.addEventListener('install', (event) => {
