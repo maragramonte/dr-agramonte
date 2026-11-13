@@ -116,6 +116,10 @@ jobs:
       - name: Probar backup-db.sh
         run: bash scripts/tests/backup-db.test.sh
 
+      # Un volcado real de PostgreSQL, cifrado y restaurado en otro contenedor limpio.
+      - name: Probar la restauración de una copia
+        run: bash scripts/tests/restauracion.test.sh
+
   imagen:
     name: Imagen de producción
     runs-on: ubuntu-latest
