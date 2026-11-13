@@ -15,18 +15,18 @@ del producto.
 
 ## 1. Portada
 
-![Portada: el titular «Su cita con el Dr. Agramonte, en un minuto», las tres razones para reservar aquí y los años de ejercicio, junto a un panel de reserva con los dos centros de consulta y los huecos libres del jueves](capturas/01-portada.jpg)
+![Portada: el titular «Su cita con el Dr. Agramonte, en un minuto», las tres cosas que incluye reservar aquí y, al lado, el panel de reserva con los dos centros de consulta y los huecos libres del primer día con agenda](capturas/01-portada.jpg)
 
 Lo primero que ve un paciente es el propio selector de cita, con los huecos reales que
 devuelve `GET /api/disponibilidad`. Elegir centro y hora ocurre aquí; `reservar.html` solo
-recoge los datos. Si el backend no contesta, el panel se repliega al botón de siempre y la
-portada nunca se queda sin vía para pedir cita.
+recoge los datos. Si el backend no contesta, el panel enseña los dos centros como enlaces a `reservar.html?centro=…`,
+sin mensaje de error, y la portada nunca se queda sin vía para pedir cita.
 
 ## 2. Servicios
 
-![Catálogo de servicios en tarjetas alineadas: consulta general, control de enfermedades crónicas, chequeos preventivos, interpretación de analíticas y asesoramiento en estilo de vida, con el proceso de atención en cuatro pasos debajo](capturas/02-servicios.png)
+![Catálogo de servicios en filas: consulta general, control de enfermedades crónicas, chequeos preventivos, interpretación de analíticas y asesoramiento en estilo de vida, con el proceso de atención en cuatro pasos debajo](capturas/02-servicios.png)
 
-Cada tarjeta lleva a la reserva con el servicio ya elegido (`reservar.html?servicio=…`), de
+Cada fila lleva a la reserva con el servicio ya elegido (`reservar.html?servicio=…`), de
 modo que el paciente no tiene que volver a decidir lo que ya decidió aquí.
 
 ## 3. Reservar: el centro manda sobre el calendario
@@ -40,7 +40,7 @@ datos desde la migración V6 (ver [BASE-DE-DATOS.md](BASE-DE-DATOS.md)).
 
 ## 4. Reservar: huecos y formulario, a la vez
 
-![Pantalla completa de reserva en una sola columna: el centro elegido, el calendario con el día 22 seleccionado, los dieciséis huecos de mañana y tarde y, debajo, el formulario con especialista, tipo de consulta y cobertura](capturas/04-reserva-huecos.png)
+![Pantalla completa de reserva en una sola columna: el centro elegido, el calendario con un día seleccionado, los huecos de mañana y tarde y, debajo, el formulario con especialista, tipo de consulta y cobertura](capturas/04-reserva-huecos.png)
 
 Los huecos libres salen de la agenda del médico para ese centro y ese día. En producción los
 calcula el servidor (`GET /api/disponibilidad`), no el navegador: es lo que impide que dos
