@@ -21,6 +21,7 @@ public class DisponibilidadService {
     private final MedicoRepository medicoRepository;
     private final HorarioRepository horarioRepository;
     private final CitaRepository citaRepository;
+    private final CalendarioLaboral calendarioLaboral;
 
     /**
      * Devuelve los huecos libres para un médico en una fecha concreta (todos los centros).
@@ -36,6 +37,9 @@ public class DisponibilidadService {
      */
     public List<LocalDateTime> obtenerHuecosLibres(Long medicoId, String fecha, String centroCodigo) {
         LocalDate fechaDate = LocalDate.parse(fecha);  // espera formato "YYYY-MM-DD"
+        if (calendarioLaboral.estaCerrado(fechaDate)) {
+            return List.of();  // fin de semana o festivo
+        }
         LocalDateTime inicioDia = fechaDate.atStartOfDay();
         // 23:59:59 (sin nanos): LocalTime.MAX (…999999999) lo redondea PostgreSQL a
         // 00:00:00 del día siguiente y colaría el primer hueco del día siguiente.

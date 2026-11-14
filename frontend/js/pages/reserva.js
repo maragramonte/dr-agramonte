@@ -1,6 +1,7 @@
 import apiClient from '../modules/api-client.js';
 import { html, crudo } from '../modules/html.js';
 import { CENTROS } from '../modules/centros.js';
+import { festivo } from '../modules/festivos.js';
 
 'use strict';
 
@@ -523,7 +524,7 @@ function renderCalendar() {
     const startOffset = (firstDay.getDay() + 6) % 7;
     const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
     for (let i = 0; i < startOffset; i++) grid.appendChild(document.createElement('div')).className = 'cal-day empty';
-    const diasLab = state.centrosDias || [1, 2, 3, 4, 5, 6];
+    const diasLab = state.centrosDias || [1, 2, 3, 4, 5];
     for (let d = 1; d <= lastDay.getDate(); d++) {
         const date = new Date(state.year, state.month, d);
         const iso = toISO(date);
@@ -534,9 +535,15 @@ function renderCalendar() {
         if (date.getTime() === hoy.getTime()) btn.classList.add('today');
         if (iso === state.dateISO) btn.classList.add('selected');
         const noLab = !diasLab.includes(date.getDay());
+        const nombreFestivo = festivo(iso);
+        if (nombreFestivo) {
+            btn.classList.add('festivo');
+            btn.title = `Festivo: ${nombreFestivo}`;
+            btn.setAttribute('aria-label', `${d}, festivo: ${nombreFestivo}`);
+        }
         const valid = isValidReserva(date);
         const avail = getAvailability(iso, state.centroId);
-        if (!valid || noLab || avail === 'lleno') btn.disabled = true;
+        if (!valid || noLab || nombreFestivo || avail === 'lleno') btn.disabled = true;
         else {
             const dot = document.createElement('span');
             dot.className = `dot ${avail === 'parcial' ? 'parcial' : avail === 'critico' ? 'critico' : ''}`.trim();

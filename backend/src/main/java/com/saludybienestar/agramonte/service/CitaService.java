@@ -34,6 +34,7 @@ public class CitaService {
     private final MedicoRepository medicoRepository;
     private final UsuarioRepository usuarioRepository;
     private final HorarioRepository horarioRepository;
+    private final CalendarioLaboral calendarioLaboral;
     private final CentroRepository centroRepository;
     private final CitaNotificationService citaNotificationService;
     private final ActivacionCuentaService activacionCuentaService;
@@ -119,6 +120,12 @@ public class CitaService {
         if (request.getFechaHora() == null || !request.getFechaHora().isAfter(LocalDateTime.now())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "No se puede reservar una cita en una fecha ya pasada");
+        }
+
+        // Fin de semana o festivo. La respuesta es la misma que la de una franja ocupada:
+        // para quien reserva, ese hueco no está disponible y punto.
+        if (calendarioLaboral.estaCerrado(request.getFechaHora().toLocalDate())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Horario no disponible");
         }
 
         // Igual que la fecha: el @AssertTrue de los DTO cubre la API, pero la regla se

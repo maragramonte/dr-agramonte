@@ -40,15 +40,15 @@ public class AgendaProperties {
 
     /**
      * Centro que atiende cada día de la semana. Un día que no aparezca no genera
-     * huecos: así el domingo queda cerrado sin necesidad de una regla aparte.
+     * huecos: así el fin de semana queda cerrado sin necesidad de una regla aparte.
+     * Hasta V16 Palma abría también el sábado; ahora la consulta es de lunes a viernes.
      */
     private Map<DayOfWeek, String> centroPorDia = new LinkedHashMap<>(Map.of(
             DayOfWeek.MONDAY, "madrid",
             DayOfWeek.TUESDAY, "madrid",
             DayOfWeek.WEDNESDAY, "palma",
             DayOfWeek.THURSDAY, "madrid",
-            DayOfWeek.FRIDAY, "palma",
-            DayOfWeek.SATURDAY, "palma"
+            DayOfWeek.FRIDAY, "palma"
     ));
 
     /** Cron Spring de la generación; por defecto cada día a las 03:30. */

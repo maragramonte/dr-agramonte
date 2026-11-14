@@ -5,6 +5,7 @@ import com.saludybienestar.agramonte.entity.Centro;
 import com.saludybienestar.agramonte.entity.Horario;
 import com.saludybienestar.agramonte.entity.Medico;
 import com.saludybienestar.agramonte.repository.CentroRepository;
+import com.saludybienestar.agramonte.repository.FestivoRepository;
 import com.saludybienestar.agramonte.repository.HorarioRepository;
 import com.saludybienestar.agramonte.repository.MedicoRepository;
 import java.time.LocalDate;
@@ -38,7 +39,8 @@ import org.springframework.transaction.annotation.Transactional;
  * médico (hay un índice único por {@code medico_id, inicio}). Por eso no resucita un
  * hueco ya reservado ni vuelve a marcar como libre uno ocupado. La contrapartida es
  * que un hueco borrado a mano dentro de la ventana se vuelve a crear; para cerrar un
- * día hay que quitarlo de {@code app.agenda.centro-por-dia} o marcarlo no disponible.
+ * día de la semana hay que quitarlo de {@code app.agenda.centro-por-dia}, y para cerrar
+ * una fecha suelta, añadirla a la tabla {@code festivos}.
  */
 @Component
 @RequiredArgsConstructor
@@ -49,6 +51,7 @@ public class GeneradorAgendaScheduler {
     private final MedicoRepository medicoRepository;
     private final CentroRepository centroRepository;
     private final HorarioRepository horarioRepository;
+    private final FestivoRepository festivoRepository;
 
     /**
      * También al arrancar: si la aplicación ha estado parada más que la ventana (o es
@@ -92,10 +95,12 @@ public class GeneradorAgendaScheduler {
         LocalDateTime ventanaInicio = desde.atStartOfDay();
         LocalDateTime ventanaFin = hasta.atTime(LocalTime.MAX);
 
+        Set<LocalDate> festivos = new HashSet<>(festivoRepository.findFechas(desde, hasta));
+
         int creados = 0;
         for (Medico medico : medicos) {
             creados += generarParaMedico(
-                    medico, franjas, centrosPorCodigo, desde, hasta, ventanaInicio, ventanaFin);
+                    medico, franjas, centrosPorCodigo, festivos, desde, hasta, ventanaInicio, ventanaFin);
         }
 
         if (creados > 0) {
@@ -108,6 +113,7 @@ public class GeneradorAgendaScheduler {
     private int generarParaMedico(Medico medico,
                                   List<LocalTime> franjas,
                                   Map<String, Centro> centrosPorCodigo,
+                                  Set<LocalDate> festivos,
                                   LocalDate desde,
                                   LocalDate hasta,
                                   LocalDateTime ventanaInicio,
@@ -120,8 +126,8 @@ public class GeneradorAgendaScheduler {
         List<Horario> nuevos = new ArrayList<>();
         for (LocalDate dia = desde; !dia.isAfter(hasta); dia = dia.plusDays(1)) {
             String codigoCentro = agenda.getCentroPorDia().get(dia.getDayOfWeek());
-            if (codigoCentro == null) {
-                continue; // día cerrado (por defecto, el domingo)
+            if (codigoCentro == null || festivos.contains(dia)) {
+                continue; // día cerrado: fin de semana o festivo
             }
             Centro centro = centrosPorCodigo.get(codigoCentro);
             if (centro == null) {

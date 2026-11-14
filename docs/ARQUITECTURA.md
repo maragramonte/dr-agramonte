@@ -117,11 +117,11 @@ El catálogo completo de endpoints está en [API.md](API.md).
 ## Base de datos
 
 PostgreSQL 15, con el esquema versionado en migraciones Flyway
-(`backend/src/main/resources/db/migration/`). Hay quince, de `V1__init.sql` a
-`V15__cita_aceptacion_privacidad.sql`, y una copia paralela para el perfil MySQL.
+(`backend/src/main/resources/db/migration/`). Hay dieciséis, de `V1__init.sql` a
+`V16__festivos_y_semana_de_cinco_dias.sql`, y una copia paralela para el perfil MySQL.
 
-Tablas principales: `usuarios`, `medicos`, `centros`, `horarios`, `citas` y
-`notificaciones`. El detalle tabla a tabla, el diagrama entidad-relación y los índices están
+Tablas principales: `usuarios`, `medicos`, `centros`, `horarios`, `citas`,
+`notificaciones` y `festivos`. El detalle tabla a tabla, el diagrama entidad-relación y los índices están
 en [BASE-DE-DATOS.md](BASE-DE-DATOS.md).
 
 Dos restricciones sostienen la integridad del dominio:
@@ -224,7 +224,16 @@ misma franja, sobre un PostgreSQL real con Testcontainers
 y V6, pero Flyway ejecuta cada migración una sola vez. `GeneradorAgendaScheduler` añade cada
 madrugada el tramo que falta al final de la ventana, y el índice único garantiza que no
 duplica ni resucita franjas ya reservadas. El patrón semanal vive en
-`config/AgendaProperties.java`.
+`config/AgendaProperties.java`: de lunes a viernes, General Riera los lunes, martes y jueves,
+Avenidas los miércoles y viernes.
+
+**Fines de semana y festivos.** El generador se salta los días sin centro asignado y las
+fechas de la tabla `festivos` (V16: nacionales, de Illes Balears y los dos locales de Palma).
+`CalendarioLaboral` repite la comprobación en la disponibilidad y en la reserva, porque
+quedan franjas antiguas de sábado con cita que vuelven a quedar libres si el paciente
+cancela. El calendario de la web tiene la misma lista en `js/modules/festivos.js` y el CI
+compara las dos con `scripts/festivos-comprobar.mjs`. Cada año hay que añadir el siguiente
+con una migración nueva y el mismo cambio en ese fichero.
 
 ---
 

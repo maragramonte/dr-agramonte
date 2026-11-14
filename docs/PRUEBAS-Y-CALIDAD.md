@@ -24,20 +24,20 @@ lugar de fallar (`@Testcontainers(disabledWithoutDocker = true)`).
 
 ## El conjunto, en números
 
-**130 pruebas** en 20 clases. El recuento sale de contar las anotaciones `@Test` y
+**138 pruebas** en 23 clases. El recuento sale de contar las anotaciones `@Test` y
 `@ParameterizedTest` del árbol `backend/src/test`.
 
 | Nivel | Pruebas | Qué verifica | Necesita Docker |
 |-------|---------|--------------|-----------------|
-| Unitarias de servicio y componentes | 76 | Lógica de negocio aislada, con dobles de prueba | No |
-| Web (`@WebMvcTest`) | 32 | Capa REST con la `SecurityConfig` real: roles, códigos, validación | No |
-| Integración (Testcontainers) | 22 | El sistema completo contra un PostgreSQL real | **Sí** |
+| Unitarias de servicio y componentes | 82 | Lógica de negocio aislada, con dobles de prueba | No |
+| Web (`@WebMvcTest`) | 33 | Capa REST con la `SecurityConfig` real: roles, códigos, validación | No |
+| Integración (Testcontainers) | 23 | El sistema completo contra un PostgreSQL real | **Sí** |
 
 ### Las de integración, una a una
 
 | Clase | Pruebas | Cubre |
 |-------|---------|-------|
-| `ReservaPublicaIntegrationTest` | 13 | Reserva sin cuenta, doble reserva concurrente, cancelación, token de acceso |
+| `ReservaPublicaIntegrationTest` | 14 | Reserva sin cuenta, doble reserva concurrente, cancelación, token de acceso, fines de semana y festivos cerrados |
 | `AccesoCitaPorCorreoIntegrationTest` | 3 | El enlace del correo abre la cita; el del recordatorio no invalida el de la reserva |
 | `ActivacionCuentaIntegrationTest` | 6 | Activación de una cuenta invitada, alta que exige abrir el buzón, correo ya registrado indistinguible de uno libre y recuperación de contraseña |
 
@@ -119,7 +119,7 @@ Viven en [`e2e/`](../e2e), fuera de `frontend/`. No es un capricho: `frontend/` 
 tal cual (nginx lo monta y el `Dockerfile` lo copia dentro del jar), así que un
 `node_modules` o un informe de pruebas ahí dentro acabaría servido en la web.
 
-Son 22 pruebas en cuatro ficheros:
+Son 25 pruebas en cinco ficheros:
 
 | Fichero | Qué comprueba |
 |---------|---------------|
@@ -127,8 +127,13 @@ Son 22 pruebas en cuatro ficheros:
 | `navegacion.spec.js` (9) | Que ninguna página pública enlaza a las herramientas internas ni habla del TFC, que un paciente con sesión tampoco las ve y que el médico sí las encuentra en el menú |
 | `portada.spec.js` (2) | Que sin agenda el recuadro del hero ofrece los centros en vez de un error, y que `reservar.html?centro=` marca el centro aunque no lleve fecha |
 | `letra-grande.spec.js` (6) | Que con la letra del navegador a 32 px ninguna página pública obliga a desplazarse en horizontal |
+| `calendario.spec.js` (3) | Con el reloj fijado en diciembre de 2026: que cada centro solo abre sus días, que el sábado y el domingo están cerrados, que la Inmaculada y Navidad salen tachadas y sin poder elegirse, y que el pie ya no anuncia los sábados |
 
 Cada una corre dos veces, en un Chrome de escritorio y en un Pixel 7 emulado.
+
+La lista de festivos de la web tiene que ser la misma que la de las migraciones del
+backend. Lo comprueba `scripts/festivos-comprobar.mjs` en el CI, con su propia prueba en
+`scripts/tests/festivos-comprobar.test.sh`.
 
 **La API está simulada** ([`e2e/tests/api-simulada.js`](../e2e/tests/api-simulada.js)). Se
 sirve `frontend/` como estático y las llamadas a `/api` se responden dentro del navegador.

@@ -48,8 +48,8 @@
         'footer.formulario': 'Formulari de contacte',
         'footer.horario': 'Horari',
         'footer.lunVie': 'De dilluns a divendres',
-        'footer.sabado': 'Dissabtes',
-        'footer.sabadoHoras': '9:00 - 13:00 (amb cita)',
+        'footer.finde': 'Caps de setmana i festius',
+        'footer.cerrado': 'Tancat',
         'footer.enlaces': 'Enllaços',
         'footer.privacidad': 'Política de Privacitat',
 

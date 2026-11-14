@@ -164,8 +164,8 @@ cd backend && mvn test
 cd e2e && npm ci && npm test   # E2E del frontend (la primera vez: npx playwright install chromium)
 ```
 
-El backend tiene 131 pruebas en tres niveles: 77 unitarias, 32 de la capa REST
-(`@WebMvcTest` con la `SecurityConfig` real) y 22 de integración contra un PostgreSQL
+El backend tiene 138 pruebas en tres niveles: 82 unitarias, 33 de la capa REST
+(`@WebMvcTest` con la `SecurityConfig` real) y 23 de integración contra un PostgreSQL
 levantado con Testcontainers. Las de correo usan GreenMail, un SMTP en memoria, y sacan el
 token del correo que de verdad ha llegado.
 
@@ -176,9 +176,10 @@ y Dependabot propone las actualizaciones de Maven, Docker y GitHub Actions. Cada
 Semgrep (reglas de Java y de secretos, de momento solo informativo) y cada semana gitleaks
 revisa todo el historial de git en busca de claves subidas por error.
 
-El frontend tiene 22 pruebas E2E con Playwright, y cada una se ejecuta en escritorio y en
+El frontend tiene 25 pruebas E2E con Playwright, y cada una se ejecuta en escritorio y en
 móvil. Cubren la reserva sin cuenta de principio a fin, que los pacientes no vean enlaces a
-las herramientas internas, la portada cuando la agenda no responde y que ninguna página se
+las herramientas internas, que el calendario no deje elegir fines de semana ni festivos, la
+portada cuando la agenda no responde y que ninguna página se
 salga de la pantalla con la letra del navegador al doble. La API está simulada en el
 navegador, así que no hace falta backend.
 
@@ -220,7 +221,7 @@ no arranca si faltan esas variables.
 ```
 .
 ├── backend/          API Spring Boot (controller · service · repository · DTOs)
-│   └── src/main/resources/db/migration/   Flyway V1–V15 (postgresql/ y mysql/)
+│   └── src/main/resources/db/migration/   Flyway V1–V16 (postgresql/ y mysql/)
 ├── frontend/         Sitio estático, PWA y nginx.conf
 ├── plantillas/       Cabecera y pie comunes a todas las páginas (scripts/plantillas.mjs)
 ├── e2e/              Pruebas E2E del frontend con Playwright

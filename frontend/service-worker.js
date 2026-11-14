@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dr-agramonte-v53';
+const CACHE_NAME = 'dr-agramonte-v54';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -25,6 +25,9 @@ const urlsToCache = [
     // Lo importan reserva.js y panel-pruebas.js: si faltara de esta lista, esas dos
     // paginas se precargarian pero su modulo no, y sin conexion fallarian al importarlo.
     '/js/modules/html.js',
+    // Los importa reserva.js (y centros.js también hero-reserva.js): mismo caso que html.js.
+    '/js/modules/centros.js',
+    '/js/modules/festivos.js',
     '/js/pages/dr-agramonte.js',
     '/js/pages/reserva.js',
     '/js/pages/contacto.js',
