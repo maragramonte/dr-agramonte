@@ -3,6 +3,8 @@
 
 'use strict';
 
+// T() es la función global de textos traducibles que define js/modules/i18n.js.
+
 // ==================== 1. VALIDACIONES (puras, sin DOM) ====================
 const Validar = {
     nombre: v => /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s-]{3,}$/.test(v.trim()),
@@ -11,13 +13,17 @@ const Validar = {
     mensaje: v => v.trim().length >= 10 && v.trim().length <= 1000
 };
 
-const MENSAJES = {
-    nombre: 'Mínimo 3 letras (solo letras, espacios o guiones)',
-    email: 'Email inválido (ej: nombre@dominio.com)',
-    telefono: 'Teléfono inválido (ej: +34 612345678)',
-    mensaje: 'El mensaje debe tener entre 10 y 1000 caracteres',
-    privacidad: 'Debes aceptar la política de privacidad'
+// Se leen al validar, así salen en el idioma que esté puesto en ese momento.
+const MENSAJES_ES = {
+    nombre: 'Escriba al menos 3 letras (solo letras, espacios o guiones)',
+    email: 'Revise el correo (por ejemplo, nombre@dominio.com)',
+    telefono: 'Revise el teléfono (por ejemplo, +34 612 345 678)',
+    mensaje: 'El mensaje tiene que tener entre 10 y 1000 caracteres',
+    privacidad: 'Tiene que aceptar la política de privacidad'
 };
+const MENSAJES = new Proxy(MENSAJES_ES, {
+    get: (obj, clave) => (clave in obj ? T(`js.contacto.${clave}`, obj[clave]) : undefined),
+});
 
 // ==================== 2. UI HELPERS (errores visuales) ====================
 function setEstado(campo, valido, msg = '') {
@@ -44,8 +50,9 @@ class Autocomplete {
     constructor(inputId, sugerencias = []) {
         this.input = document.getElementById(inputId);
         this.sugerencias = sugerencias.length ? sugerencias : [
-            'Primera consulta', 'Revisión periódica', 'Control de diabetes',
-            'Chequeo preventivo', 'Seguimiento médico', 'Resultados de pruebas'
+            T('js.sug.primera', 'Primera consulta'), T('js.sug.revision', 'Revisión periódica'),
+            T('js.sug.diabetes', 'Control de diabetes'), T('js.sug.chequeo', 'Chequeo preventivo'),
+            T('js.sug.seguimiento', 'Consulta de seguimiento'), T('js.sug.analisis', 'Análisis de resultados')
         ];
     }
 
@@ -112,7 +119,7 @@ class ContactoForm {
         if (!validador) return true;
 
         const ok = validador(campo.value);
-        setEstado(campo, ok, MENSAJES[nombre] || 'Campo inválido');
+        setEstado(campo, ok, MENSAJES[nombre] || T('js.contacto.campo', 'Revise este campo'));
         return ok;
     }
 
@@ -126,7 +133,7 @@ class ContactoForm {
             const primerError = this.form.querySelector('.is-invalid');
             primerError?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             primerError?.focus();
-            this.mostrarNotificacion('Corrige los errores antes de enviar', 'error');
+            this.mostrarNotificacion(T('js.contacto.corregir', 'Revise los campos marcados antes de enviar'), 'error');
             return;
         }
 
@@ -152,12 +159,12 @@ class ContactoForm {
             });
             if (!res.ok) {
                 const err = await res.json().catch(() => ({}));
-                throw new Error(err.message || 'No se pudo enviar el mensaje');
+                throw new Error(err.message || T('js.contacto.errorEnvio', 'No hemos podido enviar el mensaje'));
             }
             const data = await res.json();
 
             this.options.onSuccess(data);
-            const msg = data.message || '¡Mensaje enviado! Te contactaremos pronto.';
+            const msg = data.message || T('js.contacto.enviado', 'Mensaje enviado. Le responderemos lo antes posible.');
             if (window.DrAgramonte?.notify) {
                 window.DrAgramonte.notify(msg, 'success');
             } else {
@@ -171,7 +178,7 @@ class ContactoForm {
             if (counter) counter.textContent = '0/1000';
         } catch (err) {
             console.error(err);
-            const errMsg = err.message || 'Error al enviar. Inténtalo de nuevo.';
+            const errMsg = err.message || T('js.contacto.errorReintente', 'No se ha podido enviar. Pruebe de nuevo.');
             if (window.DrAgramonte?.notify) {
                 window.DrAgramonte.notify(errMsg, 'error');
             } else {
@@ -188,10 +195,10 @@ class ContactoForm {
         if (loading) {
             btn.disabled = true;
             btn.dataset.originalText = btn.innerHTML;
-            btn.innerHTML = '<span class="spinner"></span> Enviando...';
+            btn.innerHTML = `<span class="spinner"></span> ${T('js.contacto.enviando', 'Enviando…')}`;
         } else {
             btn.disabled = false;
-            btn.innerHTML = btn.dataset.originalText || 'Enviar mensaje';
+            btn.innerHTML = btn.dataset.originalText || T('t.enviar-mensaje', 'Enviar mensaje');
         }
     }
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dr-agramonte-v54';
+const CACHE_NAME = 'dr-agramonte-v55';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -18,6 +18,7 @@ const urlsToCache = [
     '/css/estadisticas.css',
     '/icons/favicon.svg',
     '/js/modules/theme-init.js',
+    '/js/modules/i18n-textos.js',
     '/js/modules/i18n.js',
     '/js/modules/api-config.js',
     '/js/modules/api-client.js',
