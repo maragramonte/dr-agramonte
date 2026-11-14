@@ -132,6 +132,12 @@ Son 38 pruebas en seis ficheros:
 
 Cada una corre dos veces, en un Chrome de escritorio y en un Pixel 7 emulado.
 
+`scripts/seo-comprobar.mjs` revisa en el CI lo básico de cada página que se puede
+indexar: título de 60 caracteres como mucho, descripción de 70 a 160, un solo `<h1>`,
+canonical a su propia URL, etiquetas para compartir iguales al título y la descripción, y
+que el sitemap tenga justo las páginas sin `noindex`. Su prueba está en
+`scripts/tests/seo-comprobar.test.sh`.
+
 La lista de festivos de la web tiene que ser la misma que la de las migraciones del
 backend. Lo comprueba `scripts/festivos-comprobar.mjs` en el CI, con su propia prueba en
 `scripts/tests/festivos-comprobar.test.sh`.
