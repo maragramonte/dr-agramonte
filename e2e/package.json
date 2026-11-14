@@ -8,7 +8,9 @@
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
     "report": "playwright show-report",
-    "instalar-navegadores": "playwright install --with-deps chromium"
+    "instalar-navegadores": "playwright install --with-deps chromium",
+    "visual:capturar": "node visual/capturar.mjs",
+    "visual:comparar": "python3 visual/comparar.py"
   },
   "devDependencies": {
     "@playwright/test": "1.62.1",
