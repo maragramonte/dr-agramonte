@@ -15,7 +15,7 @@
  * nunca se queda sin forma de pedir cita.
  */
 import apiClient from '../modules/api-client.js';
-import { CENTROS } from '../modules/centros.js';
+import { CENTROS, direccionDe, diasDe } from '../modules/centros.js';
 import { festivo } from '../modules/festivos.js';
 
 'use strict';
@@ -29,10 +29,12 @@ const DIAS_A_MIRAR = 14;
 /* Cuántos huecos caben en la rejilla sin que el hero crezca de alto. */
 const MAX_HUECOS = 8;
 
-const DIAS_LARGO = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
-const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const T = (clave, es) => (window.i18n ? window.i18n.t(clave, es) : es);
 
 const $ = (id) => document.getElementById(id);
+
+// Motivo del repliegue, si el recuadro está enseñando solo los centros.
+let enRepliegue = null;
 
 const estado = {
     medicoId: null,
@@ -57,7 +59,9 @@ const soloHora = (isoDateTime) => {
 function fechaLarga(iso) {
     const [a, m, d] = iso.split('-').map(Number);
     const f = new Date(a, m - 1, d);
-    return `${DIAS_LARGO[f.getDay()]}, ${d} de ${MESES[m - 1]}`;
+    return window.i18n
+        ? window.i18n.fecha(f, { weekday: 'long', day: 'numeric', month: 'long' })
+        : f.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
 }
 
 /**
@@ -91,13 +95,13 @@ async function primerDiaConHuecos(centro) {
 function pintarCentros() {
     return `
         <div class="hw-field">
-            <span class="hw-label" id="hwLabelCentro">Centro de consulta</span>
+            <span class="hw-label" id="hwLabelCentro">${T('js.hero.centro', 'Centro de consulta')}</span>
             <div class="hw-options" role="group" aria-labelledby="hwLabelCentro">
                 ${CENTROS.map((c) => `
                     <button type="button" class="hw-option" data-centro="${c.id}"
                             aria-pressed="${c.id === estado.centroId}">
                         ${c.nombre}
-                        <small>${c.direccion} · ${c.diasHint}</small>
+                        <small>${direccionDe(c)} · ${diasDe(c)}</small>
                     </button>
                 `).join('')}
             </div>
@@ -107,7 +111,7 @@ function pintarCentros() {
 
 function pintarHoras() {
     if (!estado.fechaISO) {
-        return '<p class="hw-estado">Este centro no tiene huecos en los próximos días.</p>';
+        return `<p class="hw-estado">${T('js.hero.sinHuecos', 'Este centro no tiene horas libres en los próximos días.')}</p>`;
     }
     return `
         <div class="hw-field">
@@ -164,7 +168,8 @@ function pintar() {
  * «no se ha podido consultar» solo le dice que algo está roto.
  */
 function replegar(motivo) {
-    console.warn('[hero] sin agenda:', motivo);
+    if (enRepliegue === null) console.warn('[hero] sin agenda:', motivo);
+    enRepliegue = motivo;
     const cuerpo = $('heroReservaCuerpo');
     const pie = $('heroReservaPie');
     if (pie) pie.hidden = true;
@@ -174,12 +179,12 @@ function replegar(motivo) {
     if (subtitulo) subtitulo.hidden = true;
     cuerpo.innerHTML = `
         <div class="hero-widget__fallback">
-            <p class="hw-label" id="hwLabelCentroRepliegue">Elija centro y verá los días libres</p>
+            <p class="hw-label" id="hwLabelCentroRepliegue">${T('js.hero.elijaCentro', 'Elija centro y verá los días libres')}</p>
             <ul class="hw-options" aria-labelledby="hwLabelCentroRepliegue">
                 ${CENTROS.map((c) => `
                     <li><a class="hw-option" href="reservar.html?centro=${encodeURIComponent(c.id)}">
                         ${c.nombre}
-                        <small>${c.direccion} · ${c.diasHint}</small>
+                        <small>${direccionDe(c)} · ${diasDe(c)}</small>
                     </a></li>
                 `).join('')}
             </ul>
@@ -197,7 +202,7 @@ async function elegirCentro(centroId) {
     estado.horasLibres = [];
 
     const cuerpo = $('heroReservaCuerpo');
-    if (cuerpo) cuerpo.innerHTML = pintarCentros() + '<p class="hw-estado">Buscando huecos…</p>';
+    if (cuerpo) cuerpo.innerHTML = pintarCentros() + `<p class="hw-estado">${T('js.hero.buscando', 'Buscando horas libres…')}</p>`;
     const pie = $('heroReservaPie');
     if (pie) pie.hidden = true;
 
@@ -232,3 +237,9 @@ async function iniciar() {
 }
 
 document.addEventListener('DOMContentLoaded', iniciar);
+
+// Al cambiar de idioma se vuelve a pintar lo que haya en el recuadro.
+document.addEventListener('i18n:cambio', () => {
+    if (enRepliegue !== null) replegar(enRepliegue);
+    else if (estado.centroId) pintar();
+});

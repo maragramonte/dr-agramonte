@@ -72,6 +72,30 @@ test('reserva una cita sin cuenta de principio a fin', async ({ page }) => {
     expect(page.api.noPrevistas).toEqual([]);
 });
 
+test('con seguro, la aseguradora se escribe a mano y es obligatoria', async ({ page }) => {
+    await page.goto('/reservar.html');
+    await page.locator('#medicoSelect').selectOption(String(MEDICO.id));
+    await elegirCentroYFecha(page);
+    await page.locator('#slotsGrid .slot', { hasText: '10:30' }).click();
+    await rellenarDatos(page);
+    await page.locator('label[for="cobSeguro"]').click();
+    await page.locator('#acepto').check();
+
+    // Es un campo de texto, no una lista de compañías.
+    await expect(page.locator('#aseguradora')).toHaveJSProperty('tagName', 'INPUT');
+
+    // Vacío (o solo espacios) no se envía.
+    await page.locator('#aseguradora').fill('   ');
+    await page.locator('#btnSubmit').click();
+    await expect(page.getByText('Indique el nombre de su aseguradora')).toBeVisible();
+    expect(page.api.reservas).toHaveLength(0);
+
+    await page.locator('#aseguradora').fill('  Mi Aseguradora  ');
+    await page.locator('#btnSubmit').click();
+    await expect(page.locator('#confirmModal')).toHaveClass(/open/);
+    expect(page.api.reservas[0]).toMatchObject({ cobertura: 'seguro', aseguradora: 'Mi Aseguradora' });
+});
+
 test('solo deja elegir las horas que la agenda tiene libres', async ({ page }) => {
     await page.goto('/reservar.html');
     await page.locator('#medicoSelect').selectOption(String(MEDICO.id));

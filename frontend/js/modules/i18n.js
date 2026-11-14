@@ -1,191 +1,151 @@
 /**
- * Internacionalización ligera (ES / CA) sin dependencias.
+ * Idiomas de la web: castellano, catalán e inglés, sin dependencias.
  *
- * Uso en el HTML:
- *   <h2 data-i18n="home.hero.title">Atención Médica...</h2>      → cambia textContent
- *   <p data-i18n-html="home.bio">El <strong>Dr...</strong></p>    → cambia innerHTML (texto con etiquetas)
- *   <input data-i18n-attr="placeholder:contacto.form.nombre">     → cambia un atributo
+ * El castellano es el texto que viene escrito en el HTML. Las traducciones viven
+ * en i18n-textos.js (window.I18N_TEXTOS = { ca: {...}, en: {...} }), que se carga
+ * justo antes que este archivo.
  *
- * El español es el texto original de la página (sirve de respaldo si falta la traducción).
- * La preferencia se guarda en localStorage y se aplica en cuanto carga cada página.
+ * En el HTML:
+ *   <h2 data-i18n="clave">Texto</h2>                    → cambia el texto
+ *   <p data-i18n-html="clave">Con <strong>marcas</strong></p> → cambia el HTML interior
+ *   <input data-i18n-attr="placeholder:clave;aria-label:otra">  → cambia atributos
+ *
+ * En JavaScript:
+ *   T('clave', 'Texto en castellano', { nombre: 'Ana' })   (o i18n.t, es lo mismo)  → «Hola, {nombre}» con valores
+ *   i18n.fecha(new Date(), { weekday: 'long', day: 'numeric', month: 'long' })
+ *   document.addEventListener('i18n:cambio', () => repintar())  → al cambiar de idioma
+ *
+ * El idioma se elige, por orden: ?lang= en la URL, el que eligió la persona
+ * (localStorage) y, si no hay ninguno, castellano.
  */
 (function () {
-    const STORAGE_KEY = 'dr-agramonte-lang';
-    const DEFAULT_LANG = 'es';
-    const SUPPORTED = ['es', 'ca'];
+    const CLAVE_GUARDADA = 'dr-agramonte-lang';
+    const IDIOMAS = ['es', 'ca', 'en'];
+    const LOCALES = { es: 'es-ES', ca: 'ca-ES', en: 'en-GB' };
+    const TEXTOS = window.I18N_TEXTOS || { ca: {}, en: {} };
 
-    // Diccionario: clave -> { ca: '...' }. Solo se guarda la traducción al catalán;
-    // si una clave no está, se conserva el español original del HTML.
-    const CA = {
-        // ---- Cabecera / navegación (compartido) ----
-        'nav.inicio': 'Inici',
-        'nav.sobre': 'Sobre el Dr.',
-        'nav.servicios': 'Serveis',
-        'nav.testimonios': 'Testimonis',
-        'nav.contacto': 'Contacte',
-        'nav.reservar': 'Demanar cita',
-        'logo.subtitle': 'Especialista en Medicina Interna',
-
-        // ---- Panel «Menú» (mapa completo del sitio) ----
-        'nav.menu': 'Menú',
-        'menu.consulta': 'La consulta',
-        'menu.citas': 'Cites',
-        'menu.inicio.hint': 'Portada i resum',
-        'menu.sobre.hint': 'Trajectòria i formació',
-        'menu.servicios.hint': "Què s'atén a la consulta",
-        'menu.testimonios.hint': 'Opinions de pacients',
-        'menu.reservar.hint': 'Triï centre, dia i hora',
-        'menu.contacto.hint': 'Formulari i ubicació',
-        // Accesos que solo ve el médico con sesión (auth-ui.js)
-        'menu.agenda': 'Agenda del metge',
-        'menu.agenda.hint': 'Reserves i pacients amb cita',
-        'menu.cuadro.hint': "Estadístiques de l'agenda",
-
-        // ---- Footer (compartido) ----
-        'footer.especialista': 'Especialista en Medicina Interna',
-        'footer.ubicacion': 'Palma, Illes Balears',
-        'footer.contacto': 'Contacte',
-        'footer.formulario': 'Formulari de contacte',
-        'footer.horario': 'Horari',
-        'footer.lunVie': 'De dilluns a divendres',
-        'footer.finde': 'Caps de setmana i festius',
-        'footer.cerrado': 'Tancat',
-        'footer.enlaces': 'Enllaços',
-        'footer.privacidad': 'Política de Privacitat',
-
-        // ---- Activar cuenta (enlace del correo) ----
-        'activar.titulo': 'Tria la teva contrasenya',
-        'activar.intro': 'Tria una contrasenya per a aquest correu. Les teves cites hi seguiran.',
-        'activar.password': 'Contrasenya nova',
-        'activar.password.ph': 'Com a mínim 6 caràcters',
-        'activar.repetir': 'Repeteix la contrasenya',
-        'activar.enviar': 'Desa la contrasenya',
-        'activar.volver': 'Torna a les meves cites',
-        'footer.cuadro': 'Quadre de comandament',
-        'footer.copyright': '© 2026 Dr. Juan Manuel Agramonte.',
-
-        // ---- Inicio ----
-        'home.eyebrow': 'Medicina Interna a Palma de Mallorca',
-        'home.hero.title': 'La seva cita amb el Dr. Agramonte, en un minut.',
-        'home.hero.subtitle': "Triï centre, dia i hora sobre l'agenda real del doctor. Sense trucar, sense registrar-se i sense esperar confirmació.",
-        'home.tick.1': "Rep per correu l'enllaç per consultar o anul·lar la seva cita",
-        'home.tick.2': 'Consulta privada 80 €, es paga després de la visita',
-        'home.tick.3': 'També amb la seva assegurança mèdica',
-        'home.fact.anios': 'anys exercint',
-        'home.fact.centros': 'centres a Palma',
-        'home.fact.dias': "dies d'agenda a la setmana",
-
-        // ---- Selector de cita del hero ----
-        'home.widget.title': 'Demanar cita',
-        'home.widget.subtitle': 'Hores lliures reals dels propers dies',
-        'home.widget.cargando': "Consultant l'agenda…",
-        'home.widget.continuar': 'Continuar',
-        'home.widget.nota': 'Si no hi acudeix, no es cobra res.',
-
-        // ---- Els tres passos ----
-        'home.pasos.title': 'Com es demana cita',
-        'home.paso.1.t': 'Triï hora',
-        'home.paso.1.d': "Les que veu són les que queden lliures de debò a l'agenda del doctor.",
-        'home.paso.2.t': 'Deixi les seves dades',
-        'home.paso.2.d': 'Nom, telèfon i correu. Pot crear compte o no fer-ho, com prefereixi.',
-        'home.paso.3.t': "Rebi l'enllaç",
-        'home.paso.3.d': "Li arriba al correu amb la seva cita. Des d'allà la consulta o l'anul·la quan vulgui.",
-        'btn.solicitar': 'Demanar cita',
-        'btn.reservar': 'Demanar cita',
-        'home.serv.title': 'Serveis mèdics',
-        'home.serv.reservar': 'Reservar aquesta consulta',
-        'home.serv.subtitle': 'Atenció integral amb diagnòstic precís i tractament personalitzat.',
-        'home.serv.general.t': 'Consulta general',
-        'home.serv.general.d': 'Avaluació mèdica completa per a diagnòstic i tractament.',
-        'home.serv.cronicas.t': 'Malalties cròniques',
-        'home.serv.cronicas.d': 'Control de diabetis, hipertensió i malalties cardiovasculars.',
-        'home.serv.chequeos.t': 'Revisions preventives',
-        'home.serv.chequeos.d': 'Revisions completes per detectar factors de risc.',
-        'home.serv.vertodos': 'Veure els cinc serveis',
-        'home.sobre.title': 'El Dr. Agramonte',
-        'home.sobre.subtitle': 'Especialista en Medicina Interna amb enfocament en el pacient',
-        'home.sobre.bio': 'El <strong>Dr. Juan Manuel Agramonte</strong> és especialista en Medicina Interna amb més de 35 anys d\'experiència en el diagnòstic i tractament de malalties complexes.',
-        'home.valor.1.t': 'Experiència Certificada',
-        'home.valor.1.d': 'Especialista en Medicina Interna amb formació contínua i actualització constant.',
-        'home.valor.2.t': 'Atenció Personalitzada',
-        'home.valor.2.d': 'Cada pacient rep un pla de tractament adaptat a les seves necessitats específiques.',
-        'home.valor.3.t': 'Comunicació Clara',
-        'home.valor.3.d': 'Explicacions comprensibles i temps per resoldre tots els seus dubtes.',
-        'home.sobre.btn': 'Conèixer el doctor',
-        'home.sobre.enfoque': 'La seva manera de treballar: escoltar bé, explicar millor i acompanyar sempre.',
-        'home.cta.title': 'Prefereix preguntar abans de demanar cita?',
-        'home.cta.escribir': 'Escriure a la consulta',
-
-        // ---- Botón de idioma (aria) ----
-        'lang.aria': 'Idioma'
-    };
+    // Lo que había en castellano antes de traducir, para poder volver a él sin
+    // recargar la página. Antes, pasar de catalán a castellano dejaba el catalán.
+    const originalTexto = new WeakMap();
+    const originalHtml = new WeakMap();
+    const originalAttr = new WeakMap();
 
     function getLang() {
-        // Prioridad: ?lang= en la URL (enlaces compartibles) > preferencia guardada > defecto.
         try {
-            const urlLang = new URLSearchParams(window.location.search).get('lang');
-            if (SUPPORTED.indexOf(urlLang) !== -1) return urlLang;
-        } catch (e) { /* navegadores sin URLSearchParams */ }
-        const saved = localStorage.getItem(STORAGE_KEY);
-        return SUPPORTED.indexOf(saved) !== -1 ? saved : DEFAULT_LANG;
+            const deUrl = new URLSearchParams(window.location.search).get('lang');
+            if (IDIOMAS.indexOf(deUrl) !== -1) return deUrl;
+        } catch (e) { /* sin URLSearchParams */ }
+        let guardado = null;
+        try { guardado = localStorage.getItem(CLAVE_GUARDADA); } catch (e) { /* sin storage */ }
+        if (IDIOMAS.indexOf(guardado) !== -1) return guardado;
+        // No se mira el idioma del navegador a propósito: el robot de Google
+        // renderiza con el navegador en inglés y acabaría indexando la versión
+        // inglesa como si fuera la de la página. Por defecto, castellano.
+        return 'es';
     }
 
-    function tr(key, lang) {
-        if (lang === 'ca' && Object.prototype.hasOwnProperty.call(CA, key)) {
-            return CA[key];
+    function interpolar(texto, valores) {
+        if (!valores) return texto;
+        return texto.replace(/\{(\w+)\}/g, (m, k) => (k in valores ? valores[k] : m));
+    }
+
+    function buscar(clave, lang) {
+        if (lang === 'es') return null;
+        const dic = TEXTOS[lang] || {};
+        return Object.prototype.hasOwnProperty.call(dic, clave) ? dic[clave] : null;
+    }
+
+    function t(clave, es, valores) {
+        const v = buscar(clave, getLang());
+        return interpolar(v !== null ? v : (es !== undefined ? es : clave), valores);
+    }
+
+    function fecha(d, opciones) {
+        try {
+            return new Intl.DateTimeFormat(LOCALES[getLang()], opciones).format(d);
+        } catch (e) {
+            return d.toLocaleDateString();
         }
-        return null; // null = mantener el original (español)
     }
 
-    function apply(lang) {
+    function aplicar(lang) {
         document.documentElement.lang = lang;
 
-        document.querySelectorAll('[data-i18n]').forEach(function (el) {
-            const v = tr(el.getAttribute('data-i18n'), lang);
-            if (v !== null) el.textContent = v;
+        document.querySelectorAll('[data-i18n]').forEach((el) => {
+            if (!originalTexto.has(el)) originalTexto.set(el, el.textContent);
+            const v = buscar(el.getAttribute('data-i18n'), lang);
+            el.textContent = v !== null ? v : originalTexto.get(el);
         });
-        document.querySelectorAll('[data-i18n-html]').forEach(function (el) {
-            const v = tr(el.getAttribute('data-i18n-html'), lang);
-            if (v !== null) el.innerHTML = v;
+        document.querySelectorAll('[data-i18n-html]').forEach((el) => {
+            if (!originalHtml.has(el)) originalHtml.set(el, el.innerHTML);
+            const v = buscar(el.getAttribute('data-i18n-html'), lang);
+            el.innerHTML = v !== null ? v : originalHtml.get(el);
         });
-        document.querySelectorAll('[data-i18n-attr]').forEach(function (el) {
-            el.getAttribute('data-i18n-attr').split(';').forEach(function (pair) {
-                const idx = pair.indexOf(':');
-                if (idx < 0) return;
-                const attr = pair.slice(0, idx).trim();
-                const key = pair.slice(idx + 1).trim();
-                const v = tr(key, lang);
-                if (v !== null) el.setAttribute(attr, v);
+        document.querySelectorAll('[data-i18n-attr]').forEach((el) => {
+            if (!originalAttr.has(el)) originalAttr.set(el, {});
+            const guardados = originalAttr.get(el);
+            el.getAttribute('data-i18n-attr').split(';').forEach((par) => {
+                const i = par.indexOf(':');
+                if (i < 0) return;
+                const attr = par.slice(0, i).trim();
+                const clave = par.slice(i + 1).trim();
+                if (!(attr in guardados)) guardados[attr] = el.getAttribute(attr);
+                const v = buscar(clave, lang);
+                const valor = v !== null ? v : guardados[attr];
+                if (valor !== null) el.setAttribute(attr, valor);
             });
         });
-        document.querySelectorAll('[data-lang-btn]').forEach(function (btn) {
-            const active = btn.getAttribute('data-lang-btn') === lang;
-            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
-            btn.classList.toggle('lang-btn--active', active);
+        document.querySelectorAll('[data-lang-btn]').forEach((btn) => {
+            const activo = btn.getAttribute('data-lang-btn') === lang;
+            btn.setAttribute('aria-pressed', activo ? 'true' : 'false');
+            btn.classList.toggle('lang-btn--active', activo);
         });
     }
 
     function setLang(lang) {
-        if (SUPPORTED.indexOf(lang) === -1) return;
-        try { localStorage.setItem(STORAGE_KEY, lang); } catch (e) { /* sin storage */ }
-        apply(lang);
+        if (IDIOMAS.indexOf(lang) === -1) return;
+        try { localStorage.setItem(CLAVE_GUARDADA, lang); } catch (e) { /* sin storage */ }
+        // Si la URL fija el idioma con ?lang=, se quita para que no gane al botón.
+        try {
+            const url = new URL(window.location.href);
+            if (url.searchParams.has('lang')) {
+                url.searchParams.delete('lang');
+                history.replaceState(history.state, '', url);
+            }
+        } catch (e) { /* navegadores antiguos */ }
+        aplicar(lang);
+        document.dispatchEvent(new CustomEvent('i18n:cambio', { detail: { lang } }));
     }
 
-    function init() {
-        apply(getLang());
-        document.addEventListener('click', function (e) {
+    function iniciar() {
+        aplicar(getLang());
+        document.addEventListener('click', (e) => {
             const btn = e.target.closest('[data-lang-btn]');
             if (btn) { e.preventDefault(); setLang(btn.getAttribute('data-lang-btn')); }
         });
     }
 
+    // Antes de pintar nada ya se sabe el idioma, para que <html lang> sea el bueno.
+    document.documentElement.lang = getLang();
+
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', iniciar);
     } else {
-        init();
+        iniciar();
     }
 
-    // refresh: vuelve a traducir lo que se ha añadido después de cargar (p. ej. los
-    // accesos del médico que pone auth-ui.js al iniciar sesión).
-    window.i18n = { setLang: setLang, getLang: getLang, refresh: function () { apply(getLang()); } };
+    // refresh: vuelve a traducir lo que se ha añadido después de cargar (los
+    // accesos del médico que pone auth-ui.js, lo que pinta la reserva...).
+    // Atajo global para los scripts clásicos (no módulos), que comparten ámbito:
+    // si cada uno declarase su propio «const T» chocarían entre sí.
+    window.T = t;
+
+    window.i18n = {
+        setLang,
+        getLang,
+        t,
+        fecha,
+        idiomas: IDIOMAS.slice(),
+        refresh() { aplicar(getLang()); },
+    };
 })();

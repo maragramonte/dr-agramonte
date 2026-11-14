@@ -119,15 +119,16 @@ Viven en [`e2e/`](../e2e), fuera de `frontend/`. No es un capricho: `frontend/` 
 tal cual (nginx lo monta y el `Dockerfile` lo copia dentro del jar), así que un
 `node_modules` o un informe de pruebas ahí dentro acabaría servido en la web.
 
-Son 25 pruebas en cinco ficheros:
+Son 38 pruebas en seis ficheros:
 
 | Fichero | Qué comprueba |
 |---------|---------------|
-| `reserva.spec.js` (5) | La reserva sin cuenta de principio a fin, con el cuerpo del `POST` que espera la API; que solo se pueden pulsar las horas libres; que no se envía sin aceptar la privacidad; que un teléfono no español se rechaza sin llamar a la API, y que un 409 se enseña sin romper el formulario |
+| `reserva.spec.js` (6) | La reserva sin cuenta de principio a fin, con el cuerpo del `POST` que espera la API; que con seguro la aseguradora se escribe a mano y es obligatoria; que solo se pueden pulsar las horas libres; que no se envía sin aceptar la privacidad; que un teléfono no español se rechaza sin llamar a la API, y que un 409 se enseña sin romper el formulario |
 | `navegacion.spec.js` (9) | Que ninguna página pública enlaza a las herramientas internas ni habla del TFC, que un paciente con sesión tampoco las ve y que el médico sí las encuentra en el menú |
 | `portada.spec.js` (2) | Que sin agenda el recuadro del hero ofrece los centros en vez de un error, y que `reservar.html?centro=` marca el centro aunque no lleve fecha |
 | `letra-grande.spec.js` (6) | Que con la letra del navegador a 32 px ninguna página pública obliga a desplazarse en horizontal |
-| `calendario.spec.js` (3) | Con el reloj fijado en diciembre de 2026: que cada centro solo abre sus días, que el sábado y el domingo están cerrados, que la Inmaculada y Navidad salen tachadas y sin poder elegirse, y que el pie ya no anuncia los sábados |
+| `calendario.spec.js` (4) | Con el reloj fijado en diciembre de 2026: que cada centro solo abre sus días, que el sábado y el domingo están cerrados, que la Inmaculada y Navidad salen tachadas y sin poder elegirse, que su nombre sale en catalán y en inglés, y que el pie ya no anuncia los sábados |
+| `idiomas.spec.js` (11) | Que el botón cambia de idioma y se puede volver al castellano sin recargar, que la elección se recuerda entre páginas y con `?lang=`, que en inglés no queda texto en castellano en ocho páginas (salvo nombres propios y las opiniones de pacientes) y que el calendario y los días de los centros también cambian |
 
 Cada una corre dos veces, en un Chrome de escritorio y en un Pixel 7 emulado.
 

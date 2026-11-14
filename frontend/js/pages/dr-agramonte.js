@@ -18,6 +18,8 @@
 
 'use strict';
 
+// T() es la función global de textos traducibles que define js/modules/i18n.js.
+
 /* ══════════════════════════════════════════════
    1. CONFIG — todo en un único lugar
    Si algo cambia (URL, timeout...) solo tocas aquí.
@@ -138,7 +140,7 @@ const Utils = {
     },
 
     /** Muestra/oculta el spinner en un botón de formulario */
-    loader(btn, cargando, txt = 'Procesando...') {
+    loader(btn, cargando, txt = T('js.procesando', 'Un momento…')) {
         if (!btn) return;
         if (cargando) {
             btn.dataset.orig = btn.innerHTML;
@@ -223,6 +225,8 @@ class Navegacion {
 
     _bindEventos() {
         this._toggle.addEventListener('click', () => this._alternar());
+        this._etiquetar();
+        document.addEventListener('i18n:cambio', () => this._etiquetar());
 
         // Cerrar al elegir un destino del panel
         this._panel.querySelectorAll('a').forEach(a =>
@@ -258,16 +262,22 @@ class Navegacion {
         this._abierto ? this._cerrar() : this._abrir();
     }
 
+    _etiquetar() {
+        this._toggle.setAttribute('aria-label', this._abierto
+            ? T('js.menu.cerrar', 'Cerrar el menú')
+            : T('js.menu.abrir', 'Abrir el menú'));
+    }
+
     _abrir() {
         this._panel.hidden = false;
         this._toggle.setAttribute('aria-expanded', 'true');
-        this._toggle.setAttribute('aria-label', 'Cerrar el menú');
+        this._etiquetar();
     }
 
     _cerrar() {
         this._panel.hidden = true;
         this._toggle.setAttribute('aria-expanded', 'false');
-        this._toggle.setAttribute('aria-label', 'Abrir el menú');
+        this._etiquetar();
     }
 }
 
@@ -341,12 +351,16 @@ class LazyLoad {
 ══════════════════════════════════════════════ */
 class Autocompletado {
 
-    #sugerencias = [
-        'Primera consulta', 'Revisión periódica', 'Control de diabetes',
-        'Control de hipertensión', 'Chequeo preventivo', 'Segunda opinión médica',
-        'Análisis de resultados', 'Consulta de seguimiento',
-        'Cambio de medicación', 'Informe médico'
-    ];
+    // Se leen al escribir, así salen en el idioma que esté puesto en ese momento.
+    get #sugerencias() {
+        return [
+            T('js.sug.primera', 'Primera consulta'), T('js.sug.revision', 'Revisión periódica'),
+            T('js.sug.diabetes', 'Control de diabetes'), T('js.sug.hipertension', 'Control de hipertensión'),
+            T('js.sug.chequeo', 'Chequeo preventivo'), T('js.sug.segunda', 'Segunda opinión médica'),
+            T('js.sug.analisis', 'Análisis de resultados'), T('js.sug.seguimiento', 'Consulta de seguimiento'),
+            T('js.sug.medicacion', 'Cambio de medicación'), T('js.sug.informe', 'Informe médico'),
+        ];
+    }
 
     init() {
         const campo = document.getElementById('motivo');
@@ -416,8 +430,8 @@ class PWA {
             .then(() => console.log('✅ Service Worker registrado'))
             .catch(err => console.warn('SW no disponible:', err));
 
-        window.addEventListener('online',  () => Utils.notify('Conexión restablecida', 'success', 3000));
-        window.addEventListener('offline', () => Utils.notify('Sin conexión a internet', 'warning', 3000));
+        window.addEventListener('online',  () => Utils.notify(T('js.red.vuelve', 'Ha vuelto la conexión'), 'success', 3000));
+        window.addEventListener('offline', () => Utils.notify(T('js.red.sin', 'Sin conexión a internet'), 'warning', 3000));
     }
 }
 
@@ -443,6 +457,8 @@ class ThemeToggle {
             const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
             this.apply(next);
         });
+        document.addEventListener('i18n:cambio', () =>
+            this.apply(document.documentElement.getAttribute('data-theme')));
     }
 
     apply(theme) {
@@ -454,9 +470,9 @@ class ThemeToggle {
             this.icon.className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
         }
         if (this.btn) {
-            const label = t === 'dark' ? 'Activar modo claro' : 'Activar modo oscuro';
+            const label = t === 'dark' ? T('js.tema.aClaro', 'Activar modo claro') : T('js.tema.aOscuro', 'Activar modo oscuro');
             this.btn.setAttribute('aria-label', label);
-            this.btn.setAttribute('title', t === 'dark' ? 'Modo oscuro (clic para claro)' : 'Modo claro (clic para oscuro)');
+            this.btn.setAttribute('title', label);
             this.btn.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
         }
 
@@ -483,8 +499,7 @@ class ThemeToggle {
         btn.type = 'button';
         btn.className = 'theme-toggle';
         btn.id = 'themeToggle';
-        btn.setAttribute('aria-label', 'Activar modo oscuro');
-        btn.setAttribute('title', 'Cambiar tema claro / oscuro');
+        btn.setAttribute('aria-label', T('js.tema.aOscuro', 'Activar modo oscuro'));
         btn.setAttribute('aria-pressed', 'false');
         btn.innerHTML = '<i class="fas fa-moon" id="themeToggleIcon" aria-hidden="true"></i>';
         wrap.insertBefore(btn, wrap.firstChild);
@@ -510,7 +525,10 @@ class Accesibilidad {
         const link = document.createElement('a');
         link.href = '#main-content';
         link.className = 'skip-link';
-        link.textContent = 'Ir al contenido principal';
+        link.textContent = T('js.saltar', 'Ir al contenido principal');
+        document.addEventListener('i18n:cambio', () => {
+            link.textContent = T('js.saltar', 'Ir al contenido principal');
+        });
         link.style.cssText = `
             position:absolute; top:0; left:0; transform:translateY(-110%);
             background:var(--teal-fill); color:#fff;

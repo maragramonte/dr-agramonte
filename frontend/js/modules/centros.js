@@ -36,4 +36,29 @@ export const CENTROS = [
     }
 ];
 
+
+const i18n = () => (typeof window !== 'undefined' ? window.i18n : undefined);
+const T = (clave, es) => (i18n() ? i18n().t(clave, es) : es);
+
+/** Calle o zona del centro, en el idioma de la página. */
+export function direccionDe(centro) {
+    return T(`centro.${centro.id}.direccion`, centro.direccion);
+}
+
+/**
+ * «Lun / Mar / Jue» en el idioma de la página. Se calcula desde diasSemana para
+ * que la etiqueta no pueda contradecir los días en que el centro abre.
+ */
+export function diasDe(centro) {
+    // 4 de enero de 2026 fue domingo: sumando el número de día sale cada uno.
+    return centro.diasSemana.map((dia) => {
+        const fecha = new Date(2026, 0, 4 + dia);
+        const corto = i18n()
+            ? i18n().fecha(fecha, { weekday: 'short' })
+            : centro.diasHint.split(' / ')[centro.diasSemana.indexOf(dia)];
+        const limpio = corto.replace(/\.$/, '');
+        return limpio.charAt(0).toUpperCase() + limpio.slice(1);
+    }).join(' / ');
+}
+
 export default CENTROS;

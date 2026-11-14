@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="description" content="Dr. Juan Manuel Agramonte - Especialista en Medicina Interna con más de 35 años de experiencia. Atención médica integral en Mallorca.">
-    <title>Dr. Agramonte | Medicina Interna en Palma de Mallorca</title>
+    <title data-i18n="t.dr-agramonte-medicina-interna-en-palma">Dr. Agramonte | Medicina Interna en Palma de Mallorca</title>
 
     <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
     <link rel="apple-touch-icon" href="icons/app-icon.svg">
@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="css/dr-agramonte.css">
     <link rel="stylesheet" href="css/pages-extra.css">
     <script src="js/modules/theme-init.js"></script>
+    <script src="js/modules/i18n-textos.js"></script>
     <script src="js/modules/i18n.js"></script>
     <meta name="robots" content="index, follow">
     <meta name="author" content="Dr. Juan Manuel Agramonte">
@@ -71,14 +72,14 @@
     <div class="container">
         <div class="header-content">
             <div class="logo-section">
-                <a href="index.html" class="logo-link" aria-label="Inicio - Dr. Agramonte">
+                <a href="index.html" class="logo-link" aria-label="Inicio - Dr. Agramonte" data-i18n-attr="aria-label:t.inicio-dr-agramonte">
                     <div class="logo-text">
                         <p class="logo-title">Dr. Agramonte</p>
                         <p class="logo-subtitle" data-i18n="logo.subtitle">Especialista en Medicina Interna</p>
                     </div>
                 </a>
             </div>
-            <nav class="main-nav" aria-label="Navegación principal">
+            <nav class="main-nav" aria-label="Navegación principal" data-i18n-attr="aria-label:t.navegacion-principal">
                 <ul class="nav-menu">
                     <li class="nav-item"><a href="sobre-mi.html" class="nav-link" data-i18n="nav.sobre">Sobre el Dr.</a></li>
                     <li class="nav-item"><a href="servicios.html" class="nav-link" data-i18n="nav.servicios">Servicios</a></li>
@@ -86,9 +87,9 @@
                 </ul>
             </nav>
             <div class="header-actions">
-                <a href="reservar.html" class="nav-cta" aria-label="Reservar cita"><i class="fas fa-calendar-plus" aria-hidden="true"></i><span class="nav-cta-text" data-i18n="nav.reservar">Reservar cita</span></a>
+                <a href="reservar.html" class="nav-cta" aria-label="Reservar cita" data-i18n-attr="aria-label:t.reservar-cita"><i class="fas fa-calendar-plus" aria-hidden="true"></i><span class="nav-cta-text" data-i18n="nav.reservar">Reservar cita</span></a>
                 <div class="header-utils">
-                    <div class="lang-switch" role="group" aria-label="Idioma"><button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" aria-pressed="true">ES</button><button type="button" class="lang-btn" data-lang-btn="ca" aria-pressed="false">CA</button></div>
+                    <div class="lang-switch" role="group" aria-label="Idioma" data-i18n-attr="aria-label:t.idioma"><button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" lang="es" title="Español" aria-pressed="true">ES</button><button type="button" class="lang-btn" data-lang-btn="ca" lang="ca" title="Català" aria-pressed="false">CA</button><button type="button" class="lang-btn" data-lang-btn="en" lang="en" title="English" aria-pressed="false">EN</button></div>
                     <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="mega-menu" aria-label="Abrir el menú"><span class="nav-toggle-icon" aria-hidden="true"></span><span class="nav-toggle-text" data-i18n="nav.menu">Menú</span></button>
                 </div>
             </div>
@@ -105,7 +106,7 @@
                 <h2 class="mega-menu__title" data-i18n="menu.consulta">La consulta</h2>
                 <ul class="mega-menu__list">
                     <li><a href="index.html" class="mega-link"><i class="fas fa-home" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.inicio">Inicio</span><span class="mega-link__hint" data-i18n="menu.inicio.hint">Portada y resumen</span></span></a></li>
-                    <li><a href="sobre-mi.html" class="mega-link"><i class="fas fa-user-md" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.sobre">El Dr. Agramonte</span><span class="mega-link__hint" data-i18n="menu.sobre.hint">Trayectoria y formación</span></span></a></li>
+                    <li><a href="sobre-mi.html" class="mega-link"><i class="fas fa-user-md" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="t.el-dr-agramonte">El Dr. Agramonte</span><span class="mega-link__hint" data-i18n="menu.sobre.hint">Trayectoria y formación</span></span></a></li>
                     <li><a href="servicios.html" class="mega-link"><i class="fas fa-stethoscope" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.servicios">Servicios</span><span class="mega-link__hint" data-i18n="menu.servicios.hint">Qué se atiende en consulta</span></span></a></li>
                 </ul>
             </div>
@@ -120,7 +121,7 @@
         <div class="mega-menu__pie">
             <a href="privacidad.html" class="mega-menu__legal"><i class="fas fa-shield-alt" aria-hidden="true"></i> <span data-i18n="footer.privacidad">Política de Privacidad</span></a>
             <!-- Copia del selector de idioma para los anchos en los que no cabe en la barra. -->
-            <div class="lang-switch lang-switch--menu" role="group" aria-label="Idioma"><button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" aria-pressed="true">ES</button><button type="button" class="lang-btn" data-lang-btn="ca" aria-pressed="false">CA</button></div>
+            <div class="lang-switch lang-switch--menu" role="group" aria-label="Idioma" data-i18n-attr="aria-label:t.idioma"><button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" lang="es" title="Español" aria-pressed="true">ES</button><button type="button" class="lang-btn" data-lang-btn="ca" lang="ca" title="Català" aria-pressed="false">CA</button><button type="button" class="lang-btn" data-lang-btn="en" lang="en" title="English" aria-pressed="false">EN</button></div>
             <button type="button" class="theme-toggle" id="themeToggle" aria-label="Activar modo oscuro" title="Cambiar tema claro / oscuro" aria-pressed="false"><i class="fas fa-moon" id="themeToggleIcon" aria-hidden="true"></i></button>
         </div>
     </div>
@@ -133,10 +134,10 @@
             <div class="hero-text">
                 <p class="hero-eyebrow"><span data-i18n="home.eyebrow">Medicina Interna en Palma de Mallorca</span></p>
                 <h1 id="hero-title" class="hero-title" data-i18n="home.hero.title">Su cita con el Dr. Agramonte, en un minuto.</h1>
-                <p class="hero-subtitle" data-i18n="home.hero.subtitle">Elija centro, día y hora sobre la agenda real del doctor. Sin llamar, sin registrarse y sin esperar confirmación.</p>
-                <ul class="hero-ticks" aria-label="Qué incluye reservar aquí">
-                    <li><i class="fas fa-check" aria-hidden="true"></i><span data-i18n="home.tick.1">Recibe por correo el enlace para consultar o cancelar su cita</span></li>
-                    <li><i class="fas fa-check" aria-hidden="true"></i><span data-i18n="home.tick.2">Consulta privada 80 €, se abona después de la visita</span></li>
+                <p class="hero-subtitle" data-i18n="home.hero.subtitle">Elija centro, día y hora en la agenda del doctor. No hace falta llamar ni registrarse.</p>
+                <ul class="hero-ticks" aria-label="Qué incluye reservar aquí" data-i18n-attr="aria-label:t.que-incluye-reservar-aqui">
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span data-i18n="home.tick.1">Le llega por correo un enlace para ver o cancelar la cita</span></li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i><span data-i18n="home.tick.2">Consulta privada: 80 €, que se pagan después de la visita</span></li>
                     <li><i class="fas fa-check" aria-hidden="true"></i><span data-i18n="home.tick.3">También con su seguro médico</span></li>
                 </ul>
             </div>
@@ -147,7 +148,7 @@
             <aside class="hero-widget" id="heroReserva" aria-labelledby="heroReservaTitulo">
                 <div class="hero-widget__head">
                     <h3 id="heroReservaTitulo" data-i18n="home.widget.title">Reservar cita</h3>
-                    <p data-i18n="home.widget.subtitle">Huecos reales de los próximos días</p>
+                    <p data-i18n="home.widget.subtitle">Horas libres de los próximos días</p>
                 </div>
                 <div class="hero-widget__body" id="heroReservaCuerpo">
                     <p class="hw-estado" data-i18n="home.widget.cargando">Consultando la agenda…</p>
@@ -166,16 +167,16 @@
             <h2 id="pasos-title" class="visually-hidden" data-i18n="home.pasos.title">Cómo se pide cita</h2>
             <div class="pasos-grid">
                 <div class="paso-reserva">
-                    <h3 data-i18n="home.paso.1.t">Elija hueco</h3>
-                    <p data-i18n="home.paso.1.d">Los que ve son los que quedan libres de verdad en la agenda del doctor.</p>
+                    <h3 data-i18n="home.paso.1.t">Elija hora</h3>
+                    <p data-i18n="home.paso.1.d">Solo verá las horas que siguen libres en la agenda.</p>
                 </div>
                 <div class="paso-reserva">
                     <h3 data-i18n="home.paso.2.t">Deje sus datos</h3>
-                    <p data-i18n="home.paso.2.d">Nombre, teléfono y correo. Puede crear cuenta o no hacerlo, como prefiera.</p>
+                    <p data-i18n="home.paso.2.d">Nombre, teléfono y correo. Puede crear una cuenta, pero no es obligatorio.</p>
                 </div>
                 <div class="paso-reserva">
                     <h3 data-i18n="home.paso.3.t">Reciba el enlace</h3>
-                    <p data-i18n="home.paso.3.d">Le llega al correo con su cita. Desde ahí la consulta o la cancela cuando quiera.</p>
+                    <p data-i18n="home.paso.3.d">Le llega por correo. Desde ese enlace puede ver la cita o cancelarla.</p>
                 </div>
             </div>
         </div>
@@ -187,17 +188,17 @@
             <ul class="servicios-lista">
                 <li class="servicio-fila">
                     <h3 class="servicio-fila__titulo" data-i18n="home.serv.general.t">Consulta general</h3>
-                    <p class="servicio-fila__texto" data-i18n="home.serv.general.d">Evaluación médica completa para diagnóstico y tratamiento.</p>
+                    <p class="servicio-fila__texto" data-i18n="home.serv.general.d">Una valoración completa para llegar al diagnóstico y decidir el tratamiento.</p>
                     <a class="servicio-fila__accion" href="reservar.html?servicio=consulta-general"><span data-i18n="home.serv.reservar">Reservar esta consulta</span></a>
                 </li>
                 <li class="servicio-fila">
                     <h3 class="servicio-fila__titulo" data-i18n="home.serv.cronicas.t">Enfermedades crónicas</h3>
-                    <p class="servicio-fila__texto" data-i18n="home.serv.cronicas.d">Control de diabetes, hipertensión y enfermedades cardiovasculares.</p>
+                    <p class="servicio-fila__texto" data-i18n="home.serv.cronicas.d">Control de la diabetes, la hipertensión y las enfermedades cardiovasculares.</p>
                     <a class="servicio-fila__accion" href="reservar.html?servicio=enfermedades-cronicas"><span data-i18n="home.serv.reservar">Reservar esta consulta</span></a>
                 </li>
                 <li class="servicio-fila">
                     <h3 class="servicio-fila__titulo" data-i18n="home.serv.chequeos.t">Chequeos preventivos</h3>
-                    <p class="servicio-fila__texto" data-i18n="home.serv.chequeos.d">Revisiones completas para detectar factores de riesgo.</p>
+                    <p class="servicio-fila__texto" data-i18n="home.serv.chequeos.d">Revisiones para detectar a tiempo los factores de riesgo.</p>
                     <a class="servicio-fila__accion" href="reservar.html?servicio=chequeos-preventivos"><span data-i18n="home.serv.reservar">Reservar esta consulta</span></a>
                 </li>
             </ul>
@@ -210,13 +211,13 @@
             <figure class="doctor-portada__boceto">
                 <picture>
                     <source type="image/webp" srcset="pictures/Boceto-400.webp 400w, pictures/Boceto-800.webp 800w" sizes="(max-width: 900px) 92vw, 560px">
-                    <img src="pictures/Boceto.png" alt="Dibujo a lápiz del Dr. Agramonte con bata y fonendoscopio" width="1536" height="1024" loading="lazy" decoding="async">
+                    <img src="pictures/Boceto.png" alt="Dibujo a lápiz del Dr. Agramonte con bata y fonendoscopio" width="1536" height="1024" loading="lazy" decoding="async" data-i18n-attr="alt:t.dibujo-a-lapiz-del-dr-agramonte">
                 </picture>
             </figure>
             <div class="doctor-portada__texto">
                 <h2 id="sobre-mi-title" class="section-title" data-i18n="home.sobre.title">El Dr. Agramonte</h2>
                 <p data-i18n-html="home.sobre.bio">El <strong>Dr. Juan Manuel Agramonte</strong> es especialista en Medicina Interna con más de 35 años de experiencia en el diagnóstico y tratamiento de enfermedades complejas.</p>
-                <p data-i18n="home.sobre.enfoque">Su forma de trabajar: escuchar bien, explicar mejor y acompañar siempre.</p>
+                <p data-i18n="home.sobre.enfoque">Dedica tiempo a escuchar y explica cada paso con palabras claras.</p>
                 <p class="doctor-portada__enlace"><a href="sobre-mi.html" data-i18n="home.sobre.btn">Conocer al doctor</a></p>
             </div>
         </div>
@@ -238,7 +239,7 @@
     <div class="footer-content">
         <div class="footer-section"><h3>Dr. Agramonte</h3><p data-i18n="footer.especialista">Especialista en Medicina Interna</p><p data-i18n="footer.ubicacion">Palma de Mallorca, Islas Baleares</p></div>
         <div class="footer-section"><h3 data-i18n="footer.horario">Horario</h3><p><strong data-i18n="footer.lunVie">Lunes a viernes</strong><br>9:00 - 14:00<br>16:00 - 19:00</p><p><strong data-i18n="footer.finde">Fines de semana y festivos</strong><br><span data-i18n="footer.cerrado">Cerrado</span></p></div>
-        <div class="footer-section"><h3 data-i18n="footer.enlaces">Enlaces</h3><a href="sobre-mi.html">El Dr. Agramonte</a><a href="servicios.html" data-i18n="nav.servicios">Servicios</a><a href="reservar.html" data-i18n="nav.reservar">Reservar cita</a><a href="contacto.html" data-i18n="nav.contacto">Contacto</a></div>
+        <div class="footer-section"><h3 data-i18n="footer.enlaces">Enlaces</h3><a href="sobre-mi.html" data-i18n="t.el-dr-agramonte">El Dr. Agramonte</a><a href="servicios.html" data-i18n="nav.servicios">Servicios</a><a href="reservar.html" data-i18n="nav.reservar">Reservar cita</a><a href="contacto.html" data-i18n="nav.contacto">Contacto</a></div>
     </div>
     <div class="footer-bottom"><p><span data-i18n="footer.copyright">© 2026 Dr. Juan Manuel Agramonte.</span> <a href="privacidad.html" data-i18n="footer.privacidad">Política de Privacidad</a></p></div>
 </footer>

@@ -19,14 +19,14 @@
         function cerrar() {
             panel.hidden = true;
             navToggle.setAttribute('aria-expanded', 'false');
-            navToggle.setAttribute('aria-label', 'Abrir el menú');
+            navToggle.setAttribute('aria-label', window.i18n ? window.i18n.t('js.menu.abrir', 'Abrir el menú') : 'Abrir el menú');
         }
 
         navToggle.addEventListener('click', function() {
             if (panel.hidden) {
                 panel.hidden = false;
                 navToggle.setAttribute('aria-expanded', 'true');
-                navToggle.setAttribute('aria-label', 'Cerrar el menú');
+                navToggle.setAttribute('aria-label', window.i18n ? window.i18n.t('js.menu.cerrar', 'Cerrar el menú') : 'Cerrar el menú');
             } else {
                 cerrar();
             }

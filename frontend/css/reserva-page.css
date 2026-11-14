@@ -116,3 +116,6 @@ body.reserva-page {
     .page-wrapper { padding: 1rem .75rem 3rem; }
     .card-header, .card-body { padding-left: 1rem; padding-right: 1rem; }
 }
+
+/* Iniciales de los días: el nombre entero va en el title del abbr. */
+.cal-weekdays abbr { text-decoration: none; cursor: default; }

@@ -70,7 +70,15 @@ Los módulos compartidos que más peso tienen:
   pintan datos de pacientes en la pantalla del médico.
 - **`modules/centros.js`**: los centros de consulta y sus días, en un solo sitio, porque los
   consumen tanto `pages/reserva.js` como el selector de la portada.
-- **`modules/i18n.js`**: traducción al catalán por atributos `data-i18n`, sin dependencias.
+- **`modules/i18n.js`** y **`modules/i18n-textos.js`**: castellano, catalán e inglés, sin
+  dependencias. El castellano es el texto del HTML; los otros dos idiomas viven en
+  `i18n-textos.js`. El HTML marca lo traducible con `data-i18n`, `data-i18n-html` y
+  `data-i18n-attr`, y el JavaScript usa `T('clave', 'texto en castellano')`. Al cambiar de
+  idioma se lanza el evento `i18n:cambio` y cada página repinta lo que genera ella (el
+  calendario, los centros, el menú). Las fechas salen de `Intl.DateTimeFormat`. No se mira
+  el idioma del navegador: el robot de Google renderiza en inglés y acabaría indexando esa
+  versión. `node scripts/i18n-comprobar.mjs` falla en el CI si algún texto marcado no tiene
+  las dos traducciones o si una traducción pierde un enlace.
 - **`modules/theme-init.js`**: fija el tema antes de pintar, para que no parpadee.
 
 ### Nada se carga de un CDN
