@@ -67,7 +67,7 @@ Todo esto está implementado en el backend y funciona contra una base de datos r
   hora la pone el servidor, no el navegador.
 - Un cuadro de mando para el médico: carga por médico, demanda por especialidad, reparto por
   centro y tasa de cancelación.
-- Castellano y catalán, con el idioma guardado en el navegador.
+- Castellano, catalán e inglés en todas las páginas para pacientes, también en lo que pinta JavaScript (calendario, avisos, formulario de acceso). El idioma elegido se recuerda en el navegador.
 - Se puede instalar como app (PWA), tiene modo oscuro y una página para cuando no hay
   conexión.
 
@@ -176,12 +176,11 @@ y Dependabot propone las actualizaciones de Maven, Docker y GitHub Actions. Cada
 Semgrep (reglas de Java y de secretos, de momento solo informativo) y cada semana gitleaks
 revisa todo el historial de git en busca de claves subidas por error.
 
-El frontend tiene 25 pruebas E2E con Playwright, y cada una se ejecuta en escritorio y en
+El frontend tiene 37 pruebas E2E con Playwright, y cada una se ejecuta en escritorio y en
 móvil. Cubren la reserva sin cuenta de principio a fin, que los pacientes no vean enlaces a
 las herramientas internas, que el calendario no deje elegir fines de semana ni festivos, la
-portada cuando la agenda no responde y que ninguna página se
-salga de la pantalla con la letra del navegador al doble. La API está simulada en el
-navegador, así que no hace falta backend.
+portada cuando la agenda no responde, que ninguna página se salga de la pantalla con la
+letra del navegador al doble y que al pasar a inglés no quede texto en castellano. La API está simulada en el navegador, así que no hace falta backend.
 
 Lo que falta: la cobertura no está medida (no hay JaCoCo, así que no hay porcentaje). El
 login, «Mis citas» y el panel del médico no tienen pruebas en el frontend. Ninguna prueba

@@ -128,6 +128,13 @@ jobs:
       - name: Probar festivos-comprobar.mjs
         run: bash scripts/tests/festivos-comprobar.test.sh
 
+      # Cada texto marcado para traducir tiene que tener catalán e inglés.
+      - name: Traducciones completas
+        run: node scripts/i18n-comprobar.mjs
+
+      - name: Probar i18n-comprobar.mjs
+        run: bash scripts/tests/i18n-comprobar.test.sh
+
       - name: Probar backup-db.sh
         run: bash scripts/tests/backup-db.test.sh
 
