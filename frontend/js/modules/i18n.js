@@ -31,10 +31,11 @@
     const CLAVE_GUARDADA = 'dr-agramonte-lang';
     const IDIOMAS = ['es', 'ca', 'en'];
     const LOCALES = { es: 'es-ES', ca: 'ca-ES', en: 'en-GB' };
-    // Ruta del diccionario relativa a este mismo archivo, para que funcione igual
-    // en la raíz del dominio que bajo /dr-agramonte/app/ en GitHub Pages.
-    const yo = document.currentScript && document.currentScript.src;
-    const RUTA_TEXTOS = yo ? yo.replace(/i18n\.js(\?.*)?$/, 'i18n-textos.js') : 'js/modules/i18n-textos.js';
+    // Ruta relativa y fija: todas las páginas están en la misma carpeta, así que
+    // vale igual en la raíz del dominio que bajo /dr-agramonte/app/ en GitHub
+    // Pages. Fija también porque va a parar a document.write: nada que venga de
+    // la página o de la URL debe acabar en ese HTML.
+    const RUTA_TEXTOS = 'js/modules/i18n-textos.js';
     const textos = () => window.I18N_TEXTOS || null;
     let cargando = null;
 
@@ -168,7 +169,7 @@
 
     if (getLang() !== 'es' && !textos() && document.readyState === 'loading') {
         // Ver la cabecera: carga síncrona del diccionario, solo fuera del castellano.
-        document.write('<script src="' + RUTA_TEXTOS + '"><\/script>');
+        document.write('<script src="js/modules/i18n-textos.js"><\/script>');
     }
 
     if (document.readyState === 'loading') {
