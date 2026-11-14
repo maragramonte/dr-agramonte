@@ -210,6 +210,7 @@ body {
     display: flex;
     flex-direction: column;
     transition: background-color 0.3s, color 0.3s;
+    font-size: 1.125rem;
 }
 
 /* El main empuja el footer hacia abajo. El width: 100% no es decorativo: body es
@@ -461,8 +462,11 @@ a {
 
 .section-header,
 .section__header {
-    text-align: center;
-    margin-bottom: var(--space-5);
+    /* Cabeceras de seccion: pegadas al margen izquierdo y con el filete debajo
+   del titulo movido a la izquierda, como el antetitulo del hero. Sin .home
+   delante: las paginas interiores comparten estas clases y siguen el mismo eje. */
+    text-align: left;
+    margin-bottom: var(--space-4);
 }
 
 .section-title,
@@ -494,9 +498,14 @@ a {
 .section__subtitle {
     font-size: clamp(0.95rem, 2vw, 1.1rem);
     color: var(--text-light);
-    max-width: 600px;
     margin: var(--space-3) auto 0;
     line-height: 1.7;
+
+    /* (El filete bajo los titulos de seccion ya no existe; antes aqui se movia
+   a la izquierda para las paginas interiores.) */
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 34rem;
 }
 
 /* Selector de idioma (ES / CA) en la cabecera */
@@ -531,63 +540,55 @@ a {
 .page-hero {
     position: relative;
     overflow: hidden;
-    background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal-fill) 42%, var(--teal-light) 100%);
-    color: var(--white);
     padding: clamp(2.25rem, 7vw, 3.75rem) 0;
     margin-bottom: var(--space-4);
-    animation: fadeInUp 0.65s ease-out;
-}
 
-.page-hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        105deg,
-        transparent 25%,
-        rgba(212, 212, 216, 0.14) 50%,
-        transparent 75%
-    );
-    animation: heroShimmer 9s ease-in-out infinite;
-    pointer-events: none;
-}
-
-@keyframes heroShimmer {
-    0%, 100% { transform: translateX(-35%); opacity: 0.6; }
-    50% { transform: translateX(35%); opacity: 1; }
+    /* ---- Cabecera de las páginas interiores: título sobre papel ----
+   Fuera el degradado teal con brillo animado en bucle: era el único sitio
+   de la web con ese lenguaje y hacía que cada página interior pareciera de
+   otra plantilla. Ahora el título va igual que en la portada. */
+    background: var(--bg);
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
 }
 
 .page-hero .container {
     position: relative;
     z-index: 1;
-    text-align: center;
+
+    /* La banda superior: titulo al margen, texto sin centrar y el mismo filete
+   corto que llevan los titulos de seccion. */
+    text-align: left;
 }
 
 .page-hero h1 {
     font-family: var(--font-display);
     letter-spacing: var(--tracking-title);
     font-size: clamp(1.75rem, 5vw, 2.45rem);
-    font-weight: 600;
     margin-bottom: var(--space-2);
     line-height: 1.2;
+    position: relative;
+    color: var(--heading);
+    font-weight: 700;
+    padding-bottom: 0;
 }
 
 .page-hero p {
-    max-width: 42rem;
-    margin: 0 auto;
     opacity: 0.93;
     font-size: clamp(0.92rem, 2vw, 1.05rem);
     line-height: 1.65;
     /* Blanco, no --silver-light: esa variable pasa a gris oscuro (#52525B) en
        tema oscuro, y la banda es teal en los dos temas, asi que el subtitulo se
        quedaba en 1.7:1. Sobre el teal, el blanco al 92% da de sobra. */
-    color: rgba(255, 255, 255, 0.92);
+    margin: 0;
+    max-width: 38rem;
+    color: var(--text-light);
 }
 
 .page-hero a {
-    color: var(--white);
     text-decoration: underline;
     text-underline-offset: 2px;
+    color: var(--teal);
 }
 
 .page-hero-badge {
@@ -692,16 +693,18 @@ a {
     letter-spacing: var(--tracking-title);
     font-size: clamp(1rem, 3.4vw, 1.25rem);
     color: var(--heading);
-    font-weight: 600;
     line-height: 1.2;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    /* ---- Logotipo: solo el nombre ---- */
+    font-weight: 700;
 }
 
 .logo-text .logo-subtitle {
-    font-size: 0.7rem;
     color: var(--text-light);
+    font-size: 0.8rem;
 }
 
 /* Zona central: los destinos principales. Crece para centrarse entre el logo
@@ -725,10 +728,10 @@ a {
     padding: 0.6rem 1rem;
     color: var(--text-light);
     font-weight: 500;
-    font-size: 0.9rem;
     white-space: nowrap;
     border-radius: var(--radius-full);
     transition: var(--transition-fast);
+    font-size: 1rem;
 }
 
 .nav-link:hover {
@@ -1080,16 +1083,11 @@ a {
     }
 
     .nav-link {
-        font-size: 0.95rem;
         padding: 0.65rem 1.15rem;
     }
 
     .logo-text .logo-title {
         font-size: 1.35rem;
-    }
-
-    .logo-text .logo-subtitle {
-        font-size: 0.75rem;
     }
 
     .nav-cta {
@@ -1118,12 +1116,7 @@ a {
         font-size: 1.5rem;
     }
 
-    .logo-text .logo-subtitle {
-        font-size: 0.82rem;
-    }
-
     .nav-link {
-        font-size: 1rem;
         padding: 0.7rem 1.3rem;
     }
 
@@ -1302,11 +1295,18 @@ a {
     padding: 0.85rem 1.8rem;
     border-radius: var(--radius-full);
     font-weight: 600;
-    font-size: 0.9rem;
     cursor: pointer;
     border: none;
     transition: var(--transition);
     font-family: var(--font-body);
+
+    /* ---- Tamaños mínimos de lectura en controles ---- */
+    font-size: 1rem;
+
+    /* Con la letra del navegador agrandada, un botón no puede ser más ancho que
+   la pantalla. */
+    max-width: 100%;
+    text-align: center;
 }
 
 .btn--primary {
@@ -1438,16 +1438,18 @@ a {
 /* Antetitulo: pastilla en vez del filete lateral que llevaba sobre el
    degradado. Sobre papel claro el filete se perdia. */
 .hero-eyebrow {
-    display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--teal-dark);
-    background: var(--teal-pale);
-    border-radius: var(--radius-full);
-    padding: 0.35rem 0.8rem;
     margin-bottom: var(--space-3);
+
+    /* ---- Antetítulo del hero: una línea de texto, no una pastilla ---- */
+    display: block;
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--teal-dark);
 }
 
 .hero-title {
@@ -2086,10 +2088,12 @@ a.hw-option:hover {
 
 /* ========== 15. FOOTER ========== */
 .footer {
-    background: var(--teal-dark);
     color: white;
     padding: var(--space-6) var(--space-3) var(--space-3);
     margin-top: auto;
+
+    /* ---- Pie en petróleo, alineado a la izquierda también en móvil ---- */
+    background: var(--petroleo);
 }
 
 .footer-content {
@@ -2105,13 +2109,14 @@ a.hw-option:hover {
     color: rgba(255, 255, 255, 0.8);
     display: block;
     margin-bottom: 0.6rem;
-    font-size: 0.9rem;
     transition: var(--transition-fast);
+    font-size: 1rem;
 }
 
 .footer-section a:hover {
     color: white;
-    transform: translateX(3px);
+    transform: none;
+    text-decoration: underline;
 }
 
 .footer-bottom {
@@ -2357,24 +2362,6 @@ a.hw-option:hover {
    quede claro de un vistazo que este bloque solo afecta a la portada.
    ============================================================ */
 
-/* Cabeceras de seccion: pegadas al margen izquierdo y con el filete debajo
-   del titulo movido a la izquierda, como el antetitulo del hero. Sin .home
-   delante: las paginas interiores comparten estas clases y siguen el mismo eje. */
-.section-header,
-.section__header {
-    text-align: left;
-    margin-bottom: var(--space-4);
-}
-
-/* (El filete bajo los titulos de seccion ya no existe; antes aqui se movia
-   a la izquierda para las paginas interiores.) */
-
-.section__subtitle {
-    margin-left: 0;
-    margin-right: 0;
-    max-width: 34rem;
-}
-
 /* Servicios: tres columnas IGUALES y alineadas.
 
    Antes iban a 1.15fr / 1fr / 0.9fr y cada tarjeta bajaba un escalon
@@ -2407,33 +2394,6 @@ a.hw-option:hover {
    marcar el <body>: solo la portada necesita .home, porque alli habia que
    distinguir componentes que comparte con estas paginas.
    ============================================================ */
-
-/* La banda superior: titulo al margen, texto sin centrar y el mismo filete
-   corto que llevan los titulos de seccion. */
-.page-hero .container {
-    text-align: left;
-}
-
-.page-hero h1 {
-    position: relative;
-    padding-bottom: var(--space-2);
-}
-
-.page-hero h1::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 60px;
-    height: 3px;
-    background: rgba(255, 255, 255, 0.75);
-    border-radius: 2px;
-}
-
-.page-hero p {
-    margin: 0;
-    max-width: 38rem;
-}
 
 @media (min-width: 56.25em) {
     /* Servicios: columnas iguales y alineadas, igual que en la portada.
@@ -2475,10 +2435,6 @@ a.hw-option:hover {
       de una lista, el doctor es un texto junto a su dibujo y el cierre es una
       banda clara. El dibujo a lápiz es lo único que lleva protagonismo.
    ============================================================ */
-
-body {
-    font-size: 1.125rem;
-}
 
 .section-title {
     letter-spacing: var(--tracking-title);
@@ -2621,29 +2577,6 @@ body {
     gap: var(--space-2);
 }
 
-/* ---- Pie en petróleo, alineado a la izquierda también en móvil ---- */
-.footer {
-    background: var(--petroleo);
-}
-
-.footer-section a:hover {
-    transform: none;
-    text-decoration: underline;
-}
-
-.footer-section a {
-    font-size: 1rem;
-}
-
-/* ---- Tamaños mínimos de lectura en controles ---- */
-.btn {
-    font-size: 1rem;
-}
-
-.nav-link {
-    font-size: 1rem;
-}
-
 /* «Iniciar sesión» es un <button>: sin esto no hereda la letra del resto
    del menú y salía más grande y más oscuro que sus vecinos. */
 button.nav-link {
@@ -2654,32 +2587,6 @@ button.nav-link {
     background: none;
     border: 0;
     cursor: pointer;
-}
-
-/* ---- Cabecera de las páginas interiores: título sobre papel ----
-   Fuera el degradado teal con brillo animado en bucle: era el único sitio
-   de la web con ese lenguaje y hacía que cada página interior pareciera de
-   otra plantilla. Ahora el título va igual que en la portada. */
-.page-hero {
-    background: var(--bg);
-    color: var(--text);
-    border-bottom: 1px solid var(--border);
-    animation: none;
-}
-
-.page-hero::before,
-.page-hero h1::after {
-    content: none;
-}
-
-.page-hero h1 {
-    color: var(--heading);
-    font-weight: 700;
-    padding-bottom: 0;
-}
-
-.page-hero p {
-    color: var(--text-light);
 }
 
 /* ---- Cierre de portada en móvil: botones a todo el ancho y la reserva
@@ -2693,10 +2600,6 @@ button.nav-link {
     .cierre-portada__acciones .btn {
         width: 100%;
     }
-}
-
-.page-hero a {
-    color: var(--teal);
 }
 
 /* ---- Servicios (página): las mismas filas que en la portada ----
@@ -2764,26 +2667,6 @@ button.nav-link {
     .servicios-grid--filas .servicio-acciones { grid-column: 3; grid-row: 1; }
 }
 
-/* ---- Antetítulo del hero: una línea de texto, no una pastilla ---- */
-.hero-eyebrow {
-    display: block;
-    background: none;
-    padding: 0;
-    border-radius: 0;
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--teal-dark);
-}
-
-/* ---- Logotipo: solo el nombre ---- */
-.logo-text .logo-title {
-    font-weight: 700;
-}
-
-.logo-text .logo-subtitle {
-    font-size: 0.8rem;
-}
-
 /* El selector de tema vive ahora en el pie del menú, junto al idioma. */
 .mega-menu__pie .theme-toggle {
     margin-left: auto;
@@ -2795,13 +2678,6 @@ button.nav-link {
     display: flex;
     align-items: center;
     cursor: pointer;
-}
-
-/* Con la letra del navegador agrandada, un botón no puede ser más ancho que
-   la pantalla. */
-.btn {
-    max-width: 100%;
-    text-align: center;
 }
 
 /* Testimonios: la rejilla no declaraba columnas y la pista implícita medía
