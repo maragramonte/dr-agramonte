@@ -17,8 +17,10 @@ dominio, no desde un CDN. Sus licencias permiten expresamente alojarlos así.
 | Atkinson Hyperlegible Next | 5.3.0 (Fontsource) | `frontend/vendor/fonts/` | SIL OFL 1.1 ([texto](frontend/vendor/fonts/LICENSE-Atkinson-Hyperlegible-Next.txt)) |
 
 La atribución que pide la CC BY 4.0 de los iconos queda cubierta por el aviso que
-Font Awesome incluye en la cabecera de `all.min.css` y por su fichero de licencia,
-que no deben borrarse.
+Font Awesome incluye en la cabecera de `all.min.css` (y que se copia en la de
+`iconos.min.css`, el recorte que cargan las páginas) y por su fichero de licencia,
+que no deben borrarse. El recorte y sus dos `.woff2` los genera
+`scripts/iconos-recortar.py` a partir de los originales.
 
 Para regenerar cualquiera de ellos, cada directorio `vendor/` explica en un
 comentario de dónde salió el fichero.

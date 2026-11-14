@@ -119,7 +119,7 @@ Viven en [`e2e/`](../e2e), fuera de `frontend/`. No es un capricho: `frontend/` 
 tal cual (nginx lo monta y el `Dockerfile` lo copia dentro del jar), así que un
 `node_modules` o un informe de pruebas ahí dentro acabaría servido en la web.
 
-Son 38 pruebas en seis ficheros:
+Son 39 pruebas en seis ficheros:
 
 | Fichero | Qué comprueba |
 |---------|---------------|
@@ -128,9 +128,19 @@ Son 38 pruebas en seis ficheros:
 | `portada.spec.js` (2) | Que sin agenda el recuadro del hero ofrece los centros en vez de un error, y que `reservar.html?centro=` marca el centro aunque no lleve fecha |
 | `letra-grande.spec.js` (6) | Que con la letra del navegador a 32 px ninguna página pública obliga a desplazarse en horizontal |
 | `calendario.spec.js` (4) | Con el reloj fijado en diciembre de 2026: que cada centro solo abre sus días, que el sábado y el domingo están cerrados, que la Inmaculada y Navidad salen tachadas y sin poder elegirse, que su nombre sale en catalán y en inglés, y que el pie ya no anuncia los sábados |
-| `idiomas.spec.js` (11) | Que el botón cambia de idioma y se puede volver al castellano sin recargar, que la elección se recuerda entre páginas y con `?lang=`, que en inglés no queda texto en castellano en ocho páginas (salvo nombres propios y las opiniones de pacientes) y que el calendario y los días de los centros también cambian |
+| `idiomas.spec.js` (12) | Que en castellano no se descargan las traducciones y en catalán sí, antes de pintar; que el botón cambia de idioma y se puede volver al castellano sin recargar, que la elección se recuerda entre páginas y con `?lang=`, que en inglés no queda texto en castellano en ocho páginas (salvo nombres propios y las opiniones de pacientes) y que el calendario y los días de los centros también cambian |
 
 Cada una corre dos veces, en un Chrome de escritorio y en un Pixel 7 emulado.
+
+`scripts/iconos-comprobar.mjs` falla si una página usa un icono de Font Awesome que no está
+en el recorte (`iconos.min.css`). Se regenera con `scripts/iconos-recortar.py`. Su prueba
+está en `scripts/tests/iconos-comprobar.test.sh`.
+
+`scripts/seo-comprobar.mjs` revisa en el CI lo básico de cada página que se puede
+indexar: título de 60 caracteres como mucho, descripción de 70 a 160, un solo `<h1>`,
+canonical a su propia URL, etiquetas para compartir iguales al título y la descripción, y
+que el sitemap tenga justo las páginas sin `noindex`. Su prueba está en
+`scripts/tests/seo-comprobar.test.sh`.
 
 La lista de festivos de la web tiene que ser la misma que la de las migraciones del
 backend. Lo comprueba `scripts/festivos-comprobar.mjs` en el CI, con su propia prueba en

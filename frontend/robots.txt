@@ -1,9 +1,10 @@
 User-agent: *
 Allow: /
 
-# Paginas internas / de pruebas: no indexar
-Disallow: /panel-pruebas.html
-Disallow: /estadisticas.html
-Disallow: /offline.html
+# Las páginas internas (la agenda del médico, el cuadro de mando, la de sin conexión
+# y la de activar cuenta) no se bloquean aquí a propósito. Llevan
+# <meta name="robots" content="noindex">, y un buscador solo puede leer esa etiqueta
+# si entra a rastrear la página. Bloqueada en robots.txt, la URL podría acabar
+# listada igualmente en cuanto alguien la enlazara.
 
 Sitemap: https://maragramonte.github.io/dr-agramonte/app/sitemap.xml

@@ -365,7 +365,11 @@ viaja sin verificar.
 **Contexto.** Tipografías, iconos y la librería de gráficos se cargan normalmente desde un
 CDN, que es la opción cómoda.
 
-**Decisión.** Todo vive en `frontend/vendor/`: DM Sans, Font Awesome y Chart.js.
+**Decisión.** Todo vive en `frontend/vendor/`: Atkinson Hyperlegible Next, Font Awesome y
+Chart.js. De Font Awesome las páginas cargan un recorte con los sesenta iconos que usa la
+web (`iconos.min.css`, 7 KB, y una fuente de 5 KB) en lugar de la hoja completa de 100 KB y
+la fuente de 150 KB, que bloqueaban el primer pintado. Lo genera
+`scripts/iconos-recortar.py`, y el CI avisa si se usa un icono que no está en el recorte.
 
 **Alternativas.** Google Fonts, cdnjs y unpkg, como estaba antes según los comentarios del
 propio código.

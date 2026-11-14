@@ -78,10 +78,26 @@ for (const ruta of ['/index.html', '/servicios.html', '/sobre-mi.html', '/contac
     });
 }
 
+test('en castellano no se descargan las traducciones; en catalán, sí, y antes de pintar', async ({ page }) => {
+    const pedidas = [];
+    page.on('request', (r) => { if (r.url().includes('i18n-textos.js')) pedidas.push(r.url()); });
+
+    await page.goto('/index.html');
+    await page.waitForLoadState('networkidle');
+    expect(pedidas).toEqual([]);
+
+    await page.goto('/index.html?lang=ca');
+    // Sin esperar a nada más: el diccionario se carga antes que el resto de scripts,
+    // así que la cabecera ya sale en catalán.
+    await expect(page.locator('.nav-cta-text')).toHaveText('Demanar cita');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'ca');
+    expect(pedidas).toHaveLength(1);
+});
+
 test('reservar.html en inglés: calendario y días de los centros', async ({ page }) => {
     await page.goto('/reservar.html?lang=en');
     const centro = page.locator('.centro-opt').first();
-    await expect(centro.locator('.centro-dias-hint')).toHaveText(/Mon \/ Tue \/ Thu|Wed \/ Fri \/ Sat/);
+    await expect(centro.locator('.centro-dias-hint')).toHaveText(/Mon \/ Tue \/ Thu|Wed \/ Fri/);
     await centro.click();
     await expect(page.locator('#calMonthLabel')).toHaveText(/^(January|February|March|April|May|June|July|August|September|October|November|December) \d{4}$/);
 });
