@@ -10,39 +10,29 @@ import apiClient from '../modules/api-client.js';
 import { html } from '../modules/html.js';
 
 const $ = (id) => document.getElementById(id);
-const esCatalan = () => document.documentElement.lang === 'ca';
-
+// Textos traducibles (js/modules/i18n.js). Si no hay i18n, se queda el castellano.
 const TEXTOS = {
-    sinToken: {
-        es: 'Este enlace no es válido. Ábrelo tal cual te llegó en el correo.',
-        ca: "Aquest enllaç no és vàlid. Obre'l tal com et va arribar al correu."
-    },
-    noCoinciden: {
-        es: 'Las dos contraseñas no coinciden.',
-        ca: 'Les dues contrasenyes no coincideixen.'
-    },
-    corta: {
-        es: 'La contraseña debe tener al menos 6 caracteres.',
-        ca: 'La contrasenya ha de tenir com a mínim 6 caràcters.'
-    },
-    hecho: {
-        es: 'Contraseña guardada. Ya puedes ver tus citas.',
-        ca: 'Contrasenya desada. Ja pots veure les teves cites.'
-    },
-    fallo: {
-        es: 'No se pudo guardar la contraseña.',
-        ca: "No s'ha pogut desar la contrasenya."
-    },
-    enviando: { es: 'Guardando…', ca: 'Desant…' }
+    sinToken: 'Este enlace no es válido. Ábralo tal y como le llegó en el correo.',
+    noCoinciden: 'Las dos contraseñas no coinciden.',
+    corta: 'La contraseña debe tener al menos 6 caracteres.',
+    hecho: 'Contraseña guardada. Ya puede ver sus citas.',
+    fallo: 'No hemos podido guardar la contraseña.',
+    enviando: 'Guardando…'
 };
 
-const t = (clave) => TEXTOS[clave][esCatalan() ? 'ca' : 'es'];
+const t = (clave) => (window.i18n ? window.i18n.t(`js.activar.${clave}`, TEXTOS[clave]) : TEXTOS[clave]);
 
 /**
  * Pinta el aviso. Se usa la plantilla `html` aunque el texto sea nuestro porque el
  * mensaje de error puede venir del servidor, y ahí es donde se cuela lo que no es nuestro.
  */
-function aviso(mensaje, tipo) {
+let ultimoAviso = null;
+document.addEventListener('i18n:cambio', () => {
+    if (ultimoAviso && ultimoAviso.clave) aviso(t(ultimoAviso.clave), ultimoAviso.tipo, ultimoAviso.clave);
+});
+
+function aviso(mensaje, tipo, clave = Object.keys(TEXTOS).find((k) => t(k) === mensaje)) {
+    ultimoAviso = { clave, tipo };
     const el = $('activarAviso');
     if (!el) return;
     const icono = tipo === 'error' ? 'fa-circle-exclamation' : 'fa-circle-check';

@@ -1,9 +1,13 @@
 import apiClient from '../modules/api-client.js';
 import { html, crudo } from '../modules/html.js';
-import { CENTROS } from '../modules/centros.js';
+import { CENTROS, direccionDe, diasDe } from '../modules/centros.js';
 import { festivo } from '../modules/festivos.js';
 
 'use strict';
+
+// Textos traducibles (js/modules/i18n.js). Si no hay i18n, se queda el castellano.
+const T = (clave, es, valores) => (window.i18n ? window.i18n.t(clave, es, valores) : es);
+const fechaLocal = (d, opciones) => (window.i18n ? window.i18n.fecha(d, opciones) : d.toLocaleDateString('es-ES', opciones));
 
 const CFG = {
     medicoIdDefault: 1,
@@ -12,9 +16,6 @@ const CFG = {
     minAnticipacion: 1,
     maxAnticipacion: 90,
     maxMesesFuturos: 3,
-    meses: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-    mesesCorto: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-    diasSemana: ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'],
     storageKey: 'citas_dr_agramonte_v3',
     // Tokens de acceso de las citas reservadas sin cuenta: { idCita: token }. Es la
     // credencial que entrega el backend al reservar y lo único que permite consultar
@@ -25,27 +26,32 @@ const CFG = {
 /** Servicios desde servicios.html → ?servicio=... */
 const SERVICIOS_RESERVA = {
     'consulta-general': {
-        label: 'Consulta General',
+        clave: 'consulta-general',
+        label: 'Consulta general',
         tipo: 'primera-visita',
         motivo: 'Consulta general'
     },
     'enfermedades-cronicas': {
-        label: 'Control de Enfermedades Crónicas',
+        clave: 'enfermedades-cronicas',
+        label: 'Control de enfermedades crónicas',
         tipo: 'control-cronico',
         motivo: 'Control de enfermedad crónica'
     },
     'chequeos-preventivos': {
-        label: 'Chequeos Preventivos',
+        clave: 'chequeos-preventivos',
+        label: 'Chequeos preventivos',
         tipo: 'revision',
         motivo: 'Chequeo preventivo'
     },
     'interpretacion-analiticas': {
-        label: 'Interpretación de Analíticas',
+        clave: 'interpretacion-analiticas',
+        label: 'Interpretación de analíticas',
         tipo: 'revision',
         motivo: 'Interpretación de analíticas'
     },
     'estilo-vida': {
-        label: 'Asesoramiento en Estilo de Vida',
+        clave: 'estilo-vida',
+        label: 'Asesoramiento en estilo de vida',
         tipo: 'revision',
         motivo: 'Asesoramiento en estilo de vida'
     }
@@ -114,10 +120,10 @@ function updateConnectionBanner() {
     if (!el) return;
     if (isAuthenticated()) {
         el.className = 'status-banner online';
-        el.innerHTML = '<i class="fas fa-circle-check"></i> Ha iniciado sesión: sus citas quedan guardadas en su cuenta';
+        el.innerHTML = '<i class="fas fa-circle-check"></i> ' + T('js.res.conSesion', 'Ha iniciado sesión: sus citas quedan guardadas en su cuenta');
     } else {
         el.className = 'status-banner online';
-        el.innerHTML = '<i class="fas fa-circle-check"></i> Puede reservar sin cuenta. Le enviaremos un enlace por correo para consultar o cancelar la cita';
+        el.innerHTML = '<i class="fas fa-circle-check"></i> ' + T('js.res.sinSesion', 'Puede reservar sin cuenta. Le enviaremos un enlace por correo para consultar o cancelar la cita');
     }
 }
 
@@ -159,12 +165,12 @@ async function updateTelegramUi() {
 
     const hint = $('telegramHint');
     if (estado.vinculado) {
-        hint.textContent = 'Avisos activos: confirmaciones, cancelaciones y recordatorio del día anterior.';
+        hint.textContent = T('js.tg.activos', 'Avisos activos: confirmaciones, cancelaciones y recordatorio del día anterior.');
         limpiarResultadoTelegram();
     } else if (estado.vinculacionPendiente) {
-        hint.textContent = 'Vinculación pendiente: abre el enlace en Telegram para activarla.';
+        hint.textContent = T('js.tg.pendiente', 'Falta un paso: abra el enlace en Telegram para activar los avisos.');
     } else {
-        hint.textContent = 'Confirmaciones, cancelaciones y recordatorio del día anterior.';
+        hint.textContent = T('js.tg.info', 'Confirmaciones, cancelaciones y recordatorio del día anterior.');
     }
 }
 
@@ -184,48 +190,46 @@ async function solicitarVinculacionTelegram() {
     try {
         const data = await apiClient.crearVinculacionTelegram();
         const caduca = data.expiraEn
-            ? new Date(data.expiraEn).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+            ? new Date(data.expiraEn).toLocaleTimeString(document.documentElement.lang || 'es', { hour: '2-digit', minute: '2-digit' })
             : null;
         const aviso = data.yaVinculado
-            ? crudo('<p class="telegram-note">Ya tenías un chat vinculado: seguirá recibiendo los avisos hasta que completes esta nueva vinculación.</p>')
+            ? crudo(`<p class="telegram-note">${T('js.tg.yaVinculado', 'Ya tenía un chat vinculado: seguirá recibiendo los avisos ahí hasta que complete este nuevo.')}</p>`)
             : '';
         const enlace = data.enlace
-            ? html`<a class="telegram-open" href="${data.enlace}" target="_blank" rel="noopener"><i class="fab fa-telegram"></i> Abrir Telegram y vincular</a>`
+            ? html`<a class="telegram-open" href="${data.enlace}" target="_blank" rel="noopener"><i class="fab fa-telegram"></i> ${T('js.tg.abrir', 'Abrir Telegram y vincular')}</a>`
             : '';
         result.innerHTML = html`${aviso}${enlace}
-            <p class="telegram-note">O escribe al bot <code>/start ${data.token}</code>${caduca ? ` — caduca a las ${caduca}.` : '.'}</p>`;
+            <p class="telegram-note">${T('js.tg.escriba', 'O escriba al bot')} <code>/start ${data.token}</code>${caduca ? ` (${T('js.tg.caduca', 'caduca a las {hora}', { hora: caduca })}).` : '.'}</p>`;
         result.hidden = false;
-        showToast('Enlace de vinculación generado', 'success');
+        showToast(T('js.tg.generado', 'Enlace de Telegram preparado'), 'success');
     } catch (err) {
         console.error(err);
-        showToast(err.message || 'No se pudo generar el enlace de Telegram', 'error');
+        showToast(err.message || T('js.tg.errorEnlace', 'No hemos podido preparar el enlace de Telegram'), 'error');
     } finally {
         btn.disabled = false;
     }
 }
 
 async function eliminarVinculacionTelegram() {
-    if (!confirm('¿Dejar de recibir avisos de citas por Telegram?')) return;
+    if (!confirm(T('js.tg.confirmarBaja', '¿Dejar de recibir avisos de citas por Telegram?'))) return;
 
     const btn = $('btnTelegramDesvincular');
     if (!btn) return;
     btn.disabled = true;
     try {
         await apiClient.eliminarVinculacionTelegram();
-        showToast('Avisos por Telegram desactivados', 'success');
+        showToast(T('js.tg.baja', 'Ya no recibirá avisos por Telegram'), 'success');
         await updateTelegramUi();
     } catch (err) {
         console.error(err);
-        showToast(err.message || 'No se pudo desvincular Telegram', 'error');
+        showToast(err.message || T('js.tg.errorBaja', 'No hemos podido desactivar los avisos de Telegram'), 'error');
     } finally {
         btn.disabled = false;
     }
 }
 
 function textoCitaRecuperada() {
-    return document.documentElement.lang === 'ca'
-        ? 'Hem recuperat la teva cita en aquest dispositiu.'
-        : 'Hemos recuperado su cita en este dispositivo.';
+    return T('js.res.recuperada', 'Hemos recuperado su cita en este dispositivo.');
 }
 
 /**
@@ -310,8 +314,7 @@ function updateSubmitState() {
 }
 
 function fmtFecha(iso) {
-    const d = parseDate(iso);
-    return `${CFG.diasSemana[d.getDay()]}, ${d.getDate()} de ${CFG.meses[d.getMonth()]}`;
+    return fechaLocal(parseDate(iso), { weekday: 'long', day: 'numeric', month: 'long' });
 }
 
 function genHorasBase() {
@@ -391,7 +394,7 @@ async function syncMisCitas() {
         } catch (err) {
             console.error(err);
             saveCitas(loadCitas().filter((c) => isServerCitaId(c.id)));
-            showToast('No hemos podido actualizar sus citas. Pruebe de nuevo en unos minutos', 'warning');
+            showToast(T('js.res.errorSync', 'No hemos podido actualizar sus citas. Pruebe de nuevo en unos minutos'), 'warning');
         }
         return;
     }
@@ -424,7 +427,7 @@ async function syncMisCitas() {
 
     const recuperadas = citas.filter(Boolean);
     if (huboErrorDeRed) {
-        showToast('No hemos podido actualizar sus citas. Pruebe de nuevo en unos minutos', 'warning');
+        showToast(T('js.res.errorSync', 'No hemos podido actualizar sus citas. Pruebe de nuevo en unos minutos'), 'warning');
         // Se conserva lo que ya había para no vaciar la lista por un error puntual.
         const previas = loadCitas().filter((c) => isServerCitaId(c.id)
             && !recuperadas.some((r) => r.id === c.id));
@@ -440,17 +443,17 @@ async function cargarMedicos() {
     try {
         const medicos = await apiClient.getMedicos();
         if (!medicos?.length) {
-            medicoSelect.innerHTML = '<option value="">No hay especialistas disponibles</option>';
+            medicoSelect.innerHTML = `<option value="" data-i18n="js.res.sinMedicos">${T('js.res.sinMedicos', 'No hay especialistas disponibles')}</option>`;
             return;
         }
         medicoSelect.innerHTML = html`
-            <option value="">Seleccione especialista…</option>
+            <option value="" data-i18n="t.seleccione-especialista">${T('t.seleccione-especialista', 'Seleccione especialista…')}</option>
             ${medicos.map((m) => html`<option value="${m.id}">${m.nombre}${m.especialidad ? ` - ${m.especialidad}` : ''}</option>`)}
         `;
     } catch (err) {
         console.error(err);
-        medicoSelect.innerHTML = '<option value="">No se pudieron cargar especialistas</option>';
-        showToast('No hemos podido cargar la agenda. Pruebe de nuevo en unos minutos', 'warning');
+        medicoSelect.innerHTML = `<option value="" data-i18n="js.res.errorMedicos">${T('js.res.errorMedicos', 'No hemos podido cargar los especialistas')}</option>`;
+        showToast(T('js.res.errorAgenda', 'No hemos podido cargar la agenda. Pruebe de nuevo en unos minutos'), 'warning');
     }
 }
 
@@ -473,9 +476,9 @@ function updateSummaryChip() {
         el.className = value ? 'chip-item' : 'chip-item empty';
         txt.textContent = value || emptyText;
     };
-    setChip('chipCentro', 'chipCentroText', state.centroNombre, 'Sin centro');
-    setChip('chipDate', 'chipDateText', state.dateISO ? fmtFecha(state.dateISO).split(', ')[1] : '', 'Sin fecha');
-    setChip('chipTime', 'chipTimeText', state.hour, 'Sin hora');
+    setChip('chipCentro', 'chipCentroText', state.centroNombre, T('t.sin-centro', 'Sin centro'));
+    setChip('chipDate', 'chipDateText', state.dateISO ? fechaLocal(parseDate(state.dateISO), { day: 'numeric', month: 'long' }) : '', T('t.sin-fecha', 'Sin fecha'));
+    setChip('chipTime', 'chipTimeText', state.hour, T('t.sin-hora', 'Sin hora'));
     const has = state.medicoId || state.centroId || state.dateISO || state.hour;
     chip.classList.toggle('empty', !has);
     editBtn.style.display = has ? 'inline-flex' : 'none';
@@ -487,9 +490,9 @@ function renderCentros() {
         <button type="button" class="centro-opt" data-id="${c.id}" data-nombre="${c.nombre}" data-dir="${c.direccion}, ${c.ciudad}" data-dias='${JSON.stringify(c.diasSemana)}'>
             <i class="fas ${c.icono}"></i>
             <span class="centro-nombre">${c.nombre}</span>
-            <span class="centro-dir">${c.direccion}</span>
+            <span class="centro-dir">${direccionDe(c)}</span>
             <span class="centro-ciudad">${c.ciudad}</span>
-            <span class="centro-dias-hint"><i class="fas fa-calendar-week"></i> ${c.diasHint}</span>
+            <span class="centro-dias-hint"><i class="fas fa-calendar-week"></i> ${diasDe(c)}</span>
         </button>
     `).join('');
     grid.querySelectorAll('.centro-opt').forEach((btn) => btn.addEventListener('click', () => selectCentro(btn)));
@@ -515,8 +518,29 @@ function selectCentro(btn) {
     updateSubmitState();
 }
 
+/** Cabecera del calendario: iniciales de lunes a domingo en el idioma de la página,
+    con el nombre entero en el title para los lectores de pantalla. */
+function pintarDiasSemana() {
+    const cab = $('calWeekdays');
+    if (!cab) return;
+    const iniciales = T('js.cal.iniciales', 'L,M,X,J,V,S,D').split(',');
+    cab.querySelectorAll('abbr').forEach((el, i) => {
+        el.textContent = iniciales[i] || el.textContent;
+        el.title = fechaLocal(new Date(2026, 0, 5 + i), { weekday: 'long' });
+    });
+}
+
+/* Los nombres de festivos.js están en castellano; la traducción va por clave
+   (festivo.<nombre-sin-acentos>) para no repetir la lista de fechas en cada idioma. */
+function nombreFestivoTraducido(nombre) {
+    const clave = 'festivo.' + nombre.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    return T(clave, nombre);
+}
+
 function renderCalendar() {
-    $('calMonthLabel').textContent = `${CFG.meses[state.month]} ${state.year}`;
+    pintarDiasSemana();
+    { const mes = fechaLocal(new Date(state.year, state.month, 1), { month: 'long', year: 'numeric' }); $('calMonthLabel').textContent = mes.charAt(0).toUpperCase() + mes.slice(1); }
     const grid = $('calGrid');
     grid.innerHTML = '';
     const firstDay = new Date(state.year, state.month, 1);
@@ -537,9 +561,10 @@ function renderCalendar() {
         const noLab = !diasLab.includes(date.getDay());
         const nombreFestivo = festivo(iso);
         if (nombreFestivo) {
+            const nombre = nombreFestivoTraducido(nombreFestivo);
             btn.classList.add('festivo');
-            btn.title = `Festivo: ${nombreFestivo}`;
-            btn.setAttribute('aria-label', `${d}, festivo: ${nombreFestivo}`);
+            btn.title = T('js.cal.festivo', 'Festivo: {nombre}', { nombre });
+            btn.setAttribute('aria-label', T('js.cal.festivoAria', '{dia}, festivo: {nombre}', { dia: d, nombre }));
         }
         const valid = isValidReserva(date);
         const avail = getAvailability(iso, state.centroId);
@@ -563,10 +588,11 @@ function renderSlots() {
     let lastPeriod = null;
     state.allHoras.forEach((hora) => {
         const h = Number(hora.split(':')[0]);
-        const period = h < CFG.horario.descanso.ini ? 'Mañana' : 'Tarde';
+        const period = h < CFG.horario.descanso.ini ? T('js.res.manana', 'Mañana') : T('js.res.tarde', 'Tarde');
         if (period !== lastPeriod) {
             const label = document.createElement('div');
             label.className = 'period-label';
+            label.dataset.periodo = h < CFG.horario.descanso.ini ? 'manana' : 'tarde';
             label.textContent = period;
             grid.appendChild(label);
             lastPeriod = period;
@@ -597,10 +623,11 @@ async function renderSlotsFromBackend() {
 
         state.allHoras.forEach((hora) => {
             const h = Number(hora.split(':')[0]);
-            const period = h < CFG.horario.descanso.ini ? 'Mañana' : 'Tarde';
+            const period = h < CFG.horario.descanso.ini ? T('js.res.manana', 'Mañana') : T('js.res.tarde', 'Tarde');
             if (period !== lastPeriod) {
                 const label = document.createElement('div');
                 label.className = 'period-label';
+                label.dataset.periodo = h < CFG.horario.descanso.ini ? 'manana' : 'tarde';
                 label.textContent = period;
                 grid.appendChild(label);
                 lastPeriod = period;
@@ -619,7 +646,7 @@ async function renderSlotsFromBackend() {
         return true;
     } catch (err) {
         console.error(err);
-        showToast('No hemos podido consultar la agenda. Las horas que ve son orientativas y pueden estar ocupadas', 'warning');
+        showToast(T('js.res.horasOrientativas', 'No hemos podido consultar la agenda. Las horas que ve son orientativas y pueden estar ocupadas'), 'warning');
         return false;
     }
 }
@@ -654,18 +681,18 @@ function validarCampos() {
     const medicoSelect = $('medicoSelect');
     if (!medicoSelect.value) {
         medicoSelect.setAttribute('aria-invalid', 'true');
-        return showToast('Seleccione un especialista', 'error'), false;
+        return showToast(T('js.val.especialista', 'Seleccione un especialista'), 'error'), false;
     }
     medicoSelect.removeAttribute('aria-invalid');
 
     const nombre = $('nombre').value.trim();
     const email = $('email').value.trim();
     const telefono = $('telefono').value.trim().replace(/\s/g, '');
-    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s-]{3,}$/.test(nombre)) return showToast('Revise el nombre: solo letras, al menos 3', 'error'), false;
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showToast('Revise el correo electrónico', 'error'), false;
-    if (!/^(\+34|34)?[6789]\d{8}$/.test(telefono)) return showToast('Revise el teléfono: 9 cifras, de España', 'error'), false;
-    if (!$('tipoConsulta').value) return showToast('Seleccione el tipo de consulta', 'error'), false;
-    if (!$('acepto').checked) return showToast('Para reservar tiene que aceptar la política de privacidad', 'error'), false;
+    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s-]{3,}$/.test(nombre)) return showToast(T('js.val.nombre', 'Revise el nombre: solo letras, al menos 3'), 'error'), false;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showToast(T('js.val.email', 'Revise el correo electrónico'), 'error'), false;
+    if (!/^(\+34|34)?[6789]\d{8}$/.test(telefono)) return showToast(T('js.val.telefono', 'Revise el teléfono: 9 cifras, de España'), 'error'), false;
+    if (!$('tipoConsulta').value) return showToast(T('js.val.tipo', 'Seleccione el tipo de consulta'), 'error'), false;
+    if (!$('acepto').checked) return showToast(T('js.val.privacidad', 'Para reservar tiene que aceptar la política de privacidad'), 'error'), false;
     return true;
 }
 
@@ -676,7 +703,7 @@ function exportICS(cita) {
     const ics = [
         'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Dr.Agramonte//ES', 'BEGIN:VEVENT',
         `UID:${cita.id}@maragramonte.github.io`, `DTSTAMP:${fmt(new Date())}`, `DTSTART:${fmt(start)}`, `DTEND:${fmt(end)}`,
-        'SUMMARY:Cita medica - Dr. Agramonte', `DESCRIPTION:${cita.motivo || 'Consulta medica'}`,
+        `SUMMARY:${T('js.ics.titulo', 'Cita médica - Dr. Agramonte')}`, `DESCRIPTION:${cita.motivo || T('js.ics.desc', 'Consulta médica')}`,
         `LOCATION:${cita.centroDireccion || 'Consulta'}`,
         'END:VEVENT', 'END:VCALENDAR'
     ].join('\n');
@@ -689,9 +716,9 @@ function exportICS(cita) {
 
 function showModalConfirm(cita) {
     $('modalDetails').innerHTML = html`
-        <div class="modal-detail-row"><i class="fas fa-map-marker-alt"></i><span class="modal-detail-label">Centro</span><span>${cita.centroNombre}</span></div>
-        <div class="modal-detail-row"><i class="fas fa-calendar-day"></i><span class="modal-detail-label">Fecha</span><span>${fmtFecha(cita.fecha)}</span></div>
-        <div class="modal-detail-row"><i class="fas fa-clock"></i><span class="modal-detail-label">Hora</span><span>${cita.hora}</span></div>
+        <div class="modal-detail-row"><i class="fas fa-map-marker-alt"></i><span class="modal-detail-label">${T('t.centro', 'Centro')}</span><span>${cita.centroNombre}</span></div>
+        <div class="modal-detail-row"><i class="fas fa-calendar-day"></i><span class="modal-detail-label">${T('t.fecha', 'Fecha')}</span><span>${fmtFecha(cita.fecha)}</span></div>
+        <div class="modal-detail-row"><i class="fas fa-clock"></i><span class="modal-detail-label">${T('t.hora', 'Hora')}</span><span>${cita.hora}</span></div>
     `;
     $('confirmModal').classList.add('open');
     const clone = $('btnExportICS').cloneNode(true);
@@ -709,25 +736,25 @@ function renderAppointments() {
     $('aptsBadge').className = `apts-badge${pending.length ? '' : ' zero'}`;
     const list = $('aptsList');
     if (!pending.length) {
-        list.innerHTML = '<div class="no-apts"><i class="fas fa-calendar-check"></i> No tiene citas próximas</div>';
+        list.innerHTML = `<div class="no-apts"><i class="fas fa-calendar-check"></i> ${T('js.res.sinCitas', 'No tiene citas próximas')}</div>`;
         return;
     }
     list.innerHTML = pending.map((c) => {
         const d = parseDate(c.fecha);
-        return html`<div class="apt-item"><div class="apt-date"><span class="day">${d.getDate()}</span><span class="month">${CFG.mesesCorto[d.getMonth()]}</span></div><div class="apt-info"><div class="apt-time">${c.hora}</div><div class="apt-centro"><i class="fas fa-map-marker-alt"></i> ${c.centroNombre || 'Consulta'}</div></div><div class="apt-actions"><button class="apt-btn" data-action="export" data-id="${c.id}"><i class="fas fa-calendar-plus"></i></button><button class="apt-btn danger" data-action="cancel" data-id="${c.id}"><i class="fas fa-times"></i></button></div></div>`;
+        return html`<div class="apt-item"><div class="apt-date"><span class="day">${d.getDate()}</span><span class="month">${fechaLocal(d, { month: 'short' }).replace(/\.$/, '')}</span></div><div class="apt-info"><div class="apt-time">${c.hora}</div><div class="apt-centro"><i class="fas fa-map-marker-alt"></i> ${c.centroNombre || 'Consulta'}</div></div><div class="apt-actions"><button class="apt-btn" data-action="export" data-id="${c.id}"><i class="fas fa-calendar-plus"></i></button><button class="apt-btn danger" data-action="cancel" data-id="${c.id}"><i class="fas fa-times"></i></button></div></div>`;
     }).join('');
     list.querySelectorAll('[data-action]').forEach((btn) => btn.addEventListener('click', async () => {
         const cita = pending.find((c) => c.id === btn.dataset.id);
         if (!cita) return;
         if (btn.dataset.action === 'export') return exportICS(cita);
-        if (!confirm('¿Cancelar esta cita?')) return;
+        if (!confirm(T('js.res.confirmarCancelar', '¿Cancelar esta cita?'))) return;
         try {
             if (isAuthenticated()) {
                 await apiClient.cancelarReserva(cita.id);
             } else if (isServerCitaId(cita.id)) {
                 const token = tokenDeCita(cita.id);
                 if (!token) {
-                    showToast('Esta cita se reservó en otro navegador: no tenemos su clave de acceso. Llame a la consulta para cancelarla', 'error');
+                    showToast(T('js.res.otroNavegador', 'Esta cita se reservó en otro navegador y aquí no podemos cancelarla. Use el enlace del correo o llame a la consulta'), 'error');
                     return;
                 }
                 await apiClient.cancelarReservaPublica(cita.id, token);
@@ -744,7 +771,7 @@ function renderAppointments() {
             await syncMisCitas();
         } catch (err) {
             console.error(err);
-            showToast(err.message || 'No hemos podido cancelar la cita. Pruebe de nuevo en unos minutos', 'error');
+            showToast(err.message || T('js.res.errorCancelar', 'No hemos podido cancelar la cita. Pruebe de nuevo en unos minutos'), 'error');
             return;
         }
         renderAppointments();
@@ -754,19 +781,19 @@ function renderAppointments() {
 
 async function onSubmit(e) {
     e.preventDefault();
-    if (!state.centroId) return showToast('Seleccione un centro', 'error');
-    if (!state.medicoId) return showToast('Seleccione un especialista', 'error');
-    if (!state.dateISO) return showToast('Seleccione un día', 'error');
-    if (!state.hour) return showToast('Seleccione una hora', 'error');
+    if (!state.centroId) return showToast(T('js.val.centro', 'Seleccione un centro'), 'error');
+    if (!state.medicoId) return showToast(T('js.val.especialista', 'Seleccione un especialista'), 'error');
+    if (!state.dateISO) return showToast(T('js.val.dia', 'Seleccione un día'), 'error');
+    if (!state.hour) return showToast(T('js.val.hora', 'Seleccione una hora'), 'error');
     if (!validarCampos()) return;
-    if ((document.querySelector('input[name="cobertura"]:checked')?.value) === 'seguro' && !$('aseguradora').value) {
-        return showToast('Seleccione su aseguradora', 'error');
+    if ((document.querySelector('input[name="cobertura"]:checked')?.value) === 'seguro' && !$('aseguradora').value.trim()) {
+        return showToast(T('js.val.aseguradora', 'Indique el nombre de su aseguradora'), 'error');
     }
     const btn = $('btnSubmit');
     btn.disabled = true; btn.classList.add('loading');
     await new Promise((r) => setTimeout(r, 300));
     const cobertura = document.querySelector('input[name="cobertura"]:checked')?.value || 'privada';
-    const aseguradora = cobertura === 'seguro' ? ($('aseguradora').value || null) : null;
+    const aseguradora = cobertura === 'seguro' ? ($('aseguradora').value.trim() || null) : null;
     const numeroTarjetaSanitaria = cobertura === 'seguro' ? ($('numTarjeta').value.trim() || null) : null;
     // Solo se paga en la consulta: el pago online no existe, así que ya no se pregunta.
     const preferenciaPago = cobertura === 'privada' ? 'en-consulta' : null;
@@ -839,7 +866,7 @@ async function onSubmit(e) {
         renderCalendar();
     } catch (err) {
         console.error(err);
-        showToast(err.message || 'No hemos podido guardar la reserva. Pruebe de nuevo en unos minutos', 'error');
+        showToast(err.message || T('js.res.errorGuardar', 'No hemos podido guardar la reserva. Pruebe de nuevo en unos minutos'), 'error');
     } finally {
         btn.disabled = false; btn.classList.remove('loading');
     }
@@ -886,6 +913,15 @@ function bindEvents() {
     $('formReserva').addEventListener('submit', onSubmit);
 }
 
+let servicioElegido = null;
+
+function pintarBannerServicio() {
+    const banner = $('servicioBanner');
+    if (!banner || !servicioElegido) return;
+    const cfg = servicioElegido;
+    banner.innerHTML = `<i class="fas fa-stethoscope" aria-hidden="true"></i> ${T('js.serv.reservando', 'Va a reservar:')} <strong>${T(`js.serv.${cfg.clave}`, cfg.label)}</strong>. ${T('js.serv.puedeCambiar', 'Puede cambiar el centro, el día y la hora.')}`;
+}
+
 function applyServicioFromUrl() {
     const id = new URLSearchParams(window.location.search).get('servicio');
     const cfg = id ? SERVICIOS_RESERVA[id] : null;
@@ -899,16 +935,17 @@ function applyServicioFromUrl() {
 
     const motivo = $('motivo');
     if (motivo && cfg.motivo && !motivo.value.trim()) {
-        motivo.value = cfg.motivo;
+        motivo.value = T(`js.serv.${cfg.clave}.motivo`, cfg.motivo);
     }
 
+    servicioElegido = cfg;
     const banner = $('servicioBanner');
     if (banner) {
         banner.hidden = false;
-        banner.innerHTML = `<i class="fas fa-stethoscope" aria-hidden="true"></i> Reservando: <strong>${cfg.label}</strong> — puede cambiar centro, fecha y hora.`;
+        pintarBannerServicio();
     }
 
-    showToast(`Servicio: ${cfg.label}`, 'info');
+    showToast(T(`js.serv.${cfg.clave}`, cfg.label), 'info');
 }
 
 /**
@@ -984,4 +1021,23 @@ document.addEventListener('DOMContentLoaded', () => {
             applySeleccionDelHero();
         });
     });
+});
+
+/* Al cambiar de idioma se repinta lo que genera este archivo, sin perder lo
+   que ya se haya elegido. */
+document.addEventListener('i18n:cambio', () => {
+    renderCentros();
+    if (state.centroId) {
+        document.querySelector(`.centro-opt[data-id="${CSS.escape(state.centroId)}"]`)?.classList.add('selected');
+    }
+    renderCalendar();
+    document.querySelectorAll('.period-label[data-periodo]').forEach((el) => {
+        el.textContent = el.dataset.periodo === 'manana' ? T('js.res.manana', 'Mañana') : T('js.res.tarde', 'Tarde');
+    });
+    if (state.dateISO && $('selectedDateLabel')) $('selectedDateLabel').textContent = fmtFecha(state.dateISO);
+    updateSummaryChip();
+    updateConnectionBanner();
+    updateTelegramUi();
+    renderAppointments();
+    pintarBannerServicio();
 });

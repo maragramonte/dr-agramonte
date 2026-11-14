@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="description" content="Contacto del Dr. Agramonte – Medicina Interna en Mallorca. Dirección, teléfonos, correo y horarios.">
-    <title>Contacto – Dr. Agramonte</title>
+    <title data-i18n="t.contacto-dr-agramonte">Contacto – Dr. Agramonte</title>
 
     
     <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="css/dr-agramonte.css">
     <link rel="stylesheet" href="css/pages-extra.css">
     <script src="js/modules/theme-init.js"></script>
+    <script src="js/modules/i18n-textos.js"></script>
     <script src="js/modules/i18n.js"></script>
 </head>
 <body>
@@ -28,14 +29,14 @@
     <div class="container">
         <div class="header-content">
             <div class="logo-section">
-                <a href="index.html" class="logo-link" aria-label="Inicio - Dr. Agramonte">
+                <a href="index.html" class="logo-link" aria-label="Inicio - Dr. Agramonte" data-i18n-attr="aria-label:t.inicio-dr-agramonte">
                     <div class="logo-text">
                         <p class="logo-title">Dr. Agramonte</p>
                         <p class="logo-subtitle" data-i18n="logo.subtitle">Especialista en Medicina Interna</p>
                     </div>
                 </a>
             </div>
-            <nav class="main-nav" aria-label="Navegación principal">
+            <nav class="main-nav" aria-label="Navegación principal" data-i18n-attr="aria-label:t.navegacion-principal">
                 <ul class="nav-menu">
                     <li class="nav-item"><a href="sobre-mi.html" class="nav-link" data-i18n="nav.sobre">Sobre el Dr.</a></li>
                     <li class="nav-item"><a href="servicios.html" class="nav-link" data-i18n="nav.servicios">Servicios</a></li>
@@ -43,9 +44,9 @@
                 </ul>
             </nav>
             <div class="header-actions">
-                <a href="reservar.html" class="nav-cta" aria-label="Reservar cita"><i class="fas fa-calendar-plus" aria-hidden="true"></i><span class="nav-cta-text" data-i18n="nav.reservar">Reservar cita</span></a>
+                <a href="reservar.html" class="nav-cta" aria-label="Reservar cita" data-i18n-attr="aria-label:t.reservar-cita"><i class="fas fa-calendar-plus" aria-hidden="true"></i><span class="nav-cta-text" data-i18n="nav.reservar">Reservar cita</span></a>
                 <div class="header-utils">
-                    <div class="lang-switch" role="group" aria-label="Idioma"><button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" aria-pressed="true">ES</button><button type="button" class="lang-btn" data-lang-btn="ca" aria-pressed="false">CA</button></div>
+                    <div class="lang-switch" role="group" aria-label="Idioma" data-i18n-attr="aria-label:t.idioma"><button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" lang="es" title="Español" aria-pressed="true">ES</button><button type="button" class="lang-btn" data-lang-btn="ca" lang="ca" title="Català" aria-pressed="false">CA</button><button type="button" class="lang-btn" data-lang-btn="en" lang="en" title="English" aria-pressed="false">EN</button></div>
                     <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="mega-menu" aria-label="Abrir el menú"><span class="nav-toggle-icon" aria-hidden="true"></span><span class="nav-toggle-text" data-i18n="nav.menu">Menú</span></button>
                 </div>
             </div>
@@ -62,7 +63,7 @@
                 <h2 class="mega-menu__title" data-i18n="menu.consulta">La consulta</h2>
                 <ul class="mega-menu__list">
                     <li><a href="index.html" class="mega-link"><i class="fas fa-home" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.inicio">Inicio</span><span class="mega-link__hint" data-i18n="menu.inicio.hint">Portada y resumen</span></span></a></li>
-                    <li><a href="sobre-mi.html" class="mega-link"><i class="fas fa-user-md" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.sobre">El Dr. Agramonte</span><span class="mega-link__hint" data-i18n="menu.sobre.hint">Trayectoria y formación</span></span></a></li>
+                    <li><a href="sobre-mi.html" class="mega-link"><i class="fas fa-user-md" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="t.el-dr-agramonte">El Dr. Agramonte</span><span class="mega-link__hint" data-i18n="menu.sobre.hint">Trayectoria y formación</span></span></a></li>
                     <li><a href="servicios.html" class="mega-link"><i class="fas fa-stethoscope" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.servicios">Servicios</span><span class="mega-link__hint" data-i18n="menu.servicios.hint">Qué se atiende en consulta</span></span></a></li>
                 </ul>
             </div>
@@ -77,7 +78,7 @@
         <div class="mega-menu__pie">
             <a href="privacidad.html" class="mega-menu__legal"><i class="fas fa-shield-alt" aria-hidden="true"></i> <span data-i18n="footer.privacidad">Política de Privacidad</span></a>
             <!-- Copia del selector de idioma para los anchos en los que no cabe en la barra. -->
-            <div class="lang-switch lang-switch--menu" role="group" aria-label="Idioma"><button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" aria-pressed="true">ES</button><button type="button" class="lang-btn" data-lang-btn="ca" aria-pressed="false">CA</button></div>
+            <div class="lang-switch lang-switch--menu" role="group" aria-label="Idioma" data-i18n-attr="aria-label:t.idioma"><button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" lang="es" title="Español" aria-pressed="true">ES</button><button type="button" class="lang-btn" data-lang-btn="ca" lang="ca" title="Català" aria-pressed="false">CA</button><button type="button" class="lang-btn" data-lang-btn="en" lang="en" title="English" aria-pressed="false">EN</button></div>
             <button type="button" class="theme-toggle" id="themeToggle" aria-label="Activar modo oscuro" title="Cambiar tema claro / oscuro" aria-pressed="false"><i class="fas fa-moon" id="themeToggleIcon" aria-hidden="true"></i></button>
         </div>
     </div>
@@ -86,8 +87,8 @@
 
 <section class="page-hero page-hero--compact" aria-labelledby="titulo-contacto">
     <div class="container">
-        <h1 id="titulo-contacto">Contacto</h1>
-        <p>Consultas generales, información sobre citas o colaboración profesional.</p>
+        <h1 id="titulo-contacto" data-i18n="t.contacto">Contacto</h1>
+        <p data-i18n="t.escriba-a-la-consulta-si-tiene">Escriba a la consulta si tiene dudas antes de pedir cita.</p>
     </div>
 </section>
 
@@ -95,26 +96,26 @@
     <section id="contacto" class="contacto-section">
         <div class="contacto-container">
             <div class="info-contacto">
-                <div class="info-item"><i class="fas fa-map-marker-alt"></i><div><h3>Dónde</h3><p>Palma de Mallorca<br>Islas Baleares</p><p>Al reservar verá los centros disponibles y su dirección.</p></div></div>
+                <div class="info-item"><i class="fas fa-map-marker-alt"></i><div><h3 data-i18n="t.donde">Dónde</h3><p data-i18n-html="t.palma-de-mallorca-islas-baleares">Palma de Mallorca<br>Islas Baleares</p><p data-i18n="t.al-reservar-vera-los-centros-disponibles">Al reservar verá los centros disponibles y su dirección.</p></div></div>
                 
-                                <div class="info-item"><i class="fas fa-clock"></i><div><h3>Horario</h3><p><strong>Lunes a viernes:</strong> 9:00 - 14:00 / 16:00 - 19:00</p><p><strong>Fines de semana y festivos:</strong> cerrado</p></div></div>
+                                <div class="info-item"><i class="fas fa-clock"></i><div><h3 data-i18n="t.horario">Horario</h3><p><strong data-i18n="t.lunes-a-viernes">Lunes a viernes:</strong> 9:00 - 14:00 / 16:00 - 19:00</p><p data-i18n-html="t.finde-cerrado"><strong>Fines de semana y festivos:</strong> cerrado</p></div></div>
             </div>
             <aside class="formulario-contacto">
-                <h3>Enviar mensaje</h3>
-                <p class="form-aviso">Este formulario no sustituye una valoración médica presencial.</p>
+                <h3 data-i18n="t.enviar-mensaje">Enviar mensaje</h3>
+                <p class="form-aviso" data-i18n="t.por-aqui-no-se-hacen-consultas">Por aquí no se hacen consultas médicas. Para eso, pida cita.</p>
                 <form id="contactForm" action="#" method="post" novalidate>
-                    <div class="form-group"><label for="nombre">Nombre y apellidos *</label><input type="text" id="nombre" name="nombre" required><span class="error-message" id="error-nombre"></span></div>
-                    <div class="form-group"><label for="email">Correo electrónico *</label><input type="email" id="email" name="email" required><span class="error-message" id="error-email"></span></div>
-                    <div class="form-group"><label for="telefono">Teléfono</label><input type="tel" id="telefono" name="telefono"></div>
-                    <div class="form-group"><label for="motivo">Motivo</label><select id="motivo" name="motivo"><option value="">Seleccione</option><option value="primera-visita">Primera visita</option><option value="revision">Revisión</option><option value="segunda-opinion">Segunda opinión</option><option value="colaboracion">Colaboración</option><option value="otro">Otro</option></select></div>
-                    <div class="form-group"><label for="mensaje">Mensaje *</label><textarea id="mensaje" name="mensaje" placeholder="Explique brevemente su consulta..." rows="4" required minlength="10" maxlength="1000"></textarea></div>
-                    <div class="form-group checkbox-group"><label class="checkbox-label"><input type="checkbox" id="privacidad" name="privacidad" required><span>Acepto la <a href="privacidad.html">Política de Privacidad</a> *</span></label><span class="error-message" id="error-privacidad"></span></div>
-                    <button type="submit" class="btn-enviar" id="submitBtn"><span class="btn-text">Enviar mensaje</span><i class="fas fa-paper-plane"></i></button>
+                    <div class="form-group"><label for="nombre" data-i18n="t.nombre-y-apellidos">Nombre y apellidos *</label><input type="text" id="nombre" name="nombre" required><span class="error-message" id="error-nombre"></span></div>
+                    <div class="form-group"><label for="email" data-i18n="t.correo-electronico">Correo electrónico *</label><input type="email" id="email" name="email" required><span class="error-message" id="error-email"></span></div>
+                    <div class="form-group"><label for="telefono" data-i18n="t.telefono">Teléfono</label><input type="tel" id="telefono" name="telefono"></div>
+                    <div class="form-group"><label for="motivo" data-i18n="t.motivo">Motivo</label><select id="motivo" name="motivo"><option value="" data-i18n="t.seleccione">Seleccione</option><option value="primera-visita" data-i18n="t.primera-visita">Primera visita</option><option value="revision" data-i18n="t.revision">Revisión</option><option value="segunda-opinion" data-i18n="t.segunda-opinion">Segunda opinión</option><option value="colaboracion" data-i18n="t.colaboracion">Colaboración</option><option value="otro" data-i18n="t.otro">Otro</option></select></div>
+                    <div class="form-group"><label for="mensaje" data-i18n="t.mensaje">Mensaje *</label><textarea id="mensaje" name="mensaje" placeholder="Cuéntenos en pocas líneas qué necesita" rows="4" required minlength="10" maxlength="1000" data-i18n-attr="placeholder:t.cuentenos-en-pocas-lineas-que-necesita"></textarea></div>
+                    <div class="form-group checkbox-group"><label class="checkbox-label"><input type="checkbox" id="privacidad" name="privacidad" required><span data-i18n-html="t.acepto-la-politica-de-privacidad">Acepto la <a href="privacidad.html">Política de Privacidad</a> *</span></label><span class="error-message" id="error-privacidad"></span></div>
+                    <button type="submit" class="btn-enviar" id="submitBtn"><span class="btn-text" data-i18n="t.enviar-mensaje">Enviar mensaje</span><i class="fas fa-paper-plane"></i></button>
                 </form>
             </aside>
         </div>
-        <section class="preguntas-frecuentes"><h3>Preguntas frecuentes</h3><div class="faq-grid"><details class="faq-item"><summary>¿Cómo puedo contactar?</summary><p>Con el formulario de esta página, o pidiendo cita en línea desde «Reservar cita».</p></details><details class="faq-item"><summary>¿Dónde se encuentra?</summary><p>Palma de Mallorca, Islas Baleares.</p></details><details class="faq-item"><summary>¿Atienden urgencias?</summary><p>No. Ante una urgencia médica, llame al 112.</p></details></div></section>
-        <div class="aviso-reservas"><i class="fas fa-info-circle" aria-hidden="true"></i><p>Para <strong>solicitar cita</strong> use el formulario de reservas online.</p><a href="reservar.html" class="btn btn--primary btn--reserva"><i class="fas fa-calendar-plus" aria-hidden="true"></i> Reservar cita</a></div>
+        <section class="preguntas-frecuentes"><h3 data-i18n="t.preguntas-frecuentes">Preguntas frecuentes</h3><div class="faq-grid"><details class="faq-item"><summary data-i18n="t.como-puedo-contactar">¿Cómo puedo contactar?</summary><p data-i18n="t.con-el-formulario-de-esta-pagina">Con el formulario de esta página, o pidiendo cita en línea desde «Reservar cita».</p></details><details class="faq-item"><summary data-i18n="t.donde-se-encuentra">¿Dónde se encuentra?</summary><p data-i18n="t.palma-de-mallorca-islas-baleares-2">Palma de Mallorca, Islas Baleares.</p></details><details class="faq-item"><summary data-i18n="t.atienden-urgencias">¿Atienden urgencias?</summary><p data-i18n="t.no-ante-una-urgencia-medica-llame">No. Ante una urgencia médica, llame al 112.</p></details></div></section>
+        <div class="aviso-reservas"><i class="fas fa-info-circle" aria-hidden="true"></i><p data-i18n-html="t.para-solicitar-cita-use-el-formulario">Para <strong>solicitar cita</strong> use el formulario de reservas online.</p><a href="reservar.html" class="btn btn--primary btn--reserva"><i class="fas fa-calendar-plus" aria-hidden="true"></i> <span data-i18n="t.reservar-cita">Reservar cita</span></a></div>
     </section>
 </main>
 
@@ -123,7 +124,7 @@
     <div class="footer-content">
         <div class="footer-section"><h3>Dr. Agramonte</h3><p data-i18n="footer.especialista">Especialista en Medicina Interna</p><p data-i18n="footer.ubicacion">Palma de Mallorca, Islas Baleares</p></div>
         <div class="footer-section"><h3 data-i18n="footer.horario">Horario</h3><p><strong data-i18n="footer.lunVie">Lunes a viernes</strong><br>9:00 - 14:00<br>16:00 - 19:00</p><p><strong data-i18n="footer.finde">Fines de semana y festivos</strong><br><span data-i18n="footer.cerrado">Cerrado</span></p></div>
-        <div class="footer-section"><h3 data-i18n="footer.enlaces">Enlaces</h3><a href="sobre-mi.html">El Dr. Agramonte</a><a href="servicios.html" data-i18n="nav.servicios">Servicios</a><a href="reservar.html" data-i18n="nav.reservar">Reservar cita</a><a href="contacto.html" data-i18n="nav.contacto">Contacto</a></div>
+        <div class="footer-section"><h3 data-i18n="footer.enlaces">Enlaces</h3><a href="sobre-mi.html" data-i18n="t.el-dr-agramonte">El Dr. Agramonte</a><a href="servicios.html" data-i18n="nav.servicios">Servicios</a><a href="reservar.html" data-i18n="nav.reservar">Reservar cita</a><a href="contacto.html" data-i18n="nav.contacto">Contacto</a></div>
     </div>
     <div class="footer-bottom"><p><span data-i18n="footer.copyright">© 2026 Dr. Juan Manuel Agramonte.</span> <a href="privacidad.html" data-i18n="footer.privacidad">Política de Privacidad</a></p></div>
 </footer>

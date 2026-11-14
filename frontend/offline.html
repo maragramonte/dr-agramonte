@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Sin conexión - Dr. Agramonte</title>
+    <title data-i18n="t.sin-conexion-dr-agramonte">Sin conexión - Dr. Agramonte</title>
     <meta name="description" content="Página offline - Dr. Agramonte. Cuando recuperes la conexión podrás acceder a todos los servicios.">
 
     <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="css/dr-agramonte.css">
     <link rel="stylesheet" href="css/pages-extra.css">
     <script src="js/modules/theme-init.js"></script>
+    <script src="js/modules/i18n-textos.js"></script>
     <script src="js/modules/i18n.js"></script>
 </head>
 <body class="offline-page">
@@ -27,14 +28,14 @@
     <div class="container">
         <div class="header-content">
             <div class="logo-section">
-                <a href="index.html" class="logo-link" aria-label="Inicio - Dr. Agramonte">
+                <a href="index.html" class="logo-link" aria-label="Inicio - Dr. Agramonte" data-i18n-attr="aria-label:t.inicio-dr-agramonte">
                     <div class="logo-text">
                         <p class="logo-title">Dr. Agramonte</p>
                         <p class="logo-subtitle" data-i18n="logo.subtitle">Especialista en Medicina Interna</p>
                     </div>
                 </a>
             </div>
-            <nav class="main-nav" aria-label="Navegación principal">
+            <nav class="main-nav" aria-label="Navegación principal" data-i18n-attr="aria-label:t.navegacion-principal">
                 <ul class="nav-menu">
                     <li class="nav-item"><a href="sobre-mi.html" class="nav-link" data-i18n="nav.sobre">Sobre el Dr.</a></li>
                     <li class="nav-item"><a href="servicios.html" class="nav-link" data-i18n="nav.servicios">Servicios</a></li>
@@ -42,9 +43,9 @@
                 </ul>
             </nav>
             <div class="header-actions">
-                <a href="reservar.html" class="nav-cta" aria-label="Reservar cita"><i class="fas fa-calendar-plus" aria-hidden="true"></i><span class="nav-cta-text" data-i18n="nav.reservar">Reservar cita</span></a>
+                <a href="reservar.html" class="nav-cta" aria-label="Reservar cita" data-i18n-attr="aria-label:t.reservar-cita"><i class="fas fa-calendar-plus" aria-hidden="true"></i><span class="nav-cta-text" data-i18n="nav.reservar">Reservar cita</span></a>
                 <div class="header-utils">
-                    <div class="lang-switch" role="group" aria-label="Idioma"><button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" aria-pressed="true">ES</button><button type="button" class="lang-btn" data-lang-btn="ca" aria-pressed="false">CA</button></div>
+                    <div class="lang-switch" role="group" aria-label="Idioma" data-i18n-attr="aria-label:t.idioma"><button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" lang="es" title="Español" aria-pressed="true">ES</button><button type="button" class="lang-btn" data-lang-btn="ca" lang="ca" title="Català" aria-pressed="false">CA</button><button type="button" class="lang-btn" data-lang-btn="en" lang="en" title="English" aria-pressed="false">EN</button></div>
                     <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="mega-menu" aria-label="Abrir el menú"><span class="nav-toggle-icon" aria-hidden="true"></span><span class="nav-toggle-text" data-i18n="nav.menu">Menú</span></button>
                 </div>
             </div>
@@ -61,7 +62,7 @@
                 <h2 class="mega-menu__title" data-i18n="menu.consulta">La consulta</h2>
                 <ul class="mega-menu__list">
                     <li><a href="index.html" class="mega-link"><i class="fas fa-home" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.inicio">Inicio</span><span class="mega-link__hint" data-i18n="menu.inicio.hint">Portada y resumen</span></span></a></li>
-                    <li><a href="sobre-mi.html" class="mega-link"><i class="fas fa-user-md" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.sobre">El Dr. Agramonte</span><span class="mega-link__hint" data-i18n="menu.sobre.hint">Trayectoria y formación</span></span></a></li>
+                    <li><a href="sobre-mi.html" class="mega-link"><i class="fas fa-user-md" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="t.el-dr-agramonte">El Dr. Agramonte</span><span class="mega-link__hint" data-i18n="menu.sobre.hint">Trayectoria y formación</span></span></a></li>
                     <li><a href="servicios.html" class="mega-link"><i class="fas fa-stethoscope" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.servicios">Servicios</span><span class="mega-link__hint" data-i18n="menu.servicios.hint">Qué se atiende en consulta</span></span></a></li>
                 </ul>
             </div>
@@ -76,7 +77,7 @@
         <div class="mega-menu__pie">
             <a href="privacidad.html" class="mega-menu__legal"><i class="fas fa-shield-alt" aria-hidden="true"></i> <span data-i18n="footer.privacidad">Política de Privacidad</span></a>
             <!-- Copia del selector de idioma para los anchos en los que no cabe en la barra. -->
-            <div class="lang-switch lang-switch--menu" role="group" aria-label="Idioma"><button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" aria-pressed="true">ES</button><button type="button" class="lang-btn" data-lang-btn="ca" aria-pressed="false">CA</button></div>
+            <div class="lang-switch lang-switch--menu" role="group" aria-label="Idioma" data-i18n-attr="aria-label:t.idioma"><button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" lang="es" title="Español" aria-pressed="true">ES</button><button type="button" class="lang-btn" data-lang-btn="ca" lang="ca" title="Català" aria-pressed="false">CA</button><button type="button" class="lang-btn" data-lang-btn="en" lang="en" title="English" aria-pressed="false">EN</button></div>
             <button type="button" class="theme-toggle" id="themeToggle" aria-label="Activar modo oscuro" title="Cambiar tema claro / oscuro" aria-pressed="false"><i class="fas fa-moon" id="themeToggleIcon" aria-hidden="true"></i></button>
         </div>
     </div>
@@ -87,26 +88,26 @@
     <div class="offline-container">
         <div class="offline-card">
             <div class="offline-icon"><i class="fas fa-plug-circle-xmark"></i></div>
-            <h1 class="offline-title">Sin conexión a Internet</h1>
-            <p class="offline-text">No hay conexión en este momento. Pero no te preocupes, aún puedes acceder a la información básica de la consulta mientras se restablece la conexión.</p>
+            <h1 class="offline-title" data-i18n="t.sin-conexion-a-internet">Sin conexión a Internet</h1>
+            <p class="offline-text" data-i18n="t.ahora-mismo-no-hay-conexion-mientras">Ahora mismo no hay conexión. Mientras vuelve, puede consultar la información básica de la consulta.</p>
             <div class="offline-features">
-                <h3><i class="fas fa-check-circle"></i> Contenido disponible offline:</h3>
+                <h3><i class="fas fa-check-circle"></i> <span data-i18n="t.puede-consultar-sin-conexion">Puede consultar sin conexión:</span></h3>
                 <ul>
-                    <li><i class="fas fa-phone-alt"></i> Información de contacto</li>
-                    <li><i class="fas fa-clock"></i> Horarios de atención</li>
-                    <li><i class="fas fa-stethoscope"></i> Servicios médicos</li>
-                    <li><i class="fas fa-user-md"></i> Sobre el Dr. Agramonte</li>
-                    <li><i class="fas fa-map-marker-alt"></i> Dirección y ubicación</li>
-                    <li><i class="fas fa-shield-alt"></i> Política de privacidad</li>
+                    <li><i class="fas fa-phone-alt"></i> <span data-i18n="t.informacion-de-contacto">Información de contacto</span></li>
+                    <li><i class="fas fa-clock"></i> <span data-i18n="t.horarios-de-atencion">Horarios de atención</span></li>
+                    <li><i class="fas fa-stethoscope"></i> <span data-i18n="t.servicios-medicos">Servicios médicos</span></li>
+                    <li><i class="fas fa-user-md"></i> <span data-i18n="t.sobre-el-dr-agramonte">Sobre el Dr. Agramonte</span></li>
+                    <li><i class="fas fa-map-marker-alt"></i> <span data-i18n="t.direccion-y-ubicacion">Dirección y ubicación</span></li>
+                    <li><i class="fas fa-shield-alt"></i> <span data-i18n="t.politica-de-privacidad-2">Política de privacidad</span></li>
                 </ul>
             </div>
             <div class="btn-group">
-                <a href="index.html" class="btn-offline btn-primary-offline"><i class="fas fa-home"></i> Ir al Inicio</a>
-                <button id="btn-reintentar" class="btn-offline btn-secondary-offline"><i class="fas fa-sync-alt"></i> Reintentar conexión</button>
+                <a href="index.html" class="btn-offline btn-primary-offline"><i class="fas fa-home"></i> <span data-i18n="t.ir-al-inicio">Ir al Inicio</span></a>
+                <button id="btn-reintentar" class="btn-offline btn-secondary-offline"><i class="fas fa-sync-alt"></i> <span data-i18n="t.reintentar-conexion">Reintentar conexión</span></button>
             </div>
             <div class="info-note">
                 <i class="fas fa-info-circle"></i>
-                <span>La conexión se restablecerá automáticamente cuando vuelvas a tener Internet</span>
+                <span data-i18n="t.cuando-vuelva-la-conexion-la-pagina">Cuando vuelva la conexión, la página le llevará sola al inicio</span>
             </div>
         </div>
     </div>
@@ -117,7 +118,7 @@
     <div class="footer-content">
         <div class="footer-section"><h3>Dr. Agramonte</h3><p data-i18n="footer.especialista">Especialista en Medicina Interna</p><p data-i18n="footer.ubicacion">Palma de Mallorca, Islas Baleares</p></div>
         <div class="footer-section"><h3 data-i18n="footer.horario">Horario</h3><p><strong data-i18n="footer.lunVie">Lunes a viernes</strong><br>9:00 - 14:00<br>16:00 - 19:00</p><p><strong data-i18n="footer.finde">Fines de semana y festivos</strong><br><span data-i18n="footer.cerrado">Cerrado</span></p></div>
-        <div class="footer-section"><h3 data-i18n="footer.enlaces">Enlaces</h3><a href="sobre-mi.html">El Dr. Agramonte</a><a href="servicios.html" data-i18n="nav.servicios">Servicios</a><a href="reservar.html" data-i18n="nav.reservar">Reservar cita</a><a href="contacto.html" data-i18n="nav.contacto">Contacto</a></div>
+        <div class="footer-section"><h3 data-i18n="footer.enlaces">Enlaces</h3><a href="sobre-mi.html" data-i18n="t.el-dr-agramonte">El Dr. Agramonte</a><a href="servicios.html" data-i18n="nav.servicios">Servicios</a><a href="reservar.html" data-i18n="nav.reservar">Reservar cita</a><a href="contacto.html" data-i18n="nav.contacto">Contacto</a></div>
     </div>
     <div class="footer-bottom"><p><span data-i18n="footer.copyright">© 2026 Dr. Juan Manuel Agramonte.</span> <a href="privacidad.html" data-i18n="footer.privacidad">Política de Privacidad</a></p></div>
 </footer>

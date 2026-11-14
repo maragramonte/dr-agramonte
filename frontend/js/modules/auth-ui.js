@@ -4,6 +4,8 @@
  */
 'use strict';
 
+// T() es la función global de textos traducibles que define js/modules/i18n.js.
+
 class AuthUI {
     #modal = null;
 
@@ -13,6 +15,17 @@ class AuthUI {
         this.#renderModal();
         this.#updateNavState();
         window.addEventListener('auth-changed', () => this.#updateNavState());
+        document.addEventListener('i18n:cambio', () => {
+            this.#updateNavState();
+            // La pista del modal depende de la pestaña abierta.
+            const hint = document.querySelector('#authModal .auth-modal__hint');
+            const login = document.getElementById('authLoginForm');
+            if (hint && login) {
+                hint.textContent = login.hidden
+                    ? T('js.auth.pistaRegistro', 'Cree su cuenta de paciente para tener sus citas en cualquier dispositivo.')
+                    : T('js.auth.pistaEntrar', 'Escriba su correo y su contraseña para ver sus citas.');
+            }
+        });
     }
 
     #bindAuthTriggers() {
@@ -43,7 +56,7 @@ class AuthUI {
             if (menu.querySelector('[data-auth-trigger]')) return;
             const li = document.createElement('li');
             li.className = 'nav-item';
-            li.innerHTML = '<button type="button" class="nav-link nav-link--auth" data-auth-trigger>Iniciar sesión</button>';
+            li.innerHTML = `<button type="button" class="nav-link nav-link--auth" data-auth-trigger>${T('js.auth.entrar', 'Iniciar sesión')}</button>`;
             menu.appendChild(li);
         });
 
@@ -57,8 +70,8 @@ class AuthUI {
                 '<button type="button" class="mega-link mega-link--auth" data-auth-trigger>' +
                 '<i class="fas fa-right-to-bracket" aria-hidden="true"></i>' +
                 '<span class="mega-link__text">' +
-                '<span class="mega-link__label" data-auth-label>Iniciar sesión</span>' +
-                '<span class="mega-link__hint">Consulte y cancele sus citas</span>' +
+                `<span class="mega-link__label" data-auth-label>${T('js.auth.entrar', 'Iniciar sesión')}</span>` +
+                `<span class="mega-link__hint" data-i18n="js.auth.pista">Consulte y cancele sus citas</span>` +
                 '</span></button>';
             lista.appendChild(li);
         });
@@ -66,8 +79,8 @@ class AuthUI {
 
     #updateNavState() {
         const authed = this.isAuthenticated();
-        const nombre = localStorage.getItem('nombre') || 'Mi cuenta';
-        const texto = authed ? nombre.split(' ')[0] : 'Iniciar sesión';
+        const nombre = localStorage.getItem('nombre') || T('js.auth.miCuenta', 'Mi cuenta');
+        const texto = authed ? nombre.split(' ')[0] : T('js.auth.entrar', 'Iniciar sesión');
         // Solo los accesos de navegación cambian de texto. Hay más disparadores
         // sueltos —los enlaces «inicia sesión» / «crea una cuenta» del formulario
         // de reserva—, y reescribirlos todos dejaba la frase con «Iniciar sesión»
@@ -77,7 +90,7 @@ class AuthUI {
             // el texto va en su etiqueta; el de la barra es el botón entero.
             const destino = btn.querySelector('[data-auth-label]') || btn;
             destino.textContent = texto;
-            btn.setAttribute('aria-label', authed ? 'Cerrar sesión' : 'Iniciar sesión');
+            btn.setAttribute('aria-label', authed ? T('js.auth.salir', 'Cerrar sesión') : T('js.auth.entrar', 'Iniciar sesión'));
         });
         this.#renderGestion(authed);
     }
@@ -132,7 +145,7 @@ class AuthUI {
 
     open(tab = 'login') {
         if (this.isAuthenticated()) {
-            if (confirm('¿Cerrar sesión?')) this.logout();
+            if (confirm(T('js.auth.confirmarSalir', '¿Cerrar sesión?'))) this.logout();
             return;
         }
         if (!this.#modal) return;
@@ -155,7 +168,7 @@ class AuthUI {
     logout() {
         ['token', 'email', 'nombre', 'telefono', 'userId', 'rol'].forEach((k) => localStorage.removeItem(k));
         window.dispatchEvent(new CustomEvent('auth-changed'));
-        window.DrAgramonte?.notify?.('Sesión cerrada', 'info');
+        window.DrAgramonte?.notify?.(T('js.auth.cerrada', 'Ha cerrado la sesión'), 'info');
         this.#updateNavState();
     }
 
@@ -194,8 +207,8 @@ class AuthUI {
         });
         if (hint) {
             hint.textContent = isLogin
-                ? 'Introduce tu email y contraseña para acceder a tus citas.'
-                : 'Crea tu cuenta de paciente para reservar y sincronizar citas con el servidor.';
+                ? T('js.auth.pistaEntrar', 'Escriba su correo y su contraseña para ver sus citas.')
+                : T('js.auth.pistaRegistro', 'Cree su cuenta de paciente para tener sus citas en cualquier dispositivo.');
         }
         if (errEl) errEl.hidden = true;
 
@@ -216,10 +229,10 @@ class AuthUI {
         if (!btn) return;
         btn.disabled = loading;
         btn.classList.toggle('is-loading', loading);
-        btn.dataset.loadingLabel = btn.dataset.loadingLabel || btn.textContent;
+        const esLogin = form.id === 'authLoginForm';
         btn.textContent = loading
-            ? (form.id === 'authLoginForm' ? 'Entrando…' : 'Creando cuenta…')
-            : btn.dataset.loadingLabel;
+            ? (esLogin ? T('js.auth.entrando', 'Entrando…') : T('js.auth.creando', 'Creando la cuenta…'))
+            : (esLogin ? T('js.auth.botonEntrar', 'Entrar') : T('js.auth.botonCrear', 'Crear cuenta'));
     }
 
     async #submitLogin(form) {
@@ -233,7 +246,7 @@ class AuthUI {
         });
         if (!res.ok) {
             const err = await res.json().catch(() => ({}));
-            throw new Error(err.message || 'Credenciales incorrectas');
+            throw new Error(err.message || T('js.auth.errorEntrar', 'El correo o la contraseña no son correctos'));
         }
         return res.json();
     }
@@ -252,7 +265,7 @@ class AuthUI {
         });
         if (!res.ok) {
             const err = await res.json().catch(() => ({}));
-            throw new Error(err.message || 'No se pudo registrar');
+            throw new Error(err.message || T('js.auth.errorRegistro', 'No hemos podido crear la cuenta'));
         }
         // No hay sesión todavía: elegir la contraseña es tomar el control de la cuenta, y
         // eso solo puede hacerlo quien abra el enlace que ha salido hacia ese buzón.
@@ -268,7 +281,7 @@ class AuthUI {
             body: JSON.stringify({ email })
         });
         const cuerpo = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(cuerpo.message || 'No se pudo enviar el enlace');
+        if (!res.ok) throw new Error(cuerpo.message || T('js.auth.errorEnlace', 'No hemos podido enviar el enlace'));
         return cuerpo.message;
     }
 
@@ -284,33 +297,33 @@ class AuthUI {
         dialog.setAttribute('aria-labelledby', 'authModalTitle');
         dialog.innerHTML = `
             <div class="auth-modal__panel" role="document">
-                <button type="button" class="auth-modal__close" aria-label="Cerrar ventana de acceso">&times;</button>
-                <h2 id="authModalTitle">Acceso pacientes</h2>
-                <p class="auth-modal__hint">Introduce tu email y contraseña para acceder a tus citas.</p>
-                <div class="auth-tabs" role="tablist" aria-label="Tipo de acceso">
-                    <button type="button" class="auth-tab active" role="tab" aria-selected="true" data-tab="login" id="auth-tab-login">Entrar</button>
-                    <button type="button" class="auth-tab" role="tab" aria-selected="false" data-tab="registro" id="auth-tab-registro">Registrarse</button>
+                <button type="button" class="auth-modal__close" aria-label="Cerrar ventana de acceso" data-i18n-attr="aria-label:js.auth.cerrarVentana">&times;</button>
+                <h2 id="authModalTitle" data-i18n="js.auth.titulo">Acceso de pacientes</h2>
+                <p class="auth-modal__hint">${T('js.auth.pistaEntrar', 'Escriba su correo y su contraseña para ver sus citas.')}</p>
+                <div class="auth-tabs" role="tablist" aria-label="Tipo de acceso" data-i18n-attr="aria-label:js.auth.tipo">
+                    <button type="button" class="auth-tab active" role="tab" aria-selected="true" data-tab="login" id="auth-tab-login" data-i18n="js.auth.botonEntrar">Entrar</button>
+                    <button type="button" class="auth-tab" role="tab" aria-selected="false" data-tab="registro" id="auth-tab-registro" data-i18n="js.auth.registrarse">Registrarse</button>
                 </div>
                 <form id="authLoginForm" class="auth-form" role="tabpanel" aria-labelledby="auth-tab-login">
-                    <label>Email<input type="email" name="email" required autocomplete="email"></label>
-                    <label>Contraseña<input type="password" name="password" required minlength="6" autocomplete="current-password"></label>
-                    <button type="submit" class="auth-submit">Entrar</button>
-                    <button type="button" class="auth-link" data-auth-recuperar>¿Has olvidado la contraseña?</button>
+                    <label><span data-i18n="js.auth.correo">Correo electrónico</span><input type="email" name="email" required autocomplete="email"></label>
+                    <label><span data-i18n="js.auth.contrasena">Contraseña</span><input type="password" name="password" required minlength="6" autocomplete="current-password"></label>
+                    <button type="submit" class="auth-submit" data-i18n="js.auth.botonEntrar">Entrar</button>
+                    <button type="button" class="auth-link" data-auth-recuperar data-i18n="js.auth.olvido">¿Ha olvidado la contraseña?</button>
                 </form>
                 <form id="authRegistroForm" class="auth-form hidden" role="tabpanel" aria-labelledby="auth-tab-registro" hidden>
-                    <label>Nombre y apellidos<input type="text" name="nombre" required minlength="3" autocomplete="name"></label>
-                    <label>Email<input type="email" name="email" required autocomplete="email"></label>
-                    <label>Teléfono (opcional)<input type="tel" name="telefono" placeholder="+34 612 345 678" autocomplete="tel"></label>
-                    <button type="submit" class="auth-submit">Crear cuenta</button>
+                    <label><span data-i18n="js.auth.nombre">Nombre y apellidos</span><input type="text" name="nombre" required minlength="3" autocomplete="name"></label>
+                    <label><span data-i18n="js.auth.correo">Correo electrónico</span><input type="email" name="email" required autocomplete="email"></label>
+                    <label><span data-i18n="js.auth.telefono">Teléfono (opcional)</span><input type="tel" name="telefono" placeholder="+34 612 345 678" autocomplete="tel"></label>
+                    <button type="submit" class="auth-submit" data-i18n="js.auth.botonCrear">Crear cuenta</button>
                 </form>
                 <p class="auth-modal__error" id="authError" role="alert" hidden></p>
                 <p class="auth-modal__footer" data-auth-footer-login>
-                    ¿No tienes cuenta?
-                    <button type="button" class="auth-link" data-auth-switch="registro">Regístrate aquí</button>
+                    <span data-i18n="js.auth.sinCuenta">¿No tiene cuenta?</span>
+                    <button type="button" class="auth-link" data-auth-switch="registro" data-i18n="js.auth.registrese">Regístrese aquí</button>
                 </p>
                 <p class="auth-modal__footer hidden" data-auth-footer-registro hidden>
-                    ¿Ya tienes cuenta?
-                    <button type="button" class="auth-link" data-auth-switch="login">Inicia sesión</button>
+                    <span data-i18n="js.auth.conCuenta">¿Ya tiene cuenta?</span>
+                    <button type="button" class="auth-link" data-auth-switch="login" data-i18n="js.auth.inicie">Inicie sesión</button>
                 </p>
             </div>
         `;
@@ -494,6 +507,7 @@ class AuthUI {
         }
 
         document.body.appendChild(dialog);
+        window.i18n?.refresh?.();
         this.#modal = dialog;
 
         dialog.addEventListener('close', () => this.#setPageLocked(false));
@@ -523,7 +537,7 @@ class AuthUI {
                 const data = await this.#submitLogin(loginForm);
                 this.#saveSession(data);
                 this.close();
-                window.DrAgramonte?.notify?.('Sesión iniciada', 'success');
+                window.DrAgramonte?.notify?.(T('js.auth.iniciada', 'Ha iniciado sesión'), 'success');
             } catch (err) {
                 errEl.textContent = err.message;
                 errEl.hidden = false;
@@ -535,7 +549,7 @@ class AuthUI {
         dialog.querySelector('[data-auth-recuperar]').addEventListener('click', async () => {
             const email = loginForm.email.value.trim();
             if (!loginForm.email.checkValidity() || !email) {
-                errEl.textContent = 'Escribe tu email y vuelve a pulsar.';
+                errEl.textContent = T('js.auth.escribaCorreo', 'Escriba su correo y vuelva a pulsar.');
                 errEl.hidden = false;
                 return;
             }
@@ -573,10 +587,7 @@ class AuthUI {
  * esto cubre el catalán y el caso de que la respuesta llegue sin cuerpo.
  */
 AuthUI.textoRevisaTuCorreo = function () {
-    const ca = document.documentElement.lang === 'ca';
-    return ca
-        ? "Revisa el teu correu: t'hem enviat un enllaç per acabar de crear el compte."
-        : 'Revisa tu correo: te hemos enviado un enlace para terminar de crear la cuenta.';
+    return T('js.auth.reviseCorreo', 'Revise su correo: le hemos enviado un enlace para terminar de crear la cuenta.');
 };
 
 window.AuthUI = AuthUI;

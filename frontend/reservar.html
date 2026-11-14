@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="description" content="Reserve su cita con el Dr. Agramonte. Elija centro, fecha y hora. Medicina Interna integral y personalizada." />
-    <title>Reservar Cita – Dr. Agramonte</title>
+    <title data-i18n="t.reservar-cita-dr-agramonte">Reservar Cita – Dr. Agramonte</title>
 
     
     <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="css/dr-agramonte.css">
     <link rel="stylesheet" href="css/pages-extra.css">
     <script src="js/modules/theme-init.js"></script>
+    <script src="js/modules/i18n-textos.js"></script>
     <script src="js/modules/i18n.js"></script>
     <link rel="stylesheet" href="css/reserva-page.css">
 </head>
@@ -31,14 +32,14 @@
     <div class="container">
         <div class="header-content">
             <div class="logo-section">
-                <a href="index.html" class="logo-link" aria-label="Inicio - Dr. Agramonte">
+                <a href="index.html" class="logo-link" aria-label="Inicio - Dr. Agramonte" data-i18n-attr="aria-label:t.inicio-dr-agramonte">
                     <div class="logo-text">
                         <p class="logo-title">Dr. Agramonte</p>
                         <p class="logo-subtitle" data-i18n="logo.subtitle">Especialista en Medicina Interna</p>
                     </div>
                 </a>
             </div>
-            <nav class="main-nav" aria-label="Navegación principal">
+            <nav class="main-nav" aria-label="Navegación principal" data-i18n-attr="aria-label:t.navegacion-principal">
                 <ul class="nav-menu">
                     <li class="nav-item"><a href="sobre-mi.html" class="nav-link" data-i18n="nav.sobre">Sobre el Dr.</a></li>
                     <li class="nav-item"><a href="servicios.html" class="nav-link" data-i18n="nav.servicios">Servicios</a></li>
@@ -46,9 +47,9 @@
                 </ul>
             </nav>
             <div class="header-actions">
-                <a href="reservar.html" class="nav-cta" aria-label="Reservar cita"><i class="fas fa-calendar-plus" aria-hidden="true"></i><span class="nav-cta-text" data-i18n="nav.reservar">Reservar cita</span></a>
+                <a href="reservar.html" class="nav-cta" aria-label="Reservar cita" data-i18n-attr="aria-label:t.reservar-cita"><i class="fas fa-calendar-plus" aria-hidden="true"></i><span class="nav-cta-text" data-i18n="nav.reservar">Reservar cita</span></a>
                 <div class="header-utils">
-                    <div class="lang-switch" role="group" aria-label="Idioma"><button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" aria-pressed="true">ES</button><button type="button" class="lang-btn" data-lang-btn="ca" aria-pressed="false">CA</button></div>
+                    <div class="lang-switch" role="group" aria-label="Idioma" data-i18n-attr="aria-label:t.idioma"><button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" lang="es" title="Español" aria-pressed="true">ES</button><button type="button" class="lang-btn" data-lang-btn="ca" lang="ca" title="Català" aria-pressed="false">CA</button><button type="button" class="lang-btn" data-lang-btn="en" lang="en" title="English" aria-pressed="false">EN</button></div>
                     <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="mega-menu" aria-label="Abrir el menú"><span class="nav-toggle-icon" aria-hidden="true"></span><span class="nav-toggle-text" data-i18n="nav.menu">Menú</span></button>
                 </div>
             </div>
@@ -65,7 +66,7 @@
                 <h2 class="mega-menu__title" data-i18n="menu.consulta">La consulta</h2>
                 <ul class="mega-menu__list">
                     <li><a href="index.html" class="mega-link"><i class="fas fa-home" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.inicio">Inicio</span><span class="mega-link__hint" data-i18n="menu.inicio.hint">Portada y resumen</span></span></a></li>
-                    <li><a href="sobre-mi.html" class="mega-link"><i class="fas fa-user-md" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.sobre">El Dr. Agramonte</span><span class="mega-link__hint" data-i18n="menu.sobre.hint">Trayectoria y formación</span></span></a></li>
+                    <li><a href="sobre-mi.html" class="mega-link"><i class="fas fa-user-md" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="t.el-dr-agramonte">El Dr. Agramonte</span><span class="mega-link__hint" data-i18n="menu.sobre.hint">Trayectoria y formación</span></span></a></li>
                     <li><a href="servicios.html" class="mega-link"><i class="fas fa-stethoscope" aria-hidden="true"></i><span class="mega-link__text"><span class="mega-link__label" data-i18n="nav.servicios">Servicios</span><span class="mega-link__hint" data-i18n="menu.servicios.hint">Qué se atiende en consulta</span></span></a></li>
                 </ul>
             </div>
@@ -80,7 +81,7 @@
         <div class="mega-menu__pie">
             <a href="privacidad.html" class="mega-menu__legal"><i class="fas fa-shield-alt" aria-hidden="true"></i> <span data-i18n="footer.privacidad">Política de Privacidad</span></a>
             <!-- Copia del selector de idioma para los anchos en los que no cabe en la barra. -->
-            <div class="lang-switch lang-switch--menu" role="group" aria-label="Idioma"><button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" aria-pressed="true">ES</button><button type="button" class="lang-btn" data-lang-btn="ca" aria-pressed="false">CA</button></div>
+            <div class="lang-switch lang-switch--menu" role="group" aria-label="Idioma" data-i18n-attr="aria-label:t.idioma"><button type="button" class="lang-btn lang-btn--active" data-lang-btn="es" lang="es" title="Español" aria-pressed="true">ES</button><button type="button" class="lang-btn" data-lang-btn="ca" lang="ca" title="Català" aria-pressed="false">CA</button><button type="button" class="lang-btn" data-lang-btn="en" lang="en" title="English" aria-pressed="false">EN</button></div>
             <button type="button" class="theme-toggle" id="themeToggle" aria-label="Activar modo oscuro" title="Cambiar tema claro / oscuro" aria-pressed="false"><i class="fas fa-moon" id="themeToggleIcon" aria-hidden="true"></i></button>
         </div>
     </div>
@@ -89,8 +90,8 @@
 
 <section class="page-hero page-hero--compact">
     <div class="container">
-        <h1>Reservar cita médica</h1>
-        <p>Elija el centro de consulta, el día y la hora.</p>
+        <h1 data-i18n="t.reservar-cita-medica">Reservar cita médica</h1>
+        <p data-i18n="t.elija-el-centro-de-consulta-el">Elija el centro de consulta, el día y la hora.</p>
         <p id="servicioBanner" class="servicio-banner" hidden style="margin-top:1rem"></p>
     </div>
 </section>
@@ -103,21 +104,21 @@
         <div class="card">
             <div class="card-header">
                 
-                <div><h2>Selección de cita</h2><p>Centro, fecha y hora</p></div>
+                <div><h2 data-i18n="t.seleccion-de-cita">Selección de cita</h2><p data-i18n="t.centro-fecha-y-hora">Centro, fecha y hora</p></div>
             </div>
             <div class="card-body">
 
                 <!-- Stepper — 4 pasos -->
                 <div class="stepper">
-                    <div class="step active" id="step-1"><div class="step-num">1</div><span>Centro</span></div>
-                    <div class="step" id="step-2"><div class="step-num">2</div><span>Fecha</span></div>
-                    <div class="step" id="step-3"><div class="step-num">3</div><span>Hora</span></div>
-                    <div class="step" id="step-4"><div class="step-num">4</div><span>Datos</span></div>
+                    <div class="step active" id="step-1"><div class="step-num">1</div><span data-i18n="t.centro">Centro</span></div>
+                    <div class="step" id="step-2"><div class="step-num">2</div><span data-i18n="t.fecha">Fecha</span></div>
+                    <div class="step" id="step-3"><div class="step-num">3</div><span data-i18n="t.hora">Hora</span></div>
+                    <div class="step" id="step-4"><div class="step-num">4</div><span data-i18n="t.datos">Datos</span></div>
                 </div>
 
                 <!-- PASO 1 — Selección de centro -->
                 <div id="centroSelector">
-                    <p class="form-section-title"><i class="fas fa-map-marker-alt" style="color:var(--teal);margin-right:.35rem;"></i>Centro de consulta</p>
+                    <p class="form-section-title"><i class="fas fa-map-marker-alt" style="color:var(--teal);margin-right:.35rem;"></i><span data-i18n="t.centro-de-consulta">Centro de consulta</span></p>
                     <div class="centros-grid" id="centrosGrid">
                         <!-- renderizado por JS con CENTROS[] -->
                     </div>
@@ -126,22 +127,22 @@
                 <!-- PASOS 2 y 3 — Calendario + horas (ocultos hasta elegir centro) -->
                 <div id="calendarSection" style="display:none">
                     <div class="cal-nav">
-                        <button class="btn-nav" id="btnPrevMonth" aria-label="Mes anterior"><i class="fas fa-chevron-left"></i></button>
+                        <button class="btn-nav" id="btnPrevMonth" aria-label="Mes anterior" data-i18n-attr="aria-label:t.mes-anterior"><i class="fas fa-chevron-left"></i></button>
                         <h3 id="calMonthLabel"></h3>
-                        <button class="btn-nav" id="btnNextMonth" aria-label="Mes siguiente"><i class="fas fa-chevron-right"></i></button>
+                        <button class="btn-nav" id="btnNextMonth" aria-label="Mes siguiente" data-i18n-attr="aria-label:t.mes-siguiente"><i class="fas fa-chevron-right"></i></button>
                     </div>
-                    <div class="cal-weekdays"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+                    <div class="cal-weekdays" id="calWeekdays"><abbr title="lunes">L</abbr><abbr title="martes">M</abbr><abbr title="miércoles">X</abbr><abbr title="jueves">J</abbr><abbr title="viernes">V</abbr><abbr title="sábado">S</abbr><abbr title="domingo">D</abbr></div>
                     <div class="cal-grid" id="calGrid"></div>
                     <div class="cal-legend">
-                        <div class="legend-item"><div class="legend-dot" style="background:var(--teal-light)"></div>Disponible</div>
-                        <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Pocas plazas</div>
-                        <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Última plaza</div>
-                        <div class="legend-item"><div class="legend-dot" style="background:var(--gray-200)"></div>Completo</div>
-                        <div class="legend-item"><span class="legend-festivo" aria-hidden="true">8</span>Festivo, sin consulta</div>
+                        <div class="legend-item"><div class="legend-dot" style="background:var(--teal-light)"></div><span data-i18n="t.disponible">Disponible</span></div>
+                        <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div><span data-i18n="t.pocas-plazas">Pocas plazas</span></div>
+                        <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div><span data-i18n="t.ultima-plaza">Última plaza</span></div>
+                        <div class="legend-item"><div class="legend-dot" style="background:var(--gray-200)"></div><span data-i18n="t.completo">Completo</span></div>
+                        <div class="legend-item"><span class="legend-festivo" aria-hidden="true">8</span><span data-i18n="t.festivo-sin-consulta">Festivo, sin consulta</span></div>
                     </div>
                     <div class="time-panel" id="timePanel" style="display:none">
                         <div class="time-panel-header">
-                            <h4>Horarios disponibles</h4>
+                            <h4 data-i18n="t.horarios-disponibles">Horarios disponibles</h4>
                             <span class="date-chip" id="selectedDateLabel"></span>
                         </div>
                         <div class="slots-grid" id="slotsGrid"></div>
@@ -156,7 +157,7 @@
             <div class="card">
                 <div class="card-header">
                     
-                    <div><h2>Datos de la cita</h2><p>Complete el formulario</p></div>
+                    <div><h2 data-i18n="t.datos-de-la-cita">Datos de la cita</h2><p data-i18n="t.complete-el-formulario">Complete el formulario</p></div>
                 </div>
                 <div class="card-body">
 
@@ -167,7 +168,7 @@
                         <div class="chip-item empty" id="chipDate"><i class="fas fa-calendar"></i> <span id="chipDateText">Sin fecha</span></div>
                         <div class="chip-divider"></div>
                         <div class="chip-item empty" id="chipTime"><i class="fas fa-clock"></i> <span id="chipTimeText">Sin hora</span></div>
-                        <button class="chip-edit" id="chipEditBtn" style="display:none">Cambiar</button>
+                        <button class="chip-edit" id="chipEditBtn" style="display:none" data-i18n="t.cambiar">Cambiar</button>
                     </div>
                     <div id="connectionStatus" class="status-banner" role="status" aria-live="polite"></div>
 
@@ -178,132 +179,124 @@
 
                         <!-- Especialista -->
                         <div class="form-section">
-                            <p class="form-section-title">Especialista</p>
+                            <p class="form-section-title" data-i18n="t.especialista">Especialista</p>
                             <div class="field">
                                 <select id="medicoSelect" required aria-describedby="medicoHelp">
-                                    <option value="">Cargando especialistas...</option>
+                                    <option value="" data-i18n="t.cargando-la-agenda">Cargando la agenda…</option>
                                 </select>
-                                <small id="medicoHelp" class="field-hint">Seleccione el especialista para ver su agenda.</small>
+                                <small id="medicoHelp" class="field-hint" data-i18n="t.seleccione-el-especialista-para-ver-su">Seleccione el especialista para ver su agenda.</small>
                             </div>
                         </div>
 
                         <!-- Tipo de consulta -->
                         <div class="form-section">
-                            <p class="form-section-title">Tipo de consulta</p>
+                            <p class="form-section-title" data-i18n="t.tipo-de-consulta">Tipo de consulta</p>
                             <div class="field">
                                 <select id="tipoConsulta" required>
-                                    <option value="">Seleccione...</option>
-                                    <option value="primera-visita">Primera visita</option>
-                                    <option value="revision">Revisión</option>
-                                    <option value="control-cronico">Control crónico</option>
-                                    <option value="urgente">Consulta urgente</option>
+                                    <option value="" data-i18n="t.seleccione-2">Seleccione...</option>
+                                    <option value="primera-visita" data-i18n="t.primera-visita">Primera visita</option>
+                                    <option value="revision" data-i18n="t.revision">Revisión</option>
+                                    <option value="control-cronico" data-i18n="t.control-cronico">Control crónico</option>
+                                    <option value="urgente" data-i18n="t.consulta-urgente">Consulta urgente</option>
                                 </select>
                             </div>
                         </div>
 
                         <!-- Cobertura / pago -->
                         <div class="form-section">
-                            <p class="form-section-title">Cobertura</p>
+                            <p class="form-section-title" data-i18n="t.cobertura">Cobertura</p>
                             <div class="modality-grid">
                                 <div class="modality-opt">
                                     <input type="radio" name="cobertura" id="cobPrivada" value="privada" checked>
                                     <label for="cobPrivada">
                                         <i class="fas fa-euro-sign"></i>
-                                        <span>Consulta privada</span>
-                                        <small>80&nbsp;&euro; por consulta</small>
+                                        <span data-i18n="t.consulta-privada">Consulta privada</span>
+                                        <small data-i18n="t.80-por-consulta">80&nbsp;&euro; por consulta</small>
                                     </label>
                                 </div>
                                 <div class="modality-opt">
                                     <input type="radio" name="cobertura" id="cobSeguro" value="seguro">
                                     <label for="cobSeguro">
                                         <i class="fas fa-id-card"></i>
-                                        <span>Seguro m&eacute;dico</span>
-                                        <small>Con su aseguradora</small>
+                                        <span data-i18n="t.seguro-medico">Seguro m&eacute;dico</span>
+                                        <small data-i18n="t.con-su-aseguradora">Con su aseguradora</small>
                                     </label>
                                 </div>
                             </div>
 
                             <!-- Si elige seguro -->
                             <div id="bloqueSeguro" class="field" style="display:none">
-                                <select id="aseguradora">
-                                    <option value="">Seleccione su aseguradora…</option>
-                                    <option value="Sanitas">Sanitas</option>
-                                    <option value="Adeslas">Adeslas (SegurCaixa)</option>
-                                    <option value="Asisa">Asisa</option>
-                                    <option value="DKV">DKV</option>
-                                    <option value="Mapfre">Mapfre Salud</option>
-                                    <option value="Cigna">Cigna</option>
-                                    <option value="Caser">Caser</option>
-                                    <option value="Otra">Otra</option>
-                                </select>
-                                <input type="text" id="numTarjeta" placeholder="N&ordm; de tarjeta sanitaria / p&oacute;liza" autocomplete="off" style="margin-top:.6rem">
+                                <!-- Texto libre a propósito: una lista de compañías diría con cuáles
+                                     trabaja el doctor, y eso no se publica. -->
+                                <input type="text" id="aseguradora" maxlength="100" autocomplete="off" placeholder="Nombre de su aseguradora" aria-label="Nombre de su aseguradora" data-i18n-attr="placeholder:t.nombre-de-su-aseguradora;aria-label:t.nombre-de-su-aseguradora">
+                                <input type="text" id="numTarjeta" placeholder="N&ordm; de tarjeta sanitaria / p&oacute;liza" autocomplete="off" style="margin-top:.6rem" data-i18n-attr="placeholder:t.no-de-tarjeta-sanitaria-poliza">
                             </div>
 
                             <!-- Si elige privada -->
                             <div id="bloquePrivada" class="field">
-                                <p class="form-hint">Importe de la consulta privada: <strong>80&nbsp;&euro;</strong>. Se abona en la consulta, despu&eacute;s de la visita: si no acude, no se cobra nada.</p>
+                                <p class="form-hint" data-i18n-html="t.importe-de-la-consulta-privada-80">Importe de la consulta privada: <strong>80&nbsp;&euro;</strong>. Se abona en la consulta, despu&eacute;s de la visita: si no acude, no se cobra nada.</p>
                             </div>
                         </div>
 
                         <!-- Datos personales -->
                         <div class="form-section">
-                            <p class="form-section-title">Datos personales</p>
+                            <p class="form-section-title" data-i18n="t.datos-personales">Datos personales</p>
                             <div class="field">
-                                <input type="text" id="nombre" placeholder="Nombre completo" autocomplete="name" required>
+                                <input type="text" id="nombre" placeholder="Nombre completo" autocomplete="name" required data-i18n-attr="placeholder:t.nombre-completo">
                             </div>
                             <div class="field-row">
                                 <div class="field">
-                                    <input type="tel" id="telefono" placeholder="Teléfono" required>
+                                    <input type="tel" id="telefono" placeholder="Teléfono" required data-i18n-attr="placeholder:t.telefono">
                                 </div>
                                 <div class="field">
-                                    <input type="email" id="email" placeholder="Email" required>
+                                    <input type="email" id="email" placeholder="Email" required data-i18n-attr="placeholder:t.email">
                                 </div>
                             </div>
                             <div id="guestAccountBlock" class="form-section guest-account-block">
-                                <p class="form-section-title">Cuenta (opcional)</p>
-                                <p class="form-hint">Puede reservar sin registrarse. Si ya tiene cuenta,
-                                    <button type="button" class="link-btn" data-auth-trigger data-auth-tab="login">inicie sesión</button>.
-                                    ¿Primera vez?
-                                    <button type="button" class="link-btn" data-auth-trigger data-auth-tab="registro">cree una cuenta</button>.</p>
+                                <p class="form-section-title" data-i18n="t.cuenta-opcional">Cuenta (opcional)</p>
+                                <p class="form-hint"><span data-i18n="t.puede-reservar-sin-registrarse-si-ya">Puede reservar sin registrarse. Si ya tiene cuenta,</span>
+                                    <button type="button" class="link-btn" data-auth-trigger data-auth-tab="login" data-i18n="t.inicie-sesion">inicie sesión</button><span data-i18n="t.primera-vez">.
+                                    ¿Primera vez?</span>
+                                    <button type="button" class="link-btn" data-auth-trigger data-auth-tab="registro" data-i18n="t.cree-una-cuenta">cree una cuenta</button>.</p>
                             </div>
                             <div class="field">
-                                <textarea id="motivo" rows="3" placeholder="Cuéntenos brevemente el motivo de la consulta (opcional)"></textarea>
+                                <textarea id="motivo" rows="3" placeholder="Cuéntenos brevemente el motivo de la consulta (opcional)" data-i18n-attr="placeholder:t.cuentenos-brevemente-el-motivo-de-la"></textarea>
                             </div>
                             <div class="field">
-                                <textarea id="notas" rows="2" placeholder="Notas adicionales (opcional)"></textarea>
+                                <textarea id="notas" rows="2" placeholder="Notas adicionales (opcional)" data-i18n-attr="placeholder:t.notas-adicionales-opcional"></textarea>
                             </div>
                         </div>
 
                         <!-- Privacidad -->
                         <div class="privacy-check">
                             <input type="checkbox" id="acepto" required>
-                            <label for="acepto">Acepto la <a href="privacidad.html">Política de Privacidad</a> y el tratamiento de mis datos.</label>
+                            <label for="acepto" data-i18n-html="t.acepto-la-politica-de-privacidad-y">Acepto la <a href="privacidad.html">Política de Privacidad</a> y el tratamiento de mis datos.</label>
                         </div>
 
                         <button type="submit" class="btn-submit" id="btnSubmit">
-                            <span class="btn-label"><i class="fas fa-paper-plane"></i> Confirmar reserva</span>
+                            <span class="btn-label"><i class="fas fa-paper-plane"></i> <span data-i18n="t.confirmar-reserva">Confirmar reserva</span></span>
                             <div class="spinner"></div>
                         </button>
                     </form>
 
                     <div class="appointments-panel">
                         <button class="appointments-toggle" id="aptsToggle" type="button">
-                            <i class="fas fa-list-alt"></i> Mis citas programadas
+                            <i class="fas fa-list-alt"></i> <span data-i18n="t.mis-citas-programadas">Mis citas programadas</span>
                             <span class="apts-badge zero" id="aptsBadge">0</span>
                             <i class="fas fa-chevron-down chevron-icon"></i>
                         </button>
-                        <p class="apts-sync-hint" id="aptsSyncHint">Sus citas se guardan en la consulta, no solo en este dispositivo.</p>
+                        <p class="apts-sync-hint" id="aptsSyncHint" data-i18n="t.sus-citas-se-guardan-en-la">Sus citas se guardan en la consulta, no solo en este dispositivo.</p>
                         <div class="appointments-list" id="aptsList"></div>
 
                         <!-- Solo con sesión iniciada y canal activo; el estado lo decide el backend -->
                         <div class="telegram-block" id="telegramBlock" style="display:none">
                             <button type="button" class="telegram-btn" id="btnTelegramVincular">
-                                <i class="fab fa-telegram"></i> Recibir avisos por Telegram
+                                <i class="fab fa-telegram"></i> <span data-i18n="t.recibir-avisos-por-telegram">Recibir avisos por Telegram</span>
                             </button>
                             <button type="button" class="telegram-btn danger" id="btnTelegramDesvincular" style="display:none">
-                                <i class="fab fa-telegram"></i> Dejar de recibir avisos por Telegram
+                                <i class="fab fa-telegram"></i> <span data-i18n="t.dejar-de-recibir-avisos-por-telegram">Dejar de recibir avisos por Telegram</span>
                             </button>
-                            <p class="apts-sync-hint" id="telegramHint">Confirmaciones, cancelaciones y recordatorio del día anterior.</p>
+                            <p class="apts-sync-hint" id="telegramHint" data-i18n="t.confirmaciones-cancelaciones-y-recordatorio-del-dia">Confirmaciones, cancelaciones y recordatorio del día anterior.</p>
                             <div class="telegram-result" id="telegramResult" hidden></div>
                         </div>
                     </div>
@@ -320,13 +313,13 @@
     <div class="modal-box">
         <div class="modal-header">
             <div class="modal-icon"><i class="fas fa-check"></i></div>
-            <h2>¡Cita reservada!</h2>
-            <p>Puede consultarla o cancelarla en «Mis citas».</p>
+            <h2 data-i18n="t.cita-reservada">¡Cita reservada!</h2>
+            <p data-i18n="t.puede-consultarla-o-cancelarla-en-mis">Puede consultarla o cancelarla en «Mis citas».</p>
         </div>
         <div class="modal-details" id="modalDetails"></div>
         <div class="modal-actions">
-            <button class="btn-modal secondary" id="btnModalClose">Cerrar</button>
-            <button class="btn-modal primary" id="btnExportICS"><i class="fas fa-calendar-plus"></i> Añadir a calendario</button>
+            <button class="btn-modal secondary" id="btnModalClose" data-i18n="t.cerrar">Cerrar</button>
+            <button class="btn-modal primary" id="btnExportICS"><i class="fas fa-calendar-plus"></i> <span data-i18n="t.anadir-a-calendario">Añadir a calendario</span></button>
         </div>
     </div>
 </div>
@@ -337,7 +330,7 @@
     <div class="footer-content">
         <div class="footer-section"><h3>Dr. Agramonte</h3><p data-i18n="footer.especialista">Especialista en Medicina Interna</p><p data-i18n="footer.ubicacion">Palma de Mallorca, Islas Baleares</p></div>
         <div class="footer-section"><h3 data-i18n="footer.horario">Horario</h3><p><strong data-i18n="footer.lunVie">Lunes a viernes</strong><br>9:00 - 14:00<br>16:00 - 19:00</p><p><strong data-i18n="footer.finde">Fines de semana y festivos</strong><br><span data-i18n="footer.cerrado">Cerrado</span></p></div>
-        <div class="footer-section"><h3 data-i18n="footer.enlaces">Enlaces</h3><a href="sobre-mi.html">El Dr. Agramonte</a><a href="servicios.html" data-i18n="nav.servicios">Servicios</a><a href="reservar.html" data-i18n="nav.reservar">Reservar cita</a><a href="contacto.html" data-i18n="nav.contacto">Contacto</a></div>
+        <div class="footer-section"><h3 data-i18n="footer.enlaces">Enlaces</h3><a href="sobre-mi.html" data-i18n="t.el-dr-agramonte">El Dr. Agramonte</a><a href="servicios.html" data-i18n="nav.servicios">Servicios</a><a href="reservar.html" data-i18n="nav.reservar">Reservar cita</a><a href="contacto.html" data-i18n="nav.contacto">Contacto</a></div>
     </div>
     <div class="footer-bottom"><p><span data-i18n="footer.copyright">© 2026 Dr. Juan Manuel Agramonte.</span> <a href="privacidad.html" data-i18n="footer.privacidad">Política de Privacidad</a></p></div>
 </footer>
