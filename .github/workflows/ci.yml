@@ -121,6 +121,13 @@ jobs:
       - name: Probar plantillas.mjs
         run: bash scripts/tests/plantillas.test.sh
 
+      # El calendario de la web y la API tienen que cerrar los mismos festivos.
+      - name: Festivos iguales en la web y en las migraciones
+        run: node scripts/festivos-comprobar.mjs
+
+      - name: Probar festivos-comprobar.mjs
+        run: bash scripts/tests/festivos-comprobar.test.sh
+
       - name: Probar backup-db.sh
         run: bash scripts/tests/backup-db.test.sh
 

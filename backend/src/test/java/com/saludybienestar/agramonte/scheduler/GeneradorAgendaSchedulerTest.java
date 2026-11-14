@@ -12,6 +12,7 @@ import com.saludybienestar.agramonte.entity.Centro;
 import com.saludybienestar.agramonte.entity.Horario;
 import com.saludybienestar.agramonte.entity.Medico;
 import com.saludybienestar.agramonte.repository.CentroRepository;
+import com.saludybienestar.agramonte.repository.FestivoRepository;
 import com.saludybienestar.agramonte.repository.HorarioRepository;
 import com.saludybienestar.agramonte.repository.MedicoRepository;
 import java.time.DayOfWeek;
@@ -41,6 +42,7 @@ class GeneradorAgendaSchedulerTest {
     @Mock private MedicoRepository medicoRepository;
     @Mock private CentroRepository centroRepository;
     @Mock private HorarioRepository horarioRepository;
+    @Mock private FestivoRepository festivoRepository;
 
     private AgendaProperties agenda;
     private GeneradorAgendaScheduler scheduler;
@@ -51,7 +53,7 @@ class GeneradorAgendaSchedulerTest {
     void setUp() {
         agenda = new AgendaProperties();
         scheduler = new GeneradorAgendaScheduler(
-                agenda, medicoRepository, centroRepository, horarioRepository);
+                agenda, medicoRepository, centroRepository, horarioRepository, festivoRepository);
     }
 
     private Medico medico() {
@@ -132,8 +134,8 @@ class GeneradorAgendaSchedulerTest {
     }
 
     @Test
-    @DisplayName("El domingo no genera nada y cada día va al centro que le toca")
-    void generar_asignaCentroPorDiaYCierraElDomingo() {
+    @DisplayName("Sábado y domingo no generan nada y cada día va al centro que le toca")
+    void generar_asignaCentroPorDiaYCierraElFinDeSemana() {
         conAgendaVacia();
         agenda.setDiasFuturo(21); // tres semanas: entran todos los días de la semana
 
@@ -142,13 +144,39 @@ class GeneradorAgendaSchedulerTest {
         List<Horario> creados = capturarGuardados();
 
         assertThat(creados)
-                .as("el domingo la consulta está cerrada")
-                .noneSatisfy(h -> assertThat(h.getInicio().getDayOfWeek()).isEqualTo(DayOfWeek.SUNDAY));
+                .as("el fin de semana la consulta está cerrada")
+                .noneSatisfy(h -> assertThat(h.getInicio().getDayOfWeek())
+                        .isIn(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY));
+        assertThat(creados.stream().map(h -> h.getInicio().getDayOfWeek()).collect(Collectors.toSet()))
+                .as("y abre los cinco días laborables")
+                .containsExactlyInAnyOrder(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY,
+                        DayOfWeek.THURSDAY, DayOfWeek.FRIDAY);
 
         assertThat(creados).allSatisfy(h -> {
             String esperado = agenda.getCentroPorDia().get(h.getInicio().getDayOfWeek());
             assertThat(h.getCentro().getCodigo()).isEqualTo(esperado);
         });
+    }
+
+    @Test
+    @DisplayName("Un festivo entre semana no genera ninguna franja; el resto de días, sí")
+    void generar_saltaLosFestivos() {
+        conAgendaVacia();
+        agenda.setDiasFuturo(14);
+
+        // El primer día laborable de la ventana pasa a ser festivo.
+        LocalDate festivo = LocalDate.now().plusDays(1);
+        while (!agenda.getCentroPorDia().containsKey(festivo.getDayOfWeek())) {
+            festivo = festivo.plusDays(1);
+        }
+        when(festivoRepository.findFechas(any(), any())).thenReturn(List.of(festivo));
+
+        scheduler.generarHuecosFuturos();
+
+        List<Horario> creados = capturarGuardados();
+        final LocalDate cerrado = festivo;
+        assertThat(creados).noneSatisfy(h -> assertThat(h.getInicio().toLocalDate()).isEqualTo(cerrado));
+        assertThat(creados).anySatisfy(h -> assertThat(h.getInicio().toLocalDate()).isAfter(cerrado));
     }
 
     @Test

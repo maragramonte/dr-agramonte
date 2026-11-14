@@ -5,12 +5,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saludybienestar.agramonte.dto.request.CrearCitaRequest;
 import com.saludybienestar.agramonte.entity.EstadoCita;
+import com.saludybienestar.agramonte.entity.Festivo;
 import com.saludybienestar.agramonte.entity.Cita;
 import com.saludybienestar.agramonte.entity.Horario;
 import com.saludybienestar.agramonte.entity.Medico;
 import com.saludybienestar.agramonte.entity.Rol;
 import com.saludybienestar.agramonte.entity.Usuario;
 import com.saludybienestar.agramonte.repository.CitaRepository;
+import com.saludybienestar.agramonte.repository.FestivoRepository;
 import com.saludybienestar.agramonte.repository.HorarioRepository;
 import com.saludybienestar.agramonte.repository.MedicoRepository;
 import com.saludybienestar.agramonte.repository.UsuarioRepository;
@@ -89,6 +91,7 @@ class ReservaPublicaIntegrationTest {
     @Autowired private ObjectMapper objectMapper;
     @Autowired private HorarioRepository horarioRepository;
     @Autowired private CitaRepository citaRepository;
+    @Autowired private FestivoRepository festivoRepository;
     @Autowired private UsuarioRepository usuarioRepository;
     @Autowired private CitaService citaService;
     @Autowired private GeneradorAgendaScheduler generadorAgenda;
@@ -139,10 +142,14 @@ class ReservaPublicaIntegrationTest {
         }
     }
 
-    /** Primer día futuro que cae en el día de la semana indicado (dentro de la semilla a 90 días). */
+    /**
+     * Primer día futuro que cae en el día de la semana indicado (dentro de la semilla a
+     * 90 días) y no es festivo: si el próximo miércoles fuera Reyes, la prueba de la
+     * agenda por centro fallaría sin que nada estuviera roto.
+     */
     private LocalDate proximoDiaSemana(DayOfWeek dia) {
         LocalDate d = LocalDate.now().plusDays(1);
-        while (d.getDayOfWeek() != dia) {
+        while (d.getDayOfWeek() != dia || festivoRepository.existsById(d)) {
             d = d.plusDays(1);
         }
         return d;
@@ -395,6 +402,39 @@ class ReservaPublicaIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[*].codigo", containsInAnyOrder("madrid", "palma")));
+    }
+
+    @Test
+    @DisplayName("Fin de semana y festivos: V16 deja la agenda sin huecos esos días y la API no los ofrece ni los reserva")
+    void finDeSemanaYFestivos_sinHuecosNiReserva() throws Exception {
+        // V16 borró las franjas libres de sábado y domingo, y el generador ya no las crea.
+        assertThat(horarioRepository.findByMedicoIdAndDisponibleTrue(1L))
+                .as("ninguna franja libre cae en fin de semana")
+                .noneSatisfy(h -> assertThat(h.getInicio().getDayOfWeek())
+                        .isIn(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY));
+        assertThat(huecos(proximoDiaSemana(DayOfWeek.SATURDAY).toString(), "palma"))
+                .as("el sábado Avenidas ya no abre").isEmpty();
+
+        // Un día laborable con huecos libres pasa a festivo: desaparecen de la
+        // disponibilidad y una reserva directa a la API recibe 409, aunque la franja siga
+        // en la tabla marcada como libre.
+        LocalDateTime franja = primeraFranjaLibre();
+        LocalDate dia = franja.toLocalDate();
+        festivoRepository.save(new Festivo(dia, "Festivo de prueba"));
+        try {
+            assertThat(huecos(dia.toString(), "madrid")).isEmpty();
+            assertThat(huecos(dia.toString(), "palma")).isEmpty();
+
+            mockMvc.perform(post("/api/citas/reserva-publica")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(cuerpoReserva("festivo@example.com", franja)))
+                    .andExpect(status().isConflict());
+        } finally {
+            festivoRepository.deleteById(dia);
+        }
+        assertThat(citaRepository.findAll())
+                .as("el 409 no deja ninguna cita a medias")
+                .noneSatisfy(c -> assertThat(c.getFechaHora()).isEqualTo(franja));
     }
 
     @Test

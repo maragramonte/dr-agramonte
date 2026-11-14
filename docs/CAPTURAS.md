@@ -31,7 +31,7 @@ modo que el paciente no tiene que volver a decidir lo que ya decidió aquí.
 
 ## 3. Reservar: el centro manda sobre el calendario
 
-![Tarjeta de selección de cita con los dos centros (Consulta General Riera (Lun / Mar / Jue) y Consulta Avenidas (Mie / Vie / Sab)) y el calendario de octubre, donde solo están activos los días en que el centro elegido pasa consulta](capturas/03-reserva-centros.png)
+![Tarjeta de selección de cita con los dos centros (Consulta General Riera (Lun / Mar / Jue) y Consulta Avenidas (Mie / Vie)) y el calendario de octubre, donde solo están activos los días en que el centro elegido pasa consulta](capturas/03-reserva-centros.png)
 
 El doctor pasa consulta en dos centros y en días distintos. Al elegir uno, el calendario
 apaga los días en que ese centro no abre: en la captura, el centro de General Riera solo

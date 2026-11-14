@@ -10,9 +10,10 @@
  * El 'id' es el código interno que se envía al backend (coincide con
  * centros.codigo en BD); se mantiene aunque el nombre visible cambie.
  *
- * 'diasSemana' (0 = domingo) tiene que cuadrar con el reparto de horarios de
- * V6__horarios_por_centro.sql: si no, el calendario deja elegir un día para el
- * que el backend no devuelve nada.
+ * 'diasSemana' (0 = domingo) tiene que cuadrar con app.agenda.centro-por-dia del
+ * backend (AgendaProperties): si no, el calendario deja elegir un día para el
+ * que el backend no devuelve nada. Entre los dos centros cubren de lunes a
+ * viernes; el fin de semana y los festivos (festivos.js) la consulta cierra.
  */
 export const CENTROS = [
     {
@@ -30,8 +31,8 @@ export const CENTROS = [
         direccion: 'Zona de las Avenidas',
         ciudad: 'Palma de Mallorca',
         icono: 'fa-clinic-medical',
-        diasSemana: [3, 5, 6],
-        diasHint: 'Mie / Vie / Sab'
+        diasSemana: [3, 5],
+        diasHint: 'Mie / Vie'
     }
 ];
 

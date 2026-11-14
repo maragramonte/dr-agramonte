@@ -1,6 +1,6 @@
 # Base de datos
 
-> **TFG DAM · Dr. Agramonte.** Esquema real reconstruido de las migraciones **Flyway V1–V15** (`backend/src/main/resources/db/migration/postgresql/`). **PostgreSQL 15.** Hibernate arranca con `ddl-auto: validate`, así que el esquema de esta referencia coincide exactamente con las entidades JPA.
+> **TFG DAM · Dr. Agramonte.** Esquema real reconstruido de las migraciones **Flyway V1–V16** (`backend/src/main/resources/db/migration/postgresql/`). **PostgreSQL 15.** Hibernate arranca con `ddl-auto: validate`, así que el esquema de esta referencia coincide exactamente con las entidades JPA.
 
 ## Resumen en una frase
 6 tablas en **3ª forma normal**, claves `BIGSERIAL`, integridad referencial con **claves foráneas** (unas en `CASCADE`, otras en `SET NULL` según convenga conservar o no el dato), un **índice único** que (junto al bloqueo pesimista) evita las dobles reservas, e **índices** sobre las consultas más frecuentes.
@@ -149,6 +149,14 @@ erDiagram
 | `disponible` | BOOLEAN | NOT NULL, default TRUE: pasa a FALSE al reservar |
 
 Índice **UNIQUE `(medico_id, inicio)`** → no puede haber dos franjas idénticas para el mismo médico. **Es la pieza clave de la integridad de reservas.**
+
+### `festivos`: días sin consulta entre semana (**V16**)
+| Columna | Tipo | Restricción |
+|---|---|---|
+| `fecha` | DATE | **PK** |
+| `nombre` | VARCHAR(120) | NOT NULL |
+
+Sin relaciones: el generador de agenda no crea franjas esas fechas y `CalendarioLaboral` las rechaza en la disponibilidad y en la reserva. V16 siembra 2026 y 2027 (nacionales, Illes Balears y los locales de Palma) y borra las franjas **libres** de fines de semana y festivos; las que ya tenían cita se conservan. El frontend lleva la misma lista en `js/modules/festivos.js`, comprobada en el CI.
 
 ### `citas`: la reserva en sí
 | Columna | Tipo | Restricción / nota |

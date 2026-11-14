@@ -16,13 +16,15 @@
  */
 import apiClient from '../modules/api-client.js';
 import { CENTROS } from '../modules/centros.js';
+import { festivo } from '../modules/festivos.js';
 
 'use strict';
 
-/* Cuántos días vista se miran buscando el primero con huecos. Con dos centros
-   que abren tres días cada uno, 10 cubre siempre al menos tres jornadas de
-   cada centro sin encadenar peticiones de más. */
-const DIAS_A_MIRAR = 10;
+/* Cuántos días vista se miran buscando el primero con huecos. Avenidas solo
+   abre miércoles y viernes, así que con 14 entran al menos cuatro jornadas de
+   ese centro aunque caiga un festivo por medio (Navidad, Semana Santa). Los
+   días cerrados no cuestan nada: se saltan sin preguntar a la API. */
+const DIAS_A_MIRAR = 14;
 
 /* Cuántos huecos caben en la rejilla sin que el hero crezca de alto. */
 const MAX_HUECOS = 8;
@@ -72,9 +74,9 @@ async function primerDiaConHuecos(centro) {
     const hoy = new Date();
     for (let salto = 1; salto <= DIAS_A_MIRAR; salto++) {
         const dia = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + salto);
-        if (!centro.diasSemana.includes(dia.getDay())) continue;
-
         const iso = aISO(dia);
+        if (!centro.diasSemana.includes(dia.getDay()) || festivo(iso)) continue;
+
         const libres = await apiClient.getDisponibilidad(estado.medicoId, centro.id, iso);
         const horas = (libres || []).map(soloHora).filter(Boolean);
         if (horas.length) {

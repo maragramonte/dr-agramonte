@@ -46,6 +46,7 @@ class CitaServiceTest {
     @Mock private MedicoRepository medicoRepository;
     @Mock private UsuarioRepository usuarioRepository;
     @Mock private HorarioRepository horarioRepository;
+    @Mock private CalendarioLaboral calendarioLaboral;
     @Mock private CitaNotificationService citaNotificationService;
     @Mock private CorreoAccesoCitaService correoAccesoCitaService;
     @Mock private CorreoCancelacionCitaService correoCancelacionCitaService;
@@ -166,6 +167,22 @@ class CitaServiceTest {
 
         verify(citaRepository, never()).save(any());
         verify(citaNotificationService, never()).notifyNuevaCita(any());
+    }
+
+    @Test
+    @DisplayName("crearCita: un fin de semana o festivo se rechaza con 409, aunque quede una franja libre en la tabla")
+    void crearCita_diaCerrado_lanza409() {
+        // Pasa con las franjas antiguas: un sábado que tenía cita antes de V16 vuelve a
+        // quedar libre si el paciente cancela. La tabla dice «libre»; el calendario, no.
+        when(calendarioLaboral.estaCerrado(FRANJA.toLocalDate())).thenReturn(true);
+
+        assertThatThrownBy(() -> citaService.crearCita(1L, crearCitaRequest()))
+                .isInstanceOf(ResponseStatusException.class)
+                .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
+                        .isEqualTo(HttpStatus.CONFLICT));
+
+        verify(horarioRepository, never()).findByMedicoIdAndInicioAndDisponibleTrueForUpdate(any(), any());
+        verify(citaRepository, never()).save(any());
     }
 
     @Test
