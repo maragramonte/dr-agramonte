@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dr-agramonte-v55';
+const CACHE_NAME = 'dr-agramonte-v56';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -50,8 +50,9 @@ const urlsToCache = [
     // el subconjunto latin de cada familia y los iconos solidos, que son el 99 %
     // de los que se usan. Los de marca (fab) y el subconjunto latin-ext se piden
     // a la red cuando toca, porque aparecen en pantallas que ya necesitan conexion.
-    '/vendor/fontawesome/css/all.min.css',
-    '/vendor/fontawesome/webfonts/fa-solid-900.woff2',
+    '/vendor/fontawesome/css/iconos.min.css',
+    '/vendor/fontawesome/webfonts/fa-solid-900-recorte.woff2',
+    '/vendor/fontawesome/webfonts/fa-brands-400-recorte.woff2',
     '/vendor/fonts/atkinson.css',
     '/vendor/fonts/atkinson-hyperlegible-next-latin-400-normal.woff2',
     '/vendor/fonts/atkinson-hyperlegible-next-latin-500-normal.woff2',

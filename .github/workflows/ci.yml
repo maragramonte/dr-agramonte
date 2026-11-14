@@ -135,6 +135,13 @@ jobs:
       - name: Probar seo-comprobar.mjs
         run: bash scripts/tests/seo-comprobar.test.sh
 
+      # Font Awesome va recortado a los iconos que usa la web: uno nuevo hay que añadirlo.
+      - name: Iconos dentro del recorte de Font Awesome
+        run: node scripts/iconos-comprobar.mjs
+
+      - name: Probar iconos-comprobar.mjs
+        run: bash scripts/tests/iconos-comprobar.test.sh
+
       # Cada texto marcado para traducir tiene que tener catalán e inglés.
       - name: Traducciones completas
         run: node scripts/i18n-comprobar.mjs
