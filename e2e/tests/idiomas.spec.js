@@ -52,7 +52,7 @@ test('la elección se recuerda al cambiar de página y ?lang= la fija', async ({
 });
 
 // Lo que puede quedar igual en inglés: nombres propios, cifras y las opiniones.
-const SE_QUEDA = /^(Dr\.? (Juan Manuel )?Agramonte.*|Consulta (General Riera|Avenidas)|Carrer del General Riera|Palma de Mallorca|Medicina Interna|Doctoralia|Telegram:?|Sanitas|Adeslas \(SegurCaixa\)|Asisa|DKV|Mapfre Salud|Cigna|Caser|Cookies|LOPDGDD|localStorage|Salud y Bienestar Interno – Dr\. Agramonte|ES|CA|EN|Menú|Menu|[\d\s:€.,/–\-+()·%*]+)$/;
+const SE_QUEDA = /^(Dr\.? (Juan Manuel )?Agramonte.*|Consulta (General Riera|Avenidas)|Carrer del General Riera|Palma de Mallorca|Medicina Interna|Doctoralia|Telegram:?|Cookies|LOPDGDD|localStorage|Salud y Bienestar Interno – Dr\. Agramonte|ES|CA|EN|Menú|Menu|[\d\s:€.,/–\-+()·%*]+)$/;
 
 const textosVisibles = () => {
     const fuera = (el) => el.closest('script, style, .testimonial__text, .testimonial__author, [translate="no"]');

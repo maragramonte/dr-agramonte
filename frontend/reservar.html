@@ -226,17 +226,9 @@
 
                             <!-- Si elige seguro -->
                             <div id="bloqueSeguro" class="field" style="display:none">
-                                <select id="aseguradora">
-                                    <option value="" data-i18n="t.seleccione-su-aseguradora">Seleccione su aseguradora…</option>
-                                    <option value="Sanitas">Sanitas</option>
-                                    <option value="Adeslas">Adeslas (SegurCaixa)</option>
-                                    <option value="Asisa">Asisa</option>
-                                    <option value="DKV">DKV</option>
-                                    <option value="Mapfre">Mapfre Salud</option>
-                                    <option value="Cigna">Cigna</option>
-                                    <option value="Caser">Caser</option>
-                                    <option value="Otra" data-i18n="t.otra">Otra</option>
-                                </select>
+                                <!-- Texto libre a propósito: una lista de compañías diría con cuáles
+                                     trabaja el doctor, y eso no se publica. -->
+                                <input type="text" id="aseguradora" maxlength="100" autocomplete="off" placeholder="Nombre de su aseguradora" aria-label="Nombre de su aseguradora" data-i18n-attr="placeholder:t.nombre-de-su-aseguradora;aria-label:t.nombre-de-su-aseguradora">
                                 <input type="text" id="numTarjeta" placeholder="N&ordm; de tarjeta sanitaria / p&oacute;liza" autocomplete="off" style="margin-top:.6rem" data-i18n-attr="placeholder:t.no-de-tarjeta-sanitaria-poliza">
                             </div>
 

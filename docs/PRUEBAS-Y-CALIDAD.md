@@ -119,11 +119,11 @@ Viven en [`e2e/`](../e2e), fuera de `frontend/`. No es un capricho: `frontend/` 
 tal cual (nginx lo monta y el `Dockerfile` lo copia dentro del jar), así que un
 `node_modules` o un informe de pruebas ahí dentro acabaría servido en la web.
 
-Son 37 pruebas en seis ficheros:
+Son 38 pruebas en seis ficheros:
 
 | Fichero | Qué comprueba |
 |---------|---------------|
-| `reserva.spec.js` (5) | La reserva sin cuenta de principio a fin, con el cuerpo del `POST` que espera la API; que solo se pueden pulsar las horas libres; que no se envía sin aceptar la privacidad; que un teléfono no español se rechaza sin llamar a la API, y que un 409 se enseña sin romper el formulario |
+| `reserva.spec.js` (6) | La reserva sin cuenta de principio a fin, con el cuerpo del `POST` que espera la API; que con seguro la aseguradora se escribe a mano y es obligatoria; que solo se pueden pulsar las horas libres; que no se envía sin aceptar la privacidad; que un teléfono no español se rechaza sin llamar a la API, y que un 409 se enseña sin romper el formulario |
 | `navegacion.spec.js` (9) | Que ninguna página pública enlaza a las herramientas internas ni habla del TFC, que un paciente con sesión tampoco las ve y que el médico sí las encuentra en el menú |
 | `portada.spec.js` (2) | Que sin agenda el recuadro del hero ofrece los centros en vez de un error, y que `reservar.html?centro=` marca el centro aunque no lleve fecha |
 | `letra-grande.spec.js` (6) | Que con la letra del navegador a 32 px ninguna página pública obliga a desplazarse en horizontal |

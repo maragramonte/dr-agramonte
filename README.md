@@ -176,7 +176,7 @@ y Dependabot propone las actualizaciones de Maven, Docker y GitHub Actions. Cada
 Semgrep (reglas de Java y de secretos, de momento solo informativo) y cada semana gitleaks
 revisa todo el historial de git en busca de claves subidas por error.
 
-El frontend tiene 37 pruebas E2E con Playwright, y cada una se ejecuta en escritorio y en
+El frontend tiene 38 pruebas E2E con Playwright, y cada una se ejecuta en escritorio y en
 móvil. Cubren la reserva sin cuenta de principio a fin, que los pacientes no vean enlaces a
 las herramientas internas, que el calendario no deje elegir fines de semana ni festivos, la
 portada cuando la agenda no responde, que ninguna página se salga de la pantalla con la

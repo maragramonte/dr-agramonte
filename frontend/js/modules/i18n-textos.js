@@ -15,6 +15,7 @@
  */
 window.I18N_TEXTOS = {
     ca: {
+        "t.nombre-de-su-aseguradora": "Nom de la seva asseguradora",
         "footer.finde": "Caps de setmana i festius",
         "footer.cerrado": "Tancat",
         "t.finde-cerrado": "<strong>Caps de setmana i festius:</strong> tancat",
@@ -234,8 +235,6 @@ window.I18N_TEXTOS = {
         "t.80-por-consulta": "80 € per consulta",
         "t.seguro-medico": "Assegurança mèdica",
         "t.con-su-aseguradora": "Amb la seva asseguradora",
-        "t.seleccione-su-aseguradora": "Seleccioni la seva asseguradora…",
-        "t.otra": "Una altra",
         "t.no-de-tarjeta-sanitaria-poliza": "Núm. de targeta sanitària / pòlissa",
         "t.importe-de-la-consulta-privada-80": "Import de la consulta privada: <strong>80&nbsp;€</strong>. Es paga a la consulta, després de la visita: si no hi va, no se li cobra res.",
         "t.datos-personales": "Dades personals",
@@ -411,7 +410,7 @@ window.I18N_TEXTOS = {
         "js.val.centro": "Seleccioni un centre",
         "js.val.dia": "Seleccioni un dia",
         "js.val.hora": "Seleccioni una hora",
-        "js.val.aseguradora": "Seleccioni la seva asseguradora",
+        "js.val.aseguradora": "Indiqui el nom de la seva asseguradora",
         "js.ics.titulo": "Cita mèdica - Dr. Agramonte",
         "js.ics.desc": "Consulta mèdica",
         "js.tg.activos": "Avisos actius: confirmacions, anul·lacions i recordatori del dia abans.",
@@ -492,6 +491,7 @@ window.I18N_TEXTOS = {
         "js.cal.iniciales": "Dl,Dt,Dc,Dj,Dv,Ds,Dg",
     },
     en: {
+        "t.nombre-de-su-aseguradora": "Name of your insurer",
         "footer.finde": "Weekends and bank holidays",
         "footer.cerrado": "Closed",
         "t.finde-cerrado": "<strong>Weekends and bank holidays:</strong> closed",
@@ -711,8 +711,6 @@ window.I18N_TEXTOS = {
         "t.80-por-consulta": "€80 per consultation",
         "t.seguro-medico": "Health insurance",
         "t.con-su-aseguradora": "Through your insurer",
-        "t.seleccione-su-aseguradora": "Select your insurer…",
-        "t.otra": "Other",
         "t.no-de-tarjeta-sanitaria-poliza": "Insurance card / policy number",
         "t.importe-de-la-consulta-privada-80": "Private consultation fee: <strong>€80</strong>. Paid at the practice after the visit: if you don't attend, you won't be charged.",
         "t.datos-personales": "Your details",
@@ -888,7 +886,7 @@ window.I18N_TEXTOS = {
         "js.val.centro": "Please select a clinic",
         "js.val.dia": "Please select a day",
         "js.val.hora": "Please select a time",
-        "js.val.aseguradora": "Please select your insurer",
+        "js.val.aseguradora": "Please enter the name of your insurer",
         "js.ics.titulo": "Medical appointment - Dr Agramonte",
         "js.ics.desc": "Medical consultation",
         "js.tg.activos": "Reminders on: confirmations, cancellations and a reminder the day before.",

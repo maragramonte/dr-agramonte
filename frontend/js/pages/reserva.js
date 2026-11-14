@@ -786,14 +786,14 @@ async function onSubmit(e) {
     if (!state.dateISO) return showToast(T('js.val.dia', 'Seleccione un día'), 'error');
     if (!state.hour) return showToast(T('js.val.hora', 'Seleccione una hora'), 'error');
     if (!validarCampos()) return;
-    if ((document.querySelector('input[name="cobertura"]:checked')?.value) === 'seguro' && !$('aseguradora').value) {
-        return showToast(T('js.val.aseguradora', 'Seleccione su aseguradora'), 'error');
+    if ((document.querySelector('input[name="cobertura"]:checked')?.value) === 'seguro' && !$('aseguradora').value.trim()) {
+        return showToast(T('js.val.aseguradora', 'Indique el nombre de su aseguradora'), 'error');
     }
     const btn = $('btnSubmit');
     btn.disabled = true; btn.classList.add('loading');
     await new Promise((r) => setTimeout(r, 300));
     const cobertura = document.querySelector('input[name="cobertura"]:checked')?.value || 'privada';
-    const aseguradora = cobertura === 'seguro' ? ($('aseguradora').value || null) : null;
+    const aseguradora = cobertura === 'seguro' ? ($('aseguradora').value.trim() || null) : null;
     const numeroTarjetaSanitaria = cobertura === 'seguro' ? ($('numTarjeta').value.trim() || null) : null;
     // Solo se paga en la consulta: el pago online no existe, así que ya no se pregunta.
     const preferenciaPago = cobertura === 'privada' ? 'en-consulta' : null;
