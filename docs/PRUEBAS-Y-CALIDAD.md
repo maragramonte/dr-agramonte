@@ -119,15 +119,14 @@ Viven en [`e2e/`](../e2e), fuera de `frontend/`. No es un capricho: `frontend/` 
 tal cual (nginx lo monta y el `Dockerfile` lo copia dentro del jar), así que un
 `node_modules` o un informe de pruebas ahí dentro acabaría servido en la web.
 
-Hoy cubren **un solo flujo**, la reserva sin cuenta de `reservar.html`, con cinco pruebas:
+Son 22 pruebas en cuatro ficheros:
 
-| Prueba | Qué comprueba |
-|--------|---------------|
-| De principio a fin | Centro, fecha, hora y datos. Que el cuerpo del `POST` es el que espera la API, que sale el aviso de confirmación y que el token queda guardado para «Mis citas» |
-| Horas libres | Solo se pueden pulsar las horas que devuelve `/disponibilidad` |
-| Privacidad | El botón no se activa hasta marcar la casilla |
-| Teléfono | Un número no español se rechaza sin llegar a llamar a la API |
-| Hueco ocupado | Un 409 del servidor se enseña al usuario y el formulario sigue usable |
+| Fichero | Qué comprueba |
+|---------|---------------|
+| `reserva.spec.js` (5) | La reserva sin cuenta de principio a fin, con el cuerpo del `POST` que espera la API; que solo se pueden pulsar las horas libres; que no se envía sin aceptar la privacidad; que un teléfono no español se rechaza sin llamar a la API, y que un 409 se enseña sin romper el formulario |
+| `navegacion.spec.js` (9) | Que ninguna página pública enlaza a las herramientas internas ni habla del TFC, que un paciente con sesión tampoco las ve y que el médico sí las encuentra en el menú |
+| `portada.spec.js` (2) | Que sin agenda el recuadro del hero ofrece los centros en vez de un error, y que `reservar.html?centro=` marca el centro aunque no lleve fecha |
+| `letra-grande.spec.js` (6) | Que con la letra del navegador a 32 px ninguna página pública obliga a desplazarse en horizontal |
 
 Cada una corre dos veces, en un Chrome de escritorio y en un Pixel 7 emulado.
 
@@ -142,6 +141,30 @@ no pase desapercibido.
 Para lanzarlas contra la pila de verdad, se pasa la URL: con `docker compose up` en marcha,
 `E2E_BASE_URL=http://localhost npm test`. Ojo: así se crean citas reales en la base de
 datos local.
+
+### Comparación visual para cambios de CSS
+
+Cuando un cambio de CSS no debería verse (borrar reglas muertas, juntar selectores
+repetidos, reordenar el archivo), las pruebas E2E no bastan: comprueban que las cosas
+funcionan, no que se vean igual. Para eso está [`e2e/visual/`](../e2e/visual):
+
+```bash
+cd e2e
+npx http-server ../frontend -p 4321 &            # la rama con el cambio
+node visual/capturar.mjs /tmp/despues            # 60 capturas
+# lo mismo con main servido en otro puerto, y luego:
+node visual/capturar.mjs /tmp/antes http://localhost:4322
+python3 visual/comparar.py /tmp/antes /tmp/despues
+```
+
+Son las 11 páginas en 1440 y 390 px, en claro y en oscuro, más cuatro estados: el menú
+abierto, los detalles de Servicios desplegados, la reserva rellena tras pulsar «Reservar» y
+Contacto enviado vacío. La API va simulada y sin animaciones. Dos pasadas seguidas sobre el
+mismo código dan las mismas imágenes, así que cualquier píxel distinto es un cambio de
+verdad. `comparar.py` necesita Pillow y sale con error si alguna escena cambia.
+
+No está en el CI: tarda unos tres minutos y solo tiene sentido en las PR que tocan CSS sin
+querer cambiar nada.
 
 ### Auditorías manuales
 
