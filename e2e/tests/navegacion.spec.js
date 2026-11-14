@@ -51,6 +51,10 @@ for (const ruta of PAGINAS_PUBLICAS) {
         expect(texto).not.toMatch(/500\+/);
         // Un solo h1 por página: el título de la página, no el logo.
         await expect(page.locator('h1')).toHaveCount(1);
+        // Y una sola zona principal y un solo pie: testimonios.html llegó a tener
+        // medio contenido repetido detrás del pie por un reemplazo mal hecho.
+        await expect(page.locator('main')).toHaveCount(1);
+        await expect(page.locator('footer.footer')).toHaveCount(1);
     });
 }
 

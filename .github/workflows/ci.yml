@@ -113,6 +113,14 @@ jobs:
       - name: Instalar age
         run: sudo apt-get update -qq && sudo apt-get install -y -qq age
 
+      # La cabecera y el pie se editan en plantillas/ y se copian a las 11 páginas.
+      # Si alguien toca una página a mano o se olvida de regenerar, falla aquí.
+      - name: Cabecera y pie al día con plantillas/
+        run: node scripts/plantillas.mjs --comprobar
+
+      - name: Probar plantillas.mjs
+        run: bash scripts/tests/plantillas.test.sh
+
       - name: Probar backup-db.sh
         run: bash scripts/tests/backup-db.test.sh
 

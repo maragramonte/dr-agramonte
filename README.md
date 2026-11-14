@@ -222,10 +222,11 @@ no arranca si faltan esas variables.
 ├── backend/          API Spring Boot (controller · service · repository · DTOs)
 │   └── src/main/resources/db/migration/   Flyway V1–V15 (postgresql/ y mysql/)
 ├── frontend/         Sitio estático, PWA y nginx.conf
+├── plantillas/       Cabecera y pie comunes a todas las páginas (scripts/plantillas.mjs)
 ├── e2e/              Pruebas E2E del frontend con Playwright
 ├── demo/             API simulada y landing de producto para GitHub Pages
 ├── postman/          Colección de la API
-├── scripts/          deploy.sh, backup-db.sh, build-demo.sh y capturar-pantallas.sh
+├── scripts/          deploy.sh, backup-db.sh, build-demo.sh, plantillas.mjs y capturar-pantallas.sh
 ├── docs/             Documentación, memoria del proyecto y diagramas
 ├── Caddyfile         HTTPS, apex → www y cabeceras de seguridad
 ├── docker-compose.yml        Local:  nginx · Spring Boot · PostgreSQL

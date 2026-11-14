@@ -49,11 +49,18 @@ que el navegador carga directamente. Vive en `frontend/`.
 
 | Carpeta | Contenido |
 |---------|-----------|
-| `frontend/*.html` | Las diez páginas del sitio, una por pantalla |
+| `frontend/*.html` | Las once páginas del sitio, una por pantalla |
 | `frontend/css/` | `dr-agramonte.css` (tokens y componentes), más hojas por página |
 | `frontend/js/modules/` | Piezas compartidas: cliente REST, i18n, plantillas, tema |
 | `frontend/js/pages/` | Un fichero por página, con su lógica propia |
 | `frontend/vendor/` | Tipografías, iconos y Chart.js autoalojados |
+
+La cabecera (con el menú) y el pie son iguales en todas las páginas. Se editan en
+`plantillas/cabecera.html` y `plantillas/pie.html`, fuera de `frontend/`, y
+`node scripts/plantillas.mjs` los copia en cada HTML entre las marcas
+`<!-- plantilla:… -->`. El resultado se sube al repositorio, así que la web sigue sin
+paso de compilación. El CI ejecuta `node scripts/plantillas.mjs --comprobar` y falla si
+alguna página no coincide con las plantillas.
 
 Los módulos compartidos que más peso tienen:
 
