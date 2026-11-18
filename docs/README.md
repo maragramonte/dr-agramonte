@@ -27,6 +27,8 @@ esencial. Aquí está el detalle, organizado por para qué sirve cada documento.
 | Documento | Contenido |
 |-----------|-----------|
 | [PRUEBAS-Y-CALIDAD.md](PRUEBAS-Y-CALIDAD.md) | Qué se comprueba y cómo, qué hace el CI y qué **no** queda cubierto |
+| [THREAT_MODEL.md](THREAT_MODEL.md) | Amenazas con STRIDE, qué las frena hoy, riesgos abiertos y datos personales (RGPD) |
+| [ASVS_CHECKLIST.md](ASVS_CHECKLIST.md) | Requisitos de OWASP ASVS que aplican, con su estado y el archivo o test que lo demuestra |
 | [DESPLIEGUE-VPS.md](DESPLIEGUE-VPS.md) | Puesta en producción en un VPS propio: Caddy y HTTPS, DNS, copias de seguridad y actualizaciones |
 | [DOCKER-TROUBLESHOOTING.md](DOCKER-TROUBLESHOOTING.md) | Arranque de Docker, errores 502 y healthchecks |
 
@@ -80,6 +82,7 @@ Si cambias el flujo de reservas, el panel o el esquema, actualiza en el mismo mo
 | Las variables de entorno | [CONFIGURACION.md](CONFIGURACION.md) y las dos plantillas `.env*.example` |
 | Una decisión de diseño | [DECISIONES-TECNICAS.md](DECISIONES-TECNICAS.md), con su evidencia |
 | Las pruebas o el CI | [PRUEBAS-Y-CALIDAD.md](PRUEBAS-Y-CALIDAD.md), incluido el recuento |
+| La autenticación, un endpoint o un canal de aviso | [THREAT_MODEL.md](THREAT_MODEL.md) y [ASVS_CHECKLIST.md](ASVS_CHECKLIST.md) |
 | **La interfaz** | Regenera las capturas: `./scripts/capturar-pantallas.sh` |
 | Cualquiera de lo anterior | La memoria LaTeX, y recompílala |
 
