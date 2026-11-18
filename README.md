@@ -242,6 +242,8 @@ no arranca si faltan esas variables.
 | [ARQUITECTURA.md](docs/ARQUITECTURA.md) | Cómo está construido: componentes, flujos y responsabilidades |
 | [DECISIONES-TECNICAS.md](docs/DECISIONES-TECNICAS.md) | Por qué se eligió cada solución, con alternativas y limitaciones |
 | [PRUEBAS-Y-CALIDAD.md](docs/PRUEBAS-Y-CALIDAD.md) | Qué se comprueba, cómo, y qué no queda cubierto |
+| [THREAT_MODEL.md](docs/THREAT_MODEL.md) | Amenazas, riesgos abiertos y datos personales (RGPD) |
+| [ASVS_CHECKLIST.md](docs/ASVS_CHECKLIST.md) | Requisitos de OWASP ASVS: qué se cumple y dónde se ve |
 | [API.md](docs/API.md) | Catálogo de endpoints, autenticación y códigos de estado |
 | [CONFIGURACION.md](docs/CONFIGURACION.md) | Variables de entorno, canales y bot de Telegram |
 | [BASE-DE-DATOS.md](docs/BASE-DE-DATOS.md) | Esquema, diagrama relacional, integridad y concurrencia |
