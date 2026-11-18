@@ -39,7 +39,7 @@
         <log4j2.version>2.25.4</log4j2.version>
         <mysql.version>26.10.0</mysql.version>
         <lombok.version>1.18.48</lombok.version>
-        <flyway.version>13.12.1</flyway.version>
+        <flyway.version>13.12.2</flyway.version>
         <testcontainers.version>1.21.4</testcontainers.version>
         <!-- docker-java más reciente que el que trae Testcontainers 1.21.x (3.4.2):
              necesario para hablar con Docker Engine 29 / API 1.54. -->
