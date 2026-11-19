@@ -13,6 +13,7 @@
     "visual:comparar": "python3 visual/comparar.py"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
     "@playwright/test": "1.62.1",
     "http-server": "14.1.1"
   }

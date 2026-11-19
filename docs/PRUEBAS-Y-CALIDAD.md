@@ -119,7 +119,7 @@ Viven en [`e2e/`](../e2e), fuera de `frontend/`. No es un capricho: `frontend/` 
 tal cual (nginx lo monta y el `Dockerfile` lo copia dentro del jar), así que un
 `node_modules` o un informe de pruebas ahí dentro acabaría servido en la web.
 
-Son 40 pruebas en seis ficheros:
+Son 47 pruebas en siete ficheros:
 
 | Fichero | Qué comprueba |
 |---------|---------------|
@@ -128,6 +128,7 @@ Son 40 pruebas en seis ficheros:
 | `portada.spec.js` (2) | Que sin agenda el recuadro del hero ofrece los centros en vez de un error, y que `reservar.html?centro=` marca el centro aunque no lleve fecha |
 | `letra-grande.spec.js` (6) | Que con la letra del navegador a 32 px ninguna página pública obliga a desplazarse en horizontal |
 | `calendario.spec.js` (4) | Con el reloj fijado en diciembre de 2026: que cada centro solo abre sus días, que el sábado y el domingo están cerrados, que la Inmaculada y Navidad salen tachadas y sin poder elegirse, que su nombre sale en catalán y en inglés, y que el pie ya no anuncia los sábados |
+| `accesibilidad.spec.js` (7) | Que axe-core no encuentra ninguna infracción de WCAG 2.1 A y AA en las siete páginas públicas. La primera pasada encontró tres: el enlace del logo se anunciaba con un nombre distinto del que se ve, los desplegables de especialista y tipo de consulta no tenían nombre, y la rejilla de opiniones decía ser una lista sin elementos |
 | `idiomas.spec.js` (12) | Que en castellano no se descargan las traducciones y en catalán sí, antes de pintar; que el botón cambia de idioma y se puede volver al castellano sin recargar, que la elección se recuerda entre páginas y con `?lang=`, que en inglés no queda texto en castellano en ocho páginas (salvo nombres propios y las opiniones de pacientes) y que el calendario y los días de los centros también cambian |
 
 Cada una corre dos veces, en un Chrome de escritorio y en un Pixel 7 emulado.
@@ -221,7 +222,7 @@ cobertura que no se corresponde:
 | **MySQL** | El perfil existe y tiene sus migraciones, pero **el CI solo prueba PostgreSQL**: cada migración de MySQL viaja sin verificar |
 | **Carga y rendimiento** | Sin medir. El bloqueo pesimista se ha probado correcto, no rápido |
 | **Entrega de notificaciones** | Se prueba que se construyen y se envían; no hay reintentos ni verificación de entrega real |
-| **Accesibilidad** | Auditada a mano en su momento (contraste, foco visible, `prefers-reduced-motion`), sin comprobación automática que lo defienda de una regresión |
+| **Accesibilidad** | axe-core revisa las páginas públicas en cada PR, pero solo en el tema claro y sin sesión. No sabe si un texto alternativo describe bien ni si el orden del foco tiene sentido, y nadie la ha probado con un lector de pantalla de verdad |
 
 ---
 
