@@ -13,9 +13,12 @@ export const MEDICO = { id: 1, nombre: 'Dr. Juan Manuel Agramonte', especialidad
  * @param {object} [opciones]
  * @param {string[]} [opciones.horasLibres] horas que la agenda devuelve como libres
  * @param {{status: number, message: string}} [opciones.errorAlReservar] fuerza un error en el POST
+ * @param {boolean} [opciones.otroLaCogeAntes] el POST responde 409 como el backend y la
+ *        hora deja de salir libre, como si otro paciente la hubiera reservado antes
  */
-export async function simularApi(page, { horasLibres = ['10:00', '10:30', '17:00'], errorAlReservar } = {}) {
+export async function simularApi(page, { horasLibres = ['10:00', '10:30', '17:00'], errorAlReservar, otroLaCogeAntes } = {}) {
     const registro = { reservas: [], noPrevistas: [] };
+    const ocupadas = new Set();
     const citas = new Map();
 
     await page.route('**/api/**', async (route) => {
@@ -29,13 +32,17 @@ export async function simularApi(page, { horasLibres = ['10:00', '10:30', '17:00
 
         if (metodo === 'GET' && ruta === '/disponibilidad') {
             const fecha = url.searchParams.get('fecha');
-            return json(horasLibres.map((h) => `${fecha}T${h}:00`));
+            return json(horasLibres.filter((h) => !ocupadas.has(h)).map((h) => `${fecha}T${h}:00`));
         }
 
         if (metodo === 'POST' && ruta === '/citas/reserva-publica') {
             const body = peticion.postDataJSON();
             registro.reservas.push(body);
             if (errorAlReservar) return json({ message: errorAlReservar.message }, errorAlReservar.status);
+            if (otroLaCogeAntes) {
+                ocupadas.add(body.fechaHora.slice(11, 16));
+                return json({ message: 'Horario no disponible' }, 409);
+            }
             const cita = {
                 id: 100 + registro.reservas.length,
                 fechaHora: body.fechaHora,

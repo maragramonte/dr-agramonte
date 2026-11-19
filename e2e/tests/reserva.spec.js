@@ -149,3 +149,23 @@ test('muestra el error del servidor si la hora ya está cogida', async ({ page }
     await expect(page.locator('#confirmModal')).not.toHaveClass(/open/);
     await expect(page.locator('#btnSubmit')).toBeEnabled();
 });
+
+test('si otro paciente coge la hora antes, se avisa y se enseñan las que quedan', async ({ page }) => {
+    await page.unrouteAll();
+    page.api = await simularApi(page, { otroLaCogeAntes: true });
+
+    await page.goto('/reservar.html');
+    await page.locator('#medicoSelect').selectOption(String(MEDICO.id));
+    await elegirCentroYFecha(page);
+    await page.locator('#slotsGrid .slot', { hasText: '10:00' }).click();
+    await rellenarDatos(page);
+    await page.locator('#acepto').check();
+    await page.locator('#btnSubmit').click();
+
+    // No se enseña el «Horario no disponible» del servidor, que no dice qué hacer.
+    await expect(page.locator('#toast')).toContainText('Esa hora se acaba de ocupar');
+    await expect(page.locator('#confirmModal')).not.toHaveClass(/open/);
+    await expect(page.locator('#slotsGrid .slot', { hasText: '10:00' })).toBeDisabled();
+    await expect(page.locator('#slotsGrid .slot.selected')).toHaveCount(0);
+    await expect(page.locator('#slotsGrid .slot', { hasText: '10:30' })).toBeEnabled();
+});

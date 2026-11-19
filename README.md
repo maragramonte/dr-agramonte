@@ -92,8 +92,8 @@ todas las decisiones visuales salen de ahí:
   competir con nada.
 - El doctor aparece en un dibujo a lápiz, no en una foto. Le da carácter a la web y no
   expone la imagen de nadie.
-- El objetivo de accesibilidad es WCAG 2.1 AA. Los contrastes están medidos, pero no ha
-  pasado una auditoría externa.
+- El objetivo de accesibilidad es WCAG 2.1 AA. Los contrastes están medidos y axe-core
+  revisa las páginas públicas en cada PR, pero no ha pasado una auditoría externa.
 
 Las pantallas, una a una, están en [docs/CAPTURAS.md](docs/CAPTURAS.md).
 
@@ -176,11 +176,11 @@ y Dependabot propone las actualizaciones de Maven, Docker y GitHub Actions. Cada
 Semgrep (reglas de Java y de secretos, de momento solo informativo) y cada semana gitleaks
 revisa todo el historial de git en busca de claves subidas por error.
 
-El frontend tiene 39 pruebas E2E con Playwright, y cada una se ejecuta en escritorio y en
+El frontend tiene 47 pruebas E2E con Playwright, y cada una se ejecuta en escritorio y en
 móvil. Cubren la reserva sin cuenta de principio a fin, que los pacientes no vean enlaces a
 las herramientas internas, que el calendario no deje elegir fines de semana ni festivos, la
 portada cuando la agenda no responde, que ninguna página se salga de la pantalla con la
-letra del navegador al doble y que al pasar a inglés no quede texto en castellano. La API está simulada en el navegador, así que no hace falta backend.
+letra del navegador al doble, que axe-core no encuentre infracciones de WCAG 2.1 AA y que al pasar a inglés no quede texto en castellano. La API está simulada en el navegador, así que no hace falta backend.
 
 Lo que falta: la cobertura no está medida (no hay JaCoCo, así que no hay porcentaje). El
 login, «Mis citas» y el panel del médico no tienen pruebas en el frontend. Ninguna prueba

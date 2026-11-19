@@ -651,6 +651,24 @@ async function renderSlotsFromBackend() {
     }
 }
 
+// Un 409 al reservar puede venir de la hora (otro paciente la ha cogido mientras
+// este rellenaba el formulario) o del email. Para no depender del texto que
+// mande el servidor, se vuelve a pedir la agenda: si la hora ya no sale libre,
+// el problema era la hora. Si la agenda no responde, se trata como un 409 más.
+async function horaElegidaYaOcupada() {
+    if (!state.hour || !state.dateISO || !state.medicoId) return false;
+    try {
+        const horarios = await apiClient.getDisponibilidad(state.medicoId, state.centroId, state.dateISO);
+        const libres = (horarios || []).map((iso) => {
+            const d = new Date(iso);
+            return Number.isNaN(d.getTime()) ? null : formatIsoTime(d);
+        });
+        return !libres.includes(state.hour);
+    } catch {
+        return false;
+    }
+}
+
 async function selectDate(iso, btn) {
     document.querySelectorAll('.cal-day.selected').forEach((b) => b.classList.remove('selected'));
     btn.classList.add('selected');
@@ -866,6 +884,15 @@ async function onSubmit(e) {
         renderCalendar();
     } catch (err) {
         console.error(err);
+        if (err.status === 409 && await horaElegidaYaOcupada()) {
+            state.hour = null;
+            $('hiddenHora').value = '';
+            await renderSlotsFromBackend();
+            updateSummaryChip();
+            setStep(3);
+            showToast(T('js.res.horaOcupada', 'Esa hora se acaba de ocupar. Le marcamos las que siguen libres para que elija otra'), 'warning');
+            return;
+        }
         showToast(err.message || T('js.res.errorGuardar', 'No hemos podido guardar la reserva. Pruebe de nuevo en unos minutos'), 'error');
     } finally {
         btn.disabled = false; btn.classList.remove('loading');

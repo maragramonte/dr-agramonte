@@ -41,7 +41,7 @@
     <div class="container">
         <div class="header-content">
             <div class="logo-section">
-                <a href="index.html" class="logo-link" aria-label="Inicio - Dr. Agramonte" data-i18n-attr="aria-label:t.inicio-dr-agramonte">
+                <a href="index.html" class="logo-link">
                     <div class="logo-text">
                         <p class="logo-title">Dr. Agramonte</p>
                         <p class="logo-subtitle" data-i18n="logo.subtitle">Especialista en Medicina Interna</p>
@@ -188,9 +188,9 @@
 
                         <!-- Especialista -->
                         <div class="form-section">
-                            <p class="form-section-title" data-i18n="t.especialista">Especialista</p>
+                            <p class="form-section-title" id="tituloEspecialista" data-i18n="t.especialista">Especialista</p>
                             <div class="field">
-                                <select id="medicoSelect" required aria-describedby="medicoHelp">
+                                <select id="medicoSelect" aria-labelledby="tituloEspecialista" required aria-describedby="medicoHelp">
                                     <option value="" data-i18n="t.cargando-la-agenda">Cargando la agenda…</option>
                                 </select>
                                 <small id="medicoHelp" class="field-hint" data-i18n="t.seleccione-el-especialista-para-ver-su">Seleccione el especialista para ver su agenda.</small>
@@ -199,9 +199,9 @@
 
                         <!-- Tipo de consulta -->
                         <div class="form-section">
-                            <p class="form-section-title" data-i18n="t.tipo-de-consulta">Tipo de consulta</p>
+                            <p class="form-section-title" id="tituloTipoConsulta" data-i18n="t.tipo-de-consulta">Tipo de consulta</p>
                             <div class="field">
-                                <select id="tipoConsulta" required>
+                                <select id="tipoConsulta" aria-labelledby="tituloTipoConsulta" required>
                                     <option value="" data-i18n="t.seleccione-2">Seleccione...</option>
                                     <option value="primera-visita" data-i18n="t.primera-visita">Primera visita</option>
                                     <option value="revision" data-i18n="t.revision">Revisión</option>
