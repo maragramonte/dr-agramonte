@@ -7,4 +7,4 @@ Allow: /
 # si entra a rastrear la página. Bloqueada en robots.txt, la URL podría acabar
 # listada igualmente en cuanto alguien la enlazara.
 
-Sitemap: https://maragramonte.github.io/dr-agramonte/app/sitemap.xml
+Sitemap: https://demo-dragramonte.maragramonte.com/app/sitemap.xml

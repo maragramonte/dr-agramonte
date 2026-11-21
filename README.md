@@ -28,8 +28,8 @@ mucha gente acaba llamando igual.
 
 ## Probarlo
 
-[Demo en línea](https://maragramonte.github.io/dr-agramonte/): una presentación del
-producto y, bajo [`/app/`](https://maragramonte.github.io/dr-agramonte/app/), la aplicación
+[Demo en línea](https://demo-dragramonte.maragramonte.com/): una presentación del
+producto y, bajo [`/app/`](https://demo-dragramonte.maragramonte.com/app/), la aplicación
 real con una API simulada en el navegador.
 
 > La demo no tiene servidor detrás. Los datos son ficticios, se guardan en tu navegador y no

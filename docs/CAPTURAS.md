@@ -1,7 +1,7 @@
 # La aplicación, pantalla a pantalla
 
 Un recorrido por la aplicación para quien prefiera verla sin tocar nada. Si quieres probarla
-tú, la [demo pública](https://maragramonte.github.io/dr-agramonte/) es el mismo frontend con
+tú, la [demo pública](https://demo-dragramonte.maragramonte.com/) es el mismo frontend con
 una API simulada en el navegador.
 
 Las capturas salen de esa misma compilación de la demo, así que la interfaz es la real

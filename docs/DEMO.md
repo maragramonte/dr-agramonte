@@ -1,6 +1,6 @@
 # La demo pública
 
-<https://maragramonte.github.io/dr-agramonte/>
+<https://demo-dragramonte.maragramonte.com/>
 
 Qué es, qué puede demostrar y qué no, y cómo construirla en local.
 

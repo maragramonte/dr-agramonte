@@ -196,7 +196,7 @@ jobs:
           unzip -p app.jar "$estaticos/sitemap.xml" | grep -q '<loc>https://www.ejemplo.test/</loc>'
           unzip -p app.jar "$estaticos/robots.txt" | grep -q '^Sitemap: https://www.ejemplo.test/sitemap.xml'
           if unzip -p app.jar "$estaticos/*.html" "$estaticos/sitemap.xml" "$estaticos/robots.txt" \
-              | grep -q 'maragramonte.github.io/dr-agramonte/app'; then
+              | grep -q 'demo-dragramonte.maragramonte.com/app'; then
             echo "Queda alguna URL de la demo en la imagen de producción" >&2
             exit 1
           fi

@@ -40,7 +40,7 @@ public class CorreoSaliente {
      * porque un enlace que apunte a localhost no sirve de nada dentro de un correo. Un
      * despliegue real define {@code APP_URL_PUBLICA}.
      */
-    @Value("${app.url-publica:https://maragramonte.github.io/dr-agramonte/app}")
+    @Value("${app.url-publica:https://demo-dragramonte.maragramonte.com/app}")
     private String urlPublica;
 
     public CorreoSaliente(@Autowired(required = false) JavaMailSender mailSender) {
