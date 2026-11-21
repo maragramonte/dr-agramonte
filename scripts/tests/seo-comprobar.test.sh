@@ -29,7 +29,7 @@ grep -q "servicios.html: título" <<<"$salida" || fallo "no dice qué página ti
 echo "✓ detecta un título demasiado largo"
 
 preparar
-sed -i 's#</urlset>#  <url><loc>https://maragramonte.github.io/dr-agramonte/app/testimonios.html</loc></url>\n</urlset>#' "$TMP/f/sitemap.xml"
+sed -i 's#</urlset>#  <url><loc>https://demo-dragramonte.maragramonte.com/app/testimonios.html</loc></url>\n</urlset>#' "$TMP/f/sitemap.xml"
 if salida=$(comprobar 2>&1); then fallo "no detecta una página noindex en el sitemap"; fi
 grep -q "testimonios.html: lleva noindex" <<<"$salida" || fallo "no dice qué página sobra en el sitemap"
 echo "✓ detecta una página con noindex en el sitemap"

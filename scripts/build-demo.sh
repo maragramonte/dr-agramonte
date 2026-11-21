@@ -24,7 +24,7 @@ APP="$OUT/app"
 # sobrescribir desde el entorno el día que el producto tenga dominio propio:
 #   BASE_URL=https://ejemplo.com/ ./scripts/build-demo.sh
 # La barra final importa: el sitemap concatena sobre ella.
-BASE_URL="${BASE_URL:-https://maragramonte.github.io/dr-agramonte/}"
+BASE_URL="${BASE_URL:-https://demo-dragramonte.maragramonte.com/}"
 BASE_URL="${BASE_URL%/}/"
 
 rm -rf "$OUT"

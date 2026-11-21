@@ -14,7 +14,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
 const dir = resolve(process.argv[2] || 'frontend');
-const BASE = 'https://maragramonte.github.io/dr-agramonte/app/';
+const BASE = 'https://demo-dragramonte.maragramonte.com/app/';
 
 const sitemap = readFileSync(join(dir, 'sitemap.xml'), 'utf8');
 const enSitemap = new Set([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]));

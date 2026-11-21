@@ -24,7 +24,7 @@ RUN if [ -n "$URL_PUBLICA" ]; then \
       case "$URL_PUBLICA" in https://*) ;; *) echo "URL_PUBLICA debe empezar por https://" >&2; exit 1 ;; esac; \
       base="${URL_PUBLICA%/}"; \
       find src/main/resources/static -maxdepth 1 \( -name '*.html' -o -name sitemap.xml -o -name robots.txt \) \
-        -exec sed -i "s#https://maragramonte.github.io/dr-agramonte/app#${base}#g" {} +; \
+        -exec sed -i "s#https://demo-dragramonte.maragramonte.com/app#${base}#g" {} +; \
     fi
 
 RUN mvn -DskipTests package
