@@ -176,6 +176,12 @@ y Dependabot propone las actualizaciones de Maven, Docker y GitHub Actions. Cada
 Semgrep (reglas de Java y de secretos, de momento solo informativo) y cada semana gitleaks
 revisa todo el historial de git en busca de claves subidas por error.
 
+Cada PR recibe además un comentario de un revisor automático que usa la API de Claude
+(`.github/scripts/revision_ia.py`). Le paso el diff y el contexto del proyecto, y señala
+riesgos que un test no ve. Va aparte del CI y nunca bloquea el merge: si la API falla o
+no hay clave, avisa y termina en verde. El revisor tiene sus propias 15 pruebas, que se
+ejecutan antes, y si fallan no se publica nada en la PR.
+
 El frontend tiene 47 pruebas E2E con Playwright, y cada una se ejecuta en escritorio y en
 móvil. Cubren la reserva sin cuenta de principio a fin, que los pacientes no vean enlaces a
 las herramientas internas, que el calendario no deje elegir fines de semana ni festivos, la
